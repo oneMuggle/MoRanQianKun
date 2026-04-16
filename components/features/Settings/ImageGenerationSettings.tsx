@@ -519,6 +519,7 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
             功能模型占位: {
                 ...prev.功能模型占位,
                 场景生图独立接口启用: checked,
+                场景生图使用配置ID: checked ? prev.功能模型占位.场景生图使用配置ID : null,
                 场景生图后端类型: checked
                     ? prev.功能模型占位.场景生图后端类型
                     : prev.功能模型占位.场景生图后端类型,
@@ -1411,102 +1412,29 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
                         {form.功能模型占位.场景生图独立接口启用 && (
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-sky-200">场景后端类型</label>
+                                    <label className="text-sm font-bold text-sky-200">选择配置</label>
                                     <InlineSelect
-                                        value={form.功能模型占位.场景生图后端类型}
-                                        options={文生图后端选项}
-                                        onChange={(value) => updatePlaceholder('场景生图后端类型', value as 功能模型占位配置结构['文生图后端类型'])}
+                                        value={form.功能模型占位.场景生图使用配置ID || ''}
+                                        options={文生图配置列表.map((cfg) => ({ value: cfg.id, label: cfg.名称 }))}
+                                        onChange={(id) => {
+                                            if (!id) {
+                                                updatePlaceholder('场景生图使用配置ID', null);
+                                                return;
+                                            }
+                                            const selected = 文生图配置列表.find((cfg) => cfg.id === id);
+                                            if (selected) {
+                                                updatePlaceholder('场景生图使用配置ID', id);
+                                                updatePlaceholder('场景生图后端类型', selected.后端类型);
+                                                updatePlaceholder('场景生图模型API地址', selected.API地址);
+                                                updatePlaceholder('场景生图模型API密钥', selected.API密钥);
+                                                updatePlaceholder('场景生图模型使用模型', selected.模型);
+                                                updatePlaceholder('场景ComfyUI工作流JSON', selected.ComfyUI工作流JSON);
+                                            }
+                                        }}
                                         buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                        placeholder="选择配置"
                                     />
                                 </div>
-
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-sky-200">场景 API 地址</label>
-                                        <input
-                                            type="text"
-                                            value={form.功能模型占位.场景生图模型API地址}
-                                            onChange={(e) => updatePlaceholder('场景生图模型API地址', e.target.value)}
-                                            placeholder={当前场景后端 === 'novelai'
-                                                ? 'https://image.novelai.net'
-                                                : 当前场景后端 === 'sd_webui'
-                                                    ? '例如：http://127.0.0.1:7860'
-                                                    : 当前场景后端 === 'comfyui'
-                                                        ? '例如：http://127.0.0.1:8188'
-                                                        : 'https://api.openai.com/v1'}
-                                            className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-sky-400"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-sky-200">{当前场景后端 === 'novelai' ? '场景 Token' : '场景 API Key'}</label>
-                                        <input
-                                            type="password"
-                                            value={form.功能模型占位.场景生图模型API密钥}
-                                            onChange={(e) => updatePlaceholder('场景生图模型API密钥', e.target.value)}
-                                            placeholder={当前场景后端 === 'sd_webui' || 当前场景后端 === 'comfyui'
-                                                ? '可留空；默认不会发送 Authorization'
-                                                : 当前场景后端 === 当前后端
-                                                    ? (当前场景后端 === 'novelai' ? '留空则沿用主文生图 Token' : '留空则沿用主文生图 API Key')
-                                                    : (当前场景后端 === 'novelai' ? '当前后端不同，建议填写独立 Token' : '当前后端不同，建议填写独立 API Key')}
-                                            className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-sky-400"
-                                        />
-                                    </div>
-                                </div>
-
-                                {图片后端需要模型选择(当前场景后端) ? (
-                                    <>
-                                        <div className="flex flex-col gap-3 md:flex-row md:items-end">
-                                            <div className="flex-1 space-y-2">
-                                                <label className="text-sm font-bold text-sky-200">场景模型名称</label>
-                                                <InlineSelect
-                                                    value={form.功能模型占位.场景生图模型使用模型}
-                                                    options={场景文生图模型选项.map((model) => ({ value: model, label: model }))}
-                                                    onChange={(model) => updatePlaceholder('场景生图模型使用模型', model)}
-                                                    placeholder="请选择或输入场景模型"
-                                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
-                                                    panelClassName="max-w-full"
-                                                />
-                                            </div>
-                                            <GameButton
-                                                onClick={() => handleFetchModels('场景生图模型使用模型', '场景模型列表')}
-                                                variant="secondary"
-                                                className="px-4 py-2 text-xs md:min-w-[96px]"
-                                                disabled={modelLoading.场景生图模型使用模型}
-                                            >
-                                                {modelLoading.场景生图模型使用模型 ? '...' : '获取列表'}
-                                            </GameButton>
-                                        </div>
-
-                                        <input
-                                            type="text"
-                                            value={form.功能模型占位.场景生图模型使用模型}
-                                            onChange={(e) => updatePlaceholder('场景生图模型使用模型', e.target.value)}
-                                            placeholder="例如：nai-diffusion-4-5-full / gpt-image-1"
-                                            className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-sky-400"
-                                        />
-                                    </>
-                                ) : (
-                                    <div className="rounded-xl border border-sky-500/20 bg-sky-950/10 px-4 py-3 text-sm text-sky-100">
-                                        当前场景后端直接调用固定生图接口，不需要选择模型名称。
-                                    </div>
-                                )}
-
-                                {当前场景后端 === 'comfyui' && (
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-sky-200">场景 ComfyUI Workflow JSON</label>
-                                        <textarea
-                                            value={form.功能模型占位.场景ComfyUI工作流JSON}
-                                            onChange={(e) => updatePlaceholder('场景ComfyUI工作流JSON', e.target.value)}
-                                            rows={12}
-                                            placeholder={'可留空以沿用主文生图 ComfyUI workflow。\n可用占位符：__PROMPT__、__NEGATIVE_PROMPT__、__WIDTH__、__HEIGHT__'}
-                                            className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 font-mono text-white outline-none transition-all focus:border-sky-400 resize-y"
-                                        />
-                                        <div className="rounded-xl border border-sky-500/20 bg-sky-950/10 px-4 py-3 text-xs leading-6 text-sky-100">
-                                            场景独立接口使用原生 ComfyUI workflow；留空时，如果与主文生图后端同为 ComfyUI，会自动沿用主 workflow。
-                                            支持占位符：{ComfyUI工作流占位提示}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         )}
 

@@ -279,6 +279,7 @@ export interface 功能模型占位配置结构 {
     文生图模型API密钥: string;
     ComfyUI工作流JSON: string;
     场景生图独立接口启用: boolean;
+    场景生图使用配置ID: string | null;
     场景生图后端类型: 文生图后端类型;
     场景生图模型使用模型: string;
     场景生图模型API地址: string;
