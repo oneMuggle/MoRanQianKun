@@ -1,0 +1,880 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { 接口设置结构, 单接口配置结构, 功能模型占位配置结构 } from '../../../types';
+import GameButton from '../../ui/GameButton';
+import ToggleSwitch from '../../ui/ToggleSwitch';
+import InlineSelect from '../../ui/InlineSelect';
+import { 规范化接口设置 } from '../../../utils/apiConfig';
+import { 默认文章优化提示词 } from '../../../prompts/runtime/defaults';
+
+interface Props {
+    settings: 接口设置结构;
+    onSave: (settings: 接口设置结构) => void;
+}
+
+type SubTab = 'recall' | 'memory_summary' | 'variable' | 'planning' | 'polish' | 'world_evolution';
+
+const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
+    const [form, setForm] = useState<接口设置结构>(() => 规范化接口设置(settings));
+    const [modelOptions, setModelOptions] = useState<string[]>([]);
+    const [loadingModels, setLoadingModels] = useState(false);
+    const [message, setMessage] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [activeSubTab, setActiveSubTab] = useState<SubTab>('memory_summary');
+
+    useEffect(() => {
+        const normalized = 规范化接口设置(settings);
+        setForm(normalized);
+        setModelOptions([]);
+    }, [settings]);
+
+    const activeConfig = useMemo<单接口配置结构 | null>(() => {
+        if (!form.configs.length) return null;
+        const selected = form.configs.find((cfg) => cfg.id === form.activeConfigId);
+        return selected || form.configs[0] || null;
+    }, [form.activeConfigId, form.configs]);
+
+    const 主剧情解析模型 = useMemo(() => {
+        return (form.功能模型占位.主剧情使用模型 || '').trim();
+    }, [form.功能模型占位.主剧情使用模型]);
+
+    const updatePlaceholder = <K extends keyof 功能模型占位配置结构>(key: K, value: 功能模型占位配置结构[K]) => {
+        setForm((prev) => ({
+            ...prev,
+            功能模型占位: {
+                ...prev.功能模型占位,
+                [key]: value
+            }
+        }));
+    };
+
+    const fetchModelsFromCurrentConfig = async (useIndependent: boolean, independentApiUrl: string, independentApiKey: string): Promise<string[] | null> => {
+        const resolvedBaseUrl = useIndependent && independentApiUrl
+            ? independentApiUrl
+            : (activeConfig?.baseUrl || '');
+        const resolvedApiKey = useIndependent && independentApiKey
+            ? independentApiKey
+            : (activeConfig?.apiKey || '');
+        if (!resolvedApiKey || !resolvedBaseUrl) {
+            setMessage('请先填写可用的 API Key 与 Base URL（支持独立密钥）。');
+            return null;
+        }
+        try {
+            const base = resolvedBaseUrl.replace(/\/+$/, '');
+            const normalized = base.replace(/\/v1$/i, '');
+            const candidateUrls = Array.from(new Set([
+                `${normalized}/v1/models`,
+                `${normalized}/models`,
+                `${base}/models`
+            ]));
+            for (const url of candidateUrls) {
+                const res = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${resolvedApiKey}`
+                    }
+                });
+                if (!res.ok) continue;
+                const data = await res.json();
+                if (data && Array.isArray(data.data)) {
+                    return data.data.map((m: any) => m?.id).filter(Boolean);
+                }
+            }
+            setMessage('获取失败：返回格式错误。');
+            return null;
+        } catch (error: any) {
+            setMessage(`获取失败：${error.message}`);
+            return null;
+        }
+    };
+
+    const handleFetchModels = async () => {
+        setLoadingModels(true);
+        setMessage('');
+        
+        let currentModelKey = '';
+        let currentApiUrl = '';
+        let currentApiKey = '';
+        
+        if (activeSubTab === 'recall') {
+            currentModelKey = '剧情回忆';
+            currentApiUrl = form.功能模型占位.剧情回忆API地址 || '';
+            currentApiKey = form.功能模型占位.剧情回忆API密钥 || '';
+        } else if (activeSubTab === 'memory_summary') {
+            currentModelKey = '记忆总结';
+            currentApiUrl = form.功能模型占位.记忆总结API地址 || '';
+            currentApiKey = form.功能模型占位.记忆总结API密钥 || '';
+        } else if (activeSubTab === 'variable') {
+            currentModelKey = '变量生成';
+            currentApiUrl = form.功能模型占位.变量计算API地址 || '';
+            currentApiKey = form.功能模型占位.变量计算API密钥 || '';
+        } else if (activeSubTab === 'planning') {
+            currentModelKey = '规划分析';
+            currentApiUrl = form.功能模型占位.规划分析API地址 || '';
+            currentApiKey = form.功能模型占位.规划分析API密钥 || '';
+        } else if (activeSubTab === 'polish') {
+            currentModelKey = '文章优化';
+            currentApiUrl = form.功能模型占位.文章优化API地址 || '';
+            currentApiKey = form.功能模型占位.文章优化API密钥 || '';
+        } else if (activeSubTab === 'world_evolution') {
+            currentModelKey = '世界演变';
+            currentApiUrl = form.功能模型占位.世界演变API地址 || '';
+            currentApiKey = form.功能模型占位.世界演变API密钥 || '';
+        }
+        
+        const isIndependent = activeSubTab === 'recall'
+            ? Boolean(form.功能模型占位.剧情回忆独立模型开关)
+            : activeSubTab === 'memory_summary'
+            ? Boolean(form.功能模型占位.记忆总结独立模型开关)
+            : activeSubTab === 'variable'
+            ? Boolean(form.功能模型占位.变量计算独立模型开关)
+            : activeSubTab === 'planning'
+            ? Boolean(form.功能模型占位.规划分析独立模型开关)
+            : activeSubTab === 'polish'
+            ? Boolean(form.功能模型占位.文章优化独立模型开关)
+            : Boolean(form.功能模型占位.世界演变独立模型开关);
+            
+        const models = await fetchModelsFromCurrentConfig(isIndependent, currentApiUrl, currentApiKey);
+        if (models) {
+            setModelOptions(models);
+            setMessage(`${currentModelKey}模型列表获取成功。`);
+        }
+        setLoadingModels(false);
+    };
+
+    const 记忆总结独立开启 = Boolean(form.功能模型占位.记忆总结独立模型开关);
+    const 记忆总结API地址 = (form.功能模型占位.记忆总结API地址 || '').trim();
+    const 记忆总结API密钥 = (form.功能模型占位.记忆总结API密钥 || '').trim();
+
+    const handleToggleMemorySummary = (checked: boolean) => {
+        setForm((prev) => {
+            const currentModel = (prev.功能模型占位.记忆总结使用模型 || '').trim();
+            return {
+                ...prev,
+                功能模型占位: {
+                    ...prev.功能模型占位,
+                    记忆总结独立模型开关: checked,
+                    记忆总结使用模型: checked ? (currentModel || 主剧情解析模型 || '') : ''
+                }
+            };
+        });
+    };
+
+    const 文章优化独立开启 = Boolean(form.功能模型占位.文章优化独立模型开关);
+    const 文章优化API地址 = (form.功能模型占位.文章优化API地址 || '').trim();
+    const 文章优化API密钥 = (form.功能模型占位.文章优化API密钥 || '').trim();
+
+    const handleTogglePolish = (checked: boolean) => {
+        setForm((prev) => {
+            const currentModel = (prev.功能模型占位.文章优化使用模型 || '').trim();
+            return {
+                ...prev,
+                功能模型占位: {
+                    ...prev.功能模型占位,
+                    文章优化独立模型开关: checked,
+                    文章优化使用模型: checked ? (currentModel || 主剧情解析模型 || '') : ''
+                }
+            };
+        });
+    };
+
+    const 剧情回忆独立开启 = Boolean(form.功能模型占位.剧情回忆独立模型开关);
+    const 剧情回忆API地址 = (form.功能模型占位.剧情回忆API地址 || '').trim();
+    const 剧情回忆API密钥 = (form.功能模型占位.剧情回忆API密钥 || '').trim();
+
+    const handleToggleRecall = (checked: boolean) => {
+        setForm((prev) => {
+            const currentModel = (prev.功能模型占位.剧情回忆使用模型 || '').trim();
+            return {
+                ...prev,
+                功能模型占位: {
+                    ...prev.功能模型占位,
+                    剧情回忆独立模型开关: checked,
+                    剧情回忆使用模型: checked ? (currentModel || 主剧情解析模型 || '') : ''
+                }
+            };
+        });
+    };
+
+    const 变量计算独立开启 = Boolean(form.功能模型占位.变量计算独立模型开关);
+    const 变量计算API地址 = (form.功能模型占位.变量计算API地址 || '').trim();
+    const 变量计算API密钥 = (form.功能模型占位.变量计算API密钥 || '').trim();
+
+    const handleToggleVariable = (checked: boolean) => {
+        setForm((prev) => {
+            return {
+                ...prev,
+                功能模型占位: {
+                    ...prev.功能模型占位,
+                    变量计算独立模型开关: checked,
+                    变量计算使用模型: (prev.功能模型占位.变量计算使用模型 || '').trim() || 主剧情解析模型 || ''
+                }
+            };
+        });
+    };
+
+    const 规划分析独立开启 = Boolean(form.功能模型占位.规划分析独立模型开关);
+    const 规划分析API地址 = (form.功能模型占位.规划分析API地址 || '').trim();
+    const 规划分析API密钥 = (form.功能模型占位.规划分析API密钥 || '').trim();
+
+    const handleTogglePlanning = (checked: boolean) => {
+        setForm((prev) => ({
+            ...prev,
+            功能模型占位: {
+                ...prev.功能模型占位,
+                规划分析独立模型开关: checked,
+                规划分析使用模型: (prev.功能模型占位.规划分析使用模型 || '').trim() || 主剧情解析模型 || ''
+            }
+        }));
+    };
+
+    const 世界演变独立开启 = Boolean(form.功能模型占位.世界演变独立模型开关);
+    const 世界演变API地址 = (form.功能模型占位.世界演变API地址 || '').trim();
+    const 世界演变API密钥 = (form.功能模型占位.世界演变API密钥 || '').trim();
+
+    const handleToggleWorldEvolution = (checked: boolean) => {
+        setForm((prev) => {
+            const currentModel = (prev.功能模型占位.世界演变使用模型 || '').trim();
+            return {
+                ...prev,
+                功能模型占位: {
+                    ...prev.功能模型占位,
+                    世界演变独立模型开关: checked,
+                    世界演变使用模型: checked ? (currentModel || 主剧情解析模型 || '') : ''
+                }
+            };
+        });
+    };
+
+    const handleSave = () => {
+        const normalized = 规范化接口设置(form);
+        onSave(normalized);
+        setForm(normalized);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+    };
+
+    const subTabs = [
+        { id: 'recall' as const, label: '剧情回忆' },
+        { id: 'memory_summary' as const, label: '记忆总结' },
+        { id: 'variable' as const, label: '变量生成' },
+        { id: 'planning' as const, label: '规划分析' },
+        { id: 'polish' as const, label: '文章优化' },
+        { id: 'world_evolution' as const, label: '世界演变' }
+    ];
+
+    const renderSubContent = () => {
+        if (activeSubTab === 'recall') {
+            const modelValue = (form.功能模型占位.剧情回忆使用模型 || '').trim();
+            const modelDisplay = 剧情回忆独立开启 ? modelValue : 主剧情解析模型;
+            const selectOptions = Array.from(new Set([
+                ...modelOptions,
+                modelValue,
+                主剧情解析模型
+            ].map((item) => (item || '').trim()).filter(Boolean)));
+
+            return (
+                <div className="space-y-4">
+                    <div className="text-[11px] text-gray-400">
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。可为剧情回忆单独指定 Base URL 与 API Key；留空时复用主配置。
+                    </div>
+
+                    <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                        <span>开启剧情回忆独立模型</span>
+                        <ToggleSwitch
+                            checked={剧情回忆独立开启}
+                            onChange={handleToggleRecall}
+                            ariaLabel="切换剧情回忆独立模型"
+                        />
+                    </label>
+
+                    <div className="flex gap-3 items-end">
+                        <div className="flex-1 space-y-1">
+                            <label className="text-xs text-gray-300">剧情回忆使用模型</label>
+                            <InlineSelect
+                                value={modelDisplay}
+                                options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                onChange={(model) => updatePlaceholder('剧情回忆使用模型', model)}
+                                disabled={!剧情回忆独立开启 || selectOptions.length === 0}
+                                placeholder={!剧情回忆独立开启
+                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
+                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
+                                buttonClassName={剧情回忆独立开启
+                                    ? 'bg-black/50 border-gray-600 py-2.5'
+                                    : 'bg-black/30 border-gray-700 py-2.5'}
+                            />
+                        </div>
+                        <GameButton
+                            onClick={handleFetchModels}
+                            variant="secondary"
+                            className="px-4 py-2 text-xs"
+                            disabled={loadingModels}
+                        >
+                            {loadingModels ? '...' : '获取列表'}
+                        </GameButton>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">剧情回忆独立 API 地址（可选）</label>
+                        <input
+                            type="text"
+                            value={form.功能模型占位.剧情回忆API地址 || ''}
+                            onChange={(e) => updatePlaceholder('剧情回忆API地址', e.target.value)}
+                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                            disabled={!剧情回忆独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                剧情回忆独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅剧情回忆请求改用此地址。</div>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">剧情回忆独立 API 密钥（可选）</label>
+                        <input
+                            type="password"
+                            value={form.功能模型占位.剧情回忆API密钥 || ''}
+                            onChange={(e) => updatePlaceholder('剧情回忆API密钥', e.target.value)}
+                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
+                            disabled={!剧情回忆独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                剧情回忆独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后剧情回忆请求优先使用该密钥。</div>
+                    </div>
+
+                    {!剧情回忆独立开启 && (
+                        <div className="text-[11px] text-gray-400">当前状态：剧情回忆检索关闭</div>
+                    )}
+
+                    <div className="rounded-md border border-wuxia-cyan/25 bg-black/20 p-4 space-y-4">
+                        <div className="text-xs text-wuxia-cyan font-bold">剧情回忆检索策略（本地设置）</div>
+                        <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                            <span>静默操作（不弹确认，自动附加回忆）</span>
+                            <ToggleSwitch
+                                checked={Boolean(form.功能模型占位.剧情回忆静默确认)}
+                                onChange={(next) => updatePlaceholder('剧情回忆静默确认', next)}
+                                ariaLabel="切换剧情回忆静默操作"
+                            />
+                        </label>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-300">完整原文回忆条数（最近 N 条）</label>
+                            <input
+                                type="number"
+                                min={1}
+                                max={100}
+                                value={Number(form.功能模型占位.剧情回忆完整原文条数N || 20)}
+                                onChange={(e) => updatePlaceholder('剧情回忆完整原文条数N', Math.max(1, Number(e.target.value) || 20))}
+                                className="w-full bg-black/50 border border-gray-700 p-2 text-white rounded-md outline-none focus:border-wuxia-gold"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-300">在第几回合前不触发剧情回忆检索</label>
+                            <input
+                                type="number"
+                                min={1}
+                                max={9999}
+                                value={Number(form.功能模型占位.剧情回忆最早触发回合 || 10)}
+                                onChange={(e) => updatePlaceholder('剧情回忆最早触发回合', Math.max(1, Number(e.target.value) || 10))}
+                                className="w-full bg-black/50 border border-gray-700 p-2 text-white rounded-md outline-none focus:border-wuxia-gold"
+                            />
+                            <div className="text-[11px] text-gray-500">例如填写 6，则回合 1-5 不调用剧情回忆 API，从第 6 回合开始启用。</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        if (activeSubTab === 'memory_summary') {
+            const modelValue = (form.功能模型占位.记忆总结使用模型 || '').trim();
+            const modelDisplay = 记忆总结独立开启 ? modelValue : 主剧情解析模型;
+            const selectOptions = Array.from(new Set([
+                ...modelOptions,
+                modelValue,
+                主剧情解析模型
+            ].map((item) => (item || '').trim()).filter(Boolean)));
+
+            return (
+                <div className="space-y-4">
+                    <div className="text-[11px] text-gray-400">
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。该设置同时作用于"短期转中期""中期转长期"以及 NPC 记忆总结流程；留空时复用主配置。
+                    </div>
+
+                    <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                        <span>开启记忆总结独立模型</span>
+                        <ToggleSwitch
+                            checked={记忆总结独立开启}
+                            onChange={handleToggleMemorySummary}
+                            ariaLabel="切换记忆总结独立模型"
+                        />
+                    </label>
+
+                    <div className="flex gap-3 items-end">
+                        <div className="flex-1 space-y-1">
+                            <label className="text-xs text-gray-300">记忆总结使用模型</label>
+                            <InlineSelect
+                                value={modelDisplay}
+                                options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                onChange={(model) => updatePlaceholder('记忆总结使用模型', model)}
+                                disabled={!记忆总结独立开启 || selectOptions.length === 0}
+                                placeholder={!记忆总结独立开启
+                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
+                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
+                                buttonClassName={记忆总结独立开启
+                                    ? 'bg-black/50 border-gray-600 py-2.5'
+                                    : 'bg-black/30 border-gray-700 py-2.5'}
+                            />
+                        </div>
+                        <GameButton
+                            onClick={handleFetchModels}
+                            variant="secondary"
+                            className="px-4 py-2 text-xs"
+                            disabled={loadingModels}
+                        >
+                            {loadingModels ? '...' : '获取列表'}
+                        </GameButton>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">记忆总结独立 API 地址（可选）</label>
+                        <input
+                            type="text"
+                            value={form.功能模型占位.记忆总结API地址 || ''}
+                            onChange={(e) => updatePlaceholder('记忆总结API地址', e.target.value)}
+                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                            disabled={!记忆总结独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                记忆总结独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅总结请求改用此地址。</div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">记忆总结独立 API 密钥（可选）</label>
+                        <input
+                            type="password"
+                            value={form.功能模型占位.记忆总结API密钥 || ''}
+                            onChange={(e) => updatePlaceholder('记忆总结API密钥', e.target.value)}
+                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
+                            disabled={!记忆总结独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                记忆总结独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后总结请求优先使用该密钥。</div>
+                    </div>
+
+                    {!记忆总结独立开启 && (
+                        <div className="text-[11px] text-gray-400">
+                            当前状态：跟随剧情回忆接口，若剧情回忆未启用则回退主剧情接口。
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        if (activeSubTab === 'variable') {
+            const modelValue = (form.功能模型占位.变量计算使用模型 || '').trim();
+            const modelDisplay = 变量计算独立开启 ? modelValue : 主剧情解析模型;
+            const selectOptions = Array.from(new Set([
+                ...modelOptions,
+                modelValue,
+                主剧情解析模型
+            ].map((item) => (item || '').trim()).filter(Boolean)));
+
+            return (
+                <div className="space-y-4">
+                    <div className="text-[11px] text-gray-400">
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启后，会启用本地确定性修正与独立变量生成链路；关闭后，两者都会停用。
+                    </div>
+
+                    <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                        <span>启用变量生成</span>
+                        <ToggleSwitch
+                            checked={变量计算独立开启}
+                            onChange={handleToggleVariable}
+                            ariaLabel="切换变量生成"
+                        />
+                    </label>
+
+                    <div className="flex gap-3 items-end">
+                        <div className="flex-1 space-y-1">
+                            <label className="text-xs text-gray-300">变量生成使用模型</label>
+                            <InlineSelect
+                                value={modelDisplay}
+                                options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                onChange={(model) => updatePlaceholder('变量计算使用模型', model)}
+                                disabled={!变量计算独立开启 || selectOptions.length === 0}
+                                placeholder={!变量计算独立开启
+                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
+                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
+                                buttonClassName={变量计算独立开启
+                                    ? 'bg-black/50 border-gray-600 py-2.5'
+                                    : 'bg-black/30 border-gray-700 py-2.5'}
+                            />
+                        </div>
+                        <GameButton
+                            onClick={handleFetchModels}
+                            variant="secondary"
+                            className="px-4 py-2 text-xs"
+                            disabled={loadingModels}
+                        >
+                            {loadingModels ? '...' : '获取列表'}
+                        </GameButton>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">变量独立 API 地址（可选）</label>
+                        <input
+                            type="text"
+                            value={form.功能模型占位.变量计算API地址 || ''}
+                            onChange={(e) => updatePlaceholder('变量计算API地址', e.target.value)}
+                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                            disabled={!变量计算独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                变量计算独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-cyan-400'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅变量生成请求改用此地址。</div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">变量独立 API 密钥（可选）</label>
+                        <input
+                            type="password"
+                            value={form.功能模型占位.变量计算API密钥 || ''}
+                            onChange={(e) => updatePlaceholder('变量计算API密钥', e.target.value)}
+                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
+                            disabled={!变量计算独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                变量计算独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-cyan-400'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后变量生成请求优先使用该密钥。</div>
+                    </div>
+
+                    <div className="rounded-md border border-cyan-500/20 bg-black/25 p-3 text-[11px] leading-5 text-gray-400">
+                        返回内容只用于变量更新，不参与正文生成。变量模型失败时，会自动回退为"主剧情命令 + 本地变量修正"。
+                    </div>
+                </div>
+            );
+        }
+
+        if (activeSubTab === 'planning') {
+            const modelValue = (form.功能模型占位.规划分析使用模型 || '').trim();
+            const modelDisplay = 规划分析独立开启 ? modelValue : 主剧情解析模型;
+            const selectOptions = Array.from(new Set([
+                ...modelOptions,
+                modelValue,
+                主剧情解析模型
+            ].map((item) => (item || '').trim()).filter(Boolean)));
+
+            return (
+                <div className="space-y-4">
+                    <div className="text-[11px] text-gray-400">当前启用接口配置：{activeConfig?.名称 || '未配置'}。</div>
+                    <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                        <span>启用规划分析独立模型</span>
+                        <ToggleSwitch checked={规划分析独立开启} onChange={handleTogglePlanning} ariaLabel="切换规划分析独立模型" />
+                    </label>
+                    <div className="flex gap-3 items-end">
+                        <div className="flex-1 space-y-1">
+                            <label className="text-xs text-gray-300">规划分析使用模型</label>
+                            <InlineSelect
+                                value={modelDisplay}
+                                options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                onChange={(model) => updatePlaceholder('规划分析使用模型', model)}
+                                disabled={!规划分析独立开启 || selectOptions.length === 0}
+                                placeholder={!规划分析独立开启 ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}` : (selectOptions.length ? '请选���模型' : '请先点击获取列表')}
+                                buttonClassName={规划分析独立开启 ? 'bg-black/50 border-gray-600 py-2.5' : 'bg-black/30 border-gray-700 py-2.5'}
+                            />
+                        </div>
+                        <GameButton onClick={handleFetchModels} variant="secondary" className="px-4 py-2 text-xs" disabled={loadingModels}>
+                            {loadingModels ? '...' : '获取列表'}
+                        </GameButton>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">规划分析独立 API 地址（可选）</label>
+                        <input
+                            type="text"
+                            value={form.功能模型占位.规划分析API地址 || ''}
+                            onChange={(e) => updatePlaceholder('规划分析API地址', e.target.value)}
+                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                            disabled={!规划分析独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${规划分析独立开启 ? 'bg-black/50 border-gray-700 focus:border-cyan-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">规划分析独立 API 密钥（可选）</label>
+                        <input
+                            type="password"
+                            value={form.功能模型占位.规划分析API密钥 || ''}
+                            onChange={(e) => updatePlaceholder('规划分析API密钥', e.target.value)}
+                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
+                            disabled={!规划分析独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${规划分析独立开启 ? 'bg-black/50 border-gray-700 focus:border-cyan-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        if (activeSubTab === 'polish') {
+            const modelValue = (form.功能模型占位.文章优化使用模型 || '').trim();
+            const modelDisplay = 文章优化独立开启 ? modelValue : 主剧情解析模型;
+            const polishPromptValue = (form.功能模型占位.文章优化提示词 || '').trim().length > 0
+                ? form.功能模型占位.文章优化提示词
+                : 默认文章优化提示词;
+            const selectOptions = Array.from(new Set([
+                ...modelOptions,
+                modelValue,
+                主剧情解析模型
+            ].map((item) => (item || '').trim()).filter(Boolean)));
+
+            return (
+                <div className="space-y-4">
+                    <div className="text-[11px] text-gray-400">
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启后才会自动润色 正文标签；可单独指定 Base URL 与 API Key，留空时复用主配置。
+                    </div>
+
+                    <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                        <span>开启文章优化独立模型</span>
+                        <ToggleSwitch
+                            checked={文章优化独立开启}
+                            onChange={handleTogglePolish}
+                            ariaLabel="切换文章优化独立模型"
+                        />
+                    </label>
+
+                    <div className="flex gap-3 items-end">
+                        <div className="flex-1 space-y-1">
+                            <label className="text-xs text-gray-300">文章优化使用模型</label>
+                            <InlineSelect
+                                value={modelDisplay}
+                                options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                onChange={(model) => updatePlaceholder('文章优化使用模型', model)}
+                                disabled={!文章优化独立开启 || selectOptions.length === 0}
+                                placeholder={!文章优化独立开启
+                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
+                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
+                                buttonClassName={文章优化独立开启
+                                    ? 'bg-black/50 border-gray-600 py-2.5'
+                                    : 'bg-black/30 border-gray-700 py-2.5'}
+                            />
+                        </div>
+                        <GameButton
+                            onClick={handleFetchModels}
+                            variant="secondary"
+                            className="px-4 py-2 text-xs"
+                            disabled={loadingModels}
+                        >
+                            {loadingModels ? '...' : '获取列表'}
+                        </GameButton>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">文章优化独立 API 地址（可选）</label>
+                        <input
+                            type="text"
+                            value={form.功能模型占位.文章优化API地址 || ''}
+                            onChange={(e) => updatePlaceholder('文章优化API地址', e.target.value)}
+                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                            disabled={!文章优化独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                文章优化独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅文章优化请求改用此地址。</div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">文章优化独立 API 密钥（可选）</label>
+                        <input
+                            type="password"
+                            value={form.功能模型占位.文章优化API密钥 || ''}
+                            onChange={(e) => updatePlaceholder('文章优化API密钥', e.target.value)}
+                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
+                            disabled={!文章优化独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${
+                                文章优化独立开启
+                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                    : 'bg-black/30 border-gray-800 text-gray-400'
+                            }`}
+                        />
+                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后文章优化请求优先使用该密钥。</div>
+                    </div>
+
+                    {!文章优化独立开启 && (
+                        <div className="text-[11px] text-gray-400">
+                            当前状态：自动润色关闭
+                        </div>
+                    )}
+
+                    <div className="rounded-md border border-wuxia-cyan/25 bg-black/20 p-4 space-y-3">
+                        <div className="text-xs text-wuxia-cyan font-bold">润色提示词</div>
+                        <textarea
+                            value={polishPromptValue}
+                            onChange={(e) => updatePlaceholder('文章优化提示词', e.target.value)}
+                            className="w-full h-44 bg-black/50 border border-gray-700 p-3 text-white rounded-md outline-none focus:border-wuxia-gold custom-scrollbar resize-none text-xs leading-relaxed"
+                        />
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => updatePlaceholder('文章优化提示词', 默认文章优化提示词)}
+                                className="px-3 py-1.5 text-[11px] rounded border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500"
+                            >
+                                恢复默认提示词
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const modelValue = (form.功能模型占位.世界演变使用模型 || '').trim();
+        const modelDisplay = 世界演变独立开启 ? modelValue : 主剧情解析模型;
+        const selectOptions = Array.from(new Set([
+            ...modelOptions,
+            modelValue,
+            主剧情解析模型
+        ].map((item) => (item || '').trim()).filter(Boolean)));
+
+        return (
+            <div className="space-y-4">
+                <div className="text-[11px] text-gray-400">
+                    当前启用接口配置：{activeConfig?.名称 || '未配置'}。可为世界演变单独指定 Base URL 与 API Key；留空时复用主配置。
+                </div>
+
+                <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                    <span>开启世界演变独立模型</span>
+                    <ToggleSwitch
+                        checked={世界演变独立开启}
+                        onChange={handleToggleWorldEvolution}
+                        ariaLabel="切换世界演变独立模型"
+                    />
+                </label>
+
+                <div className="flex gap-3 items-end">
+                    <div className="flex-1 space-y-1">
+                        <label className="text-xs text-gray-300">世界演变使用模型</label>
+                        <InlineSelect
+                            value={modelDisplay}
+                            options={selectOptions.map((model) => ({ value: model, label: model }))}
+                            onChange={(model) => updatePlaceholder('世界演变使用模型', model)}
+                            disabled={!世界演变独立开启 || selectOptions.length === 0}
+                            placeholder={!世界演变独立开启
+                                ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
+                                : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
+                            buttonClassName={世界演变独立开启
+                                ? 'bg-black/50 border-gray-600 py-2.5'
+                                : 'bg-black/30 border-gray-700 py-2.5'}
+                        />
+                    </div>
+                    <GameButton
+                        onClick={handleFetchModels}
+                        variant="secondary"
+                        className="px-4 py-2 text-xs"
+                        disabled={loadingModels}
+                    >
+                        {loadingModels ? '...' : '获取列表'}
+                    </GameButton>
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-300">世界演变独立 API 地址（可选）</label>
+                    <input
+                        type="text"
+                        value={form.功能模型占位.世界演变API地址 || ''}
+                        onChange={(e) => updatePlaceholder('世界演变API地址', e.target.value)}
+                        placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                        disabled={!世界演变独立开启}
+                        className={`w-full border p-2 text-white rounded-md outline-none ${
+                            世界演变独立开启
+                                ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                : 'bg-black/30 border-gray-800 text-gray-400'
+                        }`}
+                    />
+                    <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅世界演变请求改用此地址。</div>
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-300">世界演变独立 API 密钥（可选）</label>
+                    <input
+                        type="password"
+                        value={form.功能模型占位.世界演变API密钥 || ''}
+                        onChange={(e) => updatePlaceholder('世界演变API密钥', e.target.value)}
+                        placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
+                        disabled={!世界演变独立开启}
+                        className={`w-full border p-2 text-white rounded-md outline-none ${
+                            世界演变独立开启
+                                ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
+                                : 'bg-black/30 border-gray-800 text-gray-400'
+                        }`}
+                    />
+                    <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后世界演变请求优先使用该密钥。</div>
+                </div>
+
+                {!世界演变独立开启 && (
+                    <div className="text-[11px] text-gray-400">
+                        当前状态：世界演变自动更新关闭
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="space-y-6 text-sm animate-fadeIn">
+            <div className="flex justify-between items-center border-b border-wuxia-gold/30 pb-3 mb-6">
+                <h3 className="text-wuxia-gold font-serif font-bold text-xl">模型配置</h3>
+            </div>
+
+            {/* Sub Tab Navigation */}
+            <div className="flex gap-2 border-b border-gray-800 pb-1">
+                {subTabs.map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => {
+                            setActiveSubTab(tab.id);
+                            setModelOptions([]);
+                            setMessage('');
+                        }}
+                        className={`px-4 py-2 text-sm transition-colors ${
+                            activeSubTab === tab.id
+                                ? 'text-wuxia-gold border-b-2 border-wuxia-gold -mb-[1px]'
+                                : 'text-gray-500 hover:text-gray-300'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Sub Content */}
+            <div className="rounded-md border border-wuxia-gold/20 bg-black/25 p-4">
+                {renderSubContent()}
+            </div>
+
+            {message && <p className="text-xs text-wuxia-cyan animate-pulse">{message}</p>}
+
+            <div className="pt-6 border-t border-wuxia-gold/20 mt-8">
+                <GameButton onClick={handleSave} variant="primary" className="w-full">
+                    {showSuccess ? '✔ 配置已保存' : '保存设置'}
+                </GameButton>
+            </div>
+        </div>
+    );
+};
+
+export default IntegratedModelSettings;
