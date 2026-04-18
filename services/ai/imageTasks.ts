@@ -125,7 +125,11 @@ const 需要使用本地NovelAI代理 = (baseUrlRaw: string): boolean => {
     return isLocalDev && /https:\/\/image\.novelai\.net/i.test(baseUrlRaw || '');
 };
 
-const 构建图片端点 = (baseUrlRaw: string, customPathRaw?: string): string => {
+const 构建图片端点 = (
+    baseUrlRaw: string,
+    customPathRaw?: string,
+    pathMode?: 'preset' | 'custom'
+): string => {
     const normalizedBaseRaw = 规范化NovelAI基础地址(baseUrlRaw || '');
     const base = 清理末尾斜杠(normalizedBaseRaw || '');
     const customPath = (customPathRaw || '').trim();
@@ -142,6 +146,10 @@ const 构建图片端点 = (baseUrlRaw: string, customPathRaw?: string): string 
     if (customPath) {
         const normalizedPath = customPath.startsWith('/') ? customPath : `/${customPath}`;
         return `${base}${normalizedPath}`;
+    }
+    // 自定义模式且路径为空，直接返回 base URL
+    if (pathMode === 'custom') {
+        return base;
     }
     if (/\/images\/generations$/i.test(base)) return base;
     if (/\/v1$/i.test(base)) return `${base}/images/generations`;
@@ -1678,7 +1686,7 @@ const 执行ComfyUI生图 = async (
     if (!baseUrl) throw new Error('ComfyUI 缺少 API 地址');
     const [width, height] = size.split('x').map((value) => Number(value));
     const workflow = 构建ComfyUI工作流(apiConfig.ComfyUI工作流JSON || '', prompt, negativePrompt, width, height, pngParams);
-    const promptEndpoint = 构建图片端点(apiConfig.baseUrl, apiConfig.图片接口路径);
+    const promptEndpoint = 构建图片端点(apiConfig.baseUrl, apiConfig.图片接口路径, apiConfig.图片接口路径模式);
     const enqueueResponse = await fetch(promptEndpoint, {
         method: 'POST',
         headers: 构建生图请求头(apiConfig),
@@ -2395,16 +2403,26 @@ const 清洗最终主体提示词 = (rawText: string, options?: { isNovelAI?: bo
             return options?.isNovelAI ? 保守补全NAI权重语法(mergedStructured) : mergedStructured.trim();
         }
     }
-    const extracted = 提取最后一个标签文本列表(withoutThinking, ['提示词', '词组', '生图词组'])
-        || 提取最后一个标签文本(withoutThinking, '基础')
-        || withoutThinking;
+const extracted = 提取最后一个标签文本列表(withoutThinking, ['提示词', '词组', '生图词组'])
+        || 提取最后一个标签文本(withoutThinking, '基础');
+    let finalFallback = withoutThinking;
+    if (!extracted) {
+        const lines = withoutThinking.split('\n');
+        for (let i = lines.length - 1; i >= 0; i -= 1) {
+            const line = lines[i].trim();
+            if (line && /[,\(\)]/.test(line) && !line.startsWith('**') && !line.includes(':') && line.length > 10) {
+                finalFallback = line;
+                break;
+            }
+        }
+    }
     const withoutResidualTags = 移除序号角色名称前缀(
         移除全部结构标签(
-            (extracted || '')
-                .replace(/<\s*\/?\s*提示词\s*>/gi, '')
-                .replace(/<\s*\/?\s*词组\s*>/gi, '')
-                .replace(/<\s*\/?\s*生图词组\s*>/gi, '')
-                .trim()
+            (extracted || finalFallback || '')
+            .replace(/<\s*\/?\s*提示词\s*>/gi, '')
+            .replace(/<\s*\/?\s*词组\s*>/gi, '')
+            .replace(/<\s*\/?\s*生图词组\s*>/gi, '')
+            .trim()
         )
     );
     const cleaned = 规范化Artist标签大小写(清理生图词组输出(withoutResidualTags));
@@ -3377,7 +3395,7 @@ export const generateImageByPrompt = async (
     signal?: AbortSignal,
     options?: { 构图?: '头像' | '半身' | '立绘' | '场景' | '部位特写'; 场景类型?: 场景生成类型; 附加正向提示词?: string; 附加负面提示词?: string; 尺寸?: string; 跳过基础负面提示词?: boolean; PNG参数?: PNG解析参数结构 }
 ): Promise<图片生成结果> => {
-    const endpoint = 构建图片端点(apiConfig.baseUrl, apiConfig.图片接口路径);
+    const endpoint = 构建图片端点(apiConfig.baseUrl, apiConfig.图片接口路径, apiConfig.图片接口路径模式);
     if (!endpoint) throw new Error('Missing API Base URL');
     const promptBundle = 构建最终图片提示词(prompt, apiConfig, options);
     const normalizedPrompt = promptBundle.最终正向提示词;
