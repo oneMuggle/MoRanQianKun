@@ -6,7 +6,7 @@ import type {
     OpeningConfig,
     接口设置结构,
     剧情系统结构
-} from '../types';
+} from '../../types';
 import {
     读取小说拆分注入快照列表,
     获取当前激活小说拆分数据集,
@@ -16,7 +16,7 @@ import {
     应用剧情小说时间校准到分段,
     规范化章节时间校准列表
 } from './novelDecompositionCalibration';
-import { 获取同人角色替换规则列表 } from '../utils/openingConfig';
+import { 获取同人角色替换规则列表 } from '../../utils/openingConfig';
 
 const 读取文本 = (value: unknown): string => (typeof value === 'string' ? value : '');
 const 取有效可见性列表 = (items: unknown): string[] => (

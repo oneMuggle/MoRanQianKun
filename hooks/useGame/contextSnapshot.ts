@@ -7,7 +7,7 @@ import { 剧情回忆检索COT提示词, 剧情回忆检索输出格式提示词
 import { 构建剧情回忆检索上下文 } from './memoryRecall';
 import { 构建COT伪装提示词 } from './promptRuntime';
 import { countOpenAIChatMessagesTokensWithBreakdown } from '../../utils/tokenEstimate';
-import { 获取激活小说拆分注入文本 } from '../../services/novelDecompositionInjection';
+import { 获取激活小说拆分注入文本 } from '../../services/novel-decomposition/novelDecompositionInjection';
 
 export type 运行时提示词状态 = {
     当前启用: boolean;

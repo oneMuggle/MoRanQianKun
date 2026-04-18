@@ -1,4 +1,4 @@
-import * as textAIService from './ai/text';
+import * as textAIService from '../ai/text';
 import type {
     小说拆分数据集结构,
     小说拆分分段结构,
@@ -6,9 +6,9 @@ import type {
     小说拆分章节结构,
     小说拆分注入目标类型,
     小说拆分时间线事件结构
-} from '../types';
-import type { 当前可用接口结构 } from '../utils/apiConfig';
-import { 过滤疑似目录章节, 重排章节序号, 规范化标题, 识别TXT章节标题行 } from './novelStructureHeuristics';
+} from '../../types';
+import type { 当前可用接口结构 } from '../../utils/apiConfig';
+import { 过滤疑似目录章节, 重排章节序号, 规范化标题, 识别TXT章节标题行 } from '../../services/novelStructureHeuristics';
 import { 默认小说时间线起点, 尝试规范化小说时间锚点, 规范化小说时间锚点 } from './novelDecompositionTime';
 
 const 时间锚点格式正则 = /^\d{4,6}:\d{2}:\d{2}:\d{2}:\d{2}$/;

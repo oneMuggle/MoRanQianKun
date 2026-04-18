@@ -17,9 +17,9 @@ import { applyStateCommand } from '../../utils/stateHelpers';
 import { 构建世界书注入文本 } from '../../utils/worldbook';
 import { 提取响应规划文本 } from './thinkingContext';
 import { 构建同人运行时提示词包 } from '../../prompts/runtime/fandom';
-import { 获取激活小说拆分注入文本 } from '../../services/novelDecompositionInjection';
+import { 获取激活小说拆分注入文本 } from '../../services/novel-decomposition/novelDecompositionInjection';
 import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../utils/promptFeatureToggles';
-import { 同步剧情小说分解时间校准 } from '../../services/novelDecompositionCalibration';
+import { 同步剧情小说分解时间校准 } from '../../services/novel-decomposition/novelDecompositionCalibration';
 
 type 规划更新工作流依赖 = {
     apiConfig: any;

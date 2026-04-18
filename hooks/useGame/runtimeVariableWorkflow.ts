@@ -1,6 +1,6 @@
 import type { TavernCommand } from '../../types';
 import { applyStateCommand, normalizeStateCommandKey } from '../../utils/stateHelpers';
-import { 同步剧情小说分解时间校准 } from '../../services/novelDecompositionCalibration';
+import { 同步剧情小说分解时间校准 } from '../../services/novel-decomposition/novelDecompositionCalibration';
 
 export type 运行时变量分区类型 =
     | '角色'

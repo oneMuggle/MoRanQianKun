@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { OpeningConfig, 剧情系统结构, 接口设置结构 } from '../../../types';
 import GameButton from '../../ui/GameButton';
-import { 获取激活小说拆分注入文本 } from '../../../services/novelDecompositionInjection';
+import { 获取激活小说拆分注入文本 } from '../../../services/novel-decomposition/novelDecompositionInjection';
 
 interface Props {
     settings: 接口设置结构;

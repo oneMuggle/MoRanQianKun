@@ -6,7 +6,7 @@ import { 开局预设方案结构 } from '../../../../data/newGamePresets';
 import { OrnateBorder } from '../../../ui/decorations/OrnateBorder';
 import InlineSelect from '../../../ui/InlineSelect';
 import * as dbService from '../../../../services/dbService';
-import { 读取小说拆分数据集列表 } from '../../../../services/novelDecompositionStore';
+import { 读取小说拆分数据集列表 } from '../../../../services/novel-decomposition/novelDecompositionStore';
 import { 合并去重开局预设方案, 标准化开局预设方案, 生成自定义开局预设ID, 自定义开局预设存储键 } from '../../../../utils/customNewGamePresets';
 import {
     关系侧重选项,

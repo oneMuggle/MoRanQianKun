@@ -12,7 +12,7 @@ import { 环境时间转标准串 } from './timeUtils';
 import { 构建世界演变上下文文本, 规范化世界演变命令列表 } from './worldEvolutionUtils';
 import type { 响应命令处理状态 } from './responseCommandProcessor';
 import { 构建同人运行时提示词包 } from '../../prompts/runtime/fandom';
-import { 获取激活小说拆分注入文本 } from '../../services/novelDecompositionInjection';
+import { 获取激活小说拆分注入文本 } from '../../services/novel-decomposition/novelDecompositionInjection';
 import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../utils/promptFeatureToggles';
 import { 提取响应规划文本 } from './thinkingContext';
 

@@ -34,12 +34,12 @@ import {
     导出小说拆分分享数据,
     导入小说拆分分享数据,
     保存小说拆分注入快照列表
-} from '../../../services/novelDecompositionStore';
-import { 小说拆分后台调度服务, type 小说拆分调度状态结构 } from '../../../services/novelDecompositionScheduler';
-import { 初始化小说拆分运行时, 请求中断小说拆分任务 } from '../../../services/novelDecompositionRuntime';
-import { 构建全部小说拆分注入快照 } from '../../../services/novelDecompositionInjection';
+} from '../../../services/novel-decomposition/novelDecompositionStore';
+import { 小说拆分后台调度服务, type 小说拆分调度状态结构 } from '../../../services/novel-decomposition/novelDecompositionScheduler';
+import { 初始化小说拆分运行时, 请求中断小说拆分任务 } from '../../../services/novel-decomposition/novelDecompositionRuntime';
+import { 构建全部小说拆分注入快照 } from '../../../services/novel-decomposition/novelDecompositionInjection';
 import { 从EPUB文件提取小说内容 } from '../../../services/epubImport';
-import { 从原始文本提取章节, 根据章节生成分段列表, 聚合小说拆分数据集 } from '../../../services/novelDecompositionPipeline';
+import { 从原始文本提取章节, 根据章节生成分段列表, 聚合小说拆分数据集 } from '../../../services/novel-decomposition/novelDecompositionPipeline';
 
 interface Props {
     settings: 接口设置结构;

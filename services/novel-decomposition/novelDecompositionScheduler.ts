@@ -1,4 +1,4 @@
-import type { 小说拆分任务结构, 小说拆分数据集结构 } from '../types';
+import type { 小说拆分任务结构, 小说拆分数据集结构 } from '../../types';
 import {
     读取小说拆分任务列表,
     读取小说拆分数据集列表,

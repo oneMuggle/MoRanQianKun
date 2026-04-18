@@ -11,12 +11,12 @@ import {
 } from './novelDecompositionStore';
 import { 构建全部小说拆分注入快照 } from './novelDecompositionInjection';
 import { 从原始文本提取章节, 根据章节生成分段列表, 聚合小说拆分数据集, 解析小说拆分分段 } from './novelDecompositionPipeline';
-import * as dbService from './dbService';
-import { 设置键 } from '../utils/settingsSchema';
-import { 获取小说拆分接口配置, 规范化接口设置, 接口配置是否可用 } from '../utils/apiConfig';
-import { 规范化游戏设置 } from '../utils/gameSettings';
-import { 构建运行时额外提示词 } from '../prompts/runtime/nsfw';
-import { 构建小说拆分AI角色声明提示词 } from '../prompts/runtime/novelDecomposition';
+import * as dbService from '../dbService';
+import { 设置键 } from '../../utils/settingsSchema';
+import { 获取小说拆分接口配置, 规范化接口设置, 接口配置是否可用 } from '../../utils/apiConfig';
+import { 规范化游戏设置 } from '../../utils/gameSettings';
+import { 构建运行时额外提示词 } from '../../prompts/runtime/nsfw';
+import { 构建小说拆分AI角色声明提示词 } from '../../prompts/runtime/novelDecomposition';
 
 let 已初始化小说拆分运行时 = false;
 let 小说拆分限流队列: Promise<void> = Promise.resolve();

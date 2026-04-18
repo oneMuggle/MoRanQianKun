@@ -9,10 +9,10 @@ import type {
     小说拆分注入快照结构,
     小说拆分章节结构,
     小说拆分分段处理状态类型
-} from '../types';
+} from '../../types';
 import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
-import * as dbService from './dbService';
-import { 设置键 } from '../utils/settingsSchema';
+import * as dbService from '../dbService';
+import { 设置键 } from '../../utils/settingsSchema';
 import { 默认小说时间线起点, 尝试规范化小说时间锚点, 规范化小说时间锚点 } from './novelDecompositionTime';
 
 const 小说拆分数据集版本 = 7;
