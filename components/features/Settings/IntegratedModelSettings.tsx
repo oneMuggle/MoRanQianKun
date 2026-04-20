@@ -11,7 +11,7 @@ interface Props {
     onSave: (settings: 接口设置结构) => void;
 }
 
-type SubTab = 'recall' | 'memory_summary' | 'variable' | 'planning' | 'polish' | 'world_evolution';
+type SubTab = 'recall' | 'memory_summary' | 'variable' | 'planning' | 'heroine_plan' | 'polish' | 'world_evolution';
 
 const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
     const [form, setForm] = useState<接口设置结构>(() => 规范化接口设置(settings));
@@ -110,6 +110,10 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
             currentModelKey = '规划分析';
             currentApiUrl = form.功能模型占位.规划分析API地址 || '';
             currentApiKey = form.功能模型占位.规划分析API密钥 || '';
+        } else if (activeSubTab === 'heroine_plan') {
+            currentModelKey = '女主规划';
+            currentApiUrl = form.功能模型占位.女主规划API地址 || '';
+            currentApiKey = form.功能模型占位.女主规划API密钥 || '';
         } else if (activeSubTab === 'polish') {
             currentModelKey = '文章优化';
             currentApiUrl = form.功能模型占位.文章优化API地址 || '';
@@ -128,6 +132,8 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
             ? Boolean(form.功能模型占位.变量计算独立模型开关)
             : activeSubTab === 'planning'
             ? Boolean(form.功能模型占位.规划分析独立模型开关)
+            : activeSubTab === 'heroine_plan'
+            ? Boolean(form.功能模型占位.女主规划独立模型开关)
             : activeSubTab === 'polish'
             ? Boolean(form.功能模型占位.文章优化独立模型开关)
             : Boolean(form.功能模型占位.世界演变独立模型开关);
@@ -226,6 +232,21 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
         }));
     };
 
+    const 女主规划独立开启 = Boolean(form.功能模型占位.女主规划独立模型开关);
+    const 女主规划API地址 = (form.功能模型占位.女主规划API地址 || '').trim();
+    const 女主规划API密钥 = (form.功能模型占位.女主规划API密钥 || '').trim();
+
+    const handleToggleHeroinePlan = (checked: boolean) => {
+        setForm((prev) => ({
+            ...prev,
+            功能模型占位: {
+                ...prev.功能模型占位,
+                女主规划独立模型开关: checked,
+                女主规划使用模型: (prev.功能模型占位.女主规划使用模型 || '').trim() || 主剧情解析模型 || ''
+            }
+        }));
+    };
+
     const 世界演变独立开启 = Boolean(form.功能模型占位.世界演变独立模型开关);
     const 世界演变API地址 = (form.功能模型占位.世界演变API地址 || '').trim();
     const 世界演变API密钥 = (form.功能模型占位.世界演变API密钥 || '').trim();
@@ -257,6 +278,7 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
         { id: 'memory_summary' as const, label: '记忆总结' },
         { id: 'variable' as const, label: '变量生成' },
         { id: 'planning' as const, label: '规划分析' },
+        { id: 'heroine_plan' as const, label: '女主规划' },
         { id: 'polish' as const, label: '文章优化' },
         { id: 'world_evolution' as const, label: '世界演变' }
     ];
@@ -622,6 +644,64 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
                             placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
                             disabled={!规划分析独立开启}
                             className={`w-full border p-2 text-white rounded-md outline-none ${规划分析独立开启 ? 'bg-black/50 border-gray-700 focus:border-cyan-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        if (activeSubTab === 'heroine_plan') {
+            const modelValue = (form.功能模型占位.女主规划使用模型 || '').trim();
+            const modelDisplay = 女主规划独立开启 ? modelValue : 主剧情解析模型;
+            const selectOptions = Array.from(new Set([
+                ...modelOptions,
+                modelValue,
+                主剧情解析模型
+            ].map((item) => (item || '').trim()).filter(Boolean)));
+
+            return (
+                <div className="space-y-4">
+                    <div className="text-[11px] text-gray-400">当前启用接口配置：{activeConfig?.名称 || '未配置'}。为女主剧情规划提供独立更新模型，失败时回退为主流程状态。</div>
+                    <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
+                        <span>启用女主规划独立模型</span>
+                        <ToggleSwitch checked={女主规划独立开启} onChange={handleToggleHeroinePlan} ariaLabel="切换女主规划独立模型" />
+                    </label>
+                    <div className="flex gap-3 items-end">
+                        <div className="flex-1 space-y-1">
+                            <label className="text-xs text-gray-300">女主规划使用模型</label>
+                            <InlineSelect
+                                value={modelDisplay}
+                                options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                onChange={(model) => updatePlaceholder('女主规划使用模型', model)}
+                                disabled={!女主规划独立开启 || selectOptions.length === 0}
+                                placeholder={!女主规划独立开启 ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}` : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
+                                buttonClassName={女主规划独立开启 ? 'bg-black/50 border-gray-600 py-2.5' : 'bg-black/30 border-gray-700 py-2.5'}
+                            />
+                        </div>
+                        <GameButton onClick={handleFetchModels} variant="secondary" className="px-4 py-2 text-xs" disabled={loadingModels}>
+                            {loadingModels ? '...' : '获取列表'}
+                        </GameButton>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">女主规划独立 API 地址（可选）</label>
+                        <input
+                            type="text"
+                            value={form.功能模型占位.女主规划API地址 || ''}
+                            onChange={(e) => updatePlaceholder('女主规划API地址', e.target.value)}
+                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                            disabled={!女主规划独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${女主规划独立开启 ? 'bg-black/50 border-gray-700 focus:border-pink-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs text-gray-300">女主规划独立 API 密钥（可选）</label>
+                        <input
+                            type="password"
+                            value={form.功能模型占位.女主规划API密钥 || ''}
+                            onChange={(e) => updatePlaceholder('女主规划API密钥', e.target.value)}
+                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
+                            disabled={!女主规划独立开启}
+                            className={`w-full border p-2 text-white rounded-md outline-none ${女主规划独立开启 ? 'bg-black/50 border-gray-700 focus:border-pink-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
                         />
                     </div>
                 </div>
