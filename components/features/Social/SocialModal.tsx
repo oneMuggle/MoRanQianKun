@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { NPC结构 } from '../../../models/social';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';
 import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/npcMemorySummary';
-import { use图片资源回源预取 } from '../../../hooks/useImageAssetPrefetch';
+import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import { 获取图片展示地址 } from '../../../utils/imageAssets';
 import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';
 
@@ -28,7 +28,7 @@ const SocialModal: React.FC<Props> = ({
     onTogglePresence,
     onDeleteNpc
 }) => {
-    use图片资源回源预取(socialList);
+    useImageAssetPrefetch(socialList);
     const 显示境界 = cultivationSystemEnabled !== false;
     const [selectedId, setSelectedId] = useState<string | null>(
         socialList.length > 0 ? socialList[0].id : null

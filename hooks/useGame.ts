@@ -97,7 +97,7 @@ import { 创建手动NPC工作流 } from './useGame/manualNpcWorkflow';
 import { 创建主角图片工作流 } from './useGame/playerImageWorkflow';
 import { 创建运行时变量工作流 } from './useGame/runtimeVariableWorkflow';
 import { 创建变量校准协调器 as 创建变量生成协调器 } from './useGame/variableCalibrationCoordinator';
-import { use世界演变控制 } from './useGame/worldEvolutionControl';
+import { useWorldEvolutionControl } from './useGame/worldEvolutionControl';
 import { normalizeCanonicalGameTime, 环境时间转标准串, 提取环境月日, 结构化时间转标准串 } from './useGame/timeUtils';
 import { 构建NPC上下文, 提取NPC生图基础数据, 提取NPC香闺秘档部位生图数据, 提取主角生图基础数据 } from './useGame/npcContext';
 import { 应用NPC记忆总结, 构建手动NPC记忆总结候选, 构建自动NPC记忆总结候选, 构建NPC记忆总结回退文案 } from './useGame/npcMemorySummary';
@@ -2148,7 +2148,7 @@ export const useGame = () => {
         performAutoSave: (...args) => performAutoSave(...args)
     });
 
-    const { handleForceWorldEvolutionUpdate } = use世界演变控制({
+    const { handleForceWorldEvolutionUpdate } = useWorldEvolutionControl({
         view,
         loading,
         apiConfig,

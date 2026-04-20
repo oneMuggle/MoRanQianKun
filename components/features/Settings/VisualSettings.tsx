@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { 可用视觉区域, 区域文字样式结构, 字体资源结构, 视觉设置结构, 可用UI文字令牌, UI文字样式结构 } from '../../../types';
-import { use图片资源回源预取 } from '../../../hooks/useImageAssetPrefetch';
+import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import GameButton from '../../ui/GameButton';
 import InlineSelect from '../../ui/InlineSelect';
 import { 获取图片资源文本地址, 是否图片资源引用 } from '../../../utils/imageAssets';
@@ -204,7 +204,7 @@ const SectionCard: React.FC<React.PropsWithChildren<{ title?: string; descriptio
 );
 
 const VisualSettings: React.FC<Props> = ({ settings, onSave }) => {
-    use图片资源回源预取(settings?.背景图片);
+    useImageAssetPrefetch(settings?.背景图片);
     const backgroundFileInputRef = useRef<HTMLInputElement>(null);
     const fontFileInputRef = useRef<HTMLInputElement>(null);
     const [showSuccess, setShowSuccess] = useState(false);

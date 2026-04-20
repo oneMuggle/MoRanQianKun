@@ -18,7 +18,7 @@ import type {
     词组转化器提示词预设结构,
     PNG画风预设结构
 } from '../../../../types';
-import { use图片资源回源预取 } from '../../../../hooks/useImageAssetPrefetch';
+import { useImageAssetPrefetch } from '../../../../hooks/useImageAssetPrefetch';
 import { 获取图片展示地址, 获取图片资源文本地址, 是否存在本地图片副本, 格式化本地图片描述 } from '../../../../utils/imageAssets';
 import ToggleSwitch from '../../../ui/ToggleSwitch';
 import { 规范化接口设置 } from '../../../../utils/apiConfig';
@@ -309,7 +309,7 @@ const MobileImageManagerModal: React.FC<Props> = ({
     onImportPresets,
     onExportPresets
 }) => {
-    use图片资源回源预取(socialList, sceneArchive, currentPersistentWallpaper, apiConfig);
+    useImageAssetPrefetch(socialList, sceneArchive, currentPersistentWallpaper, apiConfig);
     const [activeTab, setActiveTab] = React.useState<页面标签类型>('manual');
     const [busyActionKey, setBusyActionKey] = React.useState('');
     const [actionError, setActionError] = React.useState('');

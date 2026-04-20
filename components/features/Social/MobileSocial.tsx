@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NPC结构 } from '../../../models/social';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';
 import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/npcMemorySummary';
-import { use图片资源回源预取 } from '../../../hooks/useImageAssetPrefetch';
+import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import { 获取图片展示地址 } from '../../../utils/imageAssets';
 import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';
 
@@ -58,7 +58,7 @@ const MobileSocial: React.FC<Props> = ({
         if (currentIndex < 0) return [currentNPC];
         return socialList.filter((_, index) => Math.abs(index - currentIndex) <= 1);
     }, [currentNPC, socialList]);
-    use图片资源回源预取(currentNPC, adjacentNPCs);
+    useImageAssetPrefetch(currentNPC, adjacentNPCs);
     const 当前记忆展示 = React.useMemo(
         () => currentNPC ? 构建NPC记忆展示结果(currentNPC.总结记忆, currentNPC.记忆) : { 总结记忆: [], 记忆: [], 原始总数: 0 },
         [currentNPC]

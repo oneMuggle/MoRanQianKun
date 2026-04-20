@@ -34,7 +34,7 @@ export const 提取图片资源引用列表 = (...sources: unknown[]): string[] 
     return Array.from(refs.values());
 };
 
-export const use图片资源回源预取 = (...sources: unknown[]): void => {
+export const useImageAssetPrefetch = (...sources: unknown[]): void => {
     const [, forceRefresh] = useState(0);
     const refList = useMemo(() => 提取图片资源引用列表(...sources), [...sources]);
     const refKey = refList.join('|');

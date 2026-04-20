@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { JudgmentThoughtBlock, NPC结构, 视觉设置结构 } from '../../../types';
-import { use图片资源回源预取 } from '../../../hooks/useImageAssetPrefetch';
+import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import { 构建区域文字样式 } from '../../../utils/visualSettings';
 import { 获取图片展示地址, 获取图片资源文本地址 } from '../../../utils/imageAssets';
 import { IconHeart, IconEye, IconBattery, IconShield, IconCompass, IconExplosion, IconDice } from '../../ui/Icons';
@@ -242,7 +242,7 @@ type 玩家资料 = {
 };
 
 export const CharacterRenderer: React.FC<{ sender: string; text: string; visualConfig?: 视觉设置结构; socialList?: NPC结构[]; playerProfile?: 玩家资料 }> = ({ sender, text, visualConfig, socialList, playerProfile }) => {
-    use图片资源回源预取(playerProfile?.头像图片URL, socialList);
+    useImageAssetPrefetch(playerProfile?.头像图片URL, socialList);
     const colors = ['bg-red-900', 'bg-blue-900', 'bg-emerald-900', 'bg-violet-900', 'bg-amber-900'];
     const colorIdx = sender.charCodeAt(0) % colors.length;
     const bgClass = colors[colorIdx];

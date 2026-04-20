@@ -25,7 +25,7 @@ type 世界演变控制依赖 = {
     }) => Promise<{ ok: boolean; statusText?: string }>;
 };
 
-export const use世界演变控制 = (deps: 世界演变控制依赖) => {
+export const useWorldEvolutionControl = (deps: 世界演变控制依赖) => {
     const handleForceWorldEvolutionUpdate = async (): Promise<string | null> => {
         const result = await deps.执行世界演变更新({
             来源: 'manual',
