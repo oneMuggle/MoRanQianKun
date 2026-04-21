@@ -1894,6 +1894,7 @@ const ImageManagerModal: React.FC<Props> = ({
         });
     };
 
+// @todo-replace: useImageManager/tabs/ManualTab
     const renderManualTab = () => (
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
             {/* 左侧：手动生成控制区 */}
@@ -2479,6 +2480,7 @@ const ImageManagerModal: React.FC<Props> = ({
             </div>
         </div>
     );
+    // @todo-replace: useImageManager/tabs/LibraryTab
     const renderLibraryTab = () => (
         <div className="grid grid-cols-1 md:grid-cols-[160px_minmax(0,1fr)] lg:grid-cols-[184px_minmax(0,1fr)] gap-6">
             <div className="bg-[#0c0d0f]/90 border border-wuxia-gold/30 rounded shadow-[0_0_30px_rgba(212,175,55,0.05)] p-5 flex flex-col">
@@ -2724,6 +2726,7 @@ const ImageManagerModal: React.FC<Props> = ({
         </div>
     );
 
+    // @todo-replace: useImageManager/tabs/QueueTab
     const renderQueueTab = () => (
         <div className="flex flex-col h-full bg-[#0c0d0f]/90 border border-wuxia-gold/30 rounded shadow-[0_0_30px_rgba(212,175,55,0.05)] p-5 relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.03)_0%,transparent_100%)] pointer-events-none"></div>
@@ -2881,6 +2884,7 @@ const ImageManagerModal: React.FC<Props> = ({
         </div>
     );
 
+    // @todo-replace: useImageManager/tabs/SceneTab
     const renderSceneTab = () => (
         <div className="grid grid-cols-1 xl:grid-cols-[380px_minmax(0,1fr)] gap-6 h-full">
             {/* 左侧：当前场景与生成记录 */}
@@ -3302,6 +3306,7 @@ const ImageManagerModal: React.FC<Props> = ({
         </div>
     );
 
+    // @todo-replace: useImageManager/tabs/HistoryTab
     const renderHistoryTab = () => (
         <div className="flex flex-col h-full bg-[#0c0d0f]/90 border border-wuxia-gold/30 rounded shadow-[0_0_30px_rgba(212,175,55,0.05)] p-5 relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.03)_0%,transparent_100%)] pointer-events-none"></div>
@@ -4221,6 +4226,7 @@ const ImageManagerModal: React.FC<Props> = ({
         </div>
     );
 
+    // @todo-replace: useImageManager/tabs/RulesTab
     const renderRulesTab = () => {
         const 规则切换按钮样式 = (active: boolean) => `rounded-full border px-4 py-2 text-xs tracking-[0.18em] uppercase transition-all ${
             active

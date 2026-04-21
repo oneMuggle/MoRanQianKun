@@ -1,3 +1,4 @@
+// @todo-replace: extract shared with ImageManagerModal (useImageManager/shared/)
 import React from 'react';
 import MobileCustomSelect from './MobileCustomSelect';
 import MobileFileUploader from './MobileFileUploader';

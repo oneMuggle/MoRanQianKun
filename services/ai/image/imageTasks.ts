@@ -1,3 +1,4 @@
+// @todo-replace: split to services/ai/image/{constants,tokenizer,parser,backends,persistence}.ts
 import { decompressSync, unzlibSync, unzipSync } from 'fflate';
 import type { 当前可用接口结构 } from '../../../utils/apiConfig';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';

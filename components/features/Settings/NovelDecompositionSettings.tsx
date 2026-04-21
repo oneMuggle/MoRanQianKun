@@ -1,3 +1,4 @@
+// @todo-replace: split to panels/{ApiConfig,Injection,Preview,ImportExport,Scheduler,Split}Panel.tsx
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
     接口设置结构,
