@@ -33,6 +33,17 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
         return selected || form.configs[0] || null;
     }, [form.activeConfigId, form.configs]);
 
+    const apiConfigOptions = useMemo(() => {
+        return form.configs.map((cfg) => ({
+            value: cfg.id,
+            label: cfg.名称 || cfg.id
+        }));
+    }, [form.configs]);
+
+    const getConfigById = (configId: string): 单接口配置结构 | undefined => {
+        return form.configs.find((cfg) => cfg.id === configId);
+    };
+
     const 主剧情解析模型 = useMemo(() => {
         return (form.功能模型占位.主剧情使用模型 || '').trim();
     }, [form.功能模型占位.主剧情使用模型]);
@@ -283,20 +294,23 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
         { id: 'world_evolution' as const, label: '世界演变' }
     ];
 
-    const renderSubContent = () => {
+const renderSubContent = () => {
         if (activeSubTab === 'recall') {
             const modelValue = (form.功能模型占位.剧情回忆使用模型 || '').trim();
+            const selectedConfigId = form.功能模型占位.剧情回忆使用配置ID;
+            const selectedRefConfig = selectedConfigId ? getConfigById(selectedConfigId) : null;
             const modelDisplay = 剧情回忆独立开启 ? modelValue : 主剧情解析模型;
             const selectOptions = Array.from(new Set([
                 ...modelOptions,
                 modelValue,
                 主剧情解析模型
             ].map((item) => (item || '').trim()).filter(Boolean)));
+            const [showManualInput, setShowManualInput] = useState(false);
 
             return (
                 <div className="space-y-4">
                     <div className="text-[11px] text-gray-400">
-                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。可为剧情回忆单独指定 Base URL 与 API Key；留空时复用主配置。
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启独立模型后选择一个已有配置，或手动输入 API 地址和密钥。
                     </div>
 
                     <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
@@ -308,63 +322,85 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
                         />
                     </label>
 
-                    <div className="flex gap-3 items-end">
-                        <div className="flex-1 space-y-1">
-                            <label className="text-xs text-gray-300">剧情回忆使用模型</label>
-                            <InlineSelect
-                                value={modelDisplay}
-                                options={selectOptions.map((model) => ({ value: model, label: model }))}
-                                onChange={(model) => updatePlaceholder('剧情回忆使用模型', model)}
-                                disabled={!剧情回忆独立开启 || selectOptions.length === 0}
-                                placeholder={!剧情回忆独立开启
-                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
-                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
-                                buttonClassName={剧情回忆独立开启
-                                    ? 'bg-black/50 border-gray-600 py-2.5'
-                                    : 'bg-black/30 border-gray-700 py-2.5'}
-                            />
-                        </div>
-                        <GameButton
-                            onClick={handleFetchModels}
-                            variant="secondary"
-                            className="px-4 py-2 text-xs"
-                            disabled={loadingModels}
-                        >
-                            {loadingModels ? '...' : '获取列表'}
-                        </GameButton>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">剧情回忆独立 API 地址（可选）</label>
-                        <input
-                            type="text"
-                            value={form.功能模型占位.剧情回忆API地址 || ''}
-                            onChange={(e) => updatePlaceholder('剧情回忆API地址', e.target.value)}
-                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
-                            disabled={!剧情回忆独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                剧情回忆独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅剧情回忆请求改用此地址。</div>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">剧情回忆独立 API 密钥（可选）</label>
-                        <input
-                            type="password"
-                            value={form.功能模型占位.剧情回忆API密钥 || ''}
-                            onChange={(e) => updatePlaceholder('剧情回忆API密钥', e.target.value)}
-                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
-                            disabled={!剧情回忆独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                剧情回忆独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后剧情回忆请求优先使用该密钥。</div>
-                    </div>
+                    {剧情回忆独立开启 && (
+                        <>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-300">引用接口配置</label>
+                                <InlineSelect
+                                    value={selectedConfigId}
+                                    options={apiConfigOptions}
+                                    onChange={(configId) => {
+                                        updatePlaceholder('剧情回忆使用配置ID', configId);
+                                        if (configId) {
+                                            const refCfg = getConfigById(configId);
+                                            if (refCfg) {
+                                                updatePlaceholder('剧情回忆API地址', refCfg.baseUrl || '');
+                                                updatePlaceholder('剧情回忆API密钥', refCfg.apiKey || '');
+                                            }
+                                        }
+                                    }}
+                                    disabled={apiConfigOptions.length === 0}
+                                    placeholder="请选择接口配置"
+                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                />
+                            </div>
+
+                            <div className="flex gap-3 items-end">
+                                <div className="flex-1 space-y-1">
+                                    <label className="text-xs text-gray-300">剧情回忆使用模型</label>
+                                    <InlineSelect
+                                        value={modelDisplay}
+                                        options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                        onChange={(model) => updatePlaceholder('剧情回忆使用模型', model)}
+                                        disabled={selectOptions.length === 0}
+                                        placeholder={selectOptions.length ? '请选择模型' : '请先点击获取列表'}
+                                        buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                    />
+                                </div>
+                                <GameButton
+                                    onClick={handleFetchModels}
+                                    variant="secondary"
+                                    className="px-4 py-2 text-xs"
+                                    disabled={loadingModels}
+                                >
+                                    {loadingModels ? '...' : '获取列表'}
+                                </GameButton>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowManualInput(!showManualInput)}
+                                className="text-xs text-gray-500 hover:text-gray-300"
+                            >
+                                {showManualInput ? '▲ 隐藏手动输入' : '▼ 显示手动输入'}
+                            </button>
+
+                            {showManualInput && (
+                                <>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">剧情回忆独立 API 地址</label>
+                                        <input
+                                            type="text"
+                                            value={form.功能模型占位.剧情回忆API地址 || ''}
+                                            onChange={(e) => updatePlaceholder('剧情回忆API地址', e.target.value)}
+                                            placeholder={selectedRefConfig?.baseUrl || activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">剧情回忆独立 API 密钥</label>
+                                        <input
+                                            type="password"
+                                            value={form.功能模型占位.剧情回忆API密钥 || ''}
+                                            onChange={(e) => updatePlaceholder('剧情回忆API密钥', e.target.value)}
+                                            placeholder={selectedRefConfig?.apiKey ? '留空则复用配置 Key' : 'sk-...'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
 
                     {!剧情回忆独立开启 && (
                         <div className="text-[11px] text-gray-400">当前状态：剧情回忆检索关闭</div>
@@ -410,17 +446,20 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
 
         if (activeSubTab === 'memory_summary') {
             const modelValue = (form.功能模型占位.记忆总结使用模型 || '').trim();
+            const selectedConfigId = form.功能模型占位.记忆总结使用配置ID;
+            const selectedRefConfig = selectedConfigId ? getConfigById(selectedConfigId) : null;
             const modelDisplay = 记忆总结独立开启 ? modelValue : 主剧情解析模型;
             const selectOptions = Array.from(new Set([
                 ...modelOptions,
                 modelValue,
                 主剧情解析模型
             ].map((item) => (item || '').trim()).filter(Boolean)));
+            const [showManualInput, setShowManualInput] = useState(false);
 
             return (
                 <div className="space-y-4">
                     <div className="text-[11px] text-gray-400">
-                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。该设置同时作用于"短期转中期""中期转长期"以及 NPC 记忆总结流程；留空时复用主配置。
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。该设置同时作用于"短期转中期""中期转长期"以及 NPC 记忆总结流程；开启独立模型后选择一个已有配置，或手动输入 API 地址和密钥。
                     </div>
 
                     <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
@@ -432,65 +471,85 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
                         />
                     </label>
 
-                    <div className="flex gap-3 items-end">
-                        <div className="flex-1 space-y-1">
-                            <label className="text-xs text-gray-300">记忆总结使用模型</label>
-                            <InlineSelect
-                                value={modelDisplay}
-                                options={selectOptions.map((model) => ({ value: model, label: model }))}
-                                onChange={(model) => updatePlaceholder('记忆总结使用模型', model)}
-                                disabled={!记忆总结独立开启 || selectOptions.length === 0}
-                                placeholder={!记忆总结独立开启
-                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
-                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
-                                buttonClassName={记忆总结独立开启
-                                    ? 'bg-black/50 border-gray-600 py-2.5'
-                                    : 'bg-black/30 border-gray-700 py-2.5'}
-                            />
-                        </div>
-                        <GameButton
-                            onClick={handleFetchModels}
-                            variant="secondary"
-                            className="px-4 py-2 text-xs"
-                            disabled={loadingModels}
-                        >
-                            {loadingModels ? '...' : '获取列表'}
-                        </GameButton>
-                    </div>
+                    {记忆总结独立开启 && (
+                        <>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-300">引用接口配置</label>
+                                <InlineSelect
+                                    value={selectedConfigId}
+                                    options={apiConfigOptions}
+                                    onChange={(configId) => {
+                                        updatePlaceholder('记忆总结使用配置ID', configId);
+                                        if (configId) {
+                                            const refCfg = getConfigById(configId);
+                                            if (refCfg) {
+                                                updatePlaceholder('记忆总结API地址', refCfg.baseUrl || '');
+                                                updatePlaceholder('记忆总结API密钥', refCfg.apiKey || '');
+                                            }
+                                        }
+                                    }}
+                                    disabled={apiConfigOptions.length === 0}
+                                    placeholder="请选择接口配置"
+                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                />
+                            </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">记忆总结独立 API 地址（可选）</label>
-                        <input
-                            type="text"
-                            value={form.功能模型占位.记忆总结API地址 || ''}
-                            onChange={(e) => updatePlaceholder('记忆总结API地址', e.target.value)}
-                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
-                            disabled={!记忆总结独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                记忆总结独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅总结请求改用此地址。</div>
-                    </div>
+                            <div className="flex gap-3 items-end">
+                                <div className="flex-1 space-y-1">
+                                    <label className="text-xs text-gray-300">记忆总结使用模型</label>
+                                    <InlineSelect
+                                        value={modelDisplay}
+                                        options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                        onChange={(model) => updatePlaceholder('记忆总结使用模型', model)}
+                                        disabled={selectOptions.length === 0}
+                                        placeholder={selectOptions.length ? '请选择模型' : '请先点击获取列表'}
+                                        buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                    />
+                                </div>
+                                <GameButton
+                                    onClick={handleFetchModels}
+                                    variant="secondary"
+                                    className="px-4 py-2 text-xs"
+                                    disabled={loadingModels}
+                                >
+                                    {loadingModels ? '...' : '获取列表'}
+                                </GameButton>
+                            </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">记忆总结独立 API 密钥（可选）</label>
-                        <input
-                            type="password"
-                            value={form.功能模型占位.记忆总结API密钥 || ''}
-                            onChange={(e) => updatePlaceholder('记忆总结API密钥', e.target.value)}
-                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
-                            disabled={!记忆总结独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                记忆总结独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后总结请求优先使用该密钥。</div>
-                    </div>
+                            <button
+                                type="button"
+                                onClick={() => setShowManualInput(!showManualInput)}
+                                className="text-xs text-gray-500 hover:text-gray-300"
+                            >
+                                {showManualInput ? '▲ 隐藏手动输入' : '▼ 显示手动输入'}
+                            </button>
+
+                            {showManualInput && (
+                                <>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">记忆总结独立 API 地址</label>
+                                        <input
+                                            type="text"
+                                            value={form.功能模型占位.记忆总结API地址 || ''}
+                                            onChange={(e) => updatePlaceholder('记忆总结API地址', e.target.value)}
+                                            placeholder={selectedRefConfig?.baseUrl || activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">记忆总结独立 API 密钥</label>
+                                        <input
+                                            type="password"
+                                            value={form.功能模型占位.记忆总结API密钥 || ''}
+                                            onChange={(e) => updatePlaceholder('记忆总结API密钥', e.target.value)}
+                                            placeholder={selectedRefConfig?.apiKey ? '留空则复用配置 Key' : 'sk-...'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
 
                     {!记忆总结独立开启 && (
                         <div className="text-[11px] text-gray-400">
@@ -503,17 +562,20 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
 
         if (activeSubTab === 'variable') {
             const modelValue = (form.功能模型占位.变量计算使用模型 || '').trim();
+            const selectedConfigId = form.功能模型占位.变量计算使用配置ID;
+            const selectedRefConfig = selectedConfigId ? getConfigById(selectedConfigId) : null;
             const modelDisplay = 变量计算独立开启 ? modelValue : 主剧情解析模型;
             const selectOptions = Array.from(new Set([
                 ...modelOptions,
                 modelValue,
                 主剧情解析模型
             ].map((item) => (item || '').trim()).filter(Boolean)));
+            const [showManualInput, setShowManualInput] = useState(false);
 
             return (
                 <div className="space-y-4">
                     <div className="text-[11px] text-gray-400">
-                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启后，会启用本地确定性修正与独立变量生成链路；关闭后，两者都会停用。
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启后，会启用本地确定性修正与独立变量生成链路；开启独立模型后选择一个已有配置，或手动输入 API 地址和密钥。
                     </div>
 
                     <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
@@ -525,65 +587,85 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
                         />
                     </label>
 
-                    <div className="flex gap-3 items-end">
-                        <div className="flex-1 space-y-1">
-                            <label className="text-xs text-gray-300">变量生成使用模型</label>
-                            <InlineSelect
-                                value={modelDisplay}
-                                options={selectOptions.map((model) => ({ value: model, label: model }))}
-                                onChange={(model) => updatePlaceholder('变量计算使用模型', model)}
-                                disabled={!变量计算独立开启 || selectOptions.length === 0}
-                                placeholder={!变量计算独立开启
-                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
-                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
-                                buttonClassName={变量计算独立开启
-                                    ? 'bg-black/50 border-gray-600 py-2.5'
-                                    : 'bg-black/30 border-gray-700 py-2.5'}
-                            />
-                        </div>
-                        <GameButton
-                            onClick={handleFetchModels}
-                            variant="secondary"
-                            className="px-4 py-2 text-xs"
-                            disabled={loadingModels}
-                        >
-                            {loadingModels ? '...' : '获取列表'}
-                        </GameButton>
-                    </div>
+                    {变量计算独立开启 && (
+                        <>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-300">引用接口配置</label>
+                                <InlineSelect
+                                    value={selectedConfigId}
+                                    options={apiConfigOptions}
+                                    onChange={(configId) => {
+                                        updatePlaceholder('变量计算使用配置ID', configId);
+                                        if (configId) {
+                                            const refCfg = getConfigById(configId);
+                                            if (refCfg) {
+                                                updatePlaceholder('变量计算API地址', refCfg.baseUrl || '');
+                                                updatePlaceholder('变量计算API密钥', refCfg.apiKey || '');
+                                            }
+                                        }
+                                    }}
+                                    disabled={apiConfigOptions.length === 0}
+                                    placeholder="请选择接口配置"
+                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                />
+                            </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">变量独立 API 地址（可选）</label>
-                        <input
-                            type="text"
-                            value={form.功能模型占位.变量计算API地址 || ''}
-                            onChange={(e) => updatePlaceholder('变量计算API地址', e.target.value)}
-                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
-                            disabled={!变量计算独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                变量计算独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-cyan-400'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅变量生成请求改用此地址。</div>
-                    </div>
+                            <div className="flex gap-3 items-end">
+                                <div className="flex-1 space-y-1">
+                                    <label className="text-xs text-gray-300">变量生成使用模型</label>
+                                    <InlineSelect
+                                        value={modelDisplay}
+                                        options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                        onChange={(model) => updatePlaceholder('变量计算使用模型', model)}
+                                        disabled={selectOptions.length === 0}
+                                        placeholder={selectOptions.length ? '请选择模型' : '请先点击获取列表'}
+                                        buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                    />
+                                </div>
+                                <GameButton
+                                    onClick={handleFetchModels}
+                                    variant="secondary"
+                                    className="px-4 py-2 text-xs"
+                                    disabled={loadingModels}
+                                >
+                                    {loadingModels ? '...' : '获取列表'}
+                                </GameButton>
+                            </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">变量独立 API 密钥（可选）</label>
-                        <input
-                            type="password"
-                            value={form.功能模型占位.变量计算API密钥 || ''}
-                            onChange={(e) => updatePlaceholder('变量计算API密钥', e.target.value)}
-                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
-                            disabled={!变量计算独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                变量计算独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-cyan-400'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后变量生成请求优先使用该密钥。</div>
-                    </div>
+                            <button
+                                type="button"
+                                onClick={() => setShowManualInput(!showManualInput)}
+                                className="text-xs text-gray-500 hover:text-gray-300"
+                            >
+                                {showManualInput ? '▲ 隐藏手动输入' : '▼ 显示手动输入'}
+                            </button>
+
+                            {showManualInput && (
+                                <>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">变量独立 API 地址</label>
+                                        <input
+                                            type="text"
+                                            value={form.功能模型占位.变量计算API地址 || ''}
+                                            onChange={(e) => updatePlaceholder('变量计算API地址', e.target.value)}
+                                            placeholder={selectedRefConfig?.baseUrl || activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-cyan-400"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">变量独立 API 密钥</label>
+                                        <input
+                                            type="password"
+                                            value={form.功能模型占位.变量计算API密钥 || ''}
+                                            onChange={(e) => updatePlaceholder('变量计算API密钥', e.target.value)}
+                                            placeholder={selectedRefConfig?.apiKey ? '留空则复用配置 Key' : 'sk-...'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-cyan-400"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
 
                     <div className="rounded-md border border-cyan-500/20 bg-black/25 p-3 text-[11px] leading-5 text-gray-400">
                         返回内容只用于变量更新，不参与正文生成。变量模型失败时，会自动回退为"主剧情命令 + 本地变量修正"。
@@ -594,122 +676,204 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
 
         if (activeSubTab === 'planning') {
             const modelValue = (form.功能模型占位.规划分析使用模型 || '').trim();
+            const selectedConfigId = form.功能模型占位.规划分析使用配置ID;
+            const selectedRefConfig = selectedConfigId ? getConfigById(selectedConfigId) : null;
             const modelDisplay = 规划分析独立开启 ? modelValue : 主剧情解析模型;
             const selectOptions = Array.from(new Set([
                 ...modelOptions,
                 modelValue,
                 主剧情解析模型
             ].map((item) => (item || '').trim()).filter(Boolean)));
+            const [showManualInput, setShowManualInput] = useState(false);
 
             return (
                 <div className="space-y-4">
-                    <div className="text-[11px] text-gray-400">当前启用接口配置：{activeConfig?.名称 || '未配置'}。</div>
+                    <div className="text-[11px] text-gray-400">当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启独立模型后选择一个已有配置，或手动输入 API 地址和密钥。</div>
                     <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
                         <span>启用规划分析独立模型</span>
                         <ToggleSwitch checked={规划分析独立开启} onChange={handleTogglePlanning} ariaLabel="切换规划分析独立模型" />
                     </label>
-                    <div className="flex gap-3 items-end">
-                        <div className="flex-1 space-y-1">
-                            <label className="text-xs text-gray-300">规划分析使用模型</label>
-                            <InlineSelect
-                                value={modelDisplay}
-                                options={selectOptions.map((model) => ({ value: model, label: model }))}
-                                onChange={(model) => updatePlaceholder('规划分析使用模型', model)}
-                                disabled={!规划分析独立开启 || selectOptions.length === 0}
-                                placeholder={!规划分析独立开启 ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}` : (selectOptions.length ? '请选���模型' : '请先点击获取列表')}
-                                buttonClassName={规划分析独立开启 ? 'bg-black/50 border-gray-600 py-2.5' : 'bg-black/30 border-gray-700 py-2.5'}
-                            />
-                        </div>
-                        <GameButton onClick={handleFetchModels} variant="secondary" className="px-4 py-2 text-xs" disabled={loadingModels}>
-                            {loadingModels ? '...' : '获取列表'}
-                        </GameButton>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">规划分析独立 API 地址（可选）</label>
-                        <input
-                            type="text"
-                            value={form.功能模型占位.规划分析API地址 || ''}
-                            onChange={(e) => updatePlaceholder('规划分析API地址', e.target.value)}
-                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
-                            disabled={!规划分析独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${规划分析独立开启 ? 'bg-black/50 border-gray-700 focus:border-cyan-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">规划分析独立 API 密钥（可选）</label>
-                        <input
-                            type="password"
-                            value={form.功能模型占位.规划分析API密钥 || ''}
-                            onChange={(e) => updatePlaceholder('规划分析API密钥', e.target.value)}
-                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
-                            disabled={!规划分析独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${规划分析独立开启 ? 'bg-black/50 border-gray-700 focus:border-cyan-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
-                        />
-                    </div>
+
+                    {规划分析独立开启 && (
+                        <>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-300">引用接口配置</label>
+                                <InlineSelect
+                                    value={selectedConfigId}
+                                    options={apiConfigOptions}
+                                    onChange={(configId) => {
+                                        updatePlaceholder('规划分析使用配置ID', configId);
+                                        if (configId) {
+                                            const refCfg = getConfigById(configId);
+                                            if (refCfg) {
+                                                updatePlaceholder('规划分析API地址', refCfg.baseUrl || '');
+                                                updatePlaceholder('规划分析API密钥', refCfg.apiKey || '');
+                                            }
+                                        }
+                                    }}
+                                    disabled={apiConfigOptions.length === 0}
+                                    placeholder="请选择接口配置"
+                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                />
+                            </div>
+
+                            <div className="flex gap-3 items-end">
+                                <div className="flex-1 space-y-1">
+                                    <label className="text-xs text-gray-300">规划分析使用模型</label>
+                                    <InlineSelect
+                                        value={modelDisplay}
+                                        options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                        onChange={(model) => updatePlaceholder('规划分析使用模型', model)}
+                                        disabled={selectOptions.length === 0}
+                                        placeholder={selectOptions.length ? '请选择模型' : '请先点击获取列表'}
+                                        buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                    />
+                                </div>
+                                <GameButton onClick={handleFetchModels} variant="secondary" className="px-4 py-2 text-xs" disabled={loadingModels}>
+                                    {loadingModels ? '...' : '获取列表'}
+                                </GameButton>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowManualInput(!showManualInput)}
+                                className="text-xs text-gray-500 hover:text-gray-300"
+                            >
+                                {showManualInput ? '▲ 隐藏手动输入' : '▼ 显示手动输入'}
+                            </button>
+
+                            {showManualInput && (
+                                <>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">规划分析独立 API 地址</label>
+                                        <input
+                                            type="text"
+                                            value={form.功能模型占位.规划分析API地址 || ''}
+                                            onChange={(e) => updatePlaceholder('规划分析API地址', e.target.value)}
+                                            placeholder={selectedRefConfig?.baseUrl || activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-cyan-400"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">规划分析独立 API 密钥</label>
+                                        <input
+                                            type="password"
+                                            value={form.功能模型占位.规划分析API密钥 || ''}
+                                            onChange={(e) => updatePlaceholder('规划分析API密钥', e.target.value)}
+                                            placeholder={selectedRefConfig?.apiKey ? '留空则复用配置 Key' : 'sk-...'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-cyan-400"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
                 </div>
             );
         }
 
         if (activeSubTab === 'heroine_plan') {
             const modelValue = (form.功能模型占位.女主规划使用模型 || '').trim();
+            const selectedConfigId = form.功能模型占位.女主规划使用配置ID;
+            const selectedRefConfig = selectedConfigId ? getConfigById(selectedConfigId) : null;
             const modelDisplay = 女主规划独立开启 ? modelValue : 主剧情解析模型;
             const selectOptions = Array.from(new Set([
                 ...modelOptions,
                 modelValue,
                 主剧情解析模型
             ].map((item) => (item || '').trim()).filter(Boolean)));
+            const [showManualInput, setShowManualInput] = useState(false);
 
             return (
                 <div className="space-y-4">
-                    <div className="text-[11px] text-gray-400">当前启用接口配置：{activeConfig?.名称 || '未配置'}。为女主剧情规划提供独立更新模型，失败时回退为主流程状态。</div>
+                    <div className="text-[11px] text-gray-400">当前启用接口配置：{activeConfig?.名称 || '未配置'}。为女主剧情规划提供独立更新模型，失败时回退为主流程状态。开启独立模型后选择一个已有配置，或手动输入 API 地址和密钥。</div>
                     <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
                         <span>启用女主规划独立模型</span>
                         <ToggleSwitch checked={女主规划独立开启} onChange={handleToggleHeroinePlan} ariaLabel="切换女主规划独立模型" />
                     </label>
-                    <div className="flex gap-3 items-end">
-                        <div className="flex-1 space-y-1">
-                            <label className="text-xs text-gray-300">女主规划使用模型</label>
-                            <InlineSelect
-                                value={modelDisplay}
-                                options={selectOptions.map((model) => ({ value: model, label: model }))}
-                                onChange={(model) => updatePlaceholder('女主规划使用模型', model)}
-                                disabled={!女主规划独立开启 || selectOptions.length === 0}
-                                placeholder={!女主规划独立开启 ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}` : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
-                                buttonClassName={女主规划独立开启 ? 'bg-black/50 border-gray-600 py-2.5' : 'bg-black/30 border-gray-700 py-2.5'}
-                            />
-                        </div>
-                        <GameButton onClick={handleFetchModels} variant="secondary" className="px-4 py-2 text-xs" disabled={loadingModels}>
-                            {loadingModels ? '...' : '获取列表'}
-                        </GameButton>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">女主规划独立 API 地址（可选）</label>
-                        <input
-                            type="text"
-                            value={form.功能模型占位.女主规划API地址 || ''}
-                            onChange={(e) => updatePlaceholder('女主规划API地址', e.target.value)}
-                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
-                            disabled={!女主规划独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${女主规划独立开启 ? 'bg-black/50 border-gray-700 focus:border-pink-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">女主规划独立 API 密钥（可选）</label>
-                        <input
-                            type="password"
-                            value={form.功能模型占位.女主规划API密钥 || ''}
-                            onChange={(e) => updatePlaceholder('女主规划API密钥', e.target.value)}
-                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
-                            disabled={!女主规划独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${女主规划独立开启 ? 'bg-black/50 border-gray-700 focus:border-pink-400' : 'bg-black/30 border-gray-800 text-gray-400'}`}
-                        />
-                    </div>
+
+                    {女主规划独立开启 && (
+                        <>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-300">引用接口配置</label>
+                                <InlineSelect
+                                    value={selectedConfigId}
+                                    options={apiConfigOptions}
+                                    onChange={(configId) => {
+                                        updatePlaceholder('女主规划使用配置ID', configId);
+                                        if (configId) {
+                                            const refCfg = getConfigById(configId);
+                                            if (refCfg) {
+                                                updatePlaceholder('女主规划API地址', refCfg.baseUrl || '');
+                                                updatePlaceholder('女主规划API密钥', refCfg.apiKey || '');
+                                            }
+                                        }
+                                    }}
+                                    disabled={apiConfigOptions.length === 0}
+                                    placeholder="请选择接口配置"
+                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                />
+                            </div>
+
+                            <div className="flex gap-3 items-end">
+                                <div className="flex-1 space-y-1">
+                                    <label className="text-xs text-gray-300">女主规划使用模型</label>
+                                    <InlineSelect
+                                        value={modelDisplay}
+                                        options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                        onChange={(model) => updatePlaceholder('女主规划使用模型', model)}
+                                        disabled={selectOptions.length === 0}
+                                        placeholder={selectOptions.length ? '请选择模型' : '请先点击获取列表'}
+                                        buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                    />
+                                </div>
+                                <GameButton onClick={handleFetchModels} variant="secondary" className="px-4 py-2 text-xs" disabled={loadingModels}>
+                                    {loadingModels ? '...' : '获取列表'}
+                                </GameButton>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowManualInput(!showManualInput)}
+                                className="text-xs text-gray-500 hover:text-gray-300"
+                            >
+                                {showManualInput ? '▲ 隐藏手动输入' : '▼ 显示手动输入'}
+                            </button>
+
+                            {showManualInput && (
+                                <>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">女主规划独立 API 地址</label>
+                                        <input
+                                            type="text"
+                                            value={form.功能模型占位.女主规划API地址 || ''}
+                                            onChange={(e) => updatePlaceholder('女主规划API地址', e.target.value)}
+                                            placeholder={selectedRefConfig?.baseUrl || activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-pink-400"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">女主规划独立 API 密钥</label>
+                                        <input
+                                            type="password"
+                                            value={form.功能模型占位.女主规划API密钥 || ''}
+                                            onChange={(e) => updatePlaceholder('女主规划API密钥', e.target.value)}
+                                            placeholder={selectedRefConfig?.apiKey ? '留空则复用配置 Key' : 'sk-...'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-pink-400"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
                 </div>
             );
         }
 
         if (activeSubTab === 'polish') {
             const modelValue = (form.功能模型占位.文章优化使用模型 || '').trim();
+            const selectedConfigId = form.功能模型占位.文章优化使用配置ID;
+            const selectedRefConfig = selectedConfigId ? getConfigById(selectedConfigId) : null;
             const modelDisplay = 文章优化独立开启 ? modelValue : 主剧情解析模型;
             const polishPromptValue = (form.功能模型占位.文章优化提示词 || '').trim().length > 0
                 ? form.功能模型占位.文章优化提示词
@@ -719,11 +883,12 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
                 modelValue,
                 主剧情解析模型
             ].map((item) => (item || '').trim()).filter(Boolean)));
+            const [showManualInput, setShowManualInput] = useState(false);
 
             return (
                 <div className="space-y-4">
                     <div className="text-[11px] text-gray-400">
-                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启后才会自动润色 正文标签；可单独指定 Base URL 与 API Key，留空时复用主配置。
+                        当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启后才会自动润色 正文标签；开启独立模型后选择一个已有配置，或手动输入 API 地址和密钥。
                     </div>
 
                     <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
@@ -735,65 +900,85 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
                         />
                     </label>
 
-                    <div className="flex gap-3 items-end">
-                        <div className="flex-1 space-y-1">
-                            <label className="text-xs text-gray-300">文章优化使用模型</label>
-                            <InlineSelect
-                                value={modelDisplay}
-                                options={selectOptions.map((model) => ({ value: model, label: model }))}
-                                onChange={(model) => updatePlaceholder('文章优化使用模型', model)}
-                                disabled={!文章优化独立开启 || selectOptions.length === 0}
-                                placeholder={!文章优化独立开启
-                                    ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
-                                    : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
-                                buttonClassName={文章优化独立开启
-                                    ? 'bg-black/50 border-gray-600 py-2.5'
-                                    : 'bg-black/30 border-gray-700 py-2.5'}
-                            />
-                        </div>
-                        <GameButton
-                            onClick={handleFetchModels}
-                            variant="secondary"
-                            className="px-4 py-2 text-xs"
-                            disabled={loadingModels}
-                        >
-                            {loadingModels ? '...' : '获取列表'}
-                        </GameButton>
-                    </div>
+                    {文章优化独立开启 && (
+                        <>
+                            <div className="space-y-1">
+                                <label className="text-xs text-gray-300">引用接口配置</label>
+                                <InlineSelect
+                                    value={selectedConfigId}
+                                    options={apiConfigOptions}
+                                    onChange={(configId) => {
+                                        updatePlaceholder('文章优化使用配置ID', configId);
+                                        if (configId) {
+                                            const refCfg = getConfigById(configId);
+                                            if (refCfg) {
+                                                updatePlaceholder('文章优化API地址', refCfg.baseUrl || '');
+                                                updatePlaceholder('文章优化API密钥', refCfg.apiKey || '');
+                                            }
+                                        }
+                                    }}
+                                    disabled={apiConfigOptions.length === 0}
+                                    placeholder="请选择接口配置"
+                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                />
+                            </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">文章优化独立 API 地址（可选）</label>
-                        <input
-                            type="text"
-                            value={form.功能模型占位.文章优化API地址 || ''}
-                            onChange={(e) => updatePlaceholder('文章优化API地址', e.target.value)}
-                            placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
-                            disabled={!文章优化独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                文章优化独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅文章优化请求改用此地址。</div>
-                    </div>
+                            <div className="flex gap-3 items-end">
+                                <div className="flex-1 space-y-1">
+                                    <label className="text-xs text-gray-300">文章优化使用模型</label>
+                                    <InlineSelect
+                                        value={modelDisplay}
+                                        options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                        onChange={(model) => updatePlaceholder('文章优化使用模型', model)}
+                                        disabled={selectOptions.length === 0}
+                                        placeholder={selectOptions.length ? '请选择模型' : '请先点击获取列表'}
+                                        buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                    />
+                                </div>
+                                <GameButton
+                                    onClick={handleFetchModels}
+                                    variant="secondary"
+                                    className="px-4 py-2 text-xs"
+                                    disabled={loadingModels}
+                                >
+                                    {loadingModels ? '...' : '获取列表'}
+                                </GameButton>
+                            </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs text-gray-300">文章优化独立 API 密钥（可选）</label>
-                        <input
-                            type="password"
-                            value={form.功能模型占位.文章优化API密钥 || ''}
-                            onChange={(e) => updatePlaceholder('文章优化API密钥', e.target.value)}
-                            placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
-                            disabled={!文章优化独立开启}
-                            className={`w-full border p-2 text-white rounded-md outline-none ${
-                                文章优化独立开启
-                                    ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                    : 'bg-black/30 border-gray-800 text-gray-400'
-                            }`}
-                        />
-                        <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后文章优化请求优先使用该密钥。</div>
-                    </div>
+                            <button
+                                type="button"
+                                onClick={() => setShowManualInput(!showManualInput)}
+                                className="text-xs text-gray-500 hover:text-gray-300"
+                            >
+                                {showManualInput ? '▲ 隐藏手动输入' : '▼ 显示手动输入'}
+                            </button>
+
+                            {showManualInput && (
+                                <>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">文章优化独立 API 地址</label>
+                                        <input
+                                            type="text"
+                                            value={form.功能模型占位.文章优化API地址 || ''}
+                                            onChange={(e) => updatePlaceholder('文章优化API地址', e.target.value)}
+                                            placeholder={selectedRefConfig?.baseUrl || activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-300">文章优化独立 API 密钥</label>
+                                        <input
+                                            type="password"
+                                            value={form.功能模型占位.文章优化API密钥 || ''}
+                                            onChange={(e) => updatePlaceholder('文章优化API密钥', e.target.value)}
+                                            placeholder={selectedRefConfig?.apiKey ? '留空则复用配置 Key' : 'sk-...'}
+                                            className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
 
                     {!文章优化独立开启 && (
                         <div className="text-[11px] text-gray-400">
@@ -823,17 +1008,20 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
         }
 
         const modelValue = (form.功能模型占位.世界演变使用模型 || '').trim();
+        const selectedConfigId = form.功能模型占位.世界演变使用配置ID;
+        const selectedRefConfig = selectedConfigId ? getConfigById(selectedConfigId) : null;
         const modelDisplay = 世界演变独立开启 ? modelValue : 主剧情解析模型;
         const selectOptions = Array.from(new Set([
             ...modelOptions,
             modelValue,
             主剧情解析模型
         ].map((item) => (item || '').trim()).filter(Boolean)));
+        const [showManualInput, setShowManualInput] = useState(false);
 
         return (
             <div className="space-y-4">
                 <div className="text-[11px] text-gray-400">
-                    当前启用接口配置：{activeConfig?.名称 || '未配置'}。可为世界演变单独指定 Base URL 与 API Key；留空时复用主配置。
+                    当前启用接口配置：{activeConfig?.名称 || '未配置'}。开启独立模型后选择一个已有配置，或手动输入 API 地址和密钥。
                 </div>
 
                 <label className="flex items-center justify-between gap-3 text-xs text-gray-300">
@@ -845,65 +1033,85 @@ const IntegratedModelSettings: React.FC<Props> = ({ settings, onSave }) => {
                     />
                 </label>
 
-                <div className="flex gap-3 items-end">
-                    <div className="flex-1 space-y-1">
-                        <label className="text-xs text-gray-300">世界演变使用模型</label>
-                        <InlineSelect
-                            value={modelDisplay}
-                            options={selectOptions.map((model) => ({ value: model, label: model }))}
-                            onChange={(model) => updatePlaceholder('世界演变使用模型', model)}
-                            disabled={!世界演变独立开启 || selectOptions.length === 0}
-                            placeholder={!世界演变独立开启
-                                ? `跟随主剧情模型：${主剧情解析模型 || '未设置'}`
-                                : (selectOptions.length ? '请选择模型' : '请先点击获取列表')}
-                            buttonClassName={世界演变独立开启
-                                ? 'bg-black/50 border-gray-600 py-2.5'
-                                : 'bg-black/30 border-gray-700 py-2.5'}
-                        />
-                    </div>
-                    <GameButton
-                        onClick={handleFetchModels}
-                        variant="secondary"
-                        className="px-4 py-2 text-xs"
-                        disabled={loadingModels}
-                    >
-                        {loadingModels ? '...' : '获取列表'}
-                    </GameButton>
-                </div>
+                {世界演变独立开启 && (
+                    <>
+                        <div className="space-y-1">
+                            <label className="text-xs text-gray-300">引用接口配置</label>
+                            <InlineSelect
+                                value={selectedConfigId}
+                                options={apiConfigOptions}
+                                onChange={(configId) => {
+                                    updatePlaceholder('世界演变使用配置ID', configId);
+                                    if (configId) {
+                                        const refCfg = getConfigById(configId);
+                                        if (refCfg) {
+                                            updatePlaceholder('世界演变API地址', refCfg.baseUrl || '');
+                                            updatePlaceholder('世界演变API密钥', refCfg.apiKey || '');
+                                        }
+                                    }
+                                }}
+                                disabled={apiConfigOptions.length === 0}
+                                placeholder="请选择接口配置"
+                                buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                            />
+                        </div>
 
-                <div className="space-y-1">
-                    <label className="text-xs text-gray-300">世界演变独立 API 地址（可选）</label>
-                    <input
-                        type="text"
-                        value={form.功能模型占位.世界演变API地址 || ''}
-                        onChange={(e) => updatePlaceholder('世界演变API地址', e.target.value)}
-                        placeholder={activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
-                        disabled={!世界演变独立开启}
-                        className={`w-full border p-2 text-white rounded-md outline-none ${
-                            世界演变独立开启
-                                ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                : 'bg-black/30 border-gray-800 text-gray-400'
-                        }`}
-                    />
-                    <div className="text-[11px] text-gray-500">留空则复用主剧情 Base URL；填写后仅世界演变请求改用此地址。</div>
-                </div>
+                        <div className="flex gap-3 items-end">
+                            <div className="flex-1 space-y-1">
+                                <label className="text-xs text-gray-300">世界演变使用模型</label>
+                                <InlineSelect
+                                    value={modelDisplay}
+                                    options={selectOptions.map((model) => ({ value: model, label: model }))}
+                                    onChange={(model) => updatePlaceholder('世界演变使用模型', model)}
+                                    disabled={selectOptions.length === 0}
+                                    placeholder={selectOptions.length ? '请选择模型' : '请先点击获取列表'}
+                                    buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                                />
+                            </div>
+                            <GameButton
+                                onClick={handleFetchModels}
+                                variant="secondary"
+                                className="px-4 py-2 text-xs"
+                                disabled={loadingModels}
+                            >
+                                {loadingModels ? '...' : '获取列表'}
+                            </GameButton>
+                        </div>
 
-                <div className="space-y-1">
-                    <label className="text-xs text-gray-300">世界演变独立 API 密钥（可选）</label>
-                    <input
-                        type="password"
-                        value={form.功能模型占位.世界演变API密钥 || ''}
-                        onChange={(e) => updatePlaceholder('世界演变API密钥', e.target.value)}
-                        placeholder={activeConfig?.apiKey ? '留空则复用主剧情 API Key' : 'sk-...'}
-                        disabled={!世界演变独立开启}
-                        className={`w-full border p-2 text-white rounded-md outline-none ${
-                            世界演变独立开启
-                                ? 'bg-black/50 border-gray-700 focus:border-wuxia-gold'
-                                : 'bg-black/30 border-gray-800 text-gray-400'
-                        }`}
-                    />
-                    <div className="text-[11px] text-gray-500">留空则复用主剧情 API Key；填写后世界演变请求优先使用该密钥。</div>
-                </div>
+                        <button
+                            type="button"
+                            onClick={() => setShowManualInput(!showManualInput)}
+                            className="text-xs text-gray-500 hover:text-gray-300"
+                        >
+                            {showManualInput ? '▲ 隐藏手动输入' : '▼ 显示手动输入'}
+                        </button>
+
+                        {showManualInput && (
+                            <>
+                                <div className="space-y-1">
+                                    <label className="text-xs text-gray-300">世界演变独立 API 地址</label>
+                                    <input
+                                        type="text"
+                                        value={form.功能模型占位.世界演变API地址 || ''}
+                                        onChange={(e) => updatePlaceholder('世界演变API地址', e.target.value)}
+                                        placeholder={selectedRefConfig?.baseUrl || activeConfig?.baseUrl || '留空则复用主剧情 Base URL'}
+                                        className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs text-gray-300">世界演变独立 API 密钥</label>
+                                    <input
+                                        type="password"
+                                        value={form.功能模型占位.世界演变API密钥 || ''}
+                                        onChange={(e) => updatePlaceholder('世界演变API密钥', e.target.value)}
+                                        placeholder={selectedRefConfig?.apiKey ? '留空则复用配置 Key' : 'sk-...'}
+                                        className="w-full border p-2 text-white rounded-md outline-none bg-black/50 border-gray-700 focus:border-wuxia-gold"
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </>
+                )}
 
                 {!世界演变独立开启 && (
                     <div className="text-[11px] text-gray-400">
