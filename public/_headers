@@ -1,0 +1,8 @@
+/*
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
+
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, GET, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, X-GitHub-Token, X-GitHub-Upload-Url, X-GitHub-Download-Url
