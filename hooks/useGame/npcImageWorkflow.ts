@@ -75,7 +75,7 @@ const 获取画风附加要求 = (style?: 当前可用接口结构['画风']): s
 
 export const 执行NPC生图工作流 = async (
     npc: any,
-    options: { force?: boolean; source?: 生图任务来源类型; 构图?: '头像' | '半身' | '立绘'; 画风?: 当前可用接口结构['画风']; 画师串?: string; 画师串预设ID?: string; PNG画风预设ID?: string; 额外要求?: string; 尺寸?: string } | undefined,
+    options: { force?: boolean; source?: 生图任务来源类型; 构图?: '头像' | '半身' | '立绘'; 画风?: 当前可用接口结构['画风']; 画师串?: string; 画师串预设ID?: string; PNG画风预设ID?: string; 额外要求?: string; 尺寸?: string; 复用提示词?: { 生图词组: string; 最终正向提示词: string; 最终负向提示词: string } } | undefined,
     deps: NPC生图工作流依赖
 ): Promise<void> => {
     const npcKey = deps.获取NPC唯一标识(npc);
@@ -86,6 +86,8 @@ export const 执行NPC生图工作流 = async (
     const backendType = imageApi?.图片后端类型;
     const shouldUsePromptTransformer = backendType === 'novelai' || imageFeature.使用词组转化器 !== false;
     const promptApi = shouldUsePromptTransformer ? deps.获取生图词组转化器接口配置(deps.apiConfig) : null;
+    const 复用提示词 = options?.复用提示词;
+    const 直接生成图片 = Boolean(复用提示词?.生图词组 || 复用提示词?.最终正向提示词);
     if (!imageFeature.总开关) return;
     if (!options?.force && !imageFeature.NPC开关) return;
     if (!options?.force && !deps.NPC符合自动生图条件(npc)) return;
@@ -228,78 +230,134 @@ export const 执行NPC生图工作流 = async (
     });
 
     try {
-        const { 原始描述, 生图词组 } = shouldUsePromptTransformer && promptApi
-            ? await imageAIService.generateNpcImagePrompt(
-                npcImageBaseData,
-                safePromptApi,
-                undefined,
-                undefined,
-                undefined,
-                {
-                    构图,
-                    画风,
-                    额外要求,
-                    后端类型,
-                    启用画师串预设: !词组转化兼容模式 && (启用画师串预设 || 启用PNG画风预设),
-                    兼容模式: 词组转化兼容模式,
-                    风格提示词输入: 兼容模式风格提示词 || undefined,
-                    角色锚点: 角色锚点 ? {
-                        名称: 角色锚点.名称,
-                        正面提示词: 角色锚点.正面提示词,
-                        负面提示词: 角色锚点.负面提示词,
-                        结构化特征: 角色锚点.结构化特征
-                    } : undefined
-                }
-            )
-            : imageAIService.buildNpcDirectImagePrompt(npcImageBaseData, { 构图, 画风, 额外要求, 后端类型, 启用画师串预设: !词组转化兼容模式 && (启用画师串预设 || 启用PNG画风预设), 兼容模式: 词组转化兼容模式, 风格提示词输入: 兼容模式风格提示词 || undefined });
-        const 最终提示词 = imageAIService.构建最终图片提示词(生图词组, imageApiForTask, {
-            构图,
-            尺寸: 尺寸 || undefined,
-            附加正向提示词: 前置正向提示词,
-            附加负面提示词: 合并负向画师串,
-            PNG参数
-        });
-        deps.更新NPC生图任务(task.id, (currentTask) => ({
-            ...currentTask,
-            原始描述,
-            生图词组,
-            最终正向提示词: 最终提示词.最终正向提示词,
-            最终负向提示词: 最终提示词.最终负向提示词,
-            构图,
-            画风,
-            画师串: 前置正向提示词,
-            额外要求,
-            尺寸,
-            进度阶段: 'generating',
-            进度文本: shouldUsePromptTransformer ? '词组转换完成，正在调用图片模型生成图片。' : '角色资料整理完成，正在调用图片模型生成图片。'
-        }));
-        deps.更新NPC最近生图结果(npcKey, (currentNpc) => {
-            const 当前结果 = currentNpc?.图片档案?.最近生图结果 || currentNpc?.最近生图结果 || {};
-            const 处理中结果 = {
-                ...当前结果,
-                id: 当前结果?.id || deps.生成NPC生图记录ID(),
+        let 原始描述: string;
+        let 生图词组: string;
+        let 最终提示词: { 最终正向提示词: string; 最终负向提示词: string };
+
+        if (直接生成图片 && 复用提示词) {
+            原始描述 = 复用提示词.生图词组 || '';
+            生图词组 = 复用提示词.生图词组 || 复用提示词.最终正向提示词 || '';
+            最终提示词 = {
+                最终正向提示词: 复用提示词.最终正向提示词 || '',
+                最终负向提示词: 复用提示词.最终负向提示词 || ''
+            };
+            deps.更新NPC生图任务(task.id, (currentTask) => ({
+                ...currentTask,
+                原始描述,
                 生图词组,
                 最终正向提示词: 最终提示词.最终正向提示词,
                 最终负向提示词: 最终提示词.最终负向提示词,
-                原始描述,
-                使用模型: modelName,
-                生成时间: 当前结果?.生成时间 || Date.now(),
                 构图,
                 画风,
                 画师串: 前置正向提示词,
+                额外要求,
                 尺寸,
-                状态: 'pending' as const,
-                错误信息: undefined
-            };
-            return {
-                ...currentNpc,
-                最近生图结果: 处理中结果,
-                图片档案: {
+                进度阶段: 'generating',
+                进度文本: '正在使用已有提示词调用图片模型生成图片。'
+            }));
+            deps.更新NPC最近生图结果(npcKey, (currentNpc) => {
+                const 当前结果 = currentNpc?.图片档案?.最近生图结果 || currentNpc?.最近生图结果 || {};
+                const 处理中结果 = {
+                    ...当前结果,
+                    id: 当前结果?.id || deps.生成NPC生图记录ID(),
+                    生图词组,
+                    最终正向提示词: 最终提示词.最终正向提示词,
+                    最终负向提示词: 最终提示词.最终负向提示词,
+                    原始描述,
+                    使用模型: modelName,
+                    生成时间: 当前结果?.生成时间 || Date.now(),
+                    构图,
+                    画风,
+                    画师串: 前置正向提示词,
+                    尺寸,
+                    状态: 'pending' as const,
+                    错误信息: undefined
+                };
+                return {
+                    ...currentNpc,
                     最近生图结果: 处理中结果,
-                    生图历史: [处理中结果]
-                }
-            };
-        });
+                    图片档案: {
+                        最近生图结果: 处理中结果,
+                        生图历史: [处理中结果]
+                    }
+                };
+            });
+        } else {
+            const promptResult = shouldUsePromptTransformer && promptApi
+                ? await imageAIService.generateNpcImagePrompt(
+                    npcImageBaseData,
+                    safePromptApi,
+                    undefined,
+                    undefined,
+                    undefined,
+                    {
+                        构图,
+                        画风,
+                        额外要求,
+                        后端类型,
+                        启用画师串预设: !词组转化兼容模式 && (启用画师串预设 || 启用PNG画风预设),
+                        兼容模式: 词组转化兼容模式,
+                        风格提示词输入: 兼容模式风格提示词 || undefined,
+                        角色锚点: 角色锚点 ? {
+                            名称: 角色锚点.名称,
+                            正面提示词: 角色锚点.正面提示词,
+                            负面提示词: 角色锚点.负面提示词,
+                            结构化特征: 角色锚点.结构化特征
+                        } : undefined
+                    }
+                )
+                : { 原始描述: '', 生图词组: imageAIService.buildNpcDirectImagePrompt(npcImageBaseData, { 构图, 画风, 额外要求, 后端类型, 启用画师串预设: !词组转化兼容模式 && (启用画师串预设 || 启用PNG画风预设), 兼容模式: 词组转化兼容模式, 风格提示词输入: 兼容模式风格提示词 || undefined }) };
+            原始描述 = promptResult.原始描述;
+            生图词组 = promptResult.生图词组;
+            最终提示词 = imageAIService.构建最终图片提示词(生图词组, imageApiForTask, {
+                构图,
+                尺寸: 尺寸 || undefined,
+                附加正向提示词: 前置正向提示词,
+                附加负面提示词: 合并负向画师串,
+                PNG参数
+            });
+            deps.更新NPC生图任务(task.id, (currentTask) => ({
+                ...currentTask,
+                原始描述,
+                生图词组,
+                最终正向提示词: 最终提示词.最终正向提示词,
+                最终负向提示词: 最终提示词.最终负向提示词,
+                构图,
+                画风,
+                画师串: 前置正向提示词,
+                额外要求,
+                尺寸,
+                进度阶段: 'generating',
+                进度文本: shouldUsePromptTransformer ? '词组转换完成，正在调用图片模型生成图片。' : '角色资料整理完成，正在调用图片模型生成图片。'
+            }));
+            deps.更新NPC最近生图结果(npcKey, (currentNpc) => {
+                const 当前结果 = currentNpc?.图片档案?.最近生图结果 || currentNpc?.最近生图结果 || {};
+                const 处理中结果 = {
+                    ...当前结果,
+                    id: 当前结果?.id || deps.生成NPC生图记录ID(),
+                    生图词组,
+                    最终正向提示词: 最终提示词.最终正向提示词,
+                    最终负向提示词: 最终提示词.最终负向提示词,
+                    原始描述,
+                    使用模型: modelName,
+                    生成时间: 当前结果?.生成时间 || Date.now(),
+                    构图,
+                    画风,
+                    画师串: 前置正向提示词,
+                    尺寸,
+                    状态: 'pending' as const,
+                    错误信息: undefined
+                };
+                return {
+                    ...currentNpc,
+                    最近生图结果: 处理中结果,
+                    图片档案: {
+                        最近生图结果: 处理中结果,
+                        生图历史: [处理中结果]
+                    }
+                };
+            });
+        }
         const imageResult = await imageAIService.generateImageByPrompt(生图词组, imageApiForTask, undefined, {
             构图,
             尺寸: 尺寸 || undefined,

@@ -22,7 +22,7 @@ interface Props {
 }
 
 type 生图模型字段 = '文生图模型使用模型' | '场景生图模型使用模型' | '词组转化器使用模型' | 'PNG提炼使用模型';
-type 设置分页 = 'basic' | 'provider' | 'transformer' | 'presets' | 'automation';
+type 设置分页 = 'basic' | 'provider' | 'transformer' | 'presets' | 'automation' | 'retry';
 type 画师串适用页签 = 'npc' | 'scene';
 type 词组预设页签 = 'nai' | 'npc' | 'scene';
 
@@ -45,7 +45,8 @@ const 基础页面选项: Array<{ value: 设置分页; label: string }> = [
     { value: 'provider', label: '接口设置' },
     { value: 'transformer', label: '转化器' },
     { value: 'presets', label: '预设管理' },
-    { value: 'automation', label: '自动任务' }
+    { value: 'automation', label: '自动任务' },
+    { value: 'retry', label: '重试设置' }
 ];
 
 const 文生图后端选项: Array<{ value: 功能模型占位配置结构['文生图后端类型']; label: string }> = [
@@ -1612,6 +1613,45 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
             {activePage === 'transformer' && renderTransformerPage()}
             {activePage === 'presets' && renderPresetsPage()}
             {activePage === 'automation' && renderAutomationPage()}
+            {activePage === 'retry' && (
+                <div className={页面容器样式}>
+                    <div className={卡片样式}>
+                        <div className="text-base font-bold text-fuchsia-200 mb-4">重试次数设置</div>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-fuchsia-200">提示词生成重试次数</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="5"
+                                    value={form.功能模型占位.提示词生成重试次数 ?? 1}
+                                    onChange={(e) => {
+                                        const value = Math.max(0, Math.min(5, Number(e.target.value) || 1));
+                                        updatePlaceholder('提示词生成重试次数', value);
+                                    }}
+                                    className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-fuchsia-400"
+                                />
+                                <p className="text-xs text-gray-400">提示词生成失败时的重试次数 (0-5，默认1)</p>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-fuchsia-200">图片生成重试次数</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="5"
+                                    value={form.功能模型占位.图片生成重试次数 ?? 1}
+                                    onChange={(e) => {
+                                        const value = Math.max(0, Math.min(5, Number(e.target.value) || 1));
+                                        updatePlaceholder('图片生成重试次数', value);
+                                    }}
+                                    className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-fuchsia-400"
+                                />
+                                <p className="text-xs text-gray-400">图片生成失败时的重试次数 (0-5，默认1)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {message && <p className="animate-pulse text-xs text-wuxia-cyan">{message}</p>}
 

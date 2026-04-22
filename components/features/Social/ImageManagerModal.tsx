@@ -36,7 +36,7 @@ interface Props {
     onSaveImageManagerConfig?: (config: 图片管理设置结构) => Promise<void> | void;
     onGenerateImage?: (npcId: string, options?: { 构图?: '头像' | '半身' | '立绘'; 画风?: '通用' | '二次元' | '写实' | '国风'; 画师串?: string; 画师串预设ID?: string; PNG画风预设ID?: string; 额外要求?: string; 尺寸?: string; 后台处理?: boolean }) => Promise<void> | void;
     onGenerateSecretPartImage?: (npcId: string, part: 香闺秘档部位类型 | '全部', options?: { 画风?: '通用' | '二次元' | '写实' | '国风'; 画师串?: string; 画师串预设ID?: string; PNG画风预设ID?: string; 额外要求?: string; 尺寸?: string; 后台处理?: boolean }) => Promise<void> | void;
-    onRetryImage?: (npcId: string) => Promise<void> | void;
+    onRetryImage?: (npcId: string, options?: { 重试模式?: '完全重试' | '复用提示词'; 保留提示词?: { 生图词组: string; 最终正向提示词: string; 最终负向提示词: string } }) => Promise<void> | void;
     onGenerateSceneImage?: (options?: { 画师串预设ID?: string; PNG画风预设ID?: string; 构图要求?: '纯场景' | '故事快照'; 尺寸?: string; 额外要求?: string; 后台处理?: boolean }) => Promise<void> | void;
     onSetPersistentWallpaper?: (imageUrl: string) => Promise<void> | void;
     onClearPersistentWallpaper?: () => Promise<void> | void;
@@ -474,6 +474,13 @@ const ImageManagerModal: React.FC<Props> = ({
     const [pngPresetImportRequirement, setPngPresetImportRequirement] = React.useState('');
     const [pngImportStage, setPngImportStage] = React.useState<'idle' | 'parsing' | 'done' | 'error'>('idle');
     const [pngImportMessage, setPngImportMessage] = React.useState('');
+    const [promptDisplayModal, setPromptDisplayModal] = React.useState<{
+        打开: boolean;
+        生图词组?: string;
+        最终正向提示词?: string;
+        最终负向提示词?: string;
+        错误信息?: string;
+    }>({ 打开: false });
 
     React.useEffect(() => {
         setPresetConfig(规范化接口设置(apiConfig));
@@ -2857,14 +2864,39 @@ const ImageManagerModal: React.FC<Props> = ({
                                     </div>
                                     {task.状态 === 'failed' && (
                                         <div className="mt-4 pt-3 border-t border-wuxia-gold/10 flex flex-wrap justify-end gap-2">
-                                            {task.构图 !== '部位特写' && (
-                                                <button type="button" onClick={() => 打开手动生图页(从任务标识提取NPCID(task.NPC标识), task.构图 === '部位特写' ? '头像' : (task.构图 || '头像'))} className={次级按钮样式()}>
-                                                    手动重试
+                                            {(task.生图词组 || task.最终正向提示词) && (
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => setPromptDisplayModal({
+                                                        打开: true,
+                                                        生图词组: task.生图词组,
+                                                        最终正向提示词: task.最终正向提示词,
+                                                        最终负向提示词: task.最终负向提示词,
+                                                        错误信息: task.错误信息
+                                                    })} 
+                                                    className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded border border-fuchsia-400/40 bg-fuchsia-500/10 text-fuchsia-300 hover:bg-fuchsia-500/20 text-xs transition-colors"
+                                                >
+                                                    查看提示词
                                                 </button>
                                             )}
-                                            {onRetryImage && task.构图 !== '部位特写' && (
-                                                <button type="button" onClick={() => onRetryImage(从任务标识提取NPCID(task.NPC标识))} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded border border-wuxia-gold/40 bg-wuxia-gold/10 text-wuxia-gold hover:bg-wuxia-gold/20 text-xs transition-colors shadow-[0_0_10px_rgba(212,175,55,0.1)]">
-                                                    重试任务
+                                            {task.构图 !== '部位特写' && (
+                                                <button type="button" onClick={() => 打开手动生图页(从任务标识提取NPCID(task.NPC标识), task.构图 === '部位特写' ? '头像' : (task.构图 || '头像'))} className={次级按钮样式()}>
+                                                    完全重试
+                                                </button>
+                                            )}
+                                            {onRetryImage && task.构图 !== '部位特写' && (task.生图词组 || task.最终正向提示词) && (
+                                                <button type="button" onClick={() => {
+                                                    if (onRetryImage) {
+                                                        const npcId = 从任务标识提取NPCID(task.NPC标识);
+                                                        const 保留提示词 = {
+                                                            生图词组: task.生图词组 || '',
+                                                            最终正向提示词: task.最终正向提示词 || '',
+                                                            最终负向提示词: task.最终负向提示词 || ''
+                                                        };
+                                                        onRetryImage(npcId, { 重试模式: '复用提示词', 保留提示词 });
+                                                    }
+                                                }} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded border border-amber-400/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 text-xs transition-colors shadow-[0_0_10px_rgba(212,175,55,0.1)]">
+                                                    复用提示词重试
                                                 </button>
                                             )}
                                         </div>
@@ -4801,6 +4833,79 @@ const ImageManagerModal: React.FC<Props> = ({
                                 </button>
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {promptDisplayModal.打开 && (
+                <div className="fixed inset-0 z-[250] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+                    <div
+                        className="w-full max-w-2xl bg-[#0c0d0f] border border-fuchsia-500/30 rounded-xl shadow-[0_0_50px_rgba(217,70,239,0.15)] max-h-[80vh] flex flex-col"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between p-4 border-b border-fuchsia-500/20">
+                            <div className="text-fuchsia-200 font-serif text-lg">提示词详情</div>
+                            <button
+                                type="button"
+                                onClick={() => setPromptDisplayModal({ 打开: false })}
+                                className="text-gray-400 hover:text-white transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                            {promptDisplayModal.生图词组 && (
+                                <div className="space-y-2">
+                                    <div className="text-sm font-bold text-fuchsia-300">生图词组</div>
+                                    <div className="text-sm text-gray-300 bg-black/40 rounded p-3 font-mono whitespace-pre-wrap">{promptDisplayModal.生图词组}</div>
+                                </div>
+                            )}
+                            {promptDisplayModal.最终正向提示词 && (
+                                <div className="space-y-2">
+                                    <div className="text-sm font-bold text-emerald-300 flex items-center justify-between">
+                                        <span>最终正向提示词</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(promptDisplayModal.最终正向提示词 || '');
+                                            }}
+                                            className="text-xs text-emerald-400 hover:text-emerald-300 underline"
+                                        >
+                                            复制
+                                        </button>
+                                    </div>
+                                    <div className="text-sm text-gray-300 bg-black/40 rounded p-3 font-mono whitespace-pre-wrap">{promptDisplayModal.最终正向提示词}</div>
+                                </div>
+                            )}
+                            {promptDisplayModal.最终负向提示词 && (
+                                <div className="space-y-2">
+                                    <div className="text-sm font-bold text-red-300 flex items-center justify-between">
+                                        <span>最终负向提示词</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(promptDisplayModal.最终负向提示词 || '');
+                                            }}
+                                            className="text-xs text-red-400 hover:text-red-300 underline"
+                                        >
+                                            复制
+                                        </button>
+                                    </div>
+                                    <div className="text-sm text-gray-300 bg-black/40 rounded p-3 font-mono whitespace-pre-wrap">{promptDisplayModal.最终负向提示词}</div>
+                                </div>
+                            )}
+                            {promptDisplayModal.错误信息 && (
+                                <div className="space-y-2">
+                                    <div className="text-sm font-bold text-red-300">错误信息</div>
+                                    <div className="text-sm text-red-400 bg-red-950/20 rounded p-3">{promptDisplayModal.错误信息}</div>
+                                </div>
+                            )}
+                            {!promptDisplayModal.生图词组 && !promptDisplayModal.最终正向提示词 && (
+                                <div className="text-center text-gray-500 py-8">提示词数据不可用</div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

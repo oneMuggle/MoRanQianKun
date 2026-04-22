@@ -211,7 +211,9 @@ export const 默认功能模型占位: 功能模型占位配置结构 = {
     场景生图启用: false,
     NPC生图启用: false,
     NPC生图性别筛选: '全部',
-    NPC生图重要性筛选: '全部'
+    NPC生图重要性筛选: '全部',
+    提示词生成重试次数: 1,
+    图片生成重试次数: 1
 };
 
 const 供应商默认值: Record<接口供应商类型, { baseUrl: string; model: string }> = {
@@ -851,7 +853,9 @@ const 标准化功能模型占位 = (raw: any): 功能模型占位配置结构 =
             : '全部',
         NPC生图重要性筛选: raw?.NPC生图重要性筛选 === '仅重要' || raw?.NPC生图重要性筛选 === '全部'
             ? raw.NPC生图重要性筛选
-            : '全部'
+            : '全部',
+        提示词生成重试次数: Math.max(0, Math.min(5, Number(raw?.提示词生成重试次数) || 1)),
+        图片生成重试次数: Math.max(0, Math.min(5, Number(raw?.图片生成重试次数) || 1))
     };
 };
 

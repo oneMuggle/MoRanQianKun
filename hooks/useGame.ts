@@ -1691,7 +1691,7 @@ export const useGame = () => {
         return records.slice(-safeLimit);
     };
 
-    const 执行单个NPC生图 = async (npc: any, options?: { force?: boolean; source?: 生图任务来源类型; 构图?: '头像' | '半身' | '立绘'; 画风?: 当前可用接口结构['画风']; 画师串?: string; 画师串预设ID?: string; PNG画风预设ID?: string; 额外要求?: string; 尺寸?: string }) => {
+    const 执行单个NPC生图 = async (npc: any, options?: { force?: boolean; source?: 生图任务来源类型; 构图?: '头像' | '半身' | '立绘'; 画风?: 当前可用接口结构['画风']; 画师串?: string; 画师串预设ID?: string; PNG画风预设ID?: string; 额外要求?: string; 尺寸?: string; 复用提示词?: { 生图词组: string; 最终正向提示词: string; 最终负向提示词: string } }) => {
         const { 执行NPC生图工作流 } = await 加载NPC生图工作流();
         return 执行NPC生图工作流(npc, {
             ...options,

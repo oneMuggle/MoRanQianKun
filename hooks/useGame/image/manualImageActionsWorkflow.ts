@@ -24,6 +24,12 @@ type 手动NPC生图选项 = {
     额外要求?: string;
     尺寸?: string;
     后台处理?: boolean;
+    重试模式?: '完全重试' | '复用提示词';
+    保留提示词?: {
+        生图词组: string;
+        最终正向提示词: string;
+        最终负向提示词: string;
+    };
 };
 
 type 手动私密生图选项 = {
@@ -160,16 +166,32 @@ export const 创建手动图片动作工作流 = (deps: 手动图片动作工作
         });
     };
 
-    const retryNpcImageGeneration = async (npcId: string) => {
+    const retryNpcImageGeneration = async (
+        npcId: string,
+        options?: {
+            重试模式?: '完全重试' | '复用提示词';
+            保留提示词?: {
+                生图词组: string;
+                最终正向提示词: string;
+                最终负向提示词: string;
+            };
+        }
+    ) => {
         if (!npcId) return;
         const targetNpc = (Array.isArray(deps.获取社交列表()) ? deps.获取社交列表() : []).find((npc: any) => npc && npc.id === npcId);
         if (!targetNpc) return;
         const comp = targetNpc?.图片档案?.最近生图结果?.构图 || targetNpc?.最近生图结果?.构图;
         const validComp = ['头像', '半身', '立绘'].includes(comp as string) ? (comp as '头像' | '半身' | '立绘') : undefined;
+        
+        const 使用复用提示词 = options?.重试模式 === '复用提示词' && options?.保留提示词;
+        
         await deps.执行单个NPC生图(targetNpc, {
             force: true,
             source: 'retry',
-            构图: validComp
+            构图: validComp,
+            ...(使用复用提示词 ? {
+                复用提示词: options.保留提示词
+            } : {})
         });
     };
 
