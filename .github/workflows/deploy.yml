@@ -30,8 +30,14 @@ jobs:
       - name: Create wrangler config
         run: |
           rm -f wrangler.toml
-          printf 'name = "wuxia-game"\ncompatibility_date = "2024-01-01"\naccount_id = "%s"\n\n[site]\nbucket = "dist"\n' \
-            "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" > wrangler.toml
+          cat > wrangler.toml << EOF
+name = "wuxia-game"
+compatibility_date = "2024-01-01"
+account_id = "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
+
+[site]
+bucket = "./dist"
+EOF
 
       - name: Deploy to Cloudflare Pages
         env:
@@ -44,4 +50,4 @@ jobs:
           else
             npx wrangler pages project create wuxia-game --production-branch=main
           fi
-          npx wrangler pages deploy dist --project-name=wuxia-game
+          npx wrangler pages deploy dist --project-name=wuxia-game --commit-dirty=true
