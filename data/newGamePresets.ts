@@ -25,6 +25,7 @@ export type 开局预设方案结构 = {
         属性: 属性分配;
         背景名称: string;
         天赋名称列表: string[];
+        气运列表?: any[];
     };
     openingConfig?: OpeningConfig;
     openingStreaming?: boolean;

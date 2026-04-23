@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import GameButton from '../../ui/GameButton';
 import { OpeningConfig, WorldGenConfig, 小说拆分数据集结构, 角色数据结构, 天赋结构, 背景结构, 游戏难度, 武力等级, 武力等级描述映射, NSFW场景类型, NSFW场景描述映射, 能力类型, 能力类型描述映射, 超能力分类, 超能力分类描述, 觉醒程度, 觉醒程度描述 } from '../../../types';
 import { 预设天赋, 预设背景 } from '../../../data/presets';
+import { randomQiyun, 气运数据, 气运数据列表 } from '../../../data/qiyun';
 import { 开局预设方案结构 } from '../../../data/newGamePresets';
 import { OrnateBorder } from '../../ui/decorations/OrnateBorder';
 import InlineSelect from '../../ui/InlineSelect';
@@ -253,6 +254,7 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
     // Talents & Background
     const [selectedBackground, setSelectedBackground] = useState<背景结构>(预设背景[0]);
     const [selectedTalents, setSelectedTalents] = useState<天赋结构[]>([]);
+    const [selectedQiyun, setSelectedQiyun] = useState<气运数据[]>([]);
     const [自定义天赋列表, 设置自定义天赋列表] = useState<天赋结构[]>([]);
     const [自定义背景列表, 设置自定义背景列表] = useState<背景结构[]>([]);
     const [自定义开局预设列表, 设置自定义开局预设列表] = useState<开局预设方案结构[]>([]);
@@ -775,6 +777,21 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
         }
     };
 
+    const toggleQiyun = (q: 气运数据) => {
+        if (selectedQiyun.find(x => x.名称 === q.名称)) {
+            setSelectedQiyun(selectedQiyun.filter(x => x.名称 !== q.名称));
+        } else {
+            setSelectedQiyun([...selectedQiyun, q]);
+        }
+    };
+
+    const generateRandomQiyun = () => {
+        if (气运数据列表.length === 0) return;
+        const count = Math.min(3, 气运数据列表.length);
+        const random = randomQiyun(count, { excludeNsfw: true });
+        setSelectedQiyun(random);
+    };
+
     const addCustomTalent = async () => {
         const normalized = 标准化天赋(customTalent);
         if (!normalized) {
@@ -893,7 +910,8 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
             性格: charPersonality.trim(),
             属性: { ...stats },
             背景名称: selectedBackground?.名称 || '',
-            天赋名称列表: selectedTalents.map(item => item.名称).slice(0, 3)
+            天赋名称列表: selectedTalents.map(item => item.名称).slice(0, 3),
+            气运列表: selectedQiyun
         },
         openingConfig: openingConfigEnabled ? 规范化开局配置(openingConfig) : undefined,
         openingStreaming: true,
@@ -1746,6 +1764,79 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
                                 </div>
                             </OrnateBorder>
                         </div>
+                    )}
+
+                    {step === 2 && (
+                    <OrnateBorder className="p-6 md:p-7 mt-8">
+                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 border-b border-wuxia-gold/30 pb-4 mb-5">
+                            <div>
+                                <div className="text-[11px] uppercase tracking-[0.35em] text-wuxia-red/70 font-mono">Fortune Matrix</div>
+                                <h3 className="text-2xl font-serif font-bold text-wuxia-gold mt-2">气运卷宗</h3>
+                                <p className="text-xs text-gray-400 mt-2 leading-6">气运乃天命所钟，可影响属性修正、判定加成与特殊效果。随机抽取或手动选择皆可。</p>
+                            </div>
+                            <GameButton onClick={generateRandomQiyun} variant="secondary" className="py-2 text-xs">
+                                随机抽取
+                            </GameButton>
+                        </div>
+
+                        {selectedQiyun.length === 0 ? (
+                            <div className="text-center py-8 text-gray-500">
+                                <span className="text-xs">尚未选择气运</span>
+                            </div>
+                        ) : (
+                            <div className="mb-4 p-4 rounded-xl border border-wuxia-gold/30 bg-black/30">
+                                <div className="text-[11px] text-wuxia-gold/70 mb-2">已选气运</div>
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedQiyun.map((q, idx) => (
+                                        <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-wuxia-red/15 border border-wuxia-red/40">
+                                            <span className="text-sm text-wuxia-red">{q.名称}</span>
+                                            <button 
+                                                type="button" 
+                                                onClick={() => toggleQiyun(q)}
+                                                className="text-gray-400 hover:text-red-400"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
+                            {气运数据列表.slice(0, 30).map((q, idx) => {
+                                const isSelected = !!selectedQiyun.find(x => x.名称 === q.名称);
+                                return (
+                                    <div
+                                        key={idx}
+                                        onClick={() => toggleQiyun(q)}
+                                        className={`group rounded-2xl border cursor-pointer transition-all duration-300 overflow-hidden ${
+                                            isSelected
+                                                ? 'border-wuxia-red bg-gradient-to-br from-wuxia-red/15 via-black/70 to-black/70 shadow-[0_0_22px_rgba(190,30,45,0.16)]'
+                                                : 'border-gray-700 bg-black/25 hover:border-wuxia-red/45 hover:bg-black/35'
+                                        }`}
+                                    >
+                                        <div className="p-4">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <div className={`font-bold text-sm font-serif ${isSelected ? 'text-wuxia-red' : 'text-gray-200'}`}>
+                                                    {q.名称}
+                                                </div>
+                                                <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500'}`}>
+                                                    {q.稀有度}
+                                                </span>
+                                            </div>
+                                            <div className="mt-2 text-xs text-gray-400 leading-5">{q.描述}</div>
+                                            {q.效果.length > 0 && (
+                                                <div className="mt-3 rounded-lg border border-white/8 bg-black/30 px-3 py-2 text-xs text-wuxia-cyan/90 leading-5">
+                                                    {q.效果[0].描述 || q.效果[0].类型}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </OrnateBorder>
                     )}
 
                     {/* STEP 4: OPENING CONFIG */}

@@ -357,6 +357,20 @@ const GameSettings: React.FC<Props> = ({ settings, onSave }) => {
                 </div>
             </div>
 
+            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <div className="text-sm text-wuxia-red font-bold">成人内容</div>
+                        <div className="text-xs text-gray-400 mt-1">开启后可显示重口味气运内容。关闭时仅显示一般向内容。</div>
+                    </div>
+                    <ToggleSwitch
+                        checked={(form as any).成人内容 === true}
+                        onChange={(next) => 实时应用更新({ 成人内容: next } as any)}
+                        ariaLabel="切换成人内容"
+                    />
+                </div>
+            </div>
+
             <div className="space-y-2">
                 <label className="text-sm text-wuxia-cyan font-bold">额外要求提示词 (Custom Prompt)</label>
                 <textarea 

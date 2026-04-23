@@ -8,16 +8,35 @@ interface Props {
 
 const CharacterProfileCard: React.FC<Props> = ({ character, visualConfig }) => {
     const 天赋列表 = Array.isArray(character.天赋列表) ? character.天赋列表 : [];
+    const 气运列表: any[] = (character as any).气运列表 || [];
     const areaStyle = 构建区域文字样式(visualConfig, '角色档案');
 
-    const attributes = [
-        { key: '力', val: character.力量 },
-        { key: '敏', val: character.敏捷 },
-        { key: '体', val: character.体质 },
-        { key: '根', val: character.根骨 },
-        { key: '悟', val: character.悟性 },
-        { key: '福', val: character.福源 },
+    const 计算气运修正 = (属性名: string) => {
+        let 修正率 = 0;
+        for (const qiyun of 气运列表) {
+            for (const effect of (qiyun.效果 || []) as any[]) {
+                if (effect.类型 === '属性修正' && effect.属性 === 属性名 && effect.修正值) {
+                    修正率 = Math.max(修正率, Math.round((effect.修正值 - 1) * 100));
+                }
+            }
+        }
+        return 修正率;
+    };
+
+    const attributeData = [
+        { key: '力', base: character.力量, attr: '力量' },
+        { key: '敏', base: character.敏捷, attr: '敏捷' },
+        { key: '体', base: character.体质, attr: '体质' },
+        { key: '根', base: character.根骨, attr: '根骨' },
+        { key: '悟', base: character.悟性, attr: '悟性' },
+        { key: '福', base: character.福源, attr: '福源' },
     ];
+
+    const attributes = attributeData.map(a => ({
+        key: a.key,
+        val: a.base,
+        bonus: 计算气运修正(a.attr)
+    }));
 
     return (
         <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-wuxia-gold/35 bg-[linear-gradient(145deg,rgba(20,16,12,0.98),rgba(8,8,8,0.98))] shadow-[0_0_40px_rgba(0,0,0,0.6),0_0_20px_rgba(230,200,110,0.08)]" style={areaStyle}>
@@ -96,13 +115,44 @@ const CharacterProfileCard: React.FC<Props> = ({ character, visualConfig }) => {
                         </div>
                     </div>
 
+                    <div className="border border-wuxia-cyan/25 bg-[linear-gradient(180deg,rgba(20,60,80,0.15),rgba(0,0,0,0.1))] p-4">
+                        <div className="mb-3 flex items-center justify-between gap-2">
+                            <div className="text-[10px] uppercase tracking-[0.35em] text-wuxia-cyan/80">气运卷宗</div>
+                            <div className="text-[10px] text-gray-500">共 {气运列表.length} 项</div>
+                        </div>
+                        <div className="space-y-3">
+                            {气运列表.length > 0 ? (
+                                气运列表.map((qiyun: any, index: number) => (
+                                    <div key={`${qiyun.名称}-${index}`} className="border border-wuxia-cyan/15 bg-black/25 p-3">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span className="text-sm font-semibold tracking-[0.12em] text-wuxia-cyan">{qiyun.名称}</span>
+                                            <span className="text-[10px] text-wuxia-cyan/70">气运 {index + 1}</span>
+                                        </div>
+                                        <p className="mt-2 text-xs leading-6" style={{ color: areaStyle.color }}>{qiyun.描述 || '暂无描述。'}</p>
+                                        {qiyun.效果 && Array.isArray(qiyun.效果) && qiyun.效果.map((eff: any, ei: number) => (
+                                            eff.描述 && <div key={`eff-${ei}`} className="mt-2 rounded-sm border border-wuxia-cyan/15 bg-white/[0.03] px-2.5 py-2 text-[11px] leading-5 text-wuxia-cyan/90">{eff.描述}</div>
+                                        ))}
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="border border-dashed border-gray-700 px-3 py-6 text-center text-sm text-gray-500">暂无气运记录</div>
+                            )}
+                        </div>
+                    </div>
+
                     <div className="border border-gray-800/80 bg-black/30 p-4">
-                        <div className="mb-3 text-[10px] uppercase tracking-[0.35em] text-wuxia-gold/65">基础六维</div>
+                        <div className="mb-3 text-[10px] uppercase tracking-[0.35em] text-wuxia-gold/65">
+                            基础六维
+                            {气运列表.length > 0 && <span className="ml-2 text-[8px] text-wuxia-cyan">(气运修正中)</span>}
+                        </div>
                         <div className="grid grid-cols-3 gap-2">
                             {attributes.map((attr) => (
                                 <div key={`detail-${attr.key}`} className="border border-gray-800 bg-white/[0.03] px-2 py-3 text-center">
                                     <div className="text-[10px] tracking-[0.2em] text-gray-500">{attr.key}</div>
-                                    <div className="mt-1 text-lg font-mono font-bold text-wuxia-gold">{attr.val}</div>
+                                    <div className="mt-1 text-lg font-mono font-bold text-wuxia-gold">
+                                        {attr.val}
+                                        {attr.bonus > 0 && <span className="ml-1 text-[10px] text-wuxia-cyan">+{attr.bonus}%</span>}
+                                    </div>
                                 </div>
                             ))}
                         </div>

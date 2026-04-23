@@ -2,7 +2,7 @@
 import { 游戏物品 } from './item';
 import { 功法结构 } from './kungfu';
 import type { NPC图片档案 } from './imageGeneration';
-import { 天赋结构, 背景结构 } from '../types';
+import { 天赋结构, 背景结构, 气运结构 } from '../types';
 
 // 角色相关定义 - 解耦自 types.ts
 
@@ -62,9 +62,10 @@ export interface 角色数据结构 {
     境界: string;
     境界层级: number;
     
-    // New: Talents and Background
+    // New: Talents, Background and Qiyun
     天赋列表: 天赋结构[];
     出身背景: 背景结构;
+    气运列表?: 气运结构[];
 
     // 门派相关
     所属门派ID: string; // "none" 为江湖散人

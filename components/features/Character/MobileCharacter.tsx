@@ -115,8 +115,31 @@ const MobileCharacter: React.FC<Props> = ({
     const 金钱 = character.金钱 || { 金元宝: 0, 银子: 0, 铜钱: 0 };
     const 玩家BUFF列表 = Array.isArray(character.玩家BUFF) ? character.玩家BUFF : [];
     const 天赋列表 = Array.isArray(character.天赋列表) ? character.天赋列表 : [];
+    const 气运列表: any[] = (character as any).气运列表 || [];
     const 启用饱腹口渴系统 = gameConfig?.启用饱腹口渴系统 !== false;
     const 启用修炼体系 = gameConfig?.启用修炼体系 !== false;
+
+    const 计算气运修正 = (属性名: string) => {
+        let 修正率 = 0;
+        for (const qiyun of 气运列表) {
+            for (const effect of (qiyun.效果 || []) as any[]) {
+                if (effect.类型 === '属性修正' && effect.属性 === 属性名 && effect.修正值) {
+                    修正率 = Math.max(修正率, Math.round((effect.修正值 - 1) * 100));
+                }
+            }
+        }
+        return 修正率;
+    };
+
+    const attributeData = [
+        { key: '力', base: character.力量, attr: '力量' },
+        { key: '敏', base: character.敏捷, attr: '敏捷' },
+        { key: '体', base: character.体质, attr: '体质' },
+        { key: '根', base: character.根骨, attr: '根骨' },
+        { key: '悟', base: character.悟性, attr: '悟性' },
+        { key: '福', base: character.福源, attr: '福源' },
+    ];
+
     const 身份信息 = useMemo(() => 构建角色身份摘要(character), [character]);
     const normalizedApiConfig = useMemo(() => 规范化接口设置(apiConfig), [apiConfig]);
     const feature = normalizedApiConfig.功能模型占位;
@@ -150,14 +173,11 @@ const MobileCharacter: React.FC<Props> = ({
         [pngStylePresets, generateOptions.PNG画风预设ID]
     );
 
-    const attributes = [
-        { key: '力', val: character.力量 },
-        { key: '敏', val: character.敏捷 },
-        { key: '体', val: character.体质 },
-        { key: '根', val: character.根骨 },
-        { key: '悟', val: character.悟性 },
-        { key: '福', val: character.福源 },
-    ];
+    const attributes = attributeData.map(a => ({
+        key: a.key,
+        val: a.base,
+        bonus: 计算气运修正(a.attr)
+    }));
 
     const bodyParts = [
         { name: '头部', current: character.头部当前血量, max: character.头部最大血量 },
@@ -361,15 +381,48 @@ const MobileCharacter: React.FC<Props> = ({
                                 </div>
                             </div>
 
-                            <div className="rounded-2xl border border-gray-800 bg-black/25 p-4">
-                                <div className="mb-3 text-[10px] tracking-[0.32em] text-wuxia-gold/65">基础六维</div>
-                                <div className="grid grid-cols-3 gap-2.5">
-                                    {attributes.map((attr) => (
-                                        <div key={attr.key} className="rounded-xl border border-gray-800 bg-white/[0.03] px-2 py-3 text-center">
-                                            <div className="text-[10px] tracking-[0.18em] text-gray-500">{attr.key}</div>
-                                            <div className="mt-1 text-base font-mono font-bold text-wuxia-gold">{attr.val}</div>
+                            <div className="rounded-2xl border border-wuxia-cyan/20 bg-[linear-gradient(180deg,rgba(20,60,80,0.15),rgba(0,0,0,0.12))] p-4">
+                                <div className="mb-3 flex items-center justify-between">
+                                    <div className="text-[10px] tracking-[0.32em] text-wuxia-cyan/80">气运卷宗</div>
+                                    <div className="text-[10px] text-gray-500">共 {气运列表.length} 项</div>
+                                </div>
+                                <div className="space-y-3">
+                                    {气运列表.length > 0 ? (
+                                        气运列表.map((qiyun: any, index: number) => (
+                                            <div key={`${qiyun.名称}-${index}`} className="rounded-xl border border-wuxia-cyan/15 bg-black/25 p-3">
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <span className="text-sm font-semibold tracking-[0.08em] text-wuxia-cyan">{qiyun.名称}</span>
+                                                    <span className="text-[10px] text-wuxia-cyan/70">气运 {index + 1}</span>
+                                                </div>
+                                                <p className="mt-2 text-[12px] leading-6 text-gray-300">{qiyun.描述 || '暂无描述。'}</p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="rounded-xl border border-dashed border-gray-700 px-3 py-5 text-center text-sm text-gray-500">
+                                            暂无气运记录
                                         </div>
-                                    ))}
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border border-gray-800 bg-black/25 p-4">
+                                <div className="mb-3 text-[10px] tracking-[0.32em] text-wuxia-gold/65">
+                                    基础六维
+                                    {气运列表.length > 0 && <span className="ml-2 text-[8px] text-wuxia-cyan">(气运修正中)</span>}
+                                </div>
+                                <div className="grid grid-cols-3 gap-2.5">
+                                    {attributeData.map((attr) => {
+                                        const bonus = 计算气运修正(attr.attr);
+                                        return (
+                                            <div key={attr.key} className="rounded-xl border border-gray-800 bg-white/[0.03] px-2 py-3 text-center">
+                                                <div className="text-[10px] tracking-[0.18em] text-gray-500">{attr.key}</div>
+                                                <div className="mt-1 text-base font-mono font-bold text-wuxia-gold">
+                                                    {attr.base}
+                                                    {bonus > 0 && <span className="ml-1 text-[10px] text-wuxia-cyan">+{bonus}%</span>}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </>
@@ -401,12 +454,18 @@ const MobileCharacter: React.FC<Props> = ({
                             </div>
 
                             <div className="rounded-2xl border border-gray-800 bg-black/30 p-4">
-                                <div className="mb-3 text-[10px] tracking-[0.3em] text-wuxia-gold/70">六维属性</div>
+                                <div className="mb-3 text-[10px] tracking-[0.3em] text-wuxia-gold/70">
+                                    六维属性
+                                    {气运列表.length > 0 && <span className="ml-2 text-[8px] text-wuxia-cyan">(气运修正中)</span>}
+                                </div>
                                 <div className="grid grid-cols-3 gap-2">
-                                    {attributes.map((attr) => (
+                                    {attributes.map((attr: any) => (
                                         <div key={attr.key} className="rounded-lg border border-gray-800 px-2 py-2 text-center transition-colors hover:border-wuxia-gold/50">
                                             <div className="text-[9px] text-gray-500">{attr.key}</div>
-                                            <div className="text-sm font-bold font-mono text-wuxia-gold">{attr.val}</div>
+                                            <div className="text-sm font-bold font-mono text-wuxia-gold">
+                                                {attr.val}
+                                                {attr.bonus > 0 && <span className="ml-1 text-[8px] text-wuxia-cyan">+{attr.bonus}%</span>}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

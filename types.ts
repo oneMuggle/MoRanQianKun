@@ -104,3 +104,27 @@ export interface 背景结构 {
     /** 是否为 NSFW 内容，默认 false */
     nsfw?: boolean;
 }
+
+/** 气运属性类型（六维） */
+export type 气运属性类型 = '力量' | '敏捷' | '体质' | '根骨' | '悟性' | '福源';
+
+/** 气运效果类型 */
+export type 气运效果类型 = '属性修正' | '描述效果';
+
+/** 气运结构 */
+export interface 气运结构 {
+    名称: string;
+    类别: string;
+    描述: string;
+    效果: Array<{
+        类型: 气运效果类型;
+        属性?: 气运属性类型;
+        修正值?: number;
+        描述?: string;
+    }>;
+    稀有度?: '传说' | '稀有' | '普通';
+    代价?: string;
+    nsfw等级?: 0 | 1 | 2;
+    能力类型?: '战斗' | '生存' | '社交' | '谋略' | '特殊' | '辅助';
+    适用境界?: [number, number];
+}
