@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import GameButton from '../../../ui/GameButton';
-import { OpeningConfig, WorldGenConfig, 小说拆分数据集结构, 角色数据结构, 天赋结构, 背景结构, 游戏难度, NSFW场景类型, 能力类型, 超能力分类, 觉醒程度, 武力等级 } from '../../../../types';
+import { OpeningConfig, WorldGenConfig, 小说拆分数据集结构, 角色数据结构, 天赋结构, 背景结构, 游戏难度, NSFW场景类型, 能力类型, 超能力分类, 觉醒程度, 武力等级, 气运数据 } from '../../../../types';
+import { randomQiyun, 气运数据列表 } from '../../../../data/qiyun';
 import { 预设天赋, 预设背景 } from '../../../../data/presets';
 import { 开局预设方案结构 } from '../../../../data/newGamePresets';
 import { OrnateBorder } from '../../../ui/decorations/OrnateBorder';
@@ -195,7 +196,7 @@ const 开关按钮: React.FC<{
 const MobileNewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, requestConfirm }) => {
     const [step, setStep] = useState(0);
 
-    // --- State: World Config ---
+// --- State: World Config ---
     const [worldConfig, setWorldConfig] = useState<WorldGenConfig>({
         worldName: '太古界',
         worldSize: '九州宏大',
@@ -210,8 +211,27 @@ const MobileNewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, r
         worldExtraRequirement: '',
         manualWorldPrompt: '',
         manualRealmPrompt: '',
-        difficulty: 'normal' as 游戏难度 // Default difficulty
+        difficulty: 'normal' as 游戏难度
     });
+
+    // --- State: 气运 ---
+    const [selectedQiyun, setSelectedQiyun] = useState<气运数据[]>([]);
+
+    const toggleQiyun = (q: 气运数据) => {
+        if (selectedQiyun.find(x => x.名称 === q.名称)) {
+            setSelectedQiyun(selectedQiyun.filter(x => x.名称 !== q.名称));
+        } else {
+            if (selectedQiyun.length >= 3) return;
+            setSelectedQiyun([...selectedQiyun, q]);
+        }
+    };
+
+    const generateRandomQiyun = () => {
+        if (气运数据列表.length === 0) return;
+        const count = Math.min(3, 气运数据列表.length);
+        const shuffled = [...气运数据列表].sort(() => Math.random() - 0.5);
+        setSelectedQiyun(shuffled.slice(0, count));
+    };
 
     // --- State: Character Config ---
     const [charName, setCharName] = useState('');
@@ -1637,6 +1657,60 @@ const MobileNewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, r
                             </OrnateBorder>
                         </div>
                     )}
+
+                    <OrnateBorder className="p-4 mt-4">
+                        <div className="border-b border-wuxia-gold/30 pb-3 mb-4">
+                            <div className="text-[10px] uppercase tracking-[0.32em] text-wuxia-red/70 font-mono">Fortune Matrix</div>
+                            <h3 className="text-lg font-bold text-wuxia-gold mt-2">气运卷宗</h3>
+                            <p className="text-[11px] text-gray-400 mt-1">气运乃天命所钟，可影响属性修正、判定加成与特殊效果。</p>
+                        </div>
+
+                        {selectedQiyun.length === 0 ? (
+                            <div className="text-center py-4 text-gray-500">
+                                <span className="text-xs">尚未选择气运</span>
+                            </div>
+                        ) : (
+                            <div className="mb-3 p-3 rounded-lg border border-wuxia-gold/30 bg-black/30">
+                                <div className="text-[10px] text-wuxia-gold/70 mb-2">已选气运</div>
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedQiyun.map((q, idx) => (
+                                        <div key={idx} className="flex items-center gap-2 px-2 py-1 rounded-lg bg-wuxia-red/15 border border-wuxia-red/40">
+                                            <span className="text-xs text-wuxia-red">{q.名称}</span>
+                                            <button 
+                                                type="button" 
+                                                onClick={() => toggleQiyun(q)}
+                                                className="text-gray-400 hover:text-red-400"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-2">
+                            {气运数据列表.slice(0, 20).map((q, idx) => {
+                                const isSelected = !!selectedQiyun.find(x => x.名称 === q.名称);
+                                return (
+                                    <div
+                                        key={idx}
+                                        onClick={() => toggleQiyun(q)}
+                                        className={`p-2 rounded-lg border cursor-pointer ${
+                                            isSelected
+                                                ? 'border-wuxia-red bg-wuxia-red/10'
+                                                : 'border-gray-700 bg-black/25 hover:border-wuxia-red/45'
+                                        }`}
+                                    >
+                                        <div className={`text-xs font-bold ${isSelected ? 'text-wuxia-red' : 'text-gray-200'}`}>
+                                            {q.名称}
+                                        </div>
+                                        <div className="text-[10px] text-gray-500">{q.稀有度}</div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </OrnateBorder>
 
                     {/* STEP 4: OPENING CONFIG */}
                     {step === 3 && (
