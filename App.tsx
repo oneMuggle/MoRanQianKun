@@ -36,6 +36,7 @@ const MobileSettingsModal = 创建可预加载懒组件(() => import('./componen
 const InventoryModal = 创建可预加载懒组件(() => import('./components/features/Inventory/InventoryModal'));
 const MobileInventoryModal = 创建可预加载懒组件(() => import('./components/features/Inventory/MobileInventoryModal'));
 const EquipmentModal = 创建可预加载懒组件(() => import('./components/features/Equipment/EquipmentModal'));
+const MobileEquipmentModal = 创建可预加载懒组件(() => import('./components/features/Equipment/MobileEquipmentModal'));
 const BattleModal = 创建可预加载懒组件(() => import('./components/features/Battle/BattleModal'));
 const MobileBattleModal = 创建可预加载懒组件(() => import('./components/features/Battle/MobileBattleModal'));
 const SocialModal = 创建可预加载懒组件(() => import('./components/features/Social/SocialModal'));
@@ -43,6 +44,7 @@ const MobileSocial = 创建可预加载懒组件(() => import('./components/feat
 const ImageManagerModal = 创建可预加载懒组件(() => import('./components/features/Social/ImageManagerModal'));
 const MobileImageManagerModal = 创建可预加载懒组件(() => import('./components/features/Social/mobile/MobileImageManagerModal'));
 const WorldbookManagerModal = 创建可预加载懒组件(() => import('./components/features/Worldbook/WorldbookManagerModal'));
+const MobileWorldbookManagerModal = 创建可预加载懒组件(() => import('./components/features/Worldbook/MobileWorldbookManagerModal'));
 const TeamModal = 创建可预加载懒组件(() => import('./components/features/Team/TeamModal'));
 const MobileTeamModal = 创建可预加载懒组件(() => import('./components/features/Team/MobileTeamModal'));
 const KungfuModal = 创建可预加载懒组件(() => import('./components/features/Kungfu/KungfuModal'));
@@ -68,8 +70,10 @@ const MemorySummaryFlowMobileModal = 创建可预加载懒组件(() => import('.
 const NpcMemorySummaryFlowModal = 创建可预加载懒组件(() => import('./components/features/Memory/NpcMemorySummaryFlowModal'));
 const NpcMemorySummaryFlowMobileModal = 创建可预加载懒组件(() => import('./components/features/Memory/NpcMemorySummaryFlowMobileModal'));
 const SaveLoadModal = 创建可预加载懒组件(() => import('./components/features/SaveLoad/SaveLoadModal'));
+const MobileSaveLoadModal = 创建可预加载懒组件(() => import('./components/features/SaveLoad/MobileSaveLoadModal'));
 const MobileMusicPlayer = 创建可预加载懒组件(() => import('./components/features/Music/mobile/MobileMusicPlayer'));
 const NovelDecompositionWorkbenchModal = 创建可预加载懒组件(() => import('./components/features/NovelDecomposition/NovelDecompositionWorkbenchModal'));
+const MobileNovelDecompositionWorkbenchModal = 创建可预加载懒组件(() => import('./components/features/NovelDecomposition/MobileNovelDecompositionWorkbenchModal'));
 
 const 懒加载占位: React.FC = () => (
     <div className="fixed inset-0 z-[260] flex items-center justify-center bg-black/45 px-6 py-10 text-center backdrop-blur-[2px]">
@@ -882,7 +886,7 @@ const App: React.FC = () => {
                             {meta.notifications.map((toast) => (
                                 <div
                                     key={toast.id}
-                                    className={`pointer-events-auto w-[280px] rounded-xl border px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur-md ${
+                                    className={`pointer-events-auto w-72 sm:w-[280px] rounded-xl border px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur-md ${
                                         toast.tone === 'success'
                                             ? 'border-emerald-600/50 bg-emerald-950/85 text-emerald-100'
                                             : toast.tone === 'error'
@@ -998,13 +1002,13 @@ const App: React.FC = () => {
             )}
 
             {/* Global Golden Border Frame */}
-            <div className="pointer-events-none fixed inset-3 z-[100] border-4 border-double border-wuxia-gold/40 rounded-2xl shadow-[inset_0_0_30px_rgba(0,0,0,0.5)]">
+            <div className="pointer-events-none fixed inset-2 md:inset-3 z-[100] border-[3px] md:border-4 border-double border-wuxia-gold/40 rounded-xl md:rounded-2xl shadow-[inset_0_0_30px_rgba(0,0,0,0.5)]">
                 {/* Corner Ornaments */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-wuxia-gold rounded-tl-xl shadow-[-2px_-2px_5px_rgba(0,0,0,0.5)]"></div>
-                <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-wuxia-gold rounded-tr-xl shadow-[2px_-2px_5px_rgba(0,0,0,0.5)]"></div>
-                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-wuxia-gold rounded-bl-xl shadow-[-2px_2px_5px_rgba(0,0,0,0.5)]"></div>
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-wuxia-gold rounded-br-xl shadow-[2px_2px_5px_rgba(0,0,0,0.5)]"></div>
-                
+                <div className="absolute top-0 left-0 w-6 h-6 md:w-8 md:h-8 border-t-[3px] md:border-t-4 border-l-[3px] md:border-l-4 border-wuxia-gold rounded-tl-lg md:rounded-tl-xl shadow-[-2px_-2px_5px_rgba(0,0,0,0.5)]"></div>
+                <div className="absolute top-0 right-0 w-6 h-6 md:w-8 md:h-8 border-t-[3px] md:border-t-4 border-r-[3px] md:border-r-4 border-wuxia-gold rounded-tr-lg md:rounded-tr-xl shadow-[2px_-2px_5px_rgba(0,0,0,0.5)]"></div>
+                <div className="absolute bottom-0 left-0 w-6 h-6 md:w-8 md:h-8 border-b-[3px] md:border-b-4 border-l-[3px] md:border-l-4 border-wuxia-gold rounded-bl-lg md:rounded-bl-xl shadow-[-2px_2px_5px_rgba(0,0,0,0.5)]"></div>
+                <div className="absolute bottom-0 right-0 w-6 h-6 md:w-8 md:h-8 border-b-[3px] md:border-b-4 border-r-[3px] md:border-r-4 border-wuxia-gold rounded-br-lg md:rounded-br-xl shadow-[2px_2px_5px_rgba(0,0,0,0.5)]"></div>
+
                 {/* Mid-point Accents */}
                 <div className="absolute top-1/2 left-0 w-1 h-12 -translate-y-1/2 bg-wuxia-gold/60"></div>
                 <div className="absolute top-1/2 right-0 w-1 h-12 -translate-y-1/2 bg-wuxia-gold/60"></div>
@@ -1013,13 +1017,23 @@ const App: React.FC = () => {
             {/* Save/Load Modal */}
             {state.showSaveLoad.show && (
                 <懒加载边界>
-                    <SaveLoadModal 
-                        onClose={closeSaveLoad}
-                        onLoadGame={actions.handleLoadGame}
-                        onSaveGame={actions.handleSaveGame}
-                        mode={state.showSaveLoad.mode}
-                        requestConfirm={requestConfirm}
-                    />
+                    {isMobile ? (
+                        <MobileSaveLoadModal 
+                            onClose={closeSaveLoad}
+                            onLoadGame={actions.handleLoadGame}
+                            onSaveGame={actions.handleSaveGame}
+                            mode={state.showSaveLoad.mode}
+                            requestConfirm={requestConfirm}
+                        />
+                    ) : (
+                        <SaveLoadModal 
+                            onClose={closeSaveLoad}
+                            onLoadGame={actions.handleLoadGame}
+                            onSaveGame={actions.handleSaveGame}
+                            mode={state.showSaveLoad.mode}
+                            requestConfirm={requestConfirm}
+                        />
+                    )}
                 </懒加载边界>
             )}
 
@@ -1106,29 +1120,53 @@ const App: React.FC = () => {
 
             {showWorldbookManager && (
                 <懒加载边界>
-                    <WorldbookManagerModal
-                        builtinPromptEntries={meta.builtinPromptEntries}
-                        worldbooks={meta.worldbooks}
-                        worldbookPresetGroups={meta.worldbookPresetGroups}
-                        onSaveBuiltinPromptEntries={actions.saveBuiltinPromptEntries}
-                        onSaveWorldbooks={actions.saveWorldbooks}
-                        onSaveWorldbookPresetGroups={actions.saveWorldbookPresetGroups}
-                        onClose={() => setShowWorldbookManager(false)}
-                        requestConfirm={requestConfirm}
-                    />
+                    {isMobile ? (
+                        <MobileWorldbookManagerModal
+                            builtinPromptEntries={meta.builtinPromptEntries}
+                            worldbooks={meta.worldbooks}
+                            worldbookPresetGroups={meta.worldbookPresetGroups}
+                            onSaveBuiltinPromptEntries={actions.saveBuiltinPromptEntries}
+                            onSaveWorldbooks={actions.saveWorldbooks}
+                            onSaveWorldbookPresetGroups={actions.saveWorldbookPresetGroups}
+                            onClose={() => setShowWorldbookManager(false)}
+                            requestConfirm={requestConfirm}
+                        />
+                    ) : (
+                        <WorldbookManagerModal
+                            builtinPromptEntries={meta.builtinPromptEntries}
+                            worldbooks={meta.worldbooks}
+                            worldbookPresetGroups={meta.worldbookPresetGroups}
+                            onSaveBuiltinPromptEntries={actions.saveBuiltinPromptEntries}
+                            onSaveWorldbooks={actions.saveWorldbooks}
+                            onSaveWorldbookPresetGroups={actions.saveWorldbookPresetGroups}
+                            onClose={() => setShowWorldbookManager(false)}
+                            requestConfirm={requestConfirm}
+                        />
+                    )}
                 </懒加载边界>
             )}
 
             {showNovelDecompositionWorkbench && (
                 <懒加载边界>
-                    <NovelDecompositionWorkbenchModal
-                        open={showNovelDecompositionWorkbench}
-                        settings={state.apiConfig}
-                        onSave={actions.saveSettings}
-                        onClose={closeNovelDecompositionWorkbench}
-                        requestConfirm={requestConfirm}
-                        onNotify={actions.pushNotification}
-                    />
+                    {isMobile ? (
+                        <MobileNovelDecompositionWorkbenchModal
+                            open={showNovelDecompositionWorkbench}
+                            settings={state.apiConfig}
+                            onSave={actions.saveSettings}
+                            onClose={closeNovelDecompositionWorkbench}
+                            requestConfirm={requestConfirm}
+                            onNotify={actions.pushNotification}
+                        />
+                    ) : (
+                        <NovelDecompositionWorkbenchModal
+                            open={showNovelDecompositionWorkbench}
+                            settings={state.apiConfig}
+                            onSave={actions.saveSettings}
+                            onClose={closeNovelDecompositionWorkbench}
+                            requestConfirm={requestConfirm}
+                            onNotify={actions.pushNotification}
+                        />
+                    )}
                 </懒加载边界>
             )}
 
@@ -1376,10 +1414,17 @@ const App: React.FC = () => {
 
                     {state.showEquipment && (
                         <懒加载边界>
-                            <EquipmentModal 
-                                character={state.角色} 
-                                onClose={() => setters.setShowEquipment(false)} 
-                            />
+                            {isMobile ? (
+                                <MobileEquipmentModal
+                                    character={state.角色}
+                                    onClose={() => setters.setShowEquipment(false)}
+                                />
+                            ) : (
+                                <EquipmentModal 
+                                    character={state.角色} 
+                                    onClose={() => setters.setShowEquipment(false)} 
+                                />
+                            )}
                         </懒加载边界>
                     )}
 

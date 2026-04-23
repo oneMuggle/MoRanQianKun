@@ -259,6 +259,7 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
     const [自定义背景列表, 设置自定义背景列表] = useState<背景结构[]>([]);
     const [自定义开局预设列表, 设置自定义开局预设列表] = useState<开局预设方案结构[]>([]);
     const [小说拆分数据集列表, 设置小说拆分数据集列表] = useState<小说拆分数据集结构[]>([]);
+    const [成人内容开启, 设置成人内容开启] = useState(false);
 
     // Custom Inputs
     const [customTalent, setCustomTalent] = useState<天赋结构>({ 名称: '', 描述: '', 效果: '' });
@@ -636,11 +637,12 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
     useEffect(() => {
         const 加载自定义建角配置 = async () => {
             try {
-                const [savedTalents, savedBackgrounds, savedStartPresets, savedNovelDatasets] = await Promise.all([
+                const [savedTalents, savedBackgrounds, savedStartPresets, savedNovelDatasets, savedGameSettings] = await Promise.all([
                     dbService.读取设置(自定义天赋存储键),
                     dbService.读取设置(自定义背景存储键),
                     dbService.读取设置(自定义开局预设存储键),
-                    读取小说拆分数据集列表()
+                    读取小说拆分数据集列表(),
+                    dbService.读取设置(设置键.游戏设置)
                 ]);
                 if (Array.isArray(savedTalents)) {
                     设置自定义天赋列表(合并去重天赋(savedTalents as 天赋结构[]));
@@ -652,6 +654,9 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
                     设置自定义开局预设列表(合并去重开局预设方案(savedStartPresets.map(item => 标准化开局预设方案(item)).filter(Boolean) as 开局预设方案结构[]));
                 }
                 设置小说拆分数据集列表(savedNovelDatasets);
+                if (savedGameSettings && typeof savedGameSettings === 'object') {
+                    设置成人内容开启(savedGameSettings.成人内容 === true);
+                }
             } catch (error) {
                 console.error('加载自定义身份/天赋/开局方案失败', error);
             }
@@ -788,7 +793,7 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, request
     const generateRandomQiyun = () => {
         if (气运数据列表.length === 0) return;
         const count = Math.min(3, 气运数据列表.length);
-        const random = randomQiyun(count, { excludeNsfw: true });
+        const random = randomQiyun(count, { excludeNsfw: true, 成人内容开启: 成人内容开启 });
         setSelectedQiyun(random);
     };
 
