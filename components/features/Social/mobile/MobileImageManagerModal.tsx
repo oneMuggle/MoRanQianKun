@@ -425,7 +425,7 @@ interface PresetEditorProps {
     busyActionKey: string;
 }
 
-const ManualTabContent: React.FC<TabProps> = ({ socialList, queue, apiConfig, onGenerateImage, onGenerateSecretPartImage, withBusyAction, busyActionKey, setActionError, setActiveTab }) => {
+const ManualTabContent: React.FC<TabProps> = ({ socialList, queue, apiConfig, onGenerateImage, onGenerateSecretPartImage, withBusyAction, busyActionKey, setActionError, setActiveTab, cultivationSystemEnabled = true }) => {
     const [selectedNpcId, setSelectedNpcId] = React.useState('');
     const [composition, setComposition] = React.useState<'头像' | '半身' | '立绘' | '自定义'>('头像');
     const [customComposition, setCustomComposition] = React.useState('');
