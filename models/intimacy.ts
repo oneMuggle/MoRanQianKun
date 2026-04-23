@@ -1,4 +1,5 @@
 import type { NPC结构 } from './social';
+import type { 里象功法 } from '../data/cultivation/lixiang';
 
 /**
  * 亲密互动系统类型定义
@@ -155,7 +156,42 @@ export function 生成亲密互动记录(
 }
 
 /**
- * 随机生成属性奖励（双修用）
+ * 计算双修收益
+ * @param 功法 - 里象功法
+ * @param npc - NPC结构（用于计算风险）
+ * @returns 属性奖励数组
+ */
+export function 计算双修收益(
+  功法: 里象功法,
+  npc: NPC结构
+): { 奖励: 属性奖励结构; 风险触发: boolean; 风险描述?: string } {
+  const 奖励: 属性奖励结构 = {
+    属性类型: 功法.收益.属性类型,
+    数值: 功法.收益.数值,
+  };
+
+  let 风险触发 = false;
+  let 风险描述: string | undefined;
+
+  if (功法.风险.类型 !== '无') {
+    const 风险概率 = Math.random();
+    if (功法.风险.类型 === '反噬') {
+      风险触发 = 风险概率 < 0.3;
+    } else if (功法.风险.类型 === '心魔') {
+      风险触发 = 风险概率 < 0.2;
+    } else if (功法.风险.类型 === '正道追杀') {
+      风险触发 = 风险概率 < 0.4;
+    }
+    if (风险触发) {
+      风险描述 = `${功法.门派}${功法.风险.类型}触发：${功法.风险.描述}`;
+    }
+  }
+
+  return { 奖励, 风险触发, 风险描述 };
+}
+
+/**
+ * 生成双修奖励
  * @returns 属性奖励结构
  */
 export function 生成双修奖励(): 属性奖励结构 {
