@@ -44,6 +44,7 @@ import {
     规范化战斗状态
 } from './storyState';
 import { 构建同人运行时提示词包, 应用境界体系区块替换 } from '../../prompts/runtime/fandom';
+import { 计算气运属性修正 } from '../../data/qiyun';
 import { 构建女主剧情规划协议 } from '../../prompts/core/heroinePlan';
 import { 构建女主规划专项提示词 } from '../../prompts/core/heroinePlanCot';
 import { 核心_境界体系 } from '../../prompts/core/realm';
@@ -395,6 +396,7 @@ export const 构建系统提示词 = ({
             描述: 取文本(item?.描述),
             效果: 取文本(item?.效果)
         }));
+        const 气运列表 = 取数组(role?.气运列表);
         const 出身背景原始 = role?.出身背景 && typeof role.出身背景 === 'object' ? role.出身背景 : {};
         const 出身背景 = {
             名称: 取文本(出身背景原始?.名称),
@@ -527,12 +529,12 @@ export const 构建系统提示词 = ({
             最大负重: 取数值(role?.最大负重),
             当前坐标X: 取数值(role?.当前坐标X),
             当前坐标Y: 取数值(role?.当前坐标Y),
-            力量: 取数值(role?.力量),
-            敏捷: 取数值(role?.敏捷),
-            体质: 取数值(role?.体质),
-            根骨: 取数值(role?.根骨),
-            悟性: 取数值(role?.悟性),
-            福源: 取数值(role?.福源),
+            力量: 计算气运属性修正(取数值(role?.力量), 气运列表),
+            敏捷: 计算气运属性修正(取数值(role?.敏捷), 气运列表),
+            体质: 计算气运属性修正(取数值(role?.体质), 气运列表),
+            根骨: 计算气运属性修正(取数值(role?.根骨), 气运列表),
+            悟性: 计算气运属性修正(取数值(role?.悟性), 气运列表),
+            福源: 计算气运属性修正(取数值(role?.福源), 气运列表),
             头部当前血量: 取数值(role?.头部当前血量),
             头部最大血量: 取数值(role?.头部最大血量),
             头部状态: 取文本(role?.头部状态),

@@ -203,6 +203,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
         属性?: 属性结构;
         背景?: 背景结构;
         天赋列表?: 天赋结构[];
+        气运列表?: 气运数据[];
     }): 角色数据结构 => {
         const 最终属性 = params?.属性 || stats;
         const 最终年龄 = params?.年龄 ?? charAge;
@@ -316,6 +317,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
             性格: (params?.性格 ?? charPersonality).trim() || '未设定',
             天赋列表: params?.天赋列表 ?? selectedTalents,
             出身背景: params?.背景 ?? selectedBackground,
+            气运列表: params?.气运列表 ?? selectedQiyun,
             称号: '初出茅庐', 境界: 初始境界名称, 境界层级: 初始境界层级,
             所属门派ID: 'none', 门派职位: '无', 门派贡献: 0,
             金钱: { 金元宝: 0, 银子: 0, 铜钱: 0 },
@@ -765,7 +767,8 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
                 性格: preset.character.性格, 出生月: preset.character.出生月,
                 出生日: preset.character.出生日, 属性: preset.character.属性,
                 背景: 根据名称查找背景(preset.character.背景名称),
-                天赋列表: 根据名称查找天赋列表(preset.character.天赋名称列表)
+                天赋列表: 根据名称查找天赋列表(preset.character.天赋名称列表),
+                气运列表: Array.isArray(preset.character.气运列表) ? preset.character.气运列表 : undefined
             })
             : 构建角色数据();
         const effectiveOpeningExtraRequirement = preset?.openingExtraRequirement ?? openingExtraRequirement;
