@@ -76,13 +76,17 @@ export const 亲密互动选项列表: 亲密互动选项[] = [
 
 /**
  * 计算亲密度等级
+ * 以 亲密度等级阈值 数组为唯一数据源
  * @param 好感度 - NPC好感度（0-100）
  * @returns 亲密度等级（0-5）
  */
 export function 计算亲密度等级(好感度: number): number {
   if (好感度 <= 0) return 0;
   if (好感度 >= 100) return 5;
-  return Math.floor(好感度 / 20) + 1;
+  for (let i = 亲密度等级阈值.length - 1; i >= 1; i--) {
+    if (好感度 >= 亲密度等级阈值[i]) return i;
+  }
+  return 1;
 }
 
 /**
@@ -174,14 +178,7 @@ export function 计算双修收益(
   let 风险描述: string | undefined;
 
   if (功法.风险.类型 !== '无') {
-    const 风险概率 = Math.random();
-    if (功法.风险.类型 === '反噬') {
-      风险触发 = 风险概率 < 0.3;
-    } else if (功法.风险.类型 === '心魔') {
-      风险触发 = 风险概率 < 0.2;
-    } else if (功法.风险.类型 === '正道追杀') {
-      风险触发 = 风险概率 < 0.4;
-    }
+    风险触发 = Math.random() < 功法.风险.概率;
     if (风险触发) {
       风险描述 = `${功法.门派}${功法.风险.类型}触发：${功法.风险.描述}`;
     }

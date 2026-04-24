@@ -70,8 +70,9 @@ Activate the following requirements ONLY when the scene already justifies adult 
 - Environment, props, posture, gaze, lighting, and fabric state should support the mature tone instead of turning into chaotic clutter.
 - Do not fade to black or automatically sanitize already-established adult context, but also do not force explicit sexual-act close-ups or graphic anatomical focus when the source scene does not require them.)`;
 
-export const 构建运行时额外提示词 = (
+const 构建运行时NSFW提示词 = (
     customPrompt: string,
+    baseNsfwPrompt: string,
     options?: {
         启用NSFW模式?: boolean;
         nsfw场景类型?: NSFW场景类型;
@@ -79,16 +80,25 @@ export const 构建运行时额外提示词 = (
 ): string => {
     const custom = typeof customPrompt === 'string' ? customPrompt.trim() : '';
     const nsfwEnabled = options?.启用NSFW模式 === true;
-    
+
     if (!nsfwEnabled) {
         return custom;
     }
-    
-    const baseNsfwPrompt = 默认NSFW模式提示词;
+
     const lixiangConstraint = 构建里象修行叙事约束(options?.nsfw场景类型 || '完全展开');
     const nsfw = [baseNsfwPrompt, lixiangConstraint].filter(Boolean).join('\n\n');
-    
+
     return [custom, nsfw].filter(Boolean).join('\n\n').trim();
+};
+
+export const 构建运行时额外提示词 = (
+    customPrompt: string,
+    options?: {
+        启用NSFW模式?: boolean;
+        nsfw场景类型?: NSFW场景类型;
+    }
+): string => {
+    return 构建运行时NSFW提示词(customPrompt, 默认NSFW模式提示词, options);
 };
 
 export const 构建文生图运行时额外提示词 = (
@@ -98,17 +108,6 @@ export const 构建文生图运行时额外提示词 = (
         nsfw场景类型?: NSFW场景类型;
     }
 ): string => {
-    const custom = typeof customPrompt === 'string' ? customPrompt.trim() : '';
-    const nsfwEnabled = options?.启用NSFW模式 === true;
-    
-    if (!nsfwEnabled) {
-        return custom;
-    }
-    
-    const baseNsfwPrompt = 默认文生图NSFW模式提示词;
-    const lixiangConstraint = 构建里象修行叙事约束(options?.nsfw场景类型 || '完全展开');
-    const nsfw = [baseNsfwPrompt, lixiangConstraint].filter(Boolean).join('\n\n');
-    
-    return [custom, nsfw].filter(Boolean).join('\n\n').trim();
+    return 构建运行时NSFW提示词(customPrompt, 默认文生图NSFW模式提示词, options);
 };
 

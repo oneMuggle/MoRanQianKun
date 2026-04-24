@@ -97,8 +97,13 @@ export const 委婉成语列表: string[] = [
 
 /**
  * 获取随机委婉成语
+ * @param seed - 可选的种子值，提供时可保证确定性输出
  * @returns 随机选择的委婉成语
  */
-export function getRandomEuphemism(): string {
-  return 委婉成语列表[Math.floor(Math.random() * 委婉成语列表.length)];
+export function getRandomEuphemism(seed?: number): string {
+  const rng = seed !== undefined
+    ? (() => { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => { s = s * 16807 % 2147483647; return (s - 1) / 2147483646; }; })()
+    : Math.random;
+  const index = Math.floor(rng() * 委婉成语列表.length);
+  return 委婉成语列表[index];
 }

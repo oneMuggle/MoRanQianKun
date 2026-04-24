@@ -1,6 +1,7 @@
 import type { NPC结构 } from '../../models/social';
 import type { NSFW场景类型 } from '../../models/system';
 import { 获取最亲密动作, 构建亲密度动作约束 } from './intimacy';
+import { 计算亲密度等级 } from '../../models/intimacy';
 import { 构建里象修行叙事约束 } from './nsfw';
 
 /**
@@ -18,8 +19,10 @@ export const 构建NPC_NSWF卡片 = (
   const lines: string[] = [];
   lines.push(`【${npc.姓名}】`);
 
-  // 亲密度等级
-  const 亲密度等级 = npc.亲密度等级 ?? 0;
+  // 亲密度等级（优先使用存储值，缺失时从好感度派生）
+  const 亲密度等级 = typeof npc.亲密度等级 === 'number'
+    ? npc.亲密度等级
+    : 计算亲密度等级(typeof npc.好感度 === 'number' ? npc.好感度 : 0);
   lines.push(`亲密度等级: ${亲密度等级}（${获取最亲密动作(亲密度等级)}）`);
 
   // 动作约束
@@ -62,7 +65,8 @@ export const 构建NPC_NSWF卡片 = (
     lines.push(`主动程度: ${特征.主动程度}`);
     if (特征.反差偏好) lines.push(`反差: ${特征.反差偏好}`);
     if (特征.特殊癖好) lines.push(`癖好: ${特征.特殊癖好}`);
-    lines.push(`叙事锚点: ${特征.叙事锚点}`);
+    const 截断 = (text: string, max: number) => text.length > max ? text.slice(0, max) + '...' : text;
+    lines.push(`叙事锚点: ${截断(特征.叙事锚点, 200)}`);
   }
 
   // 里象修行叙事约束（Level 5 时注入）
@@ -88,7 +92,7 @@ export const 构建在场NPC_NSWF卡片组 = (
 ): string => {
   if (nsfw场景类型 === '无') return '';
 
-  const 在场NPC = npcs.filter(npc => npc.是否在场 !== false);
+  const 在场NPC = npcs.filter(npc => npc.是否在场 !== false && npc.性别 === '女');
   if (在场NPC.length === 0) return '';
 
   const cards = 在场NPC

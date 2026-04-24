@@ -312,6 +312,33 @@ export function getQiyunByRealm(境界层级: number): 气运数据[] {
     });
 }
 
+function applyQiyunFilters(pool: 气运数据[], options?: {
+    类别?: 气运类别;
+    稀有度?: 气运稀有度;
+    excludeNsfw?: boolean;
+    nsfwOnly?: boolean;
+    成人内容开启?: boolean;
+    能力类型?: 气运能力类型;
+    适用境界Min?: number;
+    适用境界Max?: number;
+}): 气运数据[] {
+    if (options?.类别) pool = pool.filter(q => q.类别 === options.类别);
+    if (options?.稀有度) pool = pool.filter(q => q.稀有度 === options.稀有度);
+    if (options?.excludeNsfw) pool = pool.filter(q => !q.nsfw等级);
+    if (options?.nsfwOnly) pool = pool.filter(q => q.nsfw等级 && q.nsfw等级 > 0);
+    if (options?.成人内容开启 === false) pool = pool.filter(q => !q.nsfw等级 || q.nsfw等级 < 2);
+    if (options?.能力类型) pool = pool.filter(q => q.能力类型 === options.能力类型);
+    if (options?.适用境界Min !== undefined || options?.适用境界Max !== undefined) {
+        pool = pool.filter(q => {
+            const range = q.适用境界 || [0, 99];
+            const min = options?.适用境界Min ?? range[0];
+            const max = options?.适用境界Max ?? range[1];
+            return range[0] >= min && range[1] <= max;
+        });
+    }
+    return pool;
+}
+
 export function randomQiyun(count: number, options?: {
     类别?: 气运类别;
     稀有度?: 气运稀有度;
@@ -322,21 +349,7 @@ export function randomQiyun(count: number, options?: {
     适用境界Min?: number;
     适用境界Max?: number;
 }): 气运数据[] {
-    let pool = [...气运数据列表];
-    if (options?.类别) pool = pool.filter(q => q.类别 === options.类别);
-    if (options?.稀有度) pool = pool.filter(q => q.稀有度 === options.稀有度);
-    if (options?.excludeNsfw) pool = pool.filter(q => q.nsfw等级 === undefined || q.nsfw等级 === 0);
-    if (options?.nsfwOnly) pool = pool.filter(q => q.nsfw等级 !== undefined && q.nsfw等级 > 0);
-    if (options?.成人内容开启 === false) pool = pool.filter(q => q.nsfw等级 === undefined || q.nsfw等级 < 2);
-    if (options?.能力类型) pool = pool.filter(q => q.能力类型 === options.能力类型);
-    if (options?.适用境界Min !== undefined || options?.适用境界Max !== undefined) {
-        pool = pool.filter(q => {
-            const range = q.适用境界 || [0, 99];
-            const min = options?.适用境界Min ?? range[0];
-            const max = options?.适用境界Max ?? range[1];
-            return range[0] >= min && range[1] <= max;
-        });
-    }
+    let pool = applyQiyunFilters([...气运数据列表], options);
     const shuffled = pool.sort(() => Math.random() - 0.5);
     return shuffled.slice(0, Math.min(count, shuffled.length));
 }
@@ -351,22 +364,7 @@ export function filterQiyun(options?: {
     适用境界Min?: number;
     适用境界Max?: number;
 }): 气运数据[] {
-    let results = [...气运数据列表];
-    if (options?.类别) results = results.filter(q => q.类别 === options.类别);
-    if (options?.稀有度) results = results.filter(q => q.稀有度 === options.稀有度);
-    if (options?.excludeNsfw) results = results.filter(q => q.nsfw等级 === undefined || q.nsfw等级 === 0);
-    if (options?.nsfwOnly) results = results.filter(q => q.nsfw等级 !== undefined && q.nsfw等级 > 0);
-    if (options?.成人内容开启 === false) results = results.filter(q => q.nsfw等级 === undefined || q.nsfw等级 < 2);
-    if (options?.能力类型) results = results.filter(q => q.能力类型 === options.能力类型);
-    if (options?.适用境界Min !== undefined || options?.适用境界Max !== undefined) {
-        results = results.filter(q => {
-            const range = q.适用境界 || [0, 99];
-            const min = options?.适用境界Min ?? range[0];
-            const max = options?.适用境界Max ?? range[1];
-            return range[0] >= min && range[1] <= max;
-        });
-    }
-    return results;
+    return applyQiyunFilters([...气运数据列表], options);
 }
 
 export function 计算气运属性修正(

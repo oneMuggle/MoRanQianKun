@@ -1523,8 +1523,8 @@ export const 构建系统提示词 = ({
     const contextNPCData = npcContext.在场数据块;
     const nsfwCardBlock = normalizedGameConfig.启用NSFW模式
         ? 构建在场NPC_NSWF卡片组(
-            (socialData || []).filter((n: any) => n.是否在场 !== false),
-            openingConfig?.nsfw场景类型 || '完全展开'
+            socialData || [],
+            openingConfig?.nsfw场景类型 ?? '无'
         )
         : '';
     const contextStoryPlan = 构建剧情安排(statePayload);
