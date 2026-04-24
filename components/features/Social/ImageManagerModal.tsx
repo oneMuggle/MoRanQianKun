@@ -53,6 +53,7 @@ import {
 } from './ImageManager/utils/imageManagerHelpers';
 import { PresetsTab } from './ImageManager/tabs/PresetsTab';
 import { ImageViewerOverlay, ManualConfirmOverlay, PromptDisplayOverlay } from './ImageManager/overlays';
+import { ImageManagerShell } from './ImageManager/components';
 
 interface Props {
     socialList: NPC结构[];
@@ -3820,250 +3821,133 @@ const ImageManagerModal: React.FC<Props> = ({
 
     return (
         <div className="fixed inset-0 z-[230] bg-black/90 backdrop-blur-md flex items-center justify-center p-0 md:p-4 animate-fadeIn overflow-hidden">
-            <div
-                className="w-full h-full md:max-w-7xl md:h-[85vh] md:min-h-0 bg-[#070708]/90 md:border border-wuxia-gold/30 md:rounded overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.95)] flex"
-                onClick={(event) => event.stopPropagation()}
-                onMouseDown={(event) => event.stopPropagation()}
-                onKeyDownCapture={(event) => {
-                    const target = event.target as HTMLElement | null;
-                    if (!target) return;
-                    const tagName = target.tagName;
-                    const isEditable = tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT' || target.isContentEditable;
-                    if (isEditable) {
-                        event.stopPropagation();
-                    }
-                }}
+            <ImageManagerShell
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onClose={onClose}
+                filters={filters}
+                setFilters={setFilters}
+                图片统计={图片统计}
+                队列统计={队列统计}
+                npcLibraryGroups={npcLibraryGroups}
+                filteredCombinedQueue={filteredCombinedQueue}
+                combinedHistoryRecords={combinedHistoryRecords}
+                actionError={actionError}
+                标签按钮样式={标签按钮样式}
             >
-                {/* 侧边栏 */}
-                <div className="w-20 md:w-56 shrink-0 border-r border-wuxia-gold/20 bg-black/60 flex flex-col items-center md:items-stretch py-6 space-y-8 z-20">
-                    <div className="hidden md:block px-6">
-                        <div className="text-wuxia-gold font-serif font-bold text-2xl tracking-[0.2em] text-shadow-glow drop-shadow-lg">图像工作台</div>
-                        <div className="text-[10px] text-gray-500 mt-2 uppercase tracking-widest">Image Matrix</div>
-                    </div>
-                    <div className="flex-1 space-y-1 mt-4 md:mt-0 w-full overflow-y-auto custom-scrollbar">
-                        <button type="button" onClick={() => setActiveTab('manual')} className={标签按钮样式(activeTab === 'manual')}>
-                            <span className="md:hidden text-lg w-full text-center">推</span>
-                            <span className="hidden md:inline">手动生成</span>
-                        </button>
-                        <button type="button" onClick={() => setActiveTab('library')} className={标签按钮样式(activeTab === 'library')}>
-                            <span className="md:hidden text-lg w-full text-center">库</span>
-                            <span className="hidden md:inline">图库资源</span>
-                        </button>
-                        <button type="button" onClick={() => setActiveTab('scene')} className={标签按钮样式(activeTab === 'scene')}>
-                            <span className="md:hidden text-lg w-full text-center">景</span>
-                            <span className="hidden md:inline">场景壁纸</span>
-                        </button>
-                        <button type="button" onClick={() => setActiveTab('queue')} className={标签按钮样式(activeTab === 'queue')}>
-                            <span className="md:hidden text-lg w-full text-center">队</span>
-                            <span className="hidden md:inline">生成队列</span>
-                        </button>
-                        <button type="button" onClick={() => setActiveTab('history')} className={标签按钮样式(activeTab === 'history')}>
-                            <span className="md:hidden text-lg w-full text-center">史</span>
-                            <span className="hidden md:inline">生成历史</span>
-                        </button>
-                        <button type="button" onClick={() => setActiveTab('presets')} className={标签按钮样式(activeTab === 'presets')}>
-                            <span className="md:hidden text-lg w-full text-center">设</span>
-                            <span className="hidden md:inline">资源配置</span>
-                        </button>
-                        <button type="button" onClick={() => setActiveTab('rules')} className={标签按钮样式(activeTab === 'rules')}>
-                            <span className="md:hidden text-lg w-full text-center">规</span>
-                            <span className="hidden md:inline">规则中心</span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* 主区 */}
-                <div className="flex-1 flex flex-col min-w-0 bg-[#070708]/80 relative overflow-hidden">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="absolute right-4 top-4 z-50 w-10 h-10 flex items-center justify-center rounded border border-gray-700 bg-black/50 text-gray-300 hover:text-red-400 hover:border-red-800 transition-colors shadow-lg"
-                        title="关闭"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-
-                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-                        {activeTab !== 'manual' && activeTab !== 'scene' && activeTab !== 'presets' && activeTab !== 'rules' && (
-                            <div className="shrink-0 px-6 py-6 border-b border-wuxia-gold/10 bg-black/30 space-y-5">
-                                <div className="pr-12">
-                                    <div className="text-wuxia-gold/90 font-serif text-lg tracking-wider">图片筛选</div>
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
-                                    <统计卡 label="图片总数" value={图片统计.total} />
-                                    <统计卡 label="成功" value={图片统计.success} tone="success" />
-                                    <统计卡 label="失败" value={图片统计.failed} tone="danger" />
-                                    <统计卡 label="生成中" value={图片统计.pending} tone="warning" />
-                                    <统计卡 label="队列总数" value={队列统计.total} tone="info" />
-                                    <统计卡 label="排队中" value={队列统计.queued} />
-                                    <统计卡 label="运行中" value={队列统计.running} tone="info" />
-                                    <统计卡 label="队列失败" value={队列统计.failed} tone="danger" />
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="space-y-2">
-                                        <label className={小标题样式}>角色名称</label>
-                                        <input
-                                            type="text"
-                                            value={filters.角色姓名 || ''}
-                                            onChange={(e) => setFilters((prev) => ({ ...prev, 角色姓名: e.target.value }))}
-                                            placeholder="输入角色名筛选"
-                                            className="w-full rounded border border-wuxia-gold/20 bg-black/60 px-3 py-2 text-sm text-gray-200 outline-none focus:border-wuxia-gold/60 focus:bg-black/90 transition-colors"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className={小标题样式}>状态筛选</label>
-                                        <select
-                                            value={filters.状态 || '全部'}
-                                            onChange={(e) => setFilters((prev) => ({ ...prev, 状态: e.target.value as 图片管理筛选条件['状态'] }))}
-                                            className="w-full rounded border border-wuxia-gold/20 bg-black/60 px-3 py-2 text-sm text-gray-200 outline-none focus:border-wuxia-gold/60 focus:bg-black/90 transition-colors"
-                                        >
-                                            <option value="全部">全部</option>
-                                            <option value="success">成功</option>
-                                            <option value="failed">失败</option>
-                                            <option value="pending">进行中 / 排队中</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className={小标题样式}>当前统计</label>
-                                        <div className="h-[38px] rounded border border-wuxia-gold/10 bg-black/40 px-3 flex items-center justify-between text-sm text-gray-300">
-                                            <span>当前视图</span>
-                                            <span className="text-wuxia-gold font-medium tracking-widest drop-shadow-md">
-                                            {activeTab === 'library' && `${npcLibraryGroups.length} 个角色`}
-                                            {activeTab === 'queue' && `${filteredCombinedQueue.length} 条任务`}
-                                            {activeTab === 'history' && `${combinedHistoryRecords.length} 条记录`}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {actionError && activeTab !== 'manual' && (
-                            <div className="mx-6 mt-6 rounded border border-red-900/40 bg-red-950/20 px-4 py-3 text-sm text-red-200 whitespace-pre-wrap break-words shadow-inner">
-                                {actionError}
-                            </div>
-                        )}
-
-                        <div className="flex-1 p-4 md:p-6 lg:p-8 relative z-0">
-                            {activeTab === 'manual' && renderManualTab()}
-                            {activeTab === 'library' && renderLibraryTab()}
-                            {activeTab === 'scene' && renderSceneTab()}
-                            {activeTab === 'queue' && renderQueueTab()}
-                            {activeTab === 'history' && renderHistoryTab()}
-                            {activeTab === 'presets' && (
-                                <PresetsTab
-                                    autoNpcArtistPresets={autoNpcArtistPresets}
-                                    autoSceneArtistPresets={autoSceneArtistPresets}
-                                    pngStylePresets={pngStylePresets}
-                                    currentPngStylePresetId={currentPngStylePresetId}
-                                    characterAnchors={characterAnchors}
-                                    characterAnchorNpcOptions={characterAnchorNpcOptions}
-                                    editorScopedArtistPresets={editorScopedArtistPresets}
-                                    editorSelectedArtistPreset={editorSelectedArtistPreset}
-                                    presetFeature={presetFeature}
-                                    characterAnchorEditorId={characterAnchorEditorId}
-                                    setCharacterAnchorEditorId={setCharacterAnchorEditorId}
-                                    characterAnchorNpcId={characterAnchorNpcId}
-                                    setCharacterAnchorNpcId={setCharacterAnchorNpcId}
-                                    characterAnchorDraft={characterAnchorDraft}
-                                    setCharacterAnchorDraft={setCharacterAnchorDraft}
-                                    characterAnchorExtractStage={characterAnchorExtractStage}
-                                    characterAnchorExtractRequirement={characterAnchorExtractRequirement}
-                                    setCharacterAnchorExtractRequirement={setCharacterAnchorExtractRequirement}
-                                    characterAnchorExtractMessage={characterAnchorExtractMessage}
-                                    pngPresetEditorId={pngPresetEditorId}
-                                    setPngPresetEditorId={setPngPresetEditorId}
-                                    pngPresetDraft={pngPresetDraft}
-                                    updatePngPresetDraft={updatePngPresetDraft}
-                                    pngPresetImportName={pngPresetImportName}
-                                    setPngPresetImportName={setPngPresetImportName}
-                                    pngPresetImportRequirement={pngPresetImportRequirement}
-                                    setPngPresetImportRequirement={setPngPresetImportRequirement}
-                                    pngImportStage={pngImportStage}
-                                    pngImportMessage={pngImportMessage}
-                                    artistPresetScope={artistPresetScope}
-                                    setArtistPresetScope={setArtistPresetScope}
-                                    editorArtistPresetId={editorArtistPresetId}
-                                    setEditorArtistPresetId={setEditorArtistPresetId}
-                                    manualBackgroundMode={manualBackgroundMode}
-                                    setManualBackgroundMode={setManualBackgroundMode}
-                                    busyActionKey={busyActionKey}
-                                    onSaveApiConfig={onSaveApiConfig}
-                                    onExtractCharacterAnchor={onExtractCharacterAnchor}
-                                    onSaveCharacterAnchor={onSaveCharacterAnchor}
-                                    onDeleteCharacterAnchor={onDeleteCharacterAnchor}
-                                    onSetCurrentPngStylePreset={onSetCurrentPngStylePreset}
-                                    onSavePngStylePreset={onSavePngStylePreset}
-                                    onDeletePngStylePreset={onDeletePngStylePreset}
-                                    onExportPngStylePresets={onExportPngStylePresets}
-                                    onImportPngStylePresets={onImportPngStylePresets}
-                                    handleSelectAutoArtistPreset={handleSelectAutoArtistPreset}
-                                    handleSelectAutoPngPreset={handleSelectAutoPngPreset}
-                                    handleExtractCharacterAnchor={handleExtractCharacterAnchor}
-                                    handleSaveCharacterAnchor={handleSaveCharacterAnchor}
-                                    handleDeleteCharacterAnchor={handleDeleteCharacterAnchor}
-                                    handleImportPngFile={handleImportPngFile}
-                                    handleSavePngPreset={handleSavePngPreset}
-                                    handleDeletePngPreset={handleDeletePngPreset}
-                                    handleAddArtistPreset={handleAddArtistPreset}
-                                    handleDeleteArtistPreset={handleDeleteArtistPreset}
-                                    handleExportArtistPresets={handleExportArtistPresets}
-                                    handleImportPresetFile={handleImportPresetFile}
-                                    handleSavePresetConfig={handleSavePresetConfig}
-                                    updateArtistPreset={updateArtistPreset}
-                                />
-                            )}
-                            {activeTab === 'rules' && renderRulesTab()}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {imageViewer && (
-                <ImageViewerOverlay
-                    src={imageViewer.src}
-                    alt={imageViewer.alt}
-                    onClose={() => setImageViewer(null)}
+                {activeTab === 'manual' && renderManualTab()}
+                {activeTab === 'library' && renderLibraryTab()}
+                {activeTab === 'scene' && renderSceneTab()}
+                {activeTab === 'queue' && renderQueueTab()}
+                {activeTab === 'history' && renderHistoryTab()}
+                {activeTab === 'presets' && (
+                <PresetsTab
+                    autoNpcArtistPresets={autoNpcArtistPresets}
+                    autoSceneArtistPresets={autoSceneArtistPresets}
+                    pngStylePresets={pngStylePresets}
+                    currentPngStylePresetId={currentPngStylePresetId}
+                    characterAnchors={characterAnchors}
+                    characterAnchorNpcOptions={characterAnchorNpcOptions}
+                    editorScopedArtistPresets={editorScopedArtistPresets}
+                    editorSelectedArtistPreset={editorSelectedArtistPreset}
+                    presetFeature={presetFeature}
+                    characterAnchorEditorId={characterAnchorEditorId}
+                    setCharacterAnchorEditorId={setCharacterAnchorEditorId}
+                    characterAnchorNpcId={characterAnchorNpcId}
+                    setCharacterAnchorNpcId={setCharacterAnchorNpcId}
+                    characterAnchorDraft={characterAnchorDraft}
+                    setCharacterAnchorDraft={setCharacterAnchorDraft}
+                    characterAnchorExtractStage={characterAnchorExtractStage}
+                    characterAnchorExtractRequirement={characterAnchorExtractRequirement}
+                    setCharacterAnchorExtractRequirement={setCharacterAnchorExtractRequirement}
+                    characterAnchorExtractMessage={characterAnchorExtractMessage}
+                    pngPresetEditorId={pngPresetEditorId}
+                    setPngPresetEditorId={setPngPresetEditorId}
+                    pngPresetDraft={pngPresetDraft}
+                    updatePngPresetDraft={updatePngPresetDraft}
+                    pngPresetImportName={pngPresetImportName}
+                    setPngPresetImportName={setPngPresetImportName}
+                    pngPresetImportRequirement={pngPresetImportRequirement}
+                    setPngPresetImportRequirement={setPngPresetImportRequirement}
+                    pngImportStage={pngImportStage}
+                    pngImportMessage={pngImportMessage}
+                    artistPresetScope={artistPresetScope}
+                    setArtistPresetScope={setArtistPresetScope}
+                    editorArtistPresetId={editorArtistPresetId}
+                    setEditorArtistPresetId={setEditorArtistPresetId}
+                    manualBackgroundMode={manualBackgroundMode}
+                    setManualBackgroundMode={setManualBackgroundMode}
+                    busyActionKey={busyActionKey}
+                    onSaveApiConfig={onSaveApiConfig}
+                    onExtractCharacterAnchor={onExtractCharacterAnchor}
+                    onSaveCharacterAnchor={onSaveCharacterAnchor}
+                    onDeleteCharacterAnchor={onDeleteCharacterAnchor}
+                    onSetCurrentPngStylePreset={onSetCurrentPngStylePreset}
+                    onSavePngStylePreset={onSavePngStylePreset}
+                    onDeletePngStylePreset={onDeletePngStylePreset}
+                    onExportPngStylePresets={onExportPngStylePresets}
+                    onImportPngStylePresets={onImportPngStylePresets}
+                    handleSelectAutoArtistPreset={handleSelectAutoArtistPreset}
+                    handleSelectAutoPngPreset={handleSelectAutoPngPreset}
+                    handleExtractCharacterAnchor={handleExtractCharacterAnchor}
+                    handleSaveCharacterAnchor={handleSaveCharacterAnchor}
+                    handleDeleteCharacterAnchor={handleDeleteCharacterAnchor}
+                    handleImportPngFile={handleImportPngFile}
+                    handleSavePngPreset={handleSavePngPreset}
+                    handleDeletePngPreset={handleDeletePngPreset}
+                    handleAddArtistPreset={handleAddArtistPreset}
+                    handleDeleteArtistPreset={handleDeleteArtistPreset}
+                    handleExportArtistPresets={handleExportArtistPresets}
+                    handleImportPresetFile={handleImportPresetFile}
+                    handleSavePresetConfig={handleSavePresetConfig}
+                    updateArtistPreset={updateArtistPreset}
                 />
             )}
+            {activeTab === 'rules' && renderRulesTab()}
+        </ImageManagerShell>
 
-            {manualFlowStage !== 'idle' && (
-                <ManualConfirmOverlay
-                    flowStage={manualFlowStage}
-                    selectedNpcName={selectedNpc?.姓名}
-                    composition={manualComposition}
-                    customComposition={manualCustomComposition}
-                    backgroundMode={manualBackgroundMode}
-                    extraRequirement={manualExtraRequirement}
-                    npcSummary={selectedNpcSummary || '暂无资料'}
-                    statusText={manualStatusText}
-                    recentTask={recentManualQueueTask}
-                    fallbackTask={recentQueueTask}
-                    获取生图阶段中文={获取生图阶段中文}
-                    从任务状态推导阶段={从任务状态推导阶段}
-                    主按钮样式={主按钮样式}
-                    次级按钮样式={次级按钮样式}
-                    onCancelConfirm={handleCancelConfirm}
-                    onCancelSubmitting={handleCancelSubmitting}
-                    onSubmitManual={handleSubmitManual}
-                    canSubmit={canSubmitManual}
-                />
-            )}
+        {imageViewer && (
+            <ImageViewerOverlay
+                src={imageViewer.src}
+                alt={imageViewer.alt}
+                onClose={() => setImageViewer(null)}
+            />
+        )}
 
-            {promptDisplayModal.打开 && (
-                <PromptDisplayOverlay
-                    打开={promptDisplayModal.打开}
-                    生图词组={promptDisplayModal.生图词组}
-                    最终正向提示词={promptDisplayModal.最终正向提示词}
-                    最终负向提示词={promptDisplayModal.最终负向提示词}
-                    错误信息={promptDisplayModal.错误信息}
-                    onClose={() => setPromptDisplayModal({ 打开: false })}
-                />
-            )}
-        </div>
+        {manualFlowStage !== 'idle' && (
+            <ManualConfirmOverlay
+                flowStage={manualFlowStage}
+                selectedNpcName={selectedNpc?.姓名}
+                composition={manualComposition}
+                customComposition={manualCustomComposition}
+                backgroundMode={manualBackgroundMode}
+                extraRequirement={manualExtraRequirement}
+                npcSummary={selectedNpcSummary || '暂无资料'}
+                statusText={manualStatusText}
+                recentTask={recentManualQueueTask}
+                fallbackTask={recentQueueTask}
+                获取生图阶段中文={获取生图阶段中文}
+                从任务状态推导阶段={从任务状态推导阶段}
+                主按钮样式={主按钮样式}
+                次级按钮样式={次级按钮样式}
+                onCancelConfirm={handleCancelConfirm}
+                onCancelSubmitting={handleCancelSubmitting}
+                onSubmitManual={handleSubmitManual}
+                canSubmit={canSubmitManual}
+            />
+        )}
+
+        {promptDisplayModal.打开 && (
+            <PromptDisplayOverlay
+                打开={promptDisplayModal.打开}
+                生图词组={promptDisplayModal.生图词组}
+                最终正向提示词={promptDisplayModal.最终正向提示词}
+                最终负向提示词={promptDisplayModal.最终负向提示词}
+                错误信息={promptDisplayModal.错误信息}
+                onClose={() => setPromptDisplayModal({ 打开: false })}
+            />
+        )}
+    </div>
     );
 };
 
