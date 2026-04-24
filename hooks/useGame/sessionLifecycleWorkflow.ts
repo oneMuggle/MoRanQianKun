@@ -108,6 +108,7 @@ type 会话生命周期依赖 = {
     设置同人剧情规划: (value: any) => void;
     设置同人女主剧情规划: (value: any) => void;
     设置开局配置: (value: OpeningConfig | undefined) => void;
+    setGameConfig: (value: any) => void;
     设置开局变量生成进度: (value: any) => void;
     设置开局世界演变进度: (value: any) => void;
     设置开局规划进度: (value: any) => void;
@@ -334,6 +335,10 @@ export const 创建会话生命周期工作流 = (deps: 会话生命周期依赖
         } catch (error) {
             console.error('读取里武侠开关失败', error);
         }
+        // 将开局设置的 nsfw场景类型 同步到 gameConfig，确保运行时规范化能读取到
+        mergedGameConfig.nsfw场景类型 = worldConfig.nsfw场景类型;
+        // 同步到 React 状态，使后续游戏流程中的规范化能读取到
+        deps.setGameConfig(mergedGameConfig);
         return 执行世界生成工作流(
             worldConfig,
             charData,

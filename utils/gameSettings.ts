@@ -1,4 +1,5 @@
 import { 游戏设置结构 } from '../types';
+import { NSFW场景类型 } from '../models/system';
 import { 默认额外系统提示词, 旧版默认额外系统提示词 } from '../prompts/runtime/defaults';
 import { 获取酒馆预设顺序, 规范化酒馆预设 } from './tavernPreset';
 
@@ -82,6 +83,15 @@ const 规范化酒馆后处理 = (
         : fallback
 );
 
+const NSFW场景类型合法值: readonly NSFW场景类型[] = ['无', '点到为止', '适度展开', '完全展开'];
+
+const 规范化NSFW场景类型 = (
+    value: unknown,
+    fallback: NSFW场景类型
+): NSFW场景类型 => (
+    NSFW场景类型合法值.includes(value as NSFW场景类型) ? value as NSFW场景类型 : fallback
+);
+
 export const 默认独立APIGPT模式设置: NonNullable<游戏设置结构['独立APIGPT模式']> = {
     剧情回忆: false,
     记忆总结: false,
@@ -124,8 +134,11 @@ export const 默认游戏设置: 游戏设置结构 = {
     启用标签修复: true,
     启用自动重试: false,
     启用NSFW模式: false,
+    nsfw场景类型: '无',
+    成人内容: false,
     启用饱腹口渴系统: true,
     启用修炼体系: true,
+    启用里武侠模式: false,
     剧情风格: '一般',
     NTL后宫档位: '无限制',
     启用酒馆预设模式: false,
@@ -219,8 +232,11 @@ export const 规范化游戏设置 = (
         启用标签修复: 读取布尔(source.启用标签修复, fallback.启用标签修复 !== false),
         启用自动重试: 读取布尔(source.启用自动重试, fallback.启用自动重试 === true),
         启用NSFW模式: 读取布尔(source.启用NSFW模式, fallback.启用NSFW模式 === true),
+        nsfw场景类型: 规范化NSFW场景类型(source.nsfw场景类型, fallback.nsfw场景类型),
+        成人内容: 读取布尔(source.成人内容, fallback.成人内容 === true),
         启用饱腹口渴系统: 读取布尔(source.启用饱腹口渴系统, fallback.启用饱腹口渴系统 !== false),
         启用修炼体系: 读取布尔(source.启用修炼体系, fallback.启用修炼体系 !== false),
+        启用里武侠模式: 读取布尔(source.启用里武侠模式, fallback.启用里武侠模式 === true),
         剧情风格: 规范化剧情风格(source.剧情风格, fallback.剧情风格),
         NTL后宫档位: 规范化NTL档位(source.NTL后宫档位, fallback.NTL后宫档位),
         启用酒馆预设模式: 读取布尔(source.启用酒馆预设模式, fallback.启用酒馆预设模式 === true),
