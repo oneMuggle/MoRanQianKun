@@ -19,7 +19,7 @@ import {
 } from '../../utils/worldbook';
 import { 构建主剧情难度摘要提示词 } from '../../prompts/runtime/promptOwnership';
 import { 获取内置提示词槽位内容 } from '../../utils/builtinPrompts';
-import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../utils/promptFeatureToggles';
+import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据, 裁剪里武侠上下文数据 } from '../../utils/promptFeatureToggles';
 import {
     构建运行时提示词池,
     剥离NoControl关联提示词,
@@ -48,6 +48,7 @@ import { 计算气运属性修正 } from '../../data/qiyun';
 import { 构建女主剧情规划协议 } from '../../prompts/core/heroinePlan';
 import { 构建女主规划专项提示词 } from '../../prompts/core/heroinePlanCot';
 import { 核心_境界体系 } from '../../prompts/core/realm';
+import { 构建里武侠世界提示词 } from '../../prompts/runtime/liWuxiaWorld';
 
 export type 运行时提示词状态 = {
     当前启用: boolean;
@@ -569,7 +570,7 @@ export const 构建系统提示词 = ({
             突破条件: 突破条件列表
         };
 
-        return 包装树状上下文('用户角色数据', 裁剪修炼体系上下文数据(orderedRole, normalizedGameConfig));
+        return 包装树状上下文('用户角色数据', 裁剪里武侠上下文数据(裁剪修炼体系上下文数据(orderedRole, normalizedGameConfig), normalizedGameConfig));
     };
     const 归一化文本 = (value: any) => (
         typeof value === 'string'
@@ -1414,7 +1415,8 @@ export const 构建系统提示词 = ({
         开局剧情推动协议内容,
         ...开局女主协议提示词.map(item => item.content),
         actionOptionsPromptContent,
-        按当前设置过滤提示词(worldbookInjection.systemRuleText)
+        按当前设置过滤提示词(worldbookInjection.systemRuleText),
+        normalizedGameConfig.启用里武侠模式 === true ? 构建里武侠世界提示词() : null
     ]
         .filter(Boolean)
         .join('\n\n');

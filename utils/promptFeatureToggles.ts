@@ -44,6 +44,8 @@ const 功能附加块是否启用 = (
             return config?.启用修炼体系 !== false;
         case 'survival':
             return config?.启用饱腹口渴系统 !== false;
+        case 'liwuxia':
+            return config?.启用里武侠模式 === true;
         default:
             return true;
     }
@@ -62,6 +64,10 @@ export const 构建功能附加块 = (featureId: string, content: string): strin
 
 export const 构建修炼体系附加块 = (content: string): string => (
     构建功能附加块('cultivation', content)
+);
+
+export const 构建里武侠附加块 = (content: string): string => (
+    构建功能附加块('liwuxia', content)
 );
 
 const 解析功能附加块 = (
@@ -109,6 +115,38 @@ const 递归裁剪修炼字段 = (value: unknown): unknown => {
         result[key] = 递归裁剪修炼字段(child);
     });
     return result;
+};
+
+const 武根字段集合 = new Set([
+    '武根',
+    '硬度',
+    '尺寸',
+    '精元储量'
+]);
+
+const 递归裁剪武根字段 = (value: unknown): unknown => {
+    if (Array.isArray(value)) {
+        return value.map((item) => 递归裁剪武根字段(item));
+    }
+    if (!value || typeof value !== 'object') {
+        return value;
+    }
+
+    const source = value as Record<string, unknown>;
+    const result: Record<string, unknown> = {};
+    Object.entries(source).forEach(([key, child]) => {
+        if (武根字段集合.has(key)) return;
+        result[key] = 递归裁剪武根字段(child);
+    });
+    return result;
+};
+
+export const 裁剪里武侠上下文数据 = <T>(
+    value: T,
+    config?: Partial<游戏设置结构> | null
+): T => {
+    if (config?.启用里武侠模式 === true) return value;
+    return 递归裁剪武根字段(value) as T;
 };
 
 export const 裁剪修炼体系上下文数据 = <T>(

@@ -1,6 +1,7 @@
 import { WorldGenConfig, 角色数据结构, 武力等级描述映射, NSFW场景描述映射, 能力类型描述映射, 超能力分类描述, 觉醒程度描述 } from '../../types';
-import { 构建修炼体系附加块 } from '../../utils/promptFeatureToggles';
+import { 构建修炼体系附加块, 构建里武侠附加块 } from '../../utils/promptFeatureToggles';
 import { 构建双修门派世界书 } from './worldLixiangSects';
+import { 构建里武侠门派设定 } from './liWuxiaSects';
 
 export const 构建世界观锚点提示词 = (worldConfig: WorldGenConfig, charData: 角色数据结构): string => `
 【当前存档世界锚点（World Bible Anchor）】
@@ -40,6 +41,7 @@ ${构建修炼体系附加块(`- 初始境界: ${charData.境界}`)}
 export const 构建世界观种子提示词 = (worldConfig: WorldGenConfig, charData: 角色数据结构): string => {
     const anchor = 构建世界观锚点提示词(worldConfig, charData);
     const lixiangSectsWorldBook = 构建双修门派世界书(worldConfig.nsfw场景类型);
+    const liWuxiaSects = 构建里武侠门派设定();
     
     return `
 【世界观设定（存档绑定）】
@@ -82,6 +84,11 @@ ${构建修炼体系附加块('- 前期功法同样符合"初出江湖"的因果
 ${anchor}
 
 ${lixiangSectsWorldBook}
+
+${构建里武侠附加块(`
+【里武侠世界门派】
+${liWuxiaSects}
+`)}
     `.trim();
 };
 

@@ -207,6 +207,16 @@ const KungfuModal: React.FC<Props> = ({ skills, onClose }) => {
                                                 “ {currentSkill.描述 || '此功法精妙绝伦，非恒心者不能大成。'} ”
                                             </p>
                                         </div>
+
+                                        {(currentSkill as any).里修描述 && (
+                                            <div className="bg-black/30 border-l-4 border-wuxia-red/40 p-5 rounded-r-xl shadow-inner relative overflow-hidden">
+                                                <svg className="absolute text-wuxia-red/5 w-24 h-24 -top-4 -right-4 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h8v2H8v-2z" /></svg>
+                                                <div className="text-[10px] uppercase tracking-[0.35em] text-wuxia-red/60 mb-2">里修</div>
+                                                <p className="text-gray-300 text-base font-serif italic leading-loose tracking-wide">
+                                                    "{(currentSkill as any).里修描述}"
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 

@@ -78,6 +78,12 @@ const MobileKungfuModal: React.FC<Props> = ({ skills, onClose }) => {
                                     </div>
                                 </div>
                                 <p className="text-xs text-gray-300 mt-3 leading-relaxed">{current.描述}</p>
+                                {(current as any).里修描述 && (
+                                    <div className="mt-3 rounded-lg border border-wuxia-red/20 bg-wuxia-red/5 p-3">
+                                        <div className="text-[10px] uppercase tracking-[0.3em] text-wuxia-red/60 mb-1">里修</div>
+                                        <p className="text-xs text-gray-300 leading-relaxed">"{(current as any).里修描述}"</p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="bg-black/40 border border-gray-800 rounded-xl p-4 space-y-2">

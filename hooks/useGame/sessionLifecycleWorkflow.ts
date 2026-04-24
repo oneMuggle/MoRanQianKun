@@ -13,6 +13,8 @@ import type { 当前可用接口结构 } from '../../utils/apiConfig';
 import { 获取主剧情接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
 import { 执行开场剧情生成工作流 } from './openingStoryWorkflow';
 import { 执行世界生成工作流 } from './worldGenerationWorkflow';
+import * as dbService from '../../services/dbService';
+import { 设置键 } from '../../utils/settingsSchema';
 
 type 快速重开模式 = 'world_only' | 'opening_only' | 'all';
 
@@ -322,6 +324,16 @@ export const 创建会话生命周期工作流 = (deps: 会话生命周期依赖
         deps.设置开局变量生成进度(null);
         deps.设置开局世界演变进度(null);
         deps.设置开局规划进度(null);
+        // 合并最新保存的里武侠开关，确保世界生成时生效
+        const mergedGameConfig = { ...deps.gameConfig };
+        try {
+            const savedSettings = await dbService.读取设置(设置键.游戏设置);
+            if (savedSettings && typeof savedSettings === 'object' && '启用里武侠模式' in savedSettings) {
+                mergedGameConfig.启用里武侠模式 = savedSettings.启用里武侠模式;
+            }
+        } catch (error) {
+            console.error('读取里武侠开关失败', error);
+        }
         return 执行世界生成工作流(
             worldConfig,
             charData,
@@ -332,7 +344,7 @@ export const 创建会话生命周期工作流 = (deps: 会话生命周期依赖
             options,
             {
                 apiConfig: deps.apiConfig,
-                gameConfig: deps.gameConfig,
+                gameConfig: mergedGameConfig,
                 prompts: promptPool,
                 view: deps.view,
                 setView: deps.setView,

@@ -360,6 +360,20 @@ const GameSettings: React.FC<Props> = ({ settings, onSave }) => {
             <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
                 <div className="flex items-center justify-between gap-4">
                     <div>
+                        <div className="text-sm text-wuxia-red font-bold">里武侠世界</div>
+                        <div className="text-xs text-gray-400 mt-1">开启后，所有角色将具有表里双修人格与行为模式（外表端庄/内在反差），服装描写更暴露，功法包含表里双修描述，新增武根系统。</div>
+                    </div>
+                    <ToggleSwitch
+                        checked={(form as any).启用里武侠模式 === true}
+                        onChange={(next) => 实时应用更新({ 启用里武侠模式: next } as any)}
+                        ariaLabel="切换里武侠世界"
+                    />
+                </div>
+            </div>
+
+            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
                         <div className="text-sm text-wuxia-red font-bold">成人内容</div>
                         <div className="text-xs text-gray-400 mt-1">开启后可显示重口味气运内容。关闭时仅显示一般向内容。</div>
                     </div>

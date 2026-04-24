@@ -97,6 +97,14 @@ export interface 角色数据结构 {
     悟性: number;
     福源: number;
 
+    // 武根系统 (里武侠模式)
+    武根?: {
+        硬度: number;      // 0-100
+        尺寸: number;      // 0-100
+        精元储量: number;  // 0-100
+        等级: string;      // 如 '凡品', '良品', '上品', '极品', '绝世'
+    };
+
     // 身体部位状态
     头部当前血量: number; 头部最大血量: number; 头部状态: string;
     胸部当前血量: number; 胸部最大血量: number; 胸部状态: string;

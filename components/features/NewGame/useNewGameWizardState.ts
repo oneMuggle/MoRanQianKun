@@ -100,6 +100,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
     const [自定义开局预设列表, 设置自定义开局预设列表] = useState<开局预设方案结构[]>([]);
     const [小说拆分数据集列表, 设置小说拆分数据集列表] = useState<小说拆分数据集结构[]>([]);
     const [成人内容开启, 设置成人内容开启] = useState(false);
+    const [里武侠开启, 设置里武侠开启] = useState(false);
 
     // Custom Inputs
     const [customTalent, setCustomTalent] = useState<天赋结构>({ 名称: '', 描述: '', 效果: '' });
@@ -335,7 +336,8 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
             右腿当前血量: 右腿最大血量, 右腿最大血量, 右腿状态: '正常',
             装备: { 头部: '无', 胸部: '无', 盔甲: '无', 内衬: '无', 腿部: '无', 手部: '无', 足部: '无', 主武器: '无', 副武器: '无', 暗器: '无', 背部: '无', 腰部: '无', 坐骑: '无' },
             物品列表: [], 功法列表: [],
-            当前经验: 0, 升级经验: 初始升级经验, 玩家BUFF: [], 突破条件: []
+            当前经验: 0, 升级经验: 初始升级经验, 玩家BUFF: [], 突破条件: [],
+            ...(里武侠开启 ? { 武根: { 硬度: 10, 尺寸: 10, 精元储量: 50, 等级: '凡品' } } : {})
         };
     };
 
@@ -486,6 +488,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
                 设置小说拆分数据集列表(savedNovelDatasets);
                 if (savedGameSettings && typeof savedGameSettings === 'object') {
                     设置成人内容开启(savedGameSettings.成人内容 === true);
+                    设置里武侠开启(savedGameSettings.启用里武侠模式 === true);
                 }
             } catch (error) {
                 console.error('加载自定义身份/天赋/开局方案失败', error);
@@ -776,6 +779,13 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
             ? await requestConfirm({ title: '确认创建', message: '开局将直接以流式方式生成并展示开场剧情。是否继续创建？', confirmText: '开始生成' })
             : true;
         if (!ok) return;
+        // Persist 里武侠开关到 IndexedDB，确保后续游戏会话能读取
+        try {
+            const savedGameSettings = await dbService.读取设置(设置键.游戏设置) || {};
+            await dbService.保存设置(设置键.游戏设置, { ...savedGameSettings, 启用里武侠模式: 里武侠开启 });
+        } catch (error) {
+            console.error('保存里武侠开关失败', error);
+        }
         onComplete(effectiveWorldConfig, charData, effectiveOpeningConfig, 'all', true, effectiveOpeningExtraRequirement.trim());
     };
 
@@ -798,6 +808,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
         自定义开局预设列表, 设置自定义开局预设列表,
         小说拆分数据集列表, 设置小说拆分数据集列表,
         成人内容开启, 设置成人内容开启,
+        里武侠开启, 设置里武侠开启,
         customTalent, setCustomTalent, showCustomTalent, setShowCustomTalent,
         正在编辑天赋名, set正在编辑天赋名,
         customBackground, setCustomBackground, showCustomBackground, setShowCustomBackground,

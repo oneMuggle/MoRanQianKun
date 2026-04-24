@@ -581,6 +581,7 @@ export interface 游戏设置结构 {
     成人内容?: boolean; // Unlock nsfw等级 2 qiyun entries; default false
     启用饱腹口渴系统: boolean; // Toggle hunger/thirst prompt injection and UI visibility
     启用修炼体系: boolean; // Toggle cultivation/realm/kungfu prompt injection and related UI visibility
+    启用里武侠模式: boolean; // Toggle inner martial arts (里武侠) world: dual-cultivation personality, revealing clothing, 武根 system
     剧情风格: 剧情风格类型; // Story style injected as assistant context before COT
     NTL后宫档位: NTL后宫档位; // NTL-only tier selector
     启用酒馆预设模式: boolean; // Use SillyTavern preset prompt/order pipeline

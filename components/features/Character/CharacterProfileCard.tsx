@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { 角色数据结构, 视觉设置结构 } from '../../../types';
 import { 构建区域文字样式 } from '../../../utils/visualSettings';
 interface Props {
@@ -157,6 +157,27 @@ const CharacterProfileCard: React.FC<Props> = ({ character, visualConfig }) => {
                             ))}
                         </div>
                     </div>
+
+                    {(character as any).武根 && (
+                        <div className="border border-wuxia-red/20 bg-[linear-gradient(180deg,rgba(80,20,20,0.12),rgba(0,0,0,0.1))] p-4">
+                            <div className="mb-3 flex items-center justify-between gap-2">
+                                <div className="text-[10px] uppercase tracking-[0.35em] text-wuxia-red/80">武根</div>
+                                <div className="text-[10px] text-wuxia-red/60">{(character as any).武根.等级}</div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                {[
+                                    { label: '硬度', value: (character as any).武根.硬度 },
+                                    { label: '尺寸', value: (character as any).武根.尺寸 },
+                                    { label: '精元', value: (character as any).武根.精元储量 },
+                                ].map((stat) => (
+                                    <div key={stat.label} className="border border-wuxia-red/15 bg-black/25 px-2 py-3 text-center">
+                                        <div className="text-[10px] tracking-[0.2em] text-gray-500">{stat.label}</div>
+                                        <div className="mt-1 text-lg font-mono font-bold text-wuxia-red">{stat.value}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
