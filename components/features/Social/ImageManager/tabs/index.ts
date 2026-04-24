@@ -4,3 +4,4 @@ export { LibraryTab } from './LibraryTab';
 export { RulesTab } from './RulesTab';
 export { SceneTab } from './SceneTab';
 export { ManualTab } from './ManualTab';
+export { PresetsTab } from './PresetsTab';
