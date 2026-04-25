@@ -1,5 +1,5 @@
 import { WorldGenConfig, 角色数据结构, 武力等级描述映射, NSFW场景描述映射, 能力类型描述映射, 超能力分类描述, 觉醒程度描述, 时代配置, 内置时代配置 } from '../../types';
-import { 构建修炼体系附加块, 构建里武侠附加块 } from '../../utils/promptFeatureToggles';
+import { 构建修炼体系附加块, 构建里武侠附加块, 构建里志怪附加块 } from '../../utils/promptFeatureToggles';
 import { 构建双修门派世界书 } from './worldLixiangSects';
 import { 构建里武侠门派设定 } from './liWuxiaSects';
 
@@ -105,6 +105,13 @@ ${isAncient ? lixiangSectsWorldBook : ''}
 ${构建里武侠附加块(`
 【里武侠世界门派】
 ${liWuxiaSects}
+`)}
+
+${构建里志怪附加块(`
+【里志怪世界设定】
+志怪模式已开启。志怪生物、阴阳相克、道法体系、因果系统已融入本世界。
+志怪事件应自然融入武侠叙事，不喧宾夺主；凡人江湖中志怪属于"异闻"。
+具体规则由系统运行时注入，此处仅声明本存档启用里志怪世界观。
 `)}
     `.trim();
 };

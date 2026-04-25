@@ -1,6 +1,7 @@
 /* Extracted from index.html to avoid Vite HTML inline-css proxy issues */
 @import './components/loader.css';
 @import './lixia-enhancements.css';
+@import './lizhiguai-enhancements.css';
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {

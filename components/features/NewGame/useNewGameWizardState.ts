@@ -101,6 +101,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
     const [小说拆分数据集列表, 设置小说拆分数据集列表] = useState<小说拆分数据集结构[]>([]);
     const [成人内容开启, 设置成人内容开启] = useState(false);
     const [里武侠开启, 设置里武侠开启] = useState(false);
+    const [里志怪开启, 设置里志怪开启] = useState(false);
 
     // Search & filter
     const [背景搜索词, set背景搜索词] = useState('');
@@ -384,7 +385,8 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
             装备: { 头部: '无', 胸部: '无', 盔甲: '无', 内衬: '无', 腿部: '无', 手部: '无', 足部: '无', 主武器: '无', 副武器: '无', 暗器: '无', 背部: '无', 腰部: '无', 坐骑: '无' },
             物品列表: [], 功法列表: [],
             当前经验: 0, 升级经验: 初始升级经验, 玩家BUFF: [], 突破条件: [],
-            ...(里武侠开启 ? { 武根: { 硬度: 10, 尺寸: 10, 精元储量: 50, 等级: '凡品' } } : {})
+            ...(里武侠开启 ? { 武根: { 硬度: 10, 尺寸: 10, 精元储量: 50, 等级: '凡品' } } : {}),
+            ...(里志怪开启 ? { 妖根: { 灵脉: 10, 妖力: 10, 精怪亲和力: 10, 等级: '凡骨' }, 业障: 0, 功德: 0, 灵视能力: false, 已知道法: [] } : {})
         };
     };
 
@@ -536,6 +538,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
                 if (savedGameSettings && typeof savedGameSettings === 'object') {
                     设置成人内容开启(savedGameSettings.成人内容 === true);
                     设置里武侠开启(savedGameSettings.启用里武侠模式 === true);
+                    设置里志怪开启(savedGameSettings.启用里志怪模式 === true);
                 }
             } catch (error) {
                 console.error('加载自定义身份/天赋/开局方案失败', error);
@@ -829,7 +832,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
         // Persist 里武侠开关到 IndexedDB，确保后续游戏会话能读取
         try {
             const savedGameSettings = await dbService.读取设置(设置键.游戏设置) || {};
-            await dbService.保存设置(设置键.游戏设置, { ...savedGameSettings, 启用里武侠模式: 里武侠开启 });
+            await dbService.保存设置(设置键.游戏设置, { ...savedGameSettings, 启用里武侠模式: 里武侠开启, 启用里志怪模式: 里志怪开启 });
         } catch (error) {
             console.error('保存里武侠开关失败', error);
         }
@@ -856,6 +859,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
         小说拆分数据集列表, 设置小说拆分数据集列表,
         成人内容开启, 设置成人内容开启,
         里武侠开启, 设置里武侠开启,
+        里志怪开启, 设置里志怪开启,
         customTalent, setCustomTalent, showCustomTalent, setShowCustomTalent,
         正在编辑天赋名, set正在编辑天赋名,
         customBackground, setCustomBackground, showCustomBackground, setShowCustomBackground,

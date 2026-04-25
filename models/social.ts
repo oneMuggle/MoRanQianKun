@@ -80,6 +80,14 @@ export interface NSFW行为特征结构 {
     叙事锚点: string;
 }
 
+export interface 妖象心法结构 {
+    名称: string;
+    表描述: string;
+    里描述: string;
+    灵契解锁等级: number;
+    描写风格: string;
+}
+
 export interface NPC结构 {
     id: string;
     姓名: string;
@@ -143,6 +151,13 @@ export interface NPC结构 {
     亲密度等级?: number;
     当前服装状态?: 服装状态结构;
     NSFW行为特征?: NSFW行为特征结构;
+
+    // --- 里志怪角色卡片 ---
+    物种类型?: '人类' | '妖' | '鬼' | '精怪' | '僵尸' | '画皮' | '神仙' | '鬼王' | '大妖' | '地仙';
+    真身?: string;              // 真实身份/原形
+    妖力?: number;              // 0-100，妖力强度
+    妖象心法?: 妖象心法结构;    // 志怪修行心法
+    灵契等级?: number;          // 类似亲密度等级，人妖/人鬼羁绊等级
 
     // 记忆系统
     记忆: NPC记忆[];

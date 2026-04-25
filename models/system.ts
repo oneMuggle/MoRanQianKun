@@ -764,6 +764,7 @@ export interface 游戏设置结构 {
     启用饱腹口渴系统: boolean; // Toggle hunger/thirst prompt injection and UI visibility
     启用修炼体系: boolean; // Toggle cultivation/realm/kungfu prompt injection and related UI visibility
     启用里武侠模式: boolean; // Toggle inner martial arts (里武侠) world: dual-cultivation personality, revealing clothing, 武根 system
+    启用里志怪模式: boolean; // Toggle inner zhiguai (里志怪) world: supernatural folklore, yin-yang mechanics, talisman/法器 systems
     剧情风格: 剧情风格类型; // Story style injected as assistant context before COT
     NTL后宫档位: NTL后宫档位; // NTL-only tier selector
     启用酒馆预设模式: boolean; // Use SillyTavern preset prompt/order pipeline

@@ -329,11 +329,16 @@ export const 创建会话生命周期工作流 = (deps: 会话生命周期依赖
         const mergedGameConfig = { ...deps.gameConfig };
         try {
             const savedSettings = await dbService.读取设置(设置键.游戏设置);
-            if (savedSettings && typeof savedSettings === 'object' && '启用里武侠模式' in savedSettings) {
-                mergedGameConfig.启用里武侠模式 = savedSettings.启用里武侠模式;
+            if (savedSettings && typeof savedSettings === 'object') {
+                if ('启用里武侠模式' in savedSettings) {
+                    mergedGameConfig.启用里武侠模式 = savedSettings.启用里武侠模式;
+                }
+                if ('启用里志怪模式' in savedSettings) {
+                    mergedGameConfig.启用里志怪模式 = savedSettings.启用里志怪模式;
+                }
             }
         } catch (error) {
-            console.error('读取里武侠开关失败', error);
+            console.error('读取里武侠/里志怪开关失败', error);
         }
         // 将开局设置的 nsfw场景类型 同步到 gameConfig，确保运行时规范化能读取到
         mergedGameConfig.nsfw场景类型 = worldConfig.nsfw场景类型;

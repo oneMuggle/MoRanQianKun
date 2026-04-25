@@ -340,6 +340,12 @@ export const useGameState = () => {
         document.documentElement.dataset.lixia = enabled ? 'true' : 'false';
     }, [gameConfig.启用里武侠模式]);
 
+    // Lizhiguai Mode Visual Toggle
+    useEffect(() => {
+        const enabled = gameConfig.启用里志怪模式 === true;
+        document.documentElement.dataset.lizhiguai = enabled ? 'true' : 'false';
+    }, [gameConfig.启用里志怪模式]);
+
     return {
         // State
         view, setView,

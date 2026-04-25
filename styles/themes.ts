@@ -155,6 +155,8 @@ export const 应用主题到根元素 = (theme: ThemePreset, root?: HTMLElement)
         target.style.setProperty(key, value);
     });
     const existingLixia = target.dataset.lixia;
+    const existingLizhiguai = target.dataset.lizhiguai;
     target.dataset.theme = definition.id;
     if (existingLixia !== undefined) target.dataset.lixia = existingLixia;
+    if (existingLizhiguai !== undefined) target.dataset.lizhiguai = existingLizhiguai;
 };

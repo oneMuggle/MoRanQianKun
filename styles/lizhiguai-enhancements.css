@@ -1,0 +1,204 @@
+/* 里志怪模式视觉增强层
+   根选择器: .lizhiguai-active (加在游戏视图根 div 上)
+   辅助选择器: [data-lizhiguai="true"] (加在 html 上，用于全局效果) */
+
+/* ===================== A. 全局幽绿/暗紫光晕背景 ===================== */
+[data-lizhiguai="true"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(74, 222, 128, 0.08) 0%, rgba(107, 33, 168, 0.06) 50%, transparent 70%);
+    animation: lizhiguai-ambient-pulse 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes lizhiguai-ambient-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+/* ===================== B. 鬼火粒子动效 (脱离 overflow-hidden 容器) ===================== */
+.lizhiguai-particles {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: visible !important;
+}
+
+/* 鬼火粒子 */
+.lizhiguai-particles::before {
+    content: '';
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(74, 222, 128, 0.5);
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
+    animation: lizhiguai-fire-1 12s linear infinite;
+    left: 15%;
+}
+
+.lizhiguai-particles::after {
+    content: '';
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(167, 139, 250, 0.4);
+    box-shadow: 0 0 6px rgba(167, 139, 250, 0.3);
+    animation: lizhiguai-fire-2 14s linear infinite;
+    left: 65%;
+}
+
+@keyframes lizhiguai-fire-1 {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    5% { opacity: 0.6; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(-20px) translateX(60px); opacity: 0; }
+}
+
+@keyframes lizhiguai-fire-2 {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    5% { opacity: 0.5; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-20px) translateX(-40px); opacity: 0; }
+}
+
+/* 额外粒子 */
+.lizhiguai-particles .ghost-fire {
+    position: fixed;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(74, 222, 128, 0.4);
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.2);
+    animation: lizhiguai-fire-float linear infinite;
+}
+
+@keyframes lizhiguai-fire-float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    5% { opacity: 0.5; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-20px) translateX(80px); opacity: 0; }
+}
+
+/* ===================== C. 幽绿文字微光 ===================== */
+.lizhiguai-active .text-wuxia-gold {
+    animation: lizhiguai-green-glow 4s ease-in-out infinite;
+}
+
+@keyframes lizhiguai-green-glow {
+    0%, 100% { text-shadow: 0 0 6px rgba(74, 222, 128, 0.2); }
+    50% { text-shadow: 0 0 14px rgba(74, 222, 128, 0.5), 0 0 24px rgba(107, 33, 168, 0.15); }
+}
+
+/* ===================== D. 面板边框 ===================== */
+.lizhiguai-active .lizhiguai-panel-left {
+    border-right-color: rgba(74, 222, 128, 0.3) !important;
+    box-shadow: 10px 0 20px rgba(74, 222, 128, 0.1) !important;
+}
+
+.lizhiguai-active .lizhiguai-panel-right {
+    border-left-color: rgba(167, 139, 250, 0.3) !important;
+    box-shadow: -10px 0 20px rgba(107, 33, 168, 0.1) !important;
+}
+
+.lizhiguai-active .lizhiguai-topbar {
+    border-bottom-color: rgba(74, 222, 128, 0.25) !important;
+    box-shadow: 0 10px 30px rgba(74, 222, 128, 0.08) !important;
+}
+
+/* ===================== E. 消息装饰 ===================== */
+.lizhiguai-active .lizhiguai-narrator {
+    border-left-color: rgba(74, 222, 128, 0.6) !important;
+    border-right-color: rgba(74, 222, 128, 0.6) !important;
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.1) !important;
+}
+
+.lizhiguai-active .lizhiguai-player-msg {
+    border-right-color: rgba(167, 139, 250, 0.5) !important;
+    box-shadow: -4px 0 12px rgba(167, 139, 250, 0.1) !important;
+}
+
+.lizhiguai-active .lizhiguai-system-msg {
+    border-color: rgba(74, 222, 128, 0.35) !important;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.12) !important;
+}
+
+.lizhiguai-active .lizhiguai-stream-preview {
+    border-color: rgba(74, 222, 128, 0.4) !important;
+}
+
+/* TurnItem hover 底部绿线 */
+.lizhiguai-active .group\/turn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(74, 222, 128, 0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.lizhiguai-active .group\/turn:hover::after {
+    opacity: 1;
+}
+
+/* ===================== F. 快捷操作按钮 ===================== */
+.lizhiguai-active .lizhiguai-quick-btn {
+    border-color: rgba(74, 222, 128, 0.35) !important;
+}
+.lizhiguai-active .lizhiguai-quick-btn:hover {
+    border-color: rgba(74, 222, 128, 0.7) !important;
+    background-color: rgba(74, 222, 128, 0.12) !important;
+    color: rgba(187, 247, 208, 0.95) !important;
+}
+
+/* ===================== G. avatar 卡片幽绿光晕 ===================== */
+.lizhiguai-active .avatar-container-card {
+    box-shadow: 0 10px 30px rgba(74, 222, 128, 0.2), 0 0 16px rgba(107, 33, 168, 0.1);
+}
+.lizhiguai-active .avatar-container-card:hover {
+    border-color: rgba(74, 222, 128, 0.5) !important;
+    box-shadow: 0 15px 40px rgba(74, 222, 128, 0.35);
+}
+
+.lizhiguai-active .avatar-card-blob {
+    background-color: rgba(74, 222, 128, 0.35);
+    animation-duration: 10s;
+}
+
+/* ===================== H. 输入框禁用态光晕 ===================== */
+.lizhiguai-active .lizhiguai-input-disabled {
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.15) !important;
+}
+
+/* ===================== I. 滚动条幽绿色调 ===================== */
+[data-lizhiguai="true"] ::-webkit-scrollbar-thumb {
+    background: rgba(74, 222, 128, 0.35);
+}
+
+/* ===================== J. 角色对话 hover 偏绿 ===================== */
+.lizhiguai-active .lizhiguai-dialog-bubble:hover {
+    border-color: rgba(74, 222, 128, 0.6) !important;
+}
+
+/* ===================== K. 移动端减弱动画 ===================== */
+@media (max-width: 767px) {
+    .lizhiguai-particles::before,
+    .lizhiguai-particles::after,
+    .lizhiguai-particles .ghost-fire {
+        animation-duration: 20s;
+        opacity: 0.3;
+    }
+
+    [data-lizhiguai="true"] body::before {
+        animation-duration: 14s;
+    }
+}

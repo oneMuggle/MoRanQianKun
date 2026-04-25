@@ -399,6 +399,25 @@ const GameSettings: React.FC<Props> = ({ settings, onSave }) => {
                 </div>
             </div>
 
+            <div className="space-y-3 rounded-md border border-green-500/20 bg-black/30 p-4">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <div className="text-sm text-green-400 font-bold">里志怪世界</div>
+                        <div className="text-xs text-gray-400 mt-1">开启后，注入志怪生物生态、阴阳相克、道法体系、因果系统规则，新增妖根、灵视、业障、功德系统。</div>
+                    </div>
+                    <div className="relative">
+                        <ToggleSwitch
+                            checked={(form as any).启用里志怪模式 === true}
+                            onChange={(next) => 实时应用更新({ 启用里志怪模式: next } as any)}
+                            ariaLabel="切换里志怪世界"
+                        />
+                        {(form as any).启用里志怪模式 === true && (
+                            <span className="absolute -inset-2 rounded-lg bg-green-500/15 animate-pulse pointer-events-none" />
+                        )}
+                    </div>
+                </div>
+            </div>
+
             <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
                 <div className="flex items-center justify-between gap-4">
                     <div>
