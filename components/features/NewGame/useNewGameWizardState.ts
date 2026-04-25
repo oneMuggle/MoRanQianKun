@@ -24,6 +24,7 @@ import {
 } from '../../../utils/openingConfig';
 import { 默认境界母板提示词 } from '../../../prompts/runtime/fandom';
 import { 设置键 } from '../../../utils/settingsSchema';
+import { 体系类型 } from '../../../types';
 
 // --- Constants ---
 const STEPS = [...新开局步骤列表];
@@ -102,6 +103,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
     const [成人内容开启, 设置成人内容开启] = useState(false);
     const [里武侠开启, 设置里武侠开启] = useState(false);
     const [里志怪开启, 设置里志怪开启] = useState(false);
+    const [古代体系选择, 设置古代体系选择] = useState<体系类型>('武侠');
 
     // Search & filter
     const [背景搜索词, set背景搜索词] = useState('');
@@ -539,6 +541,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
                     设置成人内容开启(savedGameSettings.成人内容 === true);
                     设置里武侠开启(savedGameSettings.启用里武侠模式 === true);
                     设置里志怪开启(savedGameSettings.启用里志怪模式 === true);
+                    if (savedGameSettings.古代体系选择) 设置古代体系选择(savedGameSettings.古代体系选择 as 体系类型);
                 }
             } catch (error) {
                 console.error('加载自定义身份/天赋/开局方案失败', error);
@@ -794,7 +797,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
     };
 
     const handleGenerate = async (preset?: 开局预设方案结构) => {
-        const effectiveWorldConfig = preset ? { ...worldConfig, ...preset.worldConfig } : worldConfig;
+        const effectiveWorldConfig = preset ? { ...worldConfig, ...preset.worldConfig, 古代体系选择 } : { ...worldConfig, 古代体系选择 };
         const effectiveOpeningConfig = preset
             ? 规范化可选开局配置(preset.openingConfig)
             : (openingConfigEnabled ? 规范化开局配置(openingConfig) : undefined);
@@ -832,7 +835,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
         // Persist 里武侠开关到 IndexedDB，确保后续游戏会话能读取
         try {
             const savedGameSettings = await dbService.读取设置(设置键.游戏设置) || {};
-            await dbService.保存设置(设置键.游戏设置, { ...savedGameSettings, 启用里武侠模式: 里武侠开启, 启用里志怪模式: 里志怪开启 });
+            await dbService.保存设置(设置键.游戏设置, { ...savedGameSettings, 启用里武侠模式: 里武侠开启, 启用里志怪模式: 里志怪开启, 古代体系选择 });
         } catch (error) {
             console.error('保存里武侠开关失败', error);
         }
@@ -860,6 +863,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, requestCo
         成人内容开启, 设置成人内容开启,
         里武侠开启, 设置里武侠开启,
         里志怪开启, 设置里志怪开启,
+        古代体系选择, 设置古代体系选择,
         customTalent, setCustomTalent, showCustomTalent, setShowCustomTalent,
         正在编辑天赋名, set正在编辑天赋名,
         customBackground, setCustomBackground, showCustomBackground, setShowCustomBackground,

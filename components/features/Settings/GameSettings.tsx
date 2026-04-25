@@ -380,6 +380,34 @@ const GameSettings: React.FC<Props> = ({ settings, onSave }) => {
                 </div>
             </div>
 
+            <div className="space-y-3 rounded-md border border-gray-700/40 bg-black/30 p-4">
+                <div className="text-[11px] uppercase tracking-[0.35em] text-wuxia-gold/60 font-mono mb-2">古代体系</div>
+                <div className="flex gap-3">
+                    {(['武侠', '志怪', '双修'] as const).map((体系) => {
+                        const 当前选择 = (form as any).古代体系选择 || '武侠';
+                        const isActive = 当前选择 === 体系;
+                        return (
+                            <button
+                                key={体系}
+                                type="button"
+                                onClick={() => 实时应用更新({ 古代体系选择: 体系 } as any)}
+                                className={`flex-1 rounded-lg border px-3 py-2 text-center text-sm transition-all ${
+                                    isActive
+                                        ? 体系 === '志怪'
+                                            ? 'border-green-500/50 bg-green-500/10 text-green-400'
+                                            : 体系 === '双修'
+                                                ? 'border-purple-500/50 bg-purple-500/10 text-purple-400'
+                                                : 'border-wuxia-gold/50 bg-wuxia-gold/10 text-wuxia-gold'
+                                        : 'border-gray-800 bg-black/25 text-gray-500 hover:border-gray-600'
+                                }`}
+                            >
+                                {体系 === '武侠' ? '⚔ 武侠' : 体系 === '志怪' ? '🌿 志怪' : '⚔+🌿 双修'}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
             <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
                 <div className="flex items-center justify-between gap-4">
                     <div>

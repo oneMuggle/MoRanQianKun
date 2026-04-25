@@ -451,6 +451,8 @@ export interface 货币模板 {
     默认初始值: Record<string, number>;
 }
 
+export type 体系类型 = '武侠' | '志怪' | '双修';
+
 export interface 时代配置 {
     id: string;
     名称: string;
@@ -470,6 +472,7 @@ export interface 时代配置 {
     默认天骄占位符?: string;
     组织密度标签?: string;
     可用能力类型?: 能力类型[];
+    支持体系?: 体系类型[];
     世界观预设卡片?: Array<{ name: string; overrides: Partial<WorldGenConfig> }>;
 }
 
@@ -496,11 +499,16 @@ export const 内置时代配置: 时代配置[] = [
         默认天骄占位符: '大争之世，天骄并起',
         组织密度标签: '宗门密度',
         可用能力类型: ['传统武侠', '修仙体系', '混合世界'],
+        支持体系: ['武侠', '志怪', '双修'],
         世界观预设卡片: [
             { name: '传统武侠', overrides: { 能力类型: '传统武侠', 武力等级: '中武' } },
             { name: '修仙世界', overrides: { 能力类型: '修仙体系', 武力等级: '修仙' } },
             { name: '高武世界', overrides: { 能力类型: '传统武侠', 武力等级: '高武' } },
-            { name: '低武江湖', overrides: { 能力类型: '传统武侠', 武力等级: '低武' } }
+            { name: '低武江湖', overrides: { 能力类型: '传统武侠', 武力等级: '低武' } },
+            { name: '狐仙奇缘', overrides: { 能力类型: '传统武侠' as const, 武力等级: '中武' as const, worldExtraRequirement: '志怪体系：狐仙生态融入世界，妖异与人性交织，重因果报应与情感纠葛' } },
+            { name: '僵尸乱世', overrides: { 能力类型: '传统武侠' as const, 武力等级: '中武' as const, worldExtraRequirement: '志怪体系：阴阳失衡，僵尸横行，道法与符箓是主要对抗手段，世界氛围偏阴森压抑' } },
+            { name: '山海异闻', overrides: { 能力类型: '传统武侠' as const, 武力等级: '低武' as const, worldExtraRequirement: '志怪体系：精怪遍地，奇闻异事，凡人视角下的异世界探索，低武力值但高志怪密度' } },
+            { name: '妖王争霸', overrides: { 能力类型: '传统武侠' as const, 武力等级: '高武' as const, worldExtraRequirement: '志怪体系：大妖争霸，妖族势力与人类势力对抗，高武力值与高志怪威胁并存' } }
         ]
     },
     {
@@ -707,6 +715,7 @@ export interface WorldGenConfig {
     manualRealmPrompt: string;
     difficulty: 游戏难度;
     时代配置ID?: string;
+    古代体系选择?: '武侠' | '志怪' | '双修';
 }
 
 export type SaveType = 'manual' | 'auto';
@@ -765,6 +774,7 @@ export interface 游戏设置结构 {
     启用修炼体系: boolean; // Toggle cultivation/realm/kungfu prompt injection and related UI visibility
     启用里武侠模式: boolean; // Toggle inner martial arts (里武侠) world: dual-cultivation personality, revealing clothing, 武根 system
     启用里志怪模式: boolean; // Toggle inner zhiguai (里志怪) world: supernatural folklore, yin-yang mechanics, talisman/法器 systems
+    古代体系选择?: '武侠' | '志怪' | '双修'; // Selected system type for ancient era: martial arts, zhiguai, or both
     剧情风格: 剧情风格类型; // Story style injected as assistant context before COT
     NTL后宫档位: NTL后宫档位; // NTL-only tier selector
     启用酒馆预设模式: boolean; // Use SillyTavern preset prompt/order pipeline

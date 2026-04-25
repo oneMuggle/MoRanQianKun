@@ -199,6 +199,9 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         导入手动提示词文件, 导出手动世界观提示词, 导出手动境界提示词, 导出境界提示词模板,
         manualWorldPromptInputRef, manualRealmPromptInputRef,
         setShowCustomBackground, setShowCustomTalent, setShowCustomPresetEditor,
+        里武侠开启, 设置里武侠开启,
+        里志怪开启, 设置里志怪开启,
+        古代体系选择, 设置古代体系选择,
     } = wizard;
 
     const 处理能力类型变更 = (新能力类型: typeof worldConfig.能力类型) => {
@@ -226,16 +229,30 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
             dynastySetting: era.默认王朝占位符 ?? prev.dynastySetting,
             tianjiaoSetting: era.默认天骄占位符 ?? prev.tianjiaoSetting,
         }));
+        // 非古代时代重置体系选择
+        if (!Array.isArray(era.支持体系)) {
+            设置古代体系选择('武侠');
+        }
     };
 
     const 当前时代 = 内置时代配置.find(c => c.id === (worldConfig.时代配置ID || 'era_ancient_wuxia'));
     const 组织密度标签 = 当前时代?.组织密度标签 || '宗门密度';
-    const 时代预设卡片 = 当前时代?.世界观预设卡片 ?? [
-        { name: '传统武侠', overrides: { 能力类型: '传统武侠' as const, 武力等级: '中武' as const } },
-        { name: '修仙世界', overrides: { 能力类型: '修仙体系' as const, 武力等级: '修仙' as const } },
-        { name: '高武世界', overrides: { 能力类型: '传统武侠' as const, 武力等级: '高武' as const } },
-        { name: '低武江湖', overrides: { 能力类型: '传统武侠' as const, 武力等级: '低武' as const } },
-    ];
+    const 支持体系 = 当前时代?.支持体系;
+    const 是否展示体系选择 = Array.isArray(支持体系) && 支持体系.length > 0;
+
+    // 根据体系选择过滤预设卡片
+    const 时代预设卡片 = (() => {
+        const 原始 = 当前时代?.世界观预设卡片;
+        if (!原始 || 原始.length === 0) return [
+            { name: '传统武侠', overrides: { 能力类型: '传统武侠' as const, 武力等级: '中武' as const } },
+            { name: '修仙世界', overrides: { 能力类型: '修仙体系' as const, 武力等级: '修仙' as const } },
+            { name: '高武世界', overrides: { 能力类型: '传统武侠' as const, 武力等级: '高武' as const } },
+            { name: '低武江湖', overrides: { 能力类型: '传统武侠' as const, 武力等级: '低武' as const } },
+        ];
+        if (古代体系选择 === '武侠') return 原始.filter((_, idx) => idx < 4);
+        if (古代体系选择 === '志怪') return 原始.filter((_, idx) => idx >= 4);
+        return 原始; // 双修: 全部展示
+    })();
 
     const 时代过滤能力类型选项 = (() => {
         const 可用 = 当前时代?.可用能力类型;
@@ -300,6 +317,81 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                 </div>
                             </div>
                         </div>
+
+                        {/* 体系选择 + 里模式开关 — 仅古代时代展示 */}
+                        {是否展示体系选择 && (
+                            <div className="mt-6 space-y-4">
+                                <div>
+                                    <div className="text-[11px] uppercase tracking-[0.35em] text-wuxia-gold/70 font-mono mb-3">体系选择</div>
+                                    <div className="flex gap-3">
+                                        {支持体系!.map((体系) => (
+                                            <button
+                                                key={体系}
+                                                type="button"
+                                                onClick={() => 设置古代体系选择(体系)}
+                                                className={`flex-1 rounded-xl border px-4 py-3 text-center transition-all ${
+                                                    古代体系选择 === 体系
+                                                        ? 体系 === '志怪'
+                                                            ? 'border-green-500/50 bg-green-500/10 text-green-400'
+                                                            : 体系 === '双修'
+                                                                ? 'border-purple-500/50 bg-purple-500/10 text-purple-400'
+                                                                : 'border-wuxia-gold/50 bg-wuxia-gold/10 text-wuxia-gold'
+                                                        : 'border-gray-800 bg-black/25 text-gray-400 hover:border-gray-600'
+                                                }`}
+                                            >
+                                                <div className="font-bold text-sm">
+                                                    {体系 === '武侠' ? '⚔ 武侠' : 体系 === '志怪' ? '🌿 志怪' : '⚔+🌿 双修'}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 里模式开关 */}
+                                <div className="flex flex-wrap gap-3">
+                                    {(古代体系选择 === '武侠' || 古代体系选择 === '双修') && (
+                                        <div className="relative flex items-center justify-between gap-4 rounded-md border border-wuxia-red/20 bg-black/30 px-4 py-3 flex-1 min-w-[240px]">
+                                            <div>
+                                                <div className="text-sm text-wuxia-red font-bold">里武侠</div>
+                                                <div className="text-[11px] text-gray-400">双修人格、武根系统</div>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={里武侠开启}
+                                                    onChange={(e) => 设置里武侠开启(e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-wuxia-red"></div>
+                                            </label>
+                                            {里武侠开启 && (
+                                                <span className="absolute -inset-1 rounded-lg bg-wuxia-red/15 animate-pulse pointer-events-none" />
+                                            )}
+                                        </div>
+                                    )}
+                                    {(古代体系选择 === '志怪' || 古代体系选择 === '双修') && (
+                                        <div className="relative flex items-center justify-between gap-4 rounded-md border border-green-500/20 bg-black/30 px-4 py-3 flex-1 min-w-[240px]">
+                                            <div>
+                                                <div className="text-sm text-green-400 font-bold">里志怪</div>
+                                                <div className="text-[11px] text-gray-400">妖根、灵视、因果系统</div>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={里志怪开启}
+                                                    onChange={(e) => 设置里志怪开启(e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                            </label>
+                                            {里志怪开启 && (
+                                                <span className="absolute -inset-1 rounded-lg bg-green-500/15 animate-pulse pointer-events-none" />
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {/* 世界观预设 - moved up for quick-start */}
                         <div className="mt-6">

@@ -48,6 +48,8 @@ const 功能附加块是否启用 = (
             return config?.启用里武侠模式 === true;
         case 'lizhiguai':
             return config?.启用里志怪模式 === true;
+        case 'zhiguai':
+            return config?.古代体系选择 === '志怪' || config?.古代体系选择 === '双修';
         default:
             return true;
     }
