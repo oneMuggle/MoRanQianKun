@@ -13,6 +13,8 @@ import {
 } from '../../types';
 import { applyStateCommand } from '../../utils/stateHelpers';
 
+const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+
 export type 响应命令处理状态 = {
     角色: 角色数据结构;
     环境: 环境信息结构;
@@ -69,6 +71,7 @@ export const 执行响应命令处理 = (
 ): 响应命令处理状态 => {
     const shouldApplyState = options?.applyState !== false;
     let charBuffer = baseState?.角色 || currentState.角色;
+    const 原始气运列表 = Array.isArray(charBuffer?.气运列表) ? charBuffer.气运列表 : [];
     let envBuffer = deps.规范化环境信息(baseState?.环境 || currentState.环境);
     let socialBuffer = Array.isArray(baseState?.社交) ? baseState.社交 : currentState.社交;
     let worldBuffer = deps.规范化世界状态(baseState?.世界 || currentState.世界);
@@ -119,6 +122,11 @@ export const 执行响应命令处理 = (
 
         battleBuffer = deps.战斗结束自动清空(battleBuffer, storyBuffer);
         charBuffer = deps.规范化角色物品容器映射(charBuffer);
+
+        if (原始气运列表.length > 0 && (!Array.isArray(charBuffer?.气运列表) || charBuffer.气运列表.length === 0)) {
+            charBuffer = { ...charBuffer, 气运列表: 深拷贝(原始气运列表) };
+        }
+
         socialBuffer = deps.规范化社交列表(socialBuffer);
         storyBuffer = deps.规范化剧情状态(storyBuffer);
 

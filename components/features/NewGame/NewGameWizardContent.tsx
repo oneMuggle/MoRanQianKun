@@ -851,9 +851,9 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             </div>
                         )}
 
-                        <SectionCollapse title="气运列表" subtitle="点击展开查看所有气运" count={30} defaultOpen={false}>
+                        <SectionCollapse title="气运列表" subtitle="点击展开查看所有气运" count={气运数据列表.length} defaultOpen={false}>
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                            {气运数据列表.slice(0, 30).map((q, idx) => {
+                            {气运数据列表.map((q, idx) => {
                                 const isSelected = !!selectedQiyun.find(x => x.名称 === q.名称);
                                 return (
                                     <div
