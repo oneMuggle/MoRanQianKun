@@ -204,6 +204,29 @@ const GameSettings: React.FC<Props> = ({ settings, onSave }) => {
             </div>
 
             <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+                <div className="space-y-2">
+                    <div className="text-sm text-wuxia-cyan font-bold">行动选项输入模式</div>
+                    <div className="text-xs text-gray-400">点击行动选项时，是将文本追加到输入框，还是替换整个输入框内容。</div>
+                    <div className="flex gap-2 mt-2">
+                        {(['追加', '替换'] as const).map((mode) => (
+                            <button
+                                key={mode}
+                                type="button"
+                                onClick={() => 实时应用更新({ 行动选项输入模式: mode })}
+                                className={`px-4 py-2 text-sm rounded-md border transition-all ${
+                                    form.行动选项输入模式 === mode
+                                        ? 'border-wuxia-gold bg-wuxia-gold/15 text-wuxia-gold font-bold'
+                                        : 'border-gray-600 text-gray-300 hover:border-wuxia-gold/40 hover:text-white'
+                                }`}
+                            >
+                                {mode}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <div className="text-sm text-wuxia-cyan font-bold">防止说话（NoControl）</div>

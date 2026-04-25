@@ -564,10 +564,13 @@ export interface 酒馆预设条目结构 {
     导入时间?: number;
 }
 
+export type 行动选项输入模式类型 = '追加' | '替换';
+
 export interface 游戏设置结构 {
     字数要求: number; // Minimum logs body length
     叙事人称: '第一人称' | '第二人称' | '第三人称';
     启用行动选项: boolean; // Whether to require action_options output
+    行动选项输入模式: 行动选项输入模式类型; // Whether clicking an option appends or replaces input text
     启用COT伪装注入: boolean; // Inject pseudo historical COT message before latest user input
     启用GPT模式: boolean; // Main-story normal mode: send current user input directly as the user trigger message
     启用女主剧情规划: boolean; // Inject heroine planning prompts as optional addon

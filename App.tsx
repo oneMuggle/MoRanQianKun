@@ -842,6 +842,7 @@ const App: React.FC = () => {
                                     openingPlanningProgress={meta.openingPlanningProgress}
                                     openingVariableGenerationProgress={meta.openingVariableGenerationProgress}
                                     options={currentOptions}
+                                    actionOptionInputMode={state.gameConfig.行动选项输入模式}
                                 />
                             </div>
                             {sceneQuickGenToastVisible && (

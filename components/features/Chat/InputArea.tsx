@@ -81,6 +81,7 @@ interface Props {
     canReroll?: boolean;
     canQuickRestart?: boolean;
     options?: unknown[]; // Quick actions from the last turn
+    actionOptionInputMode?: '追加' | '替换';
     openingWorldEvolutionProgress?: WorldEvolutionProgress | null;
     openingPlanningProgress?: PlanningProgress | null;
     openingVariableGenerationProgress?: VariableGenerationProgress | null;
@@ -99,6 +100,7 @@ const InputArea: React.FC<Props> = ({
     canReroll = true,
     canQuickRestart = false,
     options = [],
+    actionOptionInputMode = '追加',
     openingWorldEvolutionProgress = null,
     openingPlanningProgress = null,
     openingVariableGenerationProgress = null
@@ -266,7 +268,11 @@ const InputArea: React.FC<Props> = ({
 
     const handleOptionClick = (opt: string) => {
         if (Date.now() < suppressClickUntilRef.current) return;
-        setContent((current) => 追加行动选项到输入(current, opt));
+        if (actionOptionInputMode === '替换') {
+            setContent(opt.trim());
+        } else {
+            setContent((current) => 追加行动选项到输入(current, opt));
+        }
     };
 
     const handleReroll = async () => {
