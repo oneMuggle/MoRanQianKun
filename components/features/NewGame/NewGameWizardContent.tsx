@@ -186,6 +186,8 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         编辑自定义天赋, 删除自定义天赋,
         编辑自定义背景, 删除自定义背景,
         保存当前为自定义开局方案, 重置自定义开局预设编辑,
+        自定义开局预设列表, 应用预设到表单,
+        编辑自定义开局方案信息, 用当前配置覆盖开局方案, 删除自定义开局方案,
         重置自定义天赋编辑, 重置自定义背景编辑,
         handleGenerate, loading,
         导入手动提示词文件, 导出手动世界观提示词, 导出手动境界提示词, 导出境界提示词模板,
@@ -1301,6 +1303,63 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             )}
                         </div>
                     </OrnateBorder>
+
+                    {自定义开局预设列表.length > 0 && (
+                        <OrnateBorder className="w-full max-w-lg p-4">
+                            <div className="space-y-3">
+                                <div className="text-xs text-gray-300 font-bold tracking-widest">已保存的开局方案</div>
+                                <div className="space-y-2 max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
+                                    {自定义开局预设列表.map((preset) => (
+                                        <div
+                                            key={preset.id}
+                                            className="rounded-xl border border-gray-800 bg-black/30 px-4 py-3 flex items-center justify-between gap-3"
+                                        >
+                                            <div className="min-w-0 flex-1">
+                                                <div className="text-sm text-gray-200 truncate">{preset.名称}</div>
+                                                {preset.简介 && (
+                                                    <div className="text-[11px] text-gray-500 truncate">{preset.简介}</div>
+                                                )}
+                                                <div className="text-[11px] text-gray-600 mt-1">
+                                                    世界: {preset.worldConfig?.worldName || '未命名'}
+                                                    {preset.character?.姓名 ? ` · 角色: ${preset.character.姓名}` : ''}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => 应用预设到表单(preset)}
+                                                    className="text-[11px] text-wuxia-gold hover:text-white"
+                                                >
+                                                    使用
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => 编辑自定义开局方案信息(preset)}
+                                                    className="text-[11px] text-wuxia-cyan hover:text-white"
+                                                >
+                                                    编辑
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => 用当前配置覆盖开局方案(preset)}
+                                                    className="text-[11px] text-amber-400 hover:text-white"
+                                                >
+                                                    覆盖
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { void 删除自定义开局方案(preset.id); }}
+                                                    className="text-[11px] text-red-400 hover:text-red-200"
+                                                >
+                                                    删除
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </OrnateBorder>
+                    )}
 
                     <div className="flex flex-col gap-4 w-full max-w-md">
                         <GameButton onClick={() => { void handleGenerate(); }} variant="primary" className="w-full py-4 text-lg" disabled={loading}>
