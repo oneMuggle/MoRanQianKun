@@ -154,5 +154,7 @@ export const 应用主题到根元素 = (theme: ThemePreset, root?: HTMLElement)
     Object.entries(definition.variables).forEach(([key, value]) => {
         target.style.setProperty(key, value);
     });
+    const existingLixia = target.dataset.lixia;
     target.dataset.theme = definition.id;
+    if (existingLixia !== undefined) target.dataset.lixia = existingLixia;
 };

@@ -190,7 +190,7 @@ const 提取判定前缀名称 = (prefix?: string): string => {
 export const NarratorRenderer: React.FC<{ text: string; visualConfig?: 视觉设置结构 }> = ({ text, visualConfig }) => {
     const style = 构建区域文字样式(visualConfig, '旁白');
     return (
-        <div className="w-full my-1 px-8 py-2 bg-white/5 backdrop-blur-sm border-x-4 border-wuxia-gold/55 leading-relaxed relative overflow-hidden rounded-md shadow-lg transition-all duration-300" style={style}>
+        <div className="w-full my-1 px-8 py-2 bg-white/5 backdrop-blur-sm border-x-4 border-wuxia-gold/55 leading-relaxed relative overflow-hidden rounded-md shadow-lg transition-all duration-300 lixia-narrator" style={style}>
             <p className="relative z-10 whitespace-pre-wrap break-words tracking-wide" style={{ fontSize: 'inherit', lineHeight: 'inherit' }}>{text}</p>
         </div>
     );
@@ -275,7 +275,7 @@ export const CharacterRenderer: React.FC<{ sender: string; text: string; visualC
                 </div>
             </div>
             <div className="relative flex-1 mt-0.5 sm:mt-1 min-w-0">
-                <div className="relative bg-[#fcfaf7] px-3.5 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-[0_10px_25px_rgba(0,0,0,0.15)] border border-black/10 z-10 min-h-[52px] sm:min-h-[64px] flex items-center group-hover:border-wuxia-gold/40 transition-colors duration-500">
+                <div className="relative bg-[#fcfaf7] px-3.5 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-[0_10px_25px_rgba(0,0,0,0.15)] border border-black/10 z-10 min-h-[52px] sm:min-h-[64px] flex items-center group-hover:border-wuxia-gold/40 transition-colors duration-500 lixia-dialog-bubble">
                     <div className="absolute top-3.5 sm:top-4 -left-1.5 w-3 h-3 sm:w-4 sm:h-4 bg-[#fcfaf7] rotate-45 border-l border-b border-black/10 -z-10"></div>
                     <p className="font-medium relative z-10 tracking-wide whitespace-pre-wrap break-words leading-relaxed text-[#1a1a1a]" style={style}>{text}</p>
                 </div>

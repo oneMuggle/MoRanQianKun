@@ -278,7 +278,7 @@ const ChatList: React.FC<Props> = ({ history, loading, scrollRef, onUpdateHistor
                     if (msg.role === 'user') {
                         return (
                              <div key={absoluteIdx} className="flex w-full justify-end animate-slide-in mb-8">
-                                <div className="relative max-w-[88%] sm:max-w-[80%] bg-ink-gray text-wuxia-gold px-3 py-3 sm:p-4 clip-message-right shadow-lg border-r-2 border-wuxia-gold" style={chatStyle}>
+                                <div className="relative max-w-[88%] sm:max-w-[80%] bg-ink-gray text-wuxia-gold px-3 py-3 sm:p-4 clip-message-right shadow-lg border-r-2 border-wuxia-gold lixia-player-msg" style={chatStyle}>
                                     <p className="whitespace-pre-wrap leading-relaxed text-base sm:text-lg">
                                         {msg.content}
                                     </p>
@@ -301,7 +301,7 @@ const ChatList: React.FC<Props> = ({ history, loading, scrollRef, onUpdateHistor
                         return (
                             <div key={absoluteIdx} className="flex w-full justify-center animate-slide-in mb-6">
                                 <div className="w-full max-w-3xl px-1 md:px-4">
-                                    <div className="relative mx-auto max-w-[94%] md:max-w-[88%] rounded-2xl border border-wuxia-cyan/40 bg-gradient-to-b from-wuxia-cyan/10 via-black/55 to-black/65 px-4 py-3 shadow-[0_8px_28px_rgba(0,0,0,0.45)]">
+                                    <div className="relative mx-auto max-w-[94%] md:max-w-[88%] rounded-2xl border border-wuxia-cyan/40 bg-gradient-to-b from-wuxia-cyan/10 via-black/55 to-black/65 px-4 py-3 shadow-[0_8px_28px_rgba(0,0,0,0.45)] lixia-stream-preview">
                                         <span className="block text-[10px] tracking-[0.2em] text-wuxia-cyan/90 font-mono mb-2">
                                             流式草稿
                                         </span>
@@ -339,7 +339,7 @@ const ChatList: React.FC<Props> = ({ history, loading, scrollRef, onUpdateHistor
                     if (msg.role === 'system') {
                         return (
                             <div key={absoluteIdx} className="flex w-full justify-center mb-4 opacity-90">
-                                <div className="bg-black/40 text-wuxia-gold/90 text-xs px-4 py-2 border border-wuxia-gold/30 font-mono rounded">
+                                <div className="bg-black/40 text-wuxia-gold/90 text-xs px-4 py-2 border border-wuxia-gold/30 font-mono rounded lixia-system-msg">
                                     {msg.content}
                                 </div>
                             </div>

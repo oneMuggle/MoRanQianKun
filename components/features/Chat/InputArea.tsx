@@ -459,7 +459,7 @@ const InputArea: React.FC<Props> = ({
                                 key={idx}
                                 onClick={() => handleOptionClick(opt)}
                                 disabled={loading}
-                                className="shrink-0 whitespace-nowrap px-6 py-2 bg-white/5 border border-wuxia-gold/30 text-gray-300 rounded hover:bg-wuxia-gold hover:text-ink-black hover:border-wuxia-gold transition-all text-xs tracking-wider shadow-sm min-w-[120px] text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="shrink-0 whitespace-nowrap px-6 py-2 bg-white/5 border border-wuxia-gold/30 text-gray-300 rounded hover:bg-wuxia-gold hover:text-ink-black hover:border-wuxia-gold transition-all text-xs tracking-wider shadow-sm min-w-[120px] text-center disabled:opacity-50 disabled:cursor-not-allowed lixia-quick-btn"
                             >
                                  {opt}
                             </button>

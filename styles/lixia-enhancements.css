@@ -1,0 +1,204 @@
+/* 里武侠模式视觉增强层
+   根选择器: .lixia-active (加在游戏视图根 div 上)
+   辅助选择器: [data-lixia="true"] (加在 html 上，用于全局效果) */
+
+/* ===================== A. 全局暗红光晕背景 ===================== */
+[data-lixia="true"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(163, 24, 24, 0.12) 0%, transparent 70%);
+    animation: lixia-ambient-pulse 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes lixia-ambient-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+/* ===================== B. 花瓣飘落动效 (脱离 overflow-hidden 容器) ===================== */
+.lixia-petals {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: visible !important;
+}
+
+/* 每个花瓣用 box-shadow 生成多个粒子 */
+.lixia-petals::before {
+    content: '';
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50% 0 50% 50%;
+    background: rgba(232, 110, 126, 0.6);
+    animation: lixia-petal-1 8s linear infinite;
+    left: 10%;
+}
+
+.lixia-petals::after {
+    content: '';
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50% 0 50% 50%;
+    background: rgba(232, 110, 126, 0.5);
+    animation: lixia-petal-2 10s linear infinite;
+    left: 30%;
+}
+
+@keyframes lixia-petal-1 {
+    0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+    5% { opacity: 0.8; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(100vh) rotate(720deg) translateX(120px); opacity: 0; }
+}
+
+@keyframes lixia-petal-2 {
+    0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+    5% { opacity: 0.7; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(100vh) rotate(540deg) translateX(80px); opacity: 0; }
+}
+
+/* 额外花瓣子元素 */
+.lixia-petals .petal {
+    position: fixed;
+    top: -20px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50% 0 50% 50%;
+    background: rgba(232, 110, 126, 0.5);
+    animation: lixia-petal-fall linear infinite;
+}
+
+@keyframes lixia-petal-fall {
+    0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+    5% { opacity: 0.7; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(100vh) rotate(540deg) translateX(100px); opacity: 0; }
+}
+
+/* ===================== C. 金色文字微光 ===================== */
+.lixia-active .text-wuxia-gold {
+    animation: lixia-gold-glow 3s ease-in-out infinite;
+}
+
+@keyframes lixia-gold-glow {
+    0%, 100% { text-shadow: 0 0 6px rgba(230, 200, 110, 0.3); }
+    50% { text-shadow: 0 0 16px rgba(230, 200, 110, 0.6), 0 0 30px rgba(163, 24, 24, 0.2); }
+}
+
+/* ===================== D. 面板边框 ===================== */
+.lixia-active .lixia-panel-left {
+    border-right-color: rgba(163, 24, 24, 0.4) !important;
+    box-shadow: 10px 0 20px rgba(163, 24, 24, 0.2) !important;
+}
+
+.lixia-active .lixia-panel-right {
+    border-left-color: rgba(163, 24, 24, 0.4) !important;
+    box-shadow: -10px 0 20px rgba(163, 24, 24, 0.2) !important;
+}
+
+.lixia-active .lixia-topbar {
+    border-bottom-color: rgba(163, 24, 24, 0.4) !important;
+    box-shadow: 0 10px 30px rgba(163, 24, 24, 0.15) !important;
+}
+
+/* ===================== E. 消息装饰 ===================== */
+.lixia-active .lixia-narrator {
+    border-left-color: rgba(178, 28, 52, 0.8) !important;
+    border-right-color: rgba(178, 28, 52, 0.8) !important;
+    box-shadow: 0 0 16px rgba(163, 24, 24, 0.2) !important;
+}
+
+.lixia-active .lixia-player-msg {
+    border-right-color: rgba(180, 132, 255, 0.6) !important;
+    box-shadow: -4px 0 16px rgba(180, 132, 255, 0.15) !important;
+}
+
+.lixia-active .lixia-system-msg {
+    border-color: rgba(178, 28, 52, 0.5) !important;
+    box-shadow: 0 0 10px rgba(163, 24, 24, 0.2) !important;
+}
+
+.lixia-active .lixia-stream-preview {
+    border-color: rgba(232, 110, 126, 0.5) !important;
+}
+
+/* TurnItem hover 底部红线 */
+.lixia-active .group\/turn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(163, 24, 24, 0.6), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.lixia-active .group\/turn:hover::after {
+    opacity: 1;
+}
+
+/* ===================== F. 快捷操作按钮 ===================== */
+.lixia-active .lixia-quick-btn {
+    border-color: rgba(178, 28, 52, 0.5) !important;
+}
+.lixia-active .lixia-quick-btn:hover {
+    border-color: rgba(232, 110, 126, 0.8) !important;
+    background-color: rgba(163, 24, 24, 0.25) !important;
+    color: rgba(255, 210, 218, 0.95) !important;
+}
+
+/* ===================== G. avatar 卡片红色光晕 ===================== */
+.lixia-active .avatar-container-card {
+    box-shadow: 0 10px 30px rgba(163, 24, 24, 0.35), 0 0 20px rgba(163, 24, 24, 0.2);
+}
+.lixia-active .avatar-container-card:hover {
+    border-color: rgba(232, 110, 126, 0.7) !important;
+    box-shadow: 0 15px 40px rgba(163, 24, 24, 0.6);
+}
+
+.lixia-active .avatar-card-blob {
+    background-color: rgba(178, 28, 52, 0.7);
+    animation-duration: 6s;
+}
+
+/* ===================== H. 输入框禁用态光晕 ===================== */
+.lixia-active .lixia-input-disabled {
+    box-shadow: 0 0 8px rgba(163, 24, 24, 0.2) !important;
+}
+
+/* ===================== I. 滚动条红色调 ===================== */
+[data-lixia="true"] ::-webkit-scrollbar-thumb {
+    background: rgba(163, 24, 24, 0.5);
+}
+
+/* ===================== J. 角色对话 hover 偏红 ===================== */
+.lixia-active .lixia-dialog-bubble:hover {
+    border-color: rgba(232, 110, 126, 0.7) !important;
+}
+
+/* ===================== K. 移动端减弱动画 ===================== */
+@media (max-width: 767px) {
+    .lixia-petals::before,
+    .lixia-petals::after,
+    .lixia-petals .petal {
+        animation-duration: 15s;
+        opacity: 0.4;
+    }
+
+    [data-lixia="true"] body::before {
+        animation-duration: 10s;
+    }
+}

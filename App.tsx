@@ -715,10 +715,13 @@ const App: React.FC = () => {
 
             {state.view === 'game' && (
                 /* Main Game Frame Container */
-                <div className="relative flex-1 flex flex-col w-full h-full rounded-2xl overflow-hidden bg-ink-black shadow-2xl">
+                <div className={`relative flex-1 flex flex-col w-full h-full rounded-2xl overflow-hidden bg-ink-black shadow-2xl ${state.gameConfig?.启用里武侠模式 ? 'lixia-active' : ''}`}>
+
+                    {/* 里武侠花瓣装饰层 */}
+                    {state.gameConfig?.启用里武侠模式 && <div className="lixia-petals" aria-hidden="true" />}
 
                     {/* 顶部导航栏 */}
-                    <div className="shrink-0 z-40 bg-ink-black/90 border-b border-wuxia-gold/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] relative rounded-t-xl overflow-visible mx-1 mt-1">
+                    <div className="shrink-0 z-40 bg-ink-black/90 border-b border-wuxia-gold/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] relative rounded-t-xl overflow-visible mx-1 mt-1 lixia-topbar">
                         <TopBar 
                             环境={state.环境} 
                             游戏初始时间={state.游戏初始时间}
@@ -732,7 +735,7 @@ const App: React.FC = () => {
                     <div className="flex-1 flex overflow-hidden relative z-10 mx-1 mb-1">
                         
                         {/* 左侧栏 */}
-                        <div className="hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-r border-wuxia-gold/20 flex flex-col shadow-[10px_0_20px_rgba(0,0,0,0.5)]">
+                        <div className="hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-r border-wuxia-gold/20 flex flex-col shadow-[10px_0_20px_rgba(0,0,0,0.5)] lixia-panel-left">
                             <LeftPanel
                                 角色={state.角色}
                                 onOpenCharacter={openCharacter}
@@ -851,7 +854,7 @@ const App: React.FC = () => {
                         </div>
 
                         {/* 右侧栏 */}
-                        <div className="hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-l border-wuxia-gold/20 flex flex-col shadow-[-10px_0_20px_rgba(0,0,0,0.5)]">
+                        <div className="hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-l border-wuxia-gold/20 flex flex-col shadow-[-10px_0_20px_rgba(0,0,0,0.5)] lixia-panel-right">
                             <RightPanel 
                                 onOpenSettings={openSettings} 
                                 onOpenInventory={openInventory}

@@ -334,6 +334,12 @@ export const useGameState = () => {
         dbService.保存设置(设置键.应用主题, currentTheme);
     }, [currentTheme]);
 
+    // Lixia Mode Visual Toggle
+    useEffect(() => {
+        const enabled = gameConfig.启用里武侠模式 === true;
+        document.documentElement.dataset.lixia = enabled ? 'true' : 'false';
+    }, [gameConfig.启用里武侠模式]);
+
     return {
         // State
         view, setView,
