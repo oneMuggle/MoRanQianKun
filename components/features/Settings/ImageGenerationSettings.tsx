@@ -17,8 +17,6 @@ import ToggleSwitch from '../../ui/ToggleSwitch';
 import InlineSelect from '../../ui/InlineSelect';
 import { 规范化接口设置 } from '../../../utils/apiConfig';
 import { 自动场景横屏尺寸选项, 自动场景竖屏尺寸选项 } from '../../../utils/imageSizeOptions';
-import { discoverImageBackends } from '../../../services/ai/imageBackendRegistry';
-import type { 发现图片后端记录结构 } from '../../../models/system';
 
 interface Props {
     settings: 接口设置结构;
@@ -26,7 +24,7 @@ interface Props {
 }
 
 type 生图模型字段 = '文生图模型使用模型' | '场景生图模型使用模型' | '主角生图模型使用模型' | '词组转化器使用模型' | 'PNG提炼使用模型';
-type 设置分页 = 'basic' | 'provider' | 'transformer' | 'presets' | 'automation' | 'retry' | 'player' | 'registry';
+type 设置分页 = 'basic' | 'provider' | 'transformer' | 'presets' | 'automation' | 'retry' | 'player';
 type 画师串适用页签 = 'npc' | 'scene' | 'player';
 type 词组预设页签 = 'nai' | 'npc' | 'scene' | 'player';
 
@@ -53,8 +51,7 @@ const 基础页面选项: Array<{ value: 设置分页; label: string }> = [
     { value: 'presets', label: '预设管理' },
     { value: 'automation', label: '自动任务' },
     { value: 'retry', label: '重试设置' },
-    { value: 'player', label: '主角' },
-    { value: 'registry', label: '自动发现后端' }
+    { value: 'player', label: '主角' }
 ];
 
 const 文生图后端选项: Array<{ value: 功能模型占位配置结构['文生图后端类型']; label: string }> = [
@@ -199,9 +196,6 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
     const [testResultModal, setTestResultModal] = useState<{ open: boolean; title: string; content: string; ok: boolean }>({ open: false, title: '', content: '', ok: false });
     const artistImportRef = React.useRef<HTMLInputElement | null>(null);
     const transformerImportRef = React.useRef<HTMLInputElement | null>(null);
-    const [discoveredBackends, setDiscoveredBackends] = useState<发现图片后端记录结构[]>([]);
-    const [discovering, setDiscovering] = useState(false);
-    const [discoverError, setDiscoverError] = useState<string>('');
 
     useEffect(() => {
         const normalized = 规范化接口设置(settings);
@@ -1107,15 +1101,42 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
 
             {当前配置后端 === 'comfyui' && (
                 <div className={卡片样式}>
-                    <div className="space-y-2">
-                        <label className={标签样式}>ComfyUI Workflow JSON</label>
-                        <textarea
-                            value={当前文生图配置.ComfyUI工作流JSON}
-                            onChange={(e) => updateImageGenConfig({ ComfyUI工作流JSON: e.target.value })}
-                            rows={14}
-                            placeholder={'粘贴从 ComfyUI 导出的 API workflow JSON。\n可用占位符：__PROMPT__、__NEGATIVE_PROMPT__、__WIDTH__、__HEIGHT__'}
-                            className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 font-mono text-white outline-none transition-all focus:border-fuchsia-400 resize-y"
-                        />
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <label className={标签样式}>地址来源</label>
+                            <InlineSelect
+                                value={form.功能模型占位.comfyui地址模式}
+                                options={[
+                                    { value: 'api', label: '使用上方 API 地址' },
+                                    { value: 'cnb', label: '使用 CNB ComfyUI 地址' }
+                                ]}
+                                onChange={(value) => updatePlaceholder('comfyui地址模式', value as 'api' | 'cnb')}
+                                buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                            />
+                        </div>
+                        {form.功能模型占位.comfyui地址模式 === 'cnb' && (
+                            <div className="space-y-2">
+                                <label className={标签样式}>CNB ComfyUI 地址</label>
+                                <input
+                                    type="text"
+                                    value={form.功能模型占位.cnbComfyui地址}
+                                    onChange={(e) => updatePlaceholder('cnbComfyui地址', e.target.value)}
+                                    placeholder="例如: https://mw4lgca3zk-8188.cnb.run"
+                                    className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-fuchsia-400"
+                                />
+                                <p className="text-xs text-gray-400">启动 CNB 工作区后填入此地址，将直接覆盖 API 地址用于生图</p>
+                            </div>
+                        )}
+                        <div className="space-y-2">
+                            <label className={标签样式}>ComfyUI Workflow JSON</label>
+                            <textarea
+                                value={当前文生图配置.ComfyUI工作流JSON}
+                                onChange={(e) => updateImageGenConfig({ ComfyUI工作流JSON: e.target.value })}
+                                rows={14}
+                                placeholder={'粘贴从 ComfyUI 导出的 API workflow JSON。\n可用占位符：__PROMPT__、__NEGATIVE_PROMPT__、__WIDTH__、__HEIGHT__'}
+                                className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 font-mono text-white outline-none transition-all focus:border-fuchsia-400 resize-y"
+                            />
+                        </div>
                     </div>
                     <div className="rounded-xl border border-sky-500/20 bg-sky-950/10 px-4 py-3 text-xs leading-6 text-sky-100">
                         纯原生 ComfyUI 需要 workflow JSON，提交到 <code>/prompt</code> 后再轮询 <code>/history/&#123;prompt_id&#125;</code>。
@@ -1534,6 +1555,32 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
                             </div>
                         )}
 
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-sky-200">场景地址来源</label>
+                            <InlineSelect
+                                value={form.功能模型占位.场景comfyui地址模式}
+                                options={[
+                                    { value: 'api', label: '使用上方 API 地址' },
+                                    { value: 'cnb', label: '使用 CNB ComfyUI 场景地址' }
+                                ]}
+                                onChange={(value) => updatePlaceholder('场景comfyui地址模式', value as 'api' | 'cnb')}
+                                buttonClassName="bg-black/50 border-gray-600 py-2.5"
+                            />
+                        </div>
+                        {form.功能模型占位.场景comfyui地址模式 === 'cnb' && (
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-sky-200">CNB ComfyUI 场景地址</label>
+                                <input
+                                    type="text"
+                                    value={form.功能模型占位.cnbComfyui场景地址}
+                                    onChange={(e) => updatePlaceholder('cnbComfyui场景地址', e.target.value)}
+                                    placeholder="留空则复用上方地址"
+                                    className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-fuchsia-400"
+                                />
+                                <p className="text-xs text-gray-400">场景生图可使用独立 CNB 地址，留空则复用上方地址</p>
+                            </div>
+                        )}
+
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-sky-200">场景默认画风</label>
@@ -1868,112 +1915,6 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
         );
     };
 
-    const renderRegistryPage = () => {
-        const handleDiscover = async () => {
-            const registryUrl = form.功能模型占位.图片后端注册表地址;
-            if (!registryUrl?.trim()) {
-                setDiscoverError('请先填写注册表地址');
-                return;
-            }
-            setDiscovering(true);
-            setDiscoverError('');
-            setDiscoveredBackends([]);
-            try {
-                const backends = await discoverImageBackends(registryUrl);
-                setDiscoveredBackends(backends);
-                if (backends.length === 0) {
-                    setDiscoverError('未发现可用的图片后端');
-                }
-            } catch (e: unknown) {
-                setDiscoverError(e instanceof Error ? e.message : '发现失败');
-            } finally {
-                setDiscovering(false);
-            }
-        };
-
-        const handleSelectBackend = (backend: 发现图片后端记录结构, scope: 'global' | 'scene') => {
-            updatePlaceholder(scope === 'scene' ? '当前场景图片后端发现ID' : '当前图片后端发现ID', backend.id);
-        };
-
-        const currentGlobalId = form.功能模型占位.当前图片后端发现ID;
-        const currentSceneId = form.功能模型占位.当前场景图片后端发现ID;
-
-        return (
-            <div className={页面容器样式}>
-                <div className="text-base font-bold text-fuchsia-200 mb-4">自动发现后端</div>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <label className={标签样式}>注册表地址</label>
-                        <input
-                            type="text"
-                            value={form.功能模型占位.图片后端注册表地址}
-                            onChange={(e) => updatePlaceholder('图片后端注册表地址', e.target.value)}
-                            placeholder="https://your-site.cloudflare.workers.dev/api/image-backend/cnb-sync"
-                            className="w-full rounded-md border-2 border-transparent bg-black/50 p-3 text-white outline-none transition-all focus:border-fuchsia-400"
-                        />
-                        <p className="text-xs text-gray-400">CNB ComfyUI 注册表地址，用于自动发现可用的图片生成后端</p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={handleDiscover}
-                        disabled={discovering}
-                        className="w-full rounded-lg border border-fuchsia-400/50 bg-fuchsia-500/20 px-4 py-2.5 text-sm font-semibold text-fuchsia-200 transition-all hover:bg-fuchsia-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {discovering ? '发现中...' : '发现后端'}
-                    </button>
-                    {discoverError && (
-                        <p className="text-xs text-red-400">{discoverError}</p>
-                    )}
-                    {discoveredBackends.length > 0 && (
-                        <div className="space-y-3">
-                            <div className={标签样式}>发现的后端列表 ({discoveredBackends.length})</div>
-                            <div className="space-y-2">
-                                {discoveredBackends.map((b) => (
-                                    <div key={b.id} className="rounded-lg border border-white/10 bg-black/30 p-3">
-                                        <div className="flex items-center justify-between gap-3">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-sm font-semibold text-white truncate">{b.label}</div>
-                                                <div className="text-xs text-gray-400 truncate">{b.url}</div>
-                                                <div className="text-xs text-gray-500">
-                                                    类型: {b.backendType} · 端口: {b.port}
-                                                    {b.lastHeartbeatAt && ` · 心跳: ${new Date(b.lastHeartbeatAt).toLocaleTimeString()}`}
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2 shrink-0">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleSelectBackend(b, 'global')}
-                                                    className={`rounded px-3 py-1.5 text-xs font-semibold transition-all ${
-                                                        currentGlobalId === b.id
-                                                            ? 'bg-fuchsia-500 text-white'
-                                                            : 'border border-white/20 text-gray-300 hover:border-fuchsia-400'
-                                                    }`}
-                                                >
-                                                    {currentGlobalId === b.id ? '✓ 已选(全局)' : '选为全局'}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleSelectBackend(b, 'scene')}
-                                                    className={`rounded px-3 py-1.5 text-xs font-semibold transition-all ${
-                                                        currentSceneId === b.id
-                                                            ? 'bg-cyan-500 text-white'
-                                                            : 'border border-white/20 text-gray-300 hover:border-cyan-400'
-                                                    }`}
-                                                >
-                                                    {currentSceneId === b.id ? '✓ 已选(场景)' : '选为场景'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-    };
-
     return (
         <div className="space-y-6 text-sm animate-fadeIn">
             <div className="rounded-2xl border border-fuchsia-500/30 bg-[radial-gradient(circle_at_top_left,_rgba(217,70,239,0.18),_transparent_42%),linear-gradient(180deg,rgba(16,16,24,0.96),rgba(5,5,10,0.96))] p-5">
@@ -2012,7 +1953,6 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
             {activePage === 'presets' && renderPresetsPage()}
             {activePage === 'automation' && renderAutomationPage()}
             {activePage === 'player' && renderPlayerPage?.()}
-            {activePage === 'registry' && renderRegistryPage()}
             {activePage === 'retry' && (
                 <div className={页面容器样式}>
                     <div className={卡片样式}>
