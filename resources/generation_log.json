@@ -1,0 +1,155 @@
+{
+  "timestamp": "2026-04-28T22:26:23.685584",
+  "dry_run": false,
+  "quota_before": {
+    "image_generation": 29,
+    "video_generation": 2,
+    "tts": 11000,
+    "music_generation": 93,
+    "sound_effects": 0
+  },
+  "quota_after": {
+    "image_generation": 19,
+    "video_generation": 2,
+    "tts": 11000,
+    "music_generation": 89,
+    "sound_effects": 0
+  },
+  "resources_generated": [
+    {
+      "resource_id": "bgm_battle_normal",
+      "resource_type": "music",
+      "priority": "P0",
+      "status": "failed",
+      "file_path": "",
+      "quota_used": 0,
+      "error": "API调用失败"
+    },
+    {
+      "resource_id": "bgm_qingfeng_town",
+      "resource_type": "music",
+      "priority": "P1",
+      "status": "failed",
+      "file_path": "",
+      "quota_used": 0,
+      "error": "API调用失败"
+    },
+    {
+      "resource_id": "icon_weapon_sword",
+      "resource_type": "image",
+      "priority": "P1",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/items/icon_weapon_sword.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "icon_consumable_pill",
+      "resource_type": "image",
+      "priority": "P1",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/items/icon_consumable_pill.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "building_inn",
+      "resource_type": "image",
+      "priority": "P1",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/buildings/building_inn.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "building_market",
+      "resource_type": "image",
+      "priority": "P1",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/buildings/building_market.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "skill_sword_basic",
+      "resource_type": "image",
+      "priority": "P1",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/skills/skill_sword_basic.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "icon_weapon_blade",
+      "resource_type": "image",
+      "priority": "P2",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/items/icon_weapon_blade.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "icon_armor_light",
+      "resource_type": "image",
+      "priority": "P2",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/items/icon_armor_light.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "icon_manual_skill",
+      "resource_type": "image",
+      "priority": "P2",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/items/icon_manual_skill.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "building_temple",
+      "resource_type": "image",
+      "priority": "P2",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/buildings/building_temple.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "building_sect",
+      "resource_type": "image",
+      "priority": "P2",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/images/buildings/building_sect.png",
+      "quota_used": 1,
+      "error": ""
+    },
+    {
+      "resource_id": "bgm_battle_boss",
+      "resource_type": "music",
+      "priority": "P2",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/audio/bgm/bgm_battle_boss.mp3",
+      "quota_used": 10,
+      "error": ""
+    },
+    {
+      "resource_id": "bgm_jianghu_inn",
+      "resource_type": "music",
+      "priority": "P2",
+      "status": "success",
+      "file_path": "/home/ubuntu/project/MoRanJiangHu/resources/audio/bgm/bgm_jianghu_inn.mp3",
+      "quota_used": 10,
+      "error": ""
+    }
+  ],
+  "summary": {
+    "total": 14,
+    "success": 12,
+    "failed": 2,
+    "skipped": 0,
+    "p0_completed": 0,
+    "p1_completed": 5,
+    "p2_completed": 7
+  }
+}
