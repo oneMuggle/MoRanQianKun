@@ -40,6 +40,44 @@ export interface EraUIStyle {
     decorations: UIDecoration[];
 }
 
+/** 提示词变量 — 用于世界观生成、角色创建、故事写作等 AI 提示词注入 */
+export interface EraPromptVars {
+    /** 社会形态描述，用于世界观生成 */
+    社会形态: string;
+    /** 科技水平，决定可用技术/物品 */
+    科技水平: string;
+    /** 力量体系（内力/灵力/神格/义体/灵能等） */
+    力量体系: string;
+    /** 叙事视角偏好 */
+    叙事视角: string;
+    /** 描写重点 */
+    描写重点: string;
+    /** 对话占比建议 */
+    对话占比: string;
+    /** 时代禁忌（告诉 AI 不要写什么） */
+    禁忌: string[];
+}
+
+/** 开局场景池 */
+export interface EraOpeningScene {
+    id: string;
+    name: string;
+    description: string;
+    /** 对应场景图片的 asset ID */
+    imageId?: string;
+}
+
+/** 角色原型模板 */
+export interface EraCharacterArchetype {
+    id: string;
+    name: string;
+    description: string;
+    /** 典型穿着/外观 */
+    appearance: string;
+    /** 典型能力标签 */
+    abilities: string[];
+}
+
 export type EpochDepth = 0 | 1 | 2;
 
 /** UI文案（兼容旧接口） */
@@ -65,6 +103,21 @@ export interface EraNode {
     // 界面文案（叶子节点专用，兼容旧接口）
     uiCopy?: 时代主题UI文案;
 
+    // AI 提示词变量（全层可用，叶子节点可覆盖）
+    promptVars?: EraPromptVars;
+
+    // 开局场景池（仅 SubEra）
+    openingScenes?: EraOpeningScene[];
+
+    // 角色原型模板（仅 SubEra）
+    characterArchetypes?: EraCharacterArchetype[];
+
+    // 文风示例段落（仅 SubEra）
+    writingSamples?: string[];
+
+    // 核心冲突类型（仅 SubEra）
+    conflictTypes?: string[];
+
     // 子节点（仅父节点有）
     children?: EraNode[];
 }
@@ -84,7 +137,7 @@ function makeNode(
     name: string,
     depth: EpochDepth,
     parent: string | null,
-    extra: Partial<Pick<EraNode, 'colors' | 'typography' | 'uiStyle' | 'bgmTags' | 'artStyle' | 'description' | 'uiCopy'>> = {},
+    extra: Partial<Pick<EraNode, 'colors' | 'typography' | 'uiStyle' | 'bgmTags' | 'artStyle' | 'description' | 'uiCopy' | 'promptVars' | 'openingScenes' | 'characterArchetypes' | 'writingSamples' | 'conflictTypes'>> = {},
     children: EraNode[] = []
 ): EraNode {
     return { id, name, depth, parent, ...extra, children: children.length > 0 ? children : undefined };
