@@ -144,15 +144,11 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra, onEraChan
                     <div className="text-xs text-gray-400">时代是界面风格的大前提，切换后将改变整体配色、字体与界面文案。</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {availableEras.map((era) => {
-                            const isSelected = era.id === (currentEra || 'era_ancient_wuxia');
+                            const isSelected = era.id === (currentEra || 'ancient_eastern_wuxia');
                             const scheme = eraTheme?.id === era.id ? eraTheme : undefined;
                             const colorPreview = scheme
                                 ? [scheme.配色['ink-black'], scheme.配色['ink-gray'], scheme.配色['primary'], scheme.配色['secondary']].map(v => `rgb(${v})`)
-                                : era.id === 'era_ancient_wuxia' ? ['rgb(14 13 11)', 'rgb(26 26 26)', 'rgb(230 200 110)', 'rgb(68 170 170)']
-                                : era.id === 'era_republic_modern' ? ['rgb(20 16 12)', 'rgb(42 34 26)', 'rgb(196 166 125)', 'rgb(160 130 90)']
-                                : era.id === 'era_modern_urban' ? ['rgb(13 17 23)', 'rgb(22 27 34)', 'rgb(88 166 255)', 'rgb(63 185 80)']
-                                : era.id === 'era_cyberpunk_nearfuture' ? ['rgb(6 6 16)', 'rgb(18 12 36)', 'rgb(200 100 255)', 'rgb(0 255 230)']
-                                : ['rgb(5 13 20)', 'rgb(10 25 40)', 'rgb(79 195 247)', 'rgb(0 230 118)'];
+                                : ['rgb(30 30 30)', 'rgb(60 60 60)', 'rgb(180 180 180)', 'rgb(120 120 120)'];
                             return (
                                 <button
                                     key={era.id}

@@ -37,7 +37,7 @@ import { 默认游戏设置, 规范化游戏设置 } from '../utils/gameSettings
 import { 设置键 } from '../utils/settingsSchema';
 import { 规范化视觉设置 } from '../utils/visualSettings';
 import { 默认图片管理设置, 规范化图片管理设置 } from '../utils/imageManagerSettings';
-import { 内置时代配置, 获取时代信息 } from '../models/system';
+import { 获取时代信息 } from '../models/system';
 import {
     创建开场空白世界,
     创建开场空白剧情,
@@ -224,7 +224,7 @@ export const useGameState = () => {
     const [promptsReady, setPromptsReady] = useState(false);
     const [festivals, setFestivals] = useState<节日结构[]>(节日列表);
     const [currentTheme, setCurrentTheme] = useState<ThemePreset>('ink');
-    const [currentEra, setCurrentEra] = useState<string>('era_ancient_wuxia');
+    const [currentEra, setCurrentEra] = useState<string>('ancient_eastern_wuxia');
     const [时代信息, 设置时代信息] = useState<时代信息结构 | undefined>(undefined);
     const scrollRef = useRef<HTMLDivElement>(null);
     const abortControllerRef = useRef<AbortController | null>(null);

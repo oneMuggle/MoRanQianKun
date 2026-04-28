@@ -16,7 +16,7 @@ import {
 import { 预设天赋, 预设背景 } from '../../../data/presets';
 import { type UseNewGameWizardStateReturn } from './useNewGameWizardState';
 import { SearchInput, ChipGroup } from '../../ui/FilterBar';
-import { 内置时代配置 } from '../../../models/system';
+import { 全部时代配置 } from '../../../models/system';
 
 type DropdownProps = {
     value: number;
@@ -99,7 +99,7 @@ const 难度下拉选项 = [
     { value: 'hard' as const, label: '困难 (刀光剑影)' },
     { value: 'extreme' as const, label: '极限 (修罗炼狱)' }
 ];
-const 时代选项 = 内置时代配置.map(cfg => ({
+const 时代选项 = 全部时代配置.map(cfg => ({
     value: cfg.id,
     label: cfg.名称,
     hint: `${cfg.时代} — ${cfg.科技水平描述}`
@@ -216,7 +216,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         setWorldConfig({ ...worldConfig, 能力类型: 新能力类型, 武力等级: 新武力等级 });
     };
 
-    const 当前时代 = 内置时代配置.find(c => c.id === (worldConfig.时代配置ID || 'era_ancient_wuxia'));
+    const 当前时代 = 全部时代配置.find(c => c.id === (worldConfig.时代配置ID || 'era_ancient_wuxia'));
     const 组织密度标签 = 当前时代?.组织密度标签 || '宗门密度';
     const 支持体系 = 当前时代?.支持体系;
     const 是否展示体系选择 = Array.isArray(支持体系) && 支持体系.length > 0;
@@ -1369,7 +1369,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                     <OrnateBorder className="max-w-lg w-full p-6">
                         <div className="text-sm space-y-3 font-mono text-gray-300">
                             <p>世界: <span className="text-white">{worldConfig.worldName}</span></p>
-                            <p>时代: <span className="text-white">{内置时代配置.find(c => c.id === (worldConfig.时代配置ID || 'era_ancient_wuxia'))?.名称 || '古代武侠'}</span></p>
+                            <p>时代: <span className="text-white">{全部时代配置.find(c => c.id === (worldConfig.时代配置ID || 'era_ancient_wuxia'))?.名称 || '古代武侠'}</span></p>
                             <p>难度: <span className="text-white uppercase">{worldConfig.difficulty}</span></p>
                             <p>世界观额外要求: <span className="text-white">{worldConfig.worldExtraRequirement.trim() || '无'}</span></p>
                             <p>手动世界观提示词: <span className="text-white">{worldConfig.manualWorldPrompt.trim() ? '已提供' : '未提供'}</span></p>
