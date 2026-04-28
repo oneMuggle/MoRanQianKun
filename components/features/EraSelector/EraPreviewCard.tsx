@@ -147,22 +147,14 @@ const InfoCard: React.FC<{ label: string; value: string }> = ({ label, value }) 
 );
 
 // 素材状态徽章
+// P1-3: 暂时返回 'unknown' 状态（等 P2 eraAssetsService）
 const EraAssetStatusBadge: React.FC<{ subEraId: string }> = ({ subEraId }) => {
-    const HAS_ASSETS = [
-        'ancient_eastern_wuxia',
-        'modern_eastern_republic',
-        'contemporary_urban',
-        'near-future_cyberpunk',
-        'far-future_space_opera',
-    ];
-    const hasAssets = HAS_ASSETS.includes(subEraId);
+    // TODO(P2): 接入 eraAssetsService.checkEraAssetsStatus() 获取真实状态
+    // 暂时返回 unknown，等 P2 阶段实现动态检查
+    void subEraId; // 消除未使用警告
     return (
-        <span className={`px-2 py-1 rounded text-xs font-mono ${
-            hasAssets
-                ? 'bg-green-900/60 text-green-400 border border-green-700'
-                : 'bg-yellow-900/40 text-yellow-400 border border-yellow-700'
-        }`}>
-            {hasAssets ? '有素材' : '待生成'}
+        <span className="px-2 py-1 rounded text-xs font-mono bg-gray-800/60 text-gray-400 border border-gray-700">
+            unknown
         </span>
     );
 };

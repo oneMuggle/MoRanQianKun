@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import GameButton from '../../ui/GameButton';
 import { NewGameWizardContent } from './NewGameWizardContent';
 import { useNewGameWizardState } from './useNewGameWizardState';
@@ -25,9 +25,8 @@ const STEPS = ['世界观', '角色基础', '天赋背景', '开局配置', '确
 
 const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, loading, currentEra, requestConfirm }) => {
     const wizard = useNewGameWizardState({ onComplete, onCancel, loading, currentEra, requestConfirm });
-    const { step, setStep, stepProgress, currentStepLabel, handleNextStep, handleGenerate } = wizard;
+    const { step, setStep, stepProgress, currentStepLabel, handleNextStep, handleGenerate, showEraSelector, setShowEraSelector } = wizard;
     const 文案 = useUIText();
-    const [showEraSelector, setShowEraSelector] = useState(false);
 
     // Expose setShowEraSelector to wizard state so content can trigger it
     // We use a ref pattern via the wizard's existing showEraSelector state
