@@ -1,7 +1,9 @@
 # 三层时代主题 — 资源需求清单
 
 > 基于 `era-theme-tree-structure.md`（树结构定义）和 `era-theme-three-layer-architecture.md`（架构方案）
-> 统计 35 个子时代（SubEra）的全部外部资源需求。
+> 统计 37 个子时代（SubEra）的全部外部资源需求。
+>
+> **Phase D（提示词层接入）已完成：** promptVars / openingScenes / characterArchetypes / writingSamples / conflictTypes / eraRealism 已全部接入系统提示词。
 
 ---
 
@@ -9,8 +11,8 @@
 
 | 资源类型 | 标准需求 | 已有 | 需要补充 | 获取方式 |
 |---------|---------|------|---------|---------|
-| 场景图片 | 216 张 (36×6) | 42 张 | **174 张** | AI 生成管线 |
-| BGM 音频 | 36 首 (36×1) | 5 首 | **31 首** | AI 生成 / CC 素材库 |
+| 场景图片 | 222 张 (37×6) | 42 张 | **180 张** | AI 生成管线 |
+| BGM 音频 | 37 首 (37×1) | 5 首 | **32 首** | AI 生成 / CC 素材库 |
 | Web 字体 | 15 种 | 0 (系统字体) | **~900KB** (子集化) | Google Fonts CDN |
 | SVG 滤镜 | 2 个 | 0 | **2 个** | 手写 SVG |
 | 背景纹理 | 4 种 | 0 | **3 个** (+1 纯CSS) | SVG data URI / CSS |
@@ -27,7 +29,7 @@
 |--------|---------|---------|--------|-------------|--------|
 | `primordial_african` | 非洲部落 | 0 | 6 | 岩壁画·赭石色·部落图腾 | P2 |
 | `primordial_americas` | 美洲原住民 | 0 | 6 | 玛雅石刻·羽毛图腾·丛林 | P2 |
-| `primordial_norse_saman` | 北欧萨满 | 0 | 6 | 冰原风雪·卢恩符文·萨满仪式 | P2 |
+| `primordial_norse` | 北欧萨满 ← 新 | 0 | 6 | 冰原风雪·卢恩符文·萨满仪式 | P2 |
 
 ### 1.2 古代（Ancient）— 现有 + 新增
 
@@ -36,7 +38,7 @@
 | `ancient_eastern_wuxia` | 武侠 | 6 | 0 | 水墨写实摄影 | 完成 |
 | `ancient_eastern_zhiguai` | 志怪 | 6 | 0 | 水墨灵异·幽暗 | 完成 |
 | `ancient_eastern_myth` | 神话 | 0 | 6 | 古典壁画·金石气 | P1 |
-| `ancient_eastern_politics` | 权谋 ← 新 | 0 | 6 | 宫廷暗纹·玄铁灰·官印效果 | P2 |
+| `ancient_eastern_intrigue` | 权谋 ← 新 | 0 | 6 | 宫廷暗纹·玄铁灰·官印效果 | P2 |
 | `ancient_eastern_cultivation` | 修仙 ← 新 | 0 | 6 | 紫霄灵气·炼丹炉·仙境云海 | P2 |
 | `ancient_western_greek` | 古希腊 | 0 | 6 | 希腊大理石雕塑风 | P1 |
 | `ancient_western_roman` | 古罗马 | 0 | 6 | 罗马浮雕与大理石 | P1 |
@@ -89,12 +91,12 @@
 
 | SubEra | 中文名称 | 现有图片 | 需补充 | 艺术风格定义 | 优先级 |
 |--------|---------|---------|--------|-------------|--------|
-| `post-human_pure_energy` | 纯能量生命 ← 新 | 0 | 6 | 抽象几何·光粒子·虚空 | P3 |
+| `post-human_energy` | 纯能量生命 ← 新 | 0 | 6 | 抽象几何·光粒子·虚空 | P3 |
 | `post-human_dimension` | 维度旅行 ← 新 | 0 | 6 | 多维空间·数学结构·超现实 | P3 |
-| `post-human_math_reality` | 数学实在论 ← 新 | 0 | 6 | 分形几何·曼德博集合·纯粹数学 | P3 |
+| `post-human_math` | 数学实在论 ← 新 | 0 | 6 | 分形几何·曼德博集合·纯粹数学 | P3 |
 
-**合计：168 张需要生成。** 已有 42 张（5 个子时代已完成）。
-（比扩展前新增 78 张）
+**合计：180 张需要生成。** 已有 42 张（5 个子时代已完成）。
+（比扩展前新增 90 张）
 
 **已有图片存储路径：** `data/era_assets/{eraId}/*.jpg`
 
@@ -109,7 +111,7 @@
 | `ancient_eastern_wuxia` | 武侠 | 1 | 0 | 民乐、古筝、笛子、武侠 | 完成 |
 | `ancient_eastern_zhiguai` | 志怪 | 0 | 1 | 民乐、古筝、箫、灵异、志怪 | P1 |
 | `ancient_eastern_myth` | 神话 | 0 | 1 | 民乐、编钟、埙、史诗、神话 | P1 |
-| `ancient_eastern_politics` | 权谋 ← 新 | 0 | 1 | 古琴、低沉、紧张、朝堂 | P2 |
+| `ancient_eastern_intrigue` | 权谋 ← 新 | 0 | 1 | 古琴、低沉、紧张、朝堂 | P2 |
 | `ancient_eastern_cultivation` | 修仙 ← 新 | 0 | 1 | 民乐、空灵、仙气、炼丹、飞升 | P2 |
 | `ancient_western_greek` | 古希腊 | 0 | 1 | 古典、里拉琴、管弦、地中海 | P1 |
 | `ancient_western_roman` | 古罗马 | 0 | 1 | 古典、管弦、军乐、史诗 | P1 |
@@ -139,13 +141,13 @@
 | `far-future_virtual_reality` | 虚拟现实 | 0 | 1 | 电子、环境、数字、空灵 | P3 |
 | `primordial_african` | 非洲部落 ← 新 | 0 | 1 | 部落鼓、人声吟唱、原始、巫术 | P2 |
 | `primordial_americas` | 美洲原住民 ← 新 | 0 | 1 | 原住民笛、丛林环境音、祭祀 | P2 |
-| `primordial_norse_saman` | 北欧萨满 ← 新 | 0 | 1 | 人声吟唱、风铃、萨满鼓、风雪 | P2 |
-| `post-human_pure_energy` | 纯能量生命 ← 新 | 0 | 1 | 氛围、极简、超越、意识流 | P3 |
+| `primordial_norse` | 北欧萨满 ← 新 | 0 | 1 | 人声吟唱、风铃、萨满鼓、风雪 | P2 |
+| `post-human_energy` | 纯能量生命 ← 新 | 0 | 1 | 氛围、极简、超越、意识流 | P3 |
 | `post-human_dimension` | 维度旅行 ← 新 | 0 | 1 | 氛围、数学感、多维、空灵 | P3 |
-| `post-human_math_reality` | 数学实在论 ← 新 | 0 | 1 | 极简、电子脉冲、分形、数学 | P3 |
+| `post-human_math` | 数学实在论 ← 新 | 0 | 1 | 极简、电子脉冲、分形、数学 | P3 |
 
-**合计：30 首需要补充。** 已有 5 首。
-（比扩展前新增 13 首）
+**合计：32 首需要补充。** 已有 5 首。
+（比扩展前新增 17 首）
 
 **已有音频存储路径：** `data/era_assets/{eraId}/{eraId}_bgm.mp3`
 
@@ -292,12 +294,12 @@
 |--------|--------|--------|-----|
 | `ancient_eastern_zhiguai` | 志怪 | 6 | 0 |
 
-完全无资产的 SubEra（31 个 → 扩展前 14 个）：
+完全无资产的 SubEra（31 个）：
 
 | SubEra | 中文名 |
 |--------|--------|
 | `ancient_eastern_myth` | 神话 |
-| `ancient_eastern_politics` | 权谋 ← 新 |
+| `ancient_eastern_intrigue` | 权谋 ← 新 |
 | `ancient_eastern_cultivation` | 修仙 ← 新 |
 | `ancient_western_greek` | 古希腊 |
 | `ancient_western_roman` | 古罗马 |
@@ -323,10 +325,10 @@
 | `far-future_virtual_reality` | 虚拟现实 |
 | `primordial_african` | 非洲部落 ← 新 |
 | `primordial_americas` | 美洲原住民 ← 新 |
-| `primordial_norse_saman` | 北欧萨满 ← 新 |
-| `post-human_pure_energy` | 纯能量生命 ← 新 |
+| `primordial_norse` | 北欧萨满 ← 新 (ID 修正: `primordial_norse_saman` → `primordial_norse`) |
+| `post-human_energy` | 纯能量生命 ← 新 (ID 修正: `post-human_pure_energy` → `post-human_energy`) |
 | `post-human_dimension` | 维度旅行 ← 新 |
-| `post-human_math_reality` | 数学实在论 ← 新 |
+| `post-human_math` | 数学实在论 ← 新 (ID 修正: `post-human_math_reality` → `post-human_math`) |
 
 ---
 
@@ -336,9 +338,9 @@
 |------|--------|--------|------|
 | 时代 (Epoch) | 5 | 7 | +2 |
 | 纪元 (Era) | 4 | 13 | +9 |
-| 子纪元 (SubEra) | 22 | 36 | +14 |
-| 场景图片需求 | 90 张 | 174 张 | +84 |
-| BGM 需求 | 17 首 | 31 首 | +14 |
+| 子纪元 (SubEra) | 22 | 37 | +15 |
+| 场景图片需求 | 90 张 | 222 张 (37×6) | +132 |
+| BGM 需求 | 17 首 | 36 首 (37−1已有) | +19 |
 | Web 字体 | 8 种 | 15 种 | +7 |
 | 背景纹理 | 3 种 | 4 种 | +1 |
-| 完全无资产 SubEra | 14 个 | 31 个 | +17 |
+| 完全无资产 SubEra | 14 个 | 32 个 | +18 |
