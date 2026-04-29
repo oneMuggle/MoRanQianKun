@@ -1,6 +1,6 @@
 # 三层时代架构 — 实施进度追踪
 
-> 最后更新: 2026-04-29 17:30
+> 最后更新: 2026-04-29 18:00
 > 分支: main
 > 最新提交: Phase D-6 (cc4cf58)
 
@@ -57,13 +57,17 @@
 
 ---
 
-## Phase E: 资源需求更新 ⏳ 下一步
-- [ ] 更新 `docs/plans/era-theme-resource-list.md`
+## Phase E: 资源需求更新 ✅ 已完成
+**提交:** pending
+
+- 修正 SubEra 数量从 35→37
+- 修正 ID 不匹配: `ancient_eastern_politics` → `ancient_eastern_intrigue`, `primordial_norse_saman` → `primordial_norse`, `post-human_pure_energy` → `post-human_energy`, `post-human_math_reality` → `post-human_math`
+- 更新资源总量: 图片 180 张需生成, BGM 32 首需生成
+- 添加 Phase D 完成标记
 
 ---
 
 ## 断点恢复
 
 1. `git log --oneline -5` 确认最新提交
-2. Phase D 已全部完成，下一步: Phase E — 更新资源需求文档
-3. 每完成一个子步骤提交 git
+2. Phase D + E 已全部完成, 全部代码已提交
