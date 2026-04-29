@@ -203,6 +203,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         里武侠开启, 设置里武侠开启,
         里志怪开启, 设置里志怪开启,
         古代体系选择, 设置古代体系选择,
+        子纪元里模式,
     } = wizard;
 
     const 处理能力类型变更 = (新能力类型: typeof worldConfig.能力类型) => {
@@ -338,7 +339,23 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                 </div>
 
                                 {/* 里模式开关 */}
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-col gap-3">
+                                    {/* 子纪元专属里模式（自动激活，显示为信息卡片） */}
+                                    {子纪元里模式 && (
+                                        <div
+                                            className="relative flex items-center justify-between gap-4 rounded-md border bg-black/30 px-4 py-3"
+                                            style={{ borderColor: `rgba(${子纪元里模式.themeColor}, 0.3)` }}
+                                        >
+                                            <div>
+                                                <div className="text-sm font-bold" style={{ color: `rgb(${子纪元里模式.themeColor})` }}>{子纪元里模式.name}</div>
+                                                <div className="text-[11px] text-gray-400">{子纪元里模式.description}</div>
+                                            </div>
+                                            <span className="text-[10px] text-gray-500 font-mono">自动激活</span>
+                                            <span className="absolute -inset-1 rounded-lg pointer-events-none" style={{ backgroundColor: `rgba(${子纪元里模式.themeColor}, 0.1)` }} />
+                                        </div>
+                                    )}
+                                    {/* 全局里模式开关（保留向后兼容） */}
+                                    <div className="flex flex-wrap gap-3">
                                     {(古代体系选择 === '武侠' || 古代体系选择 === '双修') && (
                                         <div className="relative flex items-center justify-between gap-4 rounded-md border border-wuxia-red/20 bg-black/30 px-4 py-3 flex-1 min-w-[240px]">
                                             <div>
@@ -379,6 +396,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                             )}
                                         </div>
                                     )}
+                                    </div>
                                 </div>
                             </div>
                         )}

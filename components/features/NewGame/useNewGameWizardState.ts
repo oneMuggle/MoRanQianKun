@@ -25,6 +25,7 @@ import {
 import { 默认境界母板提示词 } from '../../../prompts/runtime/fandom';
 import { 设置键 } from '../../../utils/settingsSchema';
 import { 内置时代配置 } from '../../../models/system';
+import { resolveEraNode } from '../../../models/eraTheme';
 import { 体系类型 } from '../../../types';
 
 // --- Constants ---
@@ -93,6 +94,22 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         });
     }, [currentEra]);
 
+    // 子纪元里模式自动同步：当选择时代时，自动检测并激活对应里模式
+    useEffect(() => {
+        const eraId = currentEra;
+        if (!eraId) {
+            设置子纪元里模式(null);
+            return;
+        }
+        const resolved = resolveEraNode(eraId);
+        if (resolved?.inherited.liMode) {
+            const { name, description, themeColor } = resolved.inherited.liMode;
+            设置子纪元里模式({ name, description, themeColor: themeColor || '163 24 24' });
+        } else {
+            设置子纪元里模式(null);
+        }
+    }, [currentEra]);
+
     const [selectedQiyun, setSelectedQiyun] = useState<气运数据[]>([]);
 
     // --- State: Character Config ---
@@ -126,6 +143,8 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
     const [成人内容开启, 设置成人内容开启] = useState(false);
     const [里武侠开启, 设置里武侠开启] = useState(false);
     const [里志怪开启, 设置里志怪开启] = useState(false);
+    // 子纪元专属里模式（自动激活，无需手动开关）
+    const [子纪元里模式, 设置子纪元里模式] = useState<{ name: string; description: string; themeColor: string } | null>(null);
     const [古代体系选择, 设置古代体系选择] = useState<体系类型>('武侠');
 
     // Search & filter
@@ -887,6 +906,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         里武侠开启, 设置里武侠开启,
         里志怪开启, 设置里志怪开启,
         古代体系选择, 设置古代体系选择,
+        子纪元里模式,
         customTalent, setCustomTalent, showCustomTalent, setShowCustomTalent,
         正在编辑天赋名, set正在编辑天赋名,
         customBackground, setCustomBackground, showCustomBackground, setShowCustomBackground,
