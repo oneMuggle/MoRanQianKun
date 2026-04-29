@@ -1085,6 +1085,7 @@ export const useGame = () => {
             世界书作用域?: 世界书作用域[];
             世界书附加文本?: string[];
             openingConfig?: OpeningConfig;
+            eraId?: string | null;
         }
     ) => 构建系统提示词工作流({
         promptPool,
@@ -1097,7 +1098,7 @@ export const useGame = () => {
         builtinPromptEntries: 内置提示词列表,
         worldbooks: 世界书列表,
         worldEvolutionEnabled: 世界演变功能已开启(),
-        options
+        options: { ...options, eraId: options?.eraId ?? currentEra }
     });
 
     const processResponseCommands = (
