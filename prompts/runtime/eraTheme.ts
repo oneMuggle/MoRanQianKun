@@ -1,0 +1,54 @@
+import { resolveEraNode } from '../../models/eraTheme';
+
+/** 从解析后的时代节点构建提示词注入文本 */
+export const 构建时代主题注入 = (eraId: string | null | undefined): string => {
+    if (!eraId) return '';
+
+    const resolved = resolveEraNode(eraId);
+    if (!resolved) return '';
+
+    const { inherited, node } = resolved;
+    const sections: string[] = [];
+
+    // 时代身份声明
+    sections.push(`<时代主题约束>
+# 当前时代：${node.name}
+# 时代标识：${node.id}
+# 时代层级：${node.depth === 0 ? 'Epoch（大纪元）' : node.depth === 1 ? 'Era（纪元）' : 'SubEra（子纪元）'}`);
+
+    // promptVars 注入
+    const vars = inherited.promptVars;
+    if (vars) {
+        const varLines: string[] = [];
+        if (vars.社会形态) varLines.push(`- 社会形态：${vars.社会形态}`);
+        if (vars.科技水平) varLines.push(`- 科技水平：${vars.科技水平}`);
+        if (vars.力量体系) varLines.push(`- 力量体系：${vars.力量体系}`);
+        if (vars.叙事视角) varLines.push(`- 叙事视角：${vars.叙事视角}`);
+        if (vars.描写重点) varLines.push(`- 描写重点：${vars.描写重点}`);
+        if (vars.对话占比) varLines.push(`- 对话占比：${vars.对话占比}`);
+        if (vars.禁忌 && vars.禁忌.length > 0) varLines.push(`- 时代禁忌：${vars.禁忌.join('；')}`);
+
+        if (varLines.length > 0) {
+            sections.push(`## 时代提示词变量\n${varLines.join('\n')}`);
+        }
+    }
+
+    // 冲突类型注入
+    if (inherited.conflictTypes && inherited.conflictTypes.length > 0) {
+        sections.push(`## 核心冲突类型\n${inherited.conflictTypes.join('、')}`);
+    }
+
+    // 美术风格注入
+    if (inherited.artStyle) {
+        sections.push(`## 美术风格参考\n${inherited.artStyle}`);
+    }
+
+    // BGM 标签注入
+    if (inherited.bgmTags && inherited.bgmTags.length > 0) {
+        sections.push(`## 背景音乐氛围\n${inherited.bgmTags.join('、')}`);
+    }
+
+    sections.push('</时代主题约束>');
+
+    return sections.join('\n\n');
+};
