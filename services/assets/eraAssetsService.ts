@@ -25,10 +25,23 @@ export interface EraAssets {
     bgmPath: string | null;
 }
 
+// R2 CDN 基础 URL（通过环境变量配置，默认为空字符串）
+const R2_CDN_BASE = (typeof window !== 'undefined' && (window as any).__R2_CDN_BASE__)
+    || '';
+
+const R2_MANIFEST_URLS = (eraId: string): string => {
+    if (R2_CDN_BASE) {
+        return `${R2_CDN_BASE.replace(/\/$/, '')}/data/era_assets/${eraId}/manifest.json`;
+    }
+    return `/data/era_assets/${eraId}/manifest.json`;
+};
+
 /** 动态加载时代素材清单 */
 export async function loadEraManifest(eraId: string): Promise<EraManifest | null> {
     try {
-        const manifestPath = `/data/era_assets/${eraId}/manifest.json`;
+        const manifestPath = R2_CDN_BASE
+            ? `${R2_CDN_BASE.replace(/\/$/, '')}/data/era_assets/${eraId}/manifest.json`
+            : `/data/era_assets/${eraId}/manifest.json`;
         const response = await fetch(manifestPath);
         if (!response.ok) {
             return null;
@@ -68,14 +81,15 @@ export async function getEraBgm(eraId: string): Promise<string | null> {
     // 尝试从 manifest 获取 bgm 文件名
     const manifest = await loadEraManifest(eraId);
     if (manifest?.bgm) {
-        return `/data/era_assets/${eraId}/${manifest.bgm}`;
+        const base = R2_CDN_BASE || '';
+        return base ? `${base}/${eraId}/${manifest.bgm}` : `/data/era_assets/${eraId}/${manifest.bgm}`;
     }
 
     // fallback: 通过 bgmTags 标签组合路径（仅作为备用）
     const bgmTags = node.bgmTags || [];
     if (bgmTags.length > 0) {
-        // 常见的 bgm 文件名模式：eraId + _bgm.mp3
-        return `/data/era_assets/${eraId}/${eraId}_bgm.mp3`;
+        const base = R2_CDN_BASE || '';
+        return base ? `${base}/${eraId}/${eraId}_bgm.mp3` : `/data/era_assets/${eraId}/${eraId}_bgm.mp3`;
     }
 
     return null;
@@ -88,8 +102,9 @@ export async function loadEraAssets(eraId: string): Promise<EraAssets> {
         getEraBgm(eraId),
     ]);
 
+    const base = R2_CDN_BASE || '';
     const images = manifest?.images?.map(
-        (img) => `/data/era_assets/${eraId}/${img}`
+        (img) => base ? `${base}/${eraId}/${img}` : `/data/era_assets/${eraId}/${img}`
     ) || [];
 
     return {

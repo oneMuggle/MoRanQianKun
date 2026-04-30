@@ -11,10 +11,10 @@ let cdnManifestLoaded = false;
 const cdnResourceMap = new Map<string, string>(); // assetId -> cdnUrl
 
 // CDN 配置 - 优雅降级：环境变量为空时不尝试加载
-const CDN_BASE_URL = (typeof window !== 'undefined' && (window as any).__CDN_BASE_URL__)
-    || (typeof import.meta !== 'undefined' && import.meta.env?.VITE_CDN_BASE_URL)
+const R2_CDN_BASE = (typeof window !== 'undefined' && (window as any).__R2_CDN_BASE__)
     || '';
 
+const CDN_BASE_URL = R2_CDN_BASE;
 const MANIFEST_URL = CDN_BASE_URL ? `${CDN_BASE_URL.replace(/\/$/, '')}/manifest.json` : '';
 
 const 读取文本 = (value: unknown): string => (
