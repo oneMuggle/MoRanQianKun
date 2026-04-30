@@ -19,13 +19,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-fund --no-audit
+        run: npm ci
+
+      - name: Verify install
+        run: test -f node_modules/.bin/vite && echo "vite OK" || echo "vite MISSING"
 
       - name: Build
-        run: npx vite build
+        run: ./node_modules/.bin/vite build
         env:
           VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
 
