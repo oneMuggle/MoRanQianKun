@@ -24,7 +24,7 @@ import {
 } from '../../../utils/openingConfig';
 import { 默认境界母板提示词 } from '../../../prompts/runtime/fandom';
 import { 设置键 } from '../../../utils/settingsSchema';
-import { 内置时代配置 } from '../../../models/system';
+import { 内置时代配置, 获取时代背景 } from '../../../models/system';
 import { 时代主题方案列表, 获取时代主题方案 } from '../../../models/eraTheme';
 import { 体系类型 } from '../../../types';
 
@@ -203,30 +203,37 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         return Array.from(map.values());
     };
 
+    const 当前时代背景 = useMemo(() => 获取时代背景(worldConfig.时代配置ID), [worldConfig.时代配置ID]);
+
+    const 匹配时代 = (item: { 时代适配?: string[] }) =>
+        !item.时代适配 || item.时代适配.length === 0 || (当前时代背景 && item.时代适配.includes(当前时代背景));
+
     const 全部背景选项 = useMemo(() => {
         const combined = [...预设背景, ...自定义背景列表.filter(item => !预设背景.some(p => p.名称 === item.名称))];
         return combined.filter(item =>
             (!item.适用性别 || item.适用性别 === charGender) &&
-            (item.nsfw !== true || worldConfig.nsfw场景类型 !== '无')
+            (item.nsfw !== true || worldConfig.nsfw场景类型 !== '无') &&
+            匹配时代(item)
         );
-    }, [自定义背景列表, charGender, worldConfig.nsfw场景类型]);
+    }, [自定义背景列表, charGender, worldConfig.nsfw场景类型, 当前时代背景]);
 
     const 全部天赋选项 = useMemo(() => {
         const combined = [...预设天赋, ...自定义天赋列表.filter(item => !预设天赋.some(p => p.名称 === item.名称))];
         return combined.filter(item =>
             (!item.适用性别 || item.适用性别 === charGender) &&
-            (item.nsfw !== true || worldConfig.nsfw场景类型 !== '无')
+            (item.nsfw !== true || worldConfig.nsfw场景类型 !== '无') &&
+            匹配时代(item)
         );
-    }, [自定义天赋列表, charGender, worldConfig.nsfw场景类型]);
+    }, [自定义天赋列表, charGender, worldConfig.nsfw场景类型, 当前时代背景]);
 
     const 全部气运选项 = useMemo(() => {
         return 气运数据列表.filter(item => {
             const nsfwOk = item.nsfw等级 !== undefined && item.nsfw等级 > 0
                 ? worldConfig.nsfw场景类型 !== '无'
                 : true;
-            return nsfwOk;
+            return nsfwOk && 匹配时代(item);
         });
-    }, [worldConfig.nsfw场景类型]);
+    }, [worldConfig.nsfw场景类型, 当前时代背景]);
 
     const 过滤匹配 = (文本: string, 搜索词: string): boolean => {
         if (!搜索词) return true;

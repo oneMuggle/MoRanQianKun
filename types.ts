@@ -93,6 +93,8 @@ export interface 天赋结构 {
     适用性别?: '男' | '女';
     /** 是否为 NSFW 内容，默认 false */
     nsfw?: boolean;
+    /** 适配的时代背景大类，不填则全时代可见 */
+    时代适配?: string[];
 }
 
 export interface 背景结构 {
@@ -103,6 +105,8 @@ export interface 背景结构 {
     适用性别?: '男' | '女';
     /** 是否为 NSFW 内容，默认 false */
     nsfw?: boolean;
+    /** 适配的时代背景大类，不填则全时代可见 */
+    时代适配?: string[];
 }
 
 /** 气运属性类型（六维） */

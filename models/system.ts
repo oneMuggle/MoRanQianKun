@@ -1045,6 +1045,12 @@ export const 获取时代信息 = (eraId: string): 时代信息结构 | null => 
     };
 };
 
+/** 将 SubEra ID 映射到时代背景大类，用于天赋/背景/气运筛选 */
+export const 获取时代背景 = (eraId: string): 时代背景 | null => {
+    const info = 获取时代信息(eraId);
+    return info?.时代背景 ?? null;
+};
+
 export type 能力类型 = '传统武侠' | '修仙体系' | '超能力线' | '混合世界';
 
 export type 超能力分类 = '心灵感应' | '念力' | '预知' | '治愈' | '元素操控' | '时空' | '变身' | '灵能' | '高科技' | '综合' | '未觉醒';
