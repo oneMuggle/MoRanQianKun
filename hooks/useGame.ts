@@ -311,6 +311,9 @@ export const useGame = () => {
         currentEra, setCurrentEra,
         scrollRef, abortControllerRef, variableGenerationAbortControllerRef
     } = gameState;
+
+    // Mobile Device
+    const { 设备状态, 设置设备状态, 设备打开, 设备关闭, 设备打开应用, 设备切换模式, 设备返回主页 } = gameState;
     const 回合快照栈Ref = useRef<回合快照结构[]>([]);
     const 最近自动存档时间戳Ref = useRef<number>(0);
     const 最近自动存档签名Ref = useRef<string>('');
@@ -1999,7 +2002,9 @@ export const useGame = () => {
             notifications: 右下角提示列表,
             chatScrollSuppressToken: 聊天区自动滚动抑制令牌,
             chatForceScrollToken: 聊天区强制置底令牌,
-            eraInfo: 时代信息Ref.current
+            eraInfo: 时代信息Ref.current,
+            // Mobile Device
+            deviceState: 设备状态,
         },
         setters: {
             setShowSettings, setShowInventory, setShowEquipment, setShowBattle, setShowSocial, setShowTeam, setShowKungfu, setShowWorld, setShowMap, setShowSect, setShowTask, setShowAgreement, setShowStory, setShowHeroinePlan, setShowMemory, setShowSaveLoad,
@@ -2105,7 +2110,14 @@ export const useGame = () => {
             setPersistentWallpaper: 设置常驻壁纸,
             clearPersistentWallpaper: 清除常驻壁纸,
             pushNotification: 推送右下角提示,
-            handleEraChange: 处理时代变更
+            handleEraChange: 处理时代变更,
+            // Mobile Device
+            openDevice: 设备打开,
+            closeDevice: 设备关闭,
+            openDeviceApp: 设备打开应用,
+            toggleDeviceMode: 设备切换模式,
+            returnDeviceHome: 设备返回主页,
+            setDeviceState: 设置设备状态
         }
     };
 };

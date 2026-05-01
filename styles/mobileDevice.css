@@ -1,0 +1,71 @@
+/* 跨时代移动设备样式 */
+
+/* 正常模式变量 */
+:root {
+    --device-bg: #111827;
+    --device-text: #e5e7eb;
+    --device-text-muted: #9ca3af;
+    --device-primary: #3b82f6;
+    --device-border: #374151;
+    --device-hover: rgba(255, 255, 255, 0.1);
+    --device-glow: none;
+}
+
+/* 里模式变量 — 由 JS 动态设置主题色 */
+[data-device-mode="li"] {
+    --device-bg: #1a1a2e;
+    --device-text: #e0e0e0;
+    --device-text-muted: #888;
+    --device-primary: var(--li-theme-color, #6B2D8B);
+    --device-border: #2a2a4a;
+    --device-hover: rgba(107, 45, 139, 0.15);
+    --device-glow: 0 0 8px var(--li-theme-color, #6B2D8B);
+}
+
+/* 设备容器 */
+.device-container {
+    background-color: var(--device-bg);
+    color: var(--device-text);
+    border-color: var(--device-border);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 应用图标 */
+.device-app-icon {
+    transition: transform 0.2s ease, filter 0.3s ease;
+}
+
+.device-app-icon:hover {
+    transform: scale(1.1);
+}
+
+[data-device-mode="li"] .device-app-icon {
+    filter: drop-shadow(0 0 4px var(--li-theme-color, #6B2D8B));
+}
+
+/* 应用名称 */
+.device-app-name {
+    transition: color 0.3s ease;
+}
+
+[data-device-mode="li"] .device-app-name {
+    color: var(--li-theme-color, #6B2D8B);
+}
+
+/* 模式切换按钮发光效果 */
+[data-device-mode="li"] .mode-toggle-active {
+    box-shadow: var(--device-glow);
+}
+
+/* 里模式标签 */
+.li-mode-badge {
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+}
+
+/* 底部状态栏 */
+.device-status-bar {
+    font-size: 0.75rem;
+    color: var(--device-text-muted);
+}

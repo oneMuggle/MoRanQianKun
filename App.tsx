@@ -75,6 +75,7 @@ const MobileSaveLoadModal = 创建可预加载懒组件(() => import('./componen
 const MobileMusicPlayer = 创建可预加载懒组件(() => import('./components/features/Music/mobile/MobileMusicPlayer'));
 const NovelDecompositionWorkbenchModal = 创建可预加载懒组件(() => import('./components/features/NovelDecomposition/NovelDecompositionWorkbenchModal'));
 const MobileNovelDecompositionWorkbenchModal = 创建可预加载懒组件(() => import('./components/features/NovelDecomposition/MobileNovelDecompositionWorkbenchModal'));
+const MobileDeviceModal = 创建可预加载懒组件(() => import('./components/features/MobileDevice/MobileDeviceModal'));
 
 const 懒加载占位: React.FC = () => (
     <div className="fixed inset-0 z-[260] flex items-center justify-center bg-black/45 px-6 py-10 text-center backdrop-blur-[2px]">
@@ -674,6 +675,19 @@ const App: React.FC = () => {
             setters.setShowKungfu(false);
         }
     }, [启用修炼体系, setters, state.showKungfu]);
+
+    // Mobile Device keyboard shortcut (M key)
+    React.useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'm' || e.key === 'M') {
+                if (state.view === 'game' && !state.showSettings && !state.showSocial && !state.showInventory && !state.showEquipment && !state.showBattle && !state.showTeam && !state.showKungfu && !state.showWorld && !state.showMap && !state.showSect && !state.showTask && !state.showAgreement && !state.showStory && !state.showHeroinePlan && !state.showMemory && !state.showSaveLoad.show) {
+                    actions.openDevice();
+                }
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [state.view, state.showSettings, state.showSocial, state.showInventory, state.showEquipment, state.showBattle, state.showTeam, state.showKungfu, state.showWorld, state.showMap, state.showSect, state.showTask, state.showAgreement, state.showStory, state.showHeroinePlan, state.showMemory, state.showSaveLoad, actions.openDevice]);
 
 
     return (
@@ -1647,6 +1661,20 @@ const App: React.FC = () => {
                                     onStartMemorySummary={actions.handleStartManualMemorySummary}
                                 />
                             )}
+                        </懒加载边界>
+                    )}
+
+                    {/* Mobile Device Modal */}
+                    {meta.deviceState?.isOpen && (
+                        <懒加载边界>
+                            <MobileDeviceModal
+                                eraId={state.currentEra || 'contemporary_urban'}
+                                deviceState={meta.deviceState}
+                                onAppClick={actions.openDeviceApp}
+                                onModeToggle={actions.toggleDeviceMode}
+                                liModeGlobalEnabled={state.gameConfig?.启用子纪元里模式 !== false}
+                                onClose={actions.closeDevice}
+                            />
                         </懒加载边界>
                     )}
                 </>
