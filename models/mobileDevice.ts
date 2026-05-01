@@ -48,6 +48,8 @@ export interface DeviceConfig {
     apps: MobileApp[];
     uiStyle: 'ancient' | 'modern' | 'retro' | 'tech' | 'holographic' | 'consciousness';
     capabilities: DeviceCapabilities;
+    // 表模式应用名称（时代化）
+    normalAppNames?: Partial<Record<MobileApp, string>>;
     // 里模式覆盖
     liModeOverrides?: {
         appNames?: Partial<Record<MobileApp, string>>;  // 里模式应用名
@@ -100,4 +102,22 @@ export interface DeviceGroup {
     type: 'tribe' | 'sect' | 'faction' | 'modern' | 'neural';
     members: string[];
     lastMessage?: DeviceMessage;
+}
+
+// ============================================================
+// 游戏状态上下文 — 设备 App 需要的数据子集
+// ============================================================
+
+import type { NPC结构 } from './domain/social';
+import type { 世界数据结构 } from './game/world';
+import type { 剧情系统结构 } from './game/story';
+import type { 角色数据结构 } from './domain/character';
+import type { 聊天记录结构 } from '../types';
+
+export interface DeviceGameContext {
+    角色: 角色数据结构 | null;
+    社交: NPC结构[];
+    世界: 世界数据结构 | null;
+    剧情: 剧情系统结构 | null;
+    历史记录: 聊天记录结构[];
 }

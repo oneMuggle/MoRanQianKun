@@ -1,16 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { getDeviceConfig, getAppName, getLiModeThemeColor } from '../../../models/eraDevice';
-import { DeviceState, MobileApp, DeviceMode, DeviceConfig } from '../../../models/mobileDevice';
+import { DeviceState, MobileApp, DeviceMode, DeviceConfig, DeviceGameContext } from '../../../models/mobileDevice';
 import { resolveEraNode } from '../../../models/eraTheme';
 import ModeToggle from './ModeToggle';
+import ChatApp from './apps/ChatApp';
+import MapApp from './apps/MapApp';
+import ContactsApp from './apps/ContactsApp';
+import ForumApp from './apps/ForumApp';
+import NewsApp from './apps/NewsApp';
+import AlbumApp from './apps/AlbumApp';
+import ToolsApp from './apps/ToolsApp';
+
+interface AppProps {
+    eraId: string;
+    mode: DeviceMode;
+    appId: MobileApp;
+    onBack: () => void;
+    gameContext?: DeviceGameContext;
+}
 
 interface MobileHomeProps {
     eraId: string;
     deviceState: DeviceState;
     onAppClick: (app: MobileApp) => void;
+    onReturnHome: () => void;
     onModeToggle: (mode: DeviceMode) => void;
     liModeGlobalEnabled: boolean;
     onClose: () => void;
+    gameContext?: DeviceGameContext;
 }
 
 const appIcons: Record<MobileApp, string> = {
@@ -27,9 +44,11 @@ const MobileHome: React.FC<MobileHomeProps> = ({
     eraId,
     deviceState,
     onAppClick,
+    onReturnHome,
     onModeToggle,
     liModeGlobalEnabled,
     onClose,
+    gameContext,
 }) => {
     const [config, setConfig] = useState<DeviceConfig | null>(null);
     const [liModeName, setLiModeName] = useState<string | undefined>();
@@ -54,6 +73,26 @@ const MobileHome: React.FC<MobileHomeProps> = ({
     const isLiMode = deviceState.mode === 'li';
     const themeColor = isLiMode ? getLiModeThemeColor(config, '#6B2D8B') : undefined;
     const liModeEnabled = liModeGlobalEnabled && !!liModeName;
+
+    const renderActiveApp = () => {
+        const appProps: AppProps = {
+            eraId,
+            mode: deviceState.mode,
+            appId: deviceState.activeApp!,
+            onBack: onReturnHome,
+            gameContext,
+        };
+        switch (deviceState.activeApp) {
+            case 'chat': return <ChatApp {...appProps} />;
+            case 'map': return <MapApp {...appProps} />;
+            case 'contacts': return <ContactsApp {...appProps} />;
+            case 'forum': return <ForumApp {...appProps} />;
+            case 'news': return <NewsApp {...appProps} />;
+            case 'album': return <AlbumApp {...appProps} />;
+            case 'tools': return <ToolsApp {...appProps} />;
+            default: return null;
+        }
+    };
 
     return (
         <div
@@ -107,49 +146,54 @@ const MobileHome: React.FC<MobileHomeProps> = ({
                 </div>
             </div>
 
-            {/* 应用网格 */}
-            <div className="flex-1 overflow-y-auto p-4">
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                    {config.apps.map((app) => {
-                        const appName = getAppName(config, app, deviceState.mode);
-                        const icon = appIcons[app];
-                        return (
-                            <button
-                                key={app}
-                                onClick={() => onAppClick(app)}
-                                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-white/10 transition-all duration-200 group"
-                            >
-                                <span
-                                    className="text-3xl transition-transform group-hover:scale-110"
-                                    style={
-                                        isLiMode
-                                            ? {
-                                                  filter: `drop-shadow(0 0 4px ${themeColor})`,
-                                              }
-                                            : undefined
-                                    }
-                                >
-                                    {icon}
-                                </span>
-                                <span
-                                    className="text-xs text-center transition-colors"
-                                    style={isLiMode ? { color: themeColor } : {}}
-                                >
-                                    {appName}
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+            {/* Active App or Home Grid */}
+            {deviceState.activeApp ? renderActiveApp() : (
+                <>
+                    {/* 应用网格 */}
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                            {config.apps.map((app) => {
+                                const appName = getAppName(config, app, deviceState.mode);
+                                const icon = appIcons[app];
+                                return (
+                                    <button
+                                        key={app}
+                                        onClick={() => onAppClick(app)}
+                                        className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-white/10 transition-all duration-200 group"
+                                    >
+                                        <span
+                                            className="text-3xl transition-transform group-hover:scale-110"
+                                            style={
+                                                isLiMode
+                                                    ? {
+                                                          filter: `drop-shadow(0 0 4px ${themeColor})`,
+                                                      }
+                                                    : undefined
+                                            }
+                                        >
+                                            {icon}
+                                        </span>
+                                        <span
+                                            className="text-xs text-center transition-colors"
+                                            style={isLiMode ? { color: themeColor } : {}}
+                                        >
+                                            {appName}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
 
-            {/* 底部状态栏 */}
-            <div className="px-4 py-2 border-t border-gray-700/50 text-xs text-gray-500">
-                <div className="flex justify-between">
-                    <span>通讯范围: {config.capabilities.通讯范围}</span>
-                    <span>能源: {config.capabilities.能源类型}</span>
-                </div>
-            </div>
+                    {/* 底部状态栏 */}
+                    <div className="px-4 py-2 border-t border-gray-700/50 text-xs text-gray-500">
+                        <div className="flex justify-between">
+                            <span>通讯范围: {config.capabilities.通讯范围}</span>
+                            <span>能源: {config.capabilities.能源类型}</span>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
