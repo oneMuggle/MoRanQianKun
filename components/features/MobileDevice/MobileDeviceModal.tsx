@@ -1,23 +1,27 @@
 import React from 'react';
 import MobileDevice from './MobileDevice';
-import { DeviceState, MobileApp, DeviceMode } from '../../../models/mobileDevice';
+import { DeviceState, MobileApp, DeviceMode, DeviceGameContext } from '../../../models/mobileDevice';
 
 interface MobileDeviceModalProps {
     eraId: string;
     deviceState: DeviceState;
     onAppClick: (app: MobileApp) => void;
+    onReturnHome: () => void;
     onModeToggle: (mode: DeviceMode) => void;
     liModeGlobalEnabled: boolean;
     onClose: () => void;
+    gameContext?: DeviceGameContext;
 }
 
 const MobileDeviceModal: React.FC<MobileDeviceModalProps> = ({
     eraId,
     deviceState,
     onAppClick,
+    onReturnHome,
     onModeToggle,
     liModeGlobalEnabled,
     onClose,
+    gameContext,
 }) => {
     return (
         <div
@@ -32,9 +36,11 @@ const MobileDeviceModal: React.FC<MobileDeviceModalProps> = ({
                     eraId={eraId}
                     deviceState={deviceState}
                     onAppClick={onAppClick}
+                    onReturnHome={onReturnHome}
                     onModeToggle={onModeToggle}
                     liModeGlobalEnabled={liModeGlobalEnabled}
                     onClose={onClose}
+                    gameContext={gameContext}
                 />
             </div>
         </div>

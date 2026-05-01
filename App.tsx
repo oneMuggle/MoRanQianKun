@@ -1675,9 +1675,17 @@ const App: React.FC = () => {
                                 eraId={state.currentEra || 'contemporary_urban'}
                                 deviceState={meta.deviceState}
                                 onAppClick={actions.openDeviceApp}
+                                onReturnHome={actions.returnDeviceHome}
                                 onModeToggle={actions.toggleDeviceMode}
                                 liModeGlobalEnabled={state.gameConfig?.启用子纪元里模式?.[state.currentEra] ?? true}
                                 onClose={actions.closeDevice}
+                                gameContext={{
+                                    角色: state.角色 || null,
+                                    社交: state.社交 || [],
+                                    世界: state.世界 || null,
+                                    剧情: state.剧情 || null,
+                                    历史记录: state.历史记录 || [],
+                                }}
                             />
                         </懒加载边界>
                     )}
