@@ -18,6 +18,31 @@ import { type UseNewGameWizardStateReturn } from './useNewGameWizardState';
 import { SearchInput, ChipGroup } from '../../ui/FilterBar';
 import { 全部时代配置 } from '../../../models/system';
 
+const 时代背景颜色: Record<string, { bg: string; text: string; label: string }> = {
+    '古代': { bg: 'bg-amber-900/40', text: 'text-amber-400', label: '古代专属' },
+    '近代': { bg: 'bg-blue-900/40', text: 'text-blue-400', label: '近代专属' },
+    '现代': { bg: 'bg-green-900/40', text: 'text-green-400', label: '现代专属' },
+    '近未来': { bg: 'bg-purple-900/40', text: 'text-purple-400', label: '近未来专属' },
+    '未来': { bg: 'bg-cyan-900/40', text: 'text-cyan-400', label: '未来专属' },
+};
+
+function 时代标签({ 时代适配 }: { 时代适配?: string[] }) {
+    if (!时代适配 || 时代适配.length === 0) return null;
+    return (
+        <div className="flex flex-wrap gap-1 mt-2">
+            {时代适配.map((era) => {
+                const style = 时代背景颜色[era];
+                if (!style) return null;
+                return (
+                    <span key={era} className={`text-[10px] px-1.5 py-0.5 rounded ${style.bg} ${style.text}`}>
+                        {style.label}
+                    </span>
+                );
+            })}
+        </div>
+    );
+}
+
 type DropdownProps = {
     value: number;
     options: number[];
@@ -877,6 +902,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                                 <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500 group-hover:text-wuxia-cyan/70'}`}>IDENTITY</span>
                                             </div>
                                             <div className="mt-3 text-sm text-gray-400 leading-6">{bg.描述}</div>
+                                            <时代标签 时代适配={bg.时代适配} />
                                             <div className="mt-4 rounded-xl border border-white/8 bg-black/30 px-4 py-3 text-sm text-wuxia-cyan/90 leading-6">
                                                 <span className="text-wuxia-gold/80 mr-2">长期效果</span>
                                                 {bg.效果}
@@ -994,6 +1020,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                                 <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500 group-hover:text-wuxia-cyan/70'}`}>{isSelected ? 'SELECTED' : 'TRAIT'}</span>
                                             </div>
                                             <div className="mt-3 text-sm text-gray-400 leading-6">{t.描述}</div>
+                                            <时代标签 时代适配={t.时代适配} />
                                             <div className="mt-4 rounded-xl border border-white/8 bg-black/30 px-4 py-3 text-sm text-wuxia-cyan/90 leading-6">
                                                 <span className="text-wuxia-gold/80 mr-2">长期效果</span>
                                                 {t.效果}
@@ -1099,6 +1126,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                                 </span>
                                             </div>
                                             <div className="mt-2 text-xs text-gray-400 leading-5">{q.描述}</div>
+                                            <时代标签 时代适配={q.时代适配} />
                                             {q.效果.length > 0 && (
                                                 <div className="mt-3 rounded-lg border border-white/8 bg-black/30 px-3 py-2 text-xs text-wuxia-cyan/90 leading-5">
                                                     {q.效果[0].描述 || q.效果[0].类型}
