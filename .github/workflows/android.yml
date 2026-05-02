@@ -38,9 +38,7 @@ jobs:
           VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
 
       - name: Setup Capacitor
-        run: npx cap sync android
-        env:
-          CI: true
+        run: npx @capacitor/cli sync android
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
