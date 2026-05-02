@@ -205,8 +205,14 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
 
     const 当前时代背景 = useMemo(() => 获取时代背景(worldConfig.时代配置ID), [worldConfig.时代配置ID]);
 
-    const 匹配时代 = (item: { 时代适配?: string[] }) =>
-        !item.时代适配 || item.时代适配.length === 0 || (当前时代背景 && item.时代适配.includes(当前时代背景));
+    const 匹配时代 = (item: { 时代适配?: string[], 子纪元适配?: string[] }) => {
+        // 子纪元精确匹配优先
+        if (item.子纪元适配 && item.子纪元适配.length > 0) {
+            return item.子纪元适配.includes(worldConfig.时代配置ID || '');
+        }
+        // 回退到时代大类匹配
+        return !item.时代适配 || item.时代适配.length === 0 || (当前时代背景 && item.时代适配.includes(当前时代背景));
+    };
 
     const 全部背景选项 = useMemo(() => {
         const combined = [...预设背景, ...自定义背景列表.filter(item => !预设背景.some(p => p.名称 === item.名称))];
