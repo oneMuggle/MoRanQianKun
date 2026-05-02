@@ -5,7 +5,7 @@ import { randomQiyun, 气运数据, 气运数据列表 } from '../../../data/qiy
 import { 预设天赋, 预设背景 } from '../../../data/presets';
 import { resolveEraNode } from '../../../models/eraTheme';
 import { 开局预设方案结构 } from '../../../data/newGamePresets';
-import { 获取子纪元默认预设, 子纪元默认预设结构 } from '../../../data/subEraDefaultPresets';
+import { 获取子纪元默认预设, 获取子纪元默认预设列表, 子纪元默认预设结构 } from '../../../data/subEraDefaultPresets';
 import { OpeningConfig, WorldGenConfig, 小说拆分数据集结构, 角色数据结构, 天赋结构, 背景结构, 游戏难度 } from '../../../types';
 import { 合并去重开局预设方案, 标准化开局预设方案, 生成自定义开局预设ID, 自定义开局预设存储键 } from '../../../utils/customNewGamePresets';
 import {
@@ -216,6 +216,10 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
 
     const 当前子纪元默认预设 = useMemo((): 子纪元默认预设结构 | undefined => {
         return 获取子纪元默认预设(worldConfig.时代配置ID || '');
+    }, [worldConfig.时代配置ID]);
+
+    const 当前子纪元默认预设列表 = useMemo((): 子纪元默认预设结构[] => {
+        return 获取子纪元默认预设列表(worldConfig.时代配置ID || '');
     }, [worldConfig.时代配置ID]);
 
     const 应用子纪元默认预设 = (preset: 子纪元默认预设结构) => {
@@ -968,7 +972,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         STEPS, monthOptions, dayOptions,
         全部背景选项, 全部天赋选项, 全部气运选项,
         过滤后背景选项, 过滤后天赋选项, 过滤后气运选项,
-        当前子纪元默认预设,
+        当前子纪元默认预设, 当前子纪元默认预设列表,
         当前性别模式,
         totalStatBudget, usedPoints, remainingPoints,
         stepProgress, currentStepLabel, selectedTalentNames,
