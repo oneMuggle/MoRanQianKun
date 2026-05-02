@@ -276,7 +276,12 @@ export const 子纪元默认预设列表: 子纪元默认预设结构[] = [
     },
 ];
 
-/** 根据 SubEra ID 查找默认预设 */
+/** 根据 SubEra ID 查找所有匹配的默认预设（同一子纪元可有多个预设） */
+export const 获取子纪元默认预设列表 = (subEraId: string): 子纪元默认预设结构[] => {
+    return 子纪元默认预设列表.filter((p) => p.子纪元ID === subEraId);
+};
+
+/** 根据 SubEra ID 查找默认预设（返回第一个匹配项，兼容旧接口） */
 export const 获取子纪元默认预设 = (subEraId: string): 子纪元默认预设结构 | undefined => {
-    return 子纪元默认预设列表.find((p) => p.子纪元ID === subEraId);
+    return 获取子纪元默认预设列表(subEraId)[0];
 };
