@@ -38,6 +38,8 @@ jobs:
 
       - name: Sync Capacitor
         run: node node_modules/@capacitor/cli/bin/capacitor sync android
+        env:
+          CI: true
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
