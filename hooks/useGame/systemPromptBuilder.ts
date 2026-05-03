@@ -332,6 +332,7 @@ export const 构建系统提示词 = ({
     builtinPromptEntries,
     worldbooks,
     worldEvolutionEnabled,
+    deviceMessages,
     options
 }: 系统提示词构建参数): 系统提示词构建结果 => {
     const 构建环境状态文本 = (payload: any) => {
