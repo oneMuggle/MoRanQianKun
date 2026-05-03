@@ -18,6 +18,7 @@ export const EraPreviewCard: React.FC<Props> = ({
     era,
     subEra,
 }) => {
+    const { assets } = useEraAssets(subEra.id);
     const bgmTags = subEra.bgmTags || era.bgmTags || epoch.bgmTags || [];
     const artStyle = subEra.artStyle || era.artStyle || epoch.artStyle || '待配置';
     const description = subEra.description || era.description || epoch.description || '';
@@ -40,13 +41,22 @@ export const EraPreviewCard: React.FC<Props> = ({
                 </p>
             </div>
 
-            {/* 预览图占位 */}
+            {/* 预览图 */}
             <div className="relative aspect-[16/9] bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg md:rounded-xl border border-gray-700/50 overflow-hidden">
-                {/* 动态背景 */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${cfg.bg} flex flex-col items-center justify-center`}>
-                    <span className="text-6xl">{icon}</span>
-                    <span className="text-gray-500 text-sm mt-3">素材占位 - {artStyle}</span>
-                </div>
+                {/* 真实时代素材背景 */}
+                {assets?.images?.[0] ? (
+                    <img
+                        src={assets.images[0]}
+                        alt={subEra.name}
+                        className="absolute inset-0 w-full h-full object-cover opacity-80"
+                    />
+                ) : (
+                    /* 动态背景（无素材时） */
+                    <div className={`absolute inset-0 bg-gradient-to-br ${cfg.bg} flex flex-col items-center justify-center`}>
+                        <span className="text-6xl">{icon}</span>
+                        <span className="text-gray-500 text-sm mt-3">素材占位 - {artStyle}</span>
+                    </div>
+                )}
 
                 {/* BGM 标签 */}
                 <div className="absolute bottom-4 left-4 flex gap-2 flex-wrap">
