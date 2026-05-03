@@ -87,7 +87,7 @@
 | 战斗 | `sfx_combat_hit`(4.3KB)、`sfx_combat_block`(3.5KB)、`sfx_combat_dodge`(6.5KB)、`sfx_sword_swing`(8.7KB)、`sfx_victory`(51.7KB)、`sfx_defeat`(56.0KB)、`sfx_miss`(8.7KB) |
 | 系统 | `sfx_level_up`(34.5KB)、`sfx_buff_apply`(25.9KB)、`sfx_debuff`(20.3KB)、`sfx_coin`(15.1KB)、`sfx_door_open`(17.3KB) |
 
-### 2.5 时代场景素材（R2 CDN，7 时代已完成 ✅）
+### 2.5 时代场景素材（R2 CDN，16 时代已完成 ✅）
 
 CDN 路径：`https://mrqk.cc.cd/data/era_assets/{eraId}/manifest.json`
 
@@ -100,8 +100,15 @@ CDN 路径：`https://mrqk.cc.cd/data/era_assets/{eraId}/manifest.json`
 | 西方·罗马 `ancient_western_roman` | ✅ | 6 张 | ✅ |
 | 西方·中世纪 `ancient_western_medieval` | ✅ | 6 张 | ✅ |
 | 当代·都市 `contemporary_urban` | ✅ | 6 张 | ✅ |
+| 文艺复兴 `renaissance` | ✅ | 6 张 | ✅ |
+| 魔幻文艺复兴 `fantasy_renaissance` | ✅ | 6 张 | ✅ |
+| 校园模拟 `school_sim` | ✅ | 6 张 | ✅ |
+| 赛博朋克 `cyberpunk` | ✅ | 6 张 | ✅ |
+| 太空科幻 `space_scifi` | ✅ | 6 张 | ✅ |
+| 后人类 `post_human` | ✅ | 6 张 | ✅ |
+| 远古时代 `ancient_prehistoric` | ✅ | 6 张 | ✅ |
 
-**统计：** 7 × 6 = 42 张场景图 + 7 首时代 BGM
+**统计：** 16 × 6 = 96 张场景图 + 16 首时代 BGM
 
 ### 2.6 R2 CDN 图标图片（14 张）
 
