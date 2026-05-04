@@ -2,7 +2,7 @@
 
 > 创建日期：2026-05-04
 > 最后更新：2026-05-04 (v1.4 - 校园祭 NSFW 深化)
-> 状态：实施中（Phase 1-4 已完成）
+> 状态：实施中（Phase 1-4 已完成，Phase 5 集成中）
 
 ---
 
@@ -2293,8 +2293,14 @@ export interface 校园系统数据 {
 - **风险**: Medium
 
 #### Step 10: 扩展社交面板 [x]
-- **文件**: `components/features/SocialModal.tsx` (修改)
-- **内容**: NPC 卡片新增欲望阶段标识、关系时间线入口
+- **文件**: `components/features/Social/SocialModal.tsx` (修改)
+- **文件**: `components/features/Social/MobileSocial.tsx` (修改)
+- **文件**: `App.tsx` (修改)
+- **内容**:
+  - NPC 列表卡片新增欲望阶段颜色标识（克制/试探/渴望/沉沦/支配 五色区分）
+  - NPC 详情 header 区域新增欲望阶段+关系轨道 inline badge
+  - 主要角色且有欲望档案时，显示"欲望档案"按钮，点击打开 CampusDesireDashboard
+  - App.tsx 注入 `欲望系统` 和 `onOpenCampusDesire` props 到 Social 模态框
 - **风险**: Medium
 
 #### Step 11: 扩展设置面板 [x]
