@@ -1595,6 +1595,7 @@ export const useGame = () => {
                 开局配置,
                 校规系统,
                 催眠系统,
+                校园系统,
                 loading,
                 gameConfig,
                 apiConfig,

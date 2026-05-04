@@ -10,11 +10,16 @@ interface Props {
     socialList: NPC结构[];
     cultivationSystemEnabled?: boolean;
     onClose: () => void;
-    playerName?: string; // Add playerName prop to check for first time taker
+    playerName?: string;
     nsfwEnabled?: boolean;
     onToggleMajorRole?: (npcId: string, nextIsMajor: boolean) => void;
     onTogglePresence?: (npcId: string, nextIsPresent: boolean) => void;
     onDeleteNpc?: (npcId: string) => void;
+    欲望系统?: {
+        NPC欲望档案?: Record<string, { 当前阶段: string; 关系轨道?: string; 暴露风险值?: number; 流言等级?: number }>;
+        后果列表?: Array<{ 类型: string; 描述: string }>;
+    };
+    onOpenCampusDesire?: () => void;
 }
 
 const MobileSocial: React.FC<Props> = ({
@@ -25,7 +30,9 @@ const MobileSocial: React.FC<Props> = ({
     nsfwEnabled = false,
     onToggleMajorRole,
     onTogglePresence,
-    onDeleteNpc
+    onDeleteNpc,
+    欲望系统,
+    onOpenCampusDesire
 }) => {
     const [selectedId, setSelectedId] = useState<string | null>(
         socialList.length > 0 ? socialList[0].id : null
@@ -34,6 +41,20 @@ const MobileSocial: React.FC<Props> = ({
     const [香闺展示模式, set香闺展示模式] = useState<Record<string, 'text' | 'image'>>({});
     const [showFullBackground, setShowFullBackground] = useState<boolean>(false);
     const [imageViewer, setImageViewer] = useState<{ src: string; alt: string } | null>(null);
+
+    const 获取欲望阶段颜色 = (npcId: string): { bg: string; text: string; label: string } => {
+        const 档案 = 欲望系统?.NPC欲望档案?.[npcId];
+        if (!档案) return { bg: '', text: '', label: '' };
+        const 颜色映射: Record<string, { bg: string; text: string }> = {
+            '克制': { bg: 'bg-slate-600/30', text: 'text-slate-300' },
+            '试探': { bg: 'bg-blue-600/30', text: 'text-blue-300' },
+            '渴望': { bg: 'bg-amber-600/30', text: 'text-amber-300' },
+            '沉沦': { bg: 'bg-red-600/30', text: 'text-red-300' },
+            '支配': { bg: 'bg-purple-600/30', text: 'text-purple-300' },
+        };
+        const c = 颜色映射[档案.当前阶段] ?? 颜色映射['克制'];
+        return { ...c, label: 档案.当前阶段 };
+    };
 
     useEffect(() => {
         if (socialList.length === 0) {
@@ -320,6 +341,12 @@ const MobileSocial: React.FC<Props> = ({
                                             <span className="absolute -top-[18px] -left-[9px] text-[7px] font-bold text-black rotate-45 transform origin-center font-serif leading-none shadow-sm">主</span>
                                         </div>
                                     )}
+                                    {(() => {
+                                        const desire = 获取欲望阶段颜色(npc.id);
+                                        return desire.label ? (
+                                            <div className={`absolute bottom-0 right-0 text-[7px] ${desire.text} ${desire.bg} px-1 rounded-tl border-l border-t border-white/10 font-bold`}>{desire.label}</div>
+                                        ) : null;
+                                    })()}
                                 </button>
                             ))}
                             {socialList.length === 0 && (
@@ -460,6 +487,28 @@ const MobileSocial: React.FC<Props> = ({
                                                 >
                                                     忘却此人
                                                 </button>
+                                                {currentNPC.是否主要角色 && 欲望系统?.NPC欲望档案?.[currentNPC.id] && onOpenCampusDesire && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={onOpenCampusDesire}
+                                                        className="inline-flex items-center gap-1 px-2 py-1 rounded border border-pink-900/40 text-pink-300/80 active:bg-pink-500/10 active:border-pink-500/30 active:text-pink-400 transition-all text-[9px]"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-2.5 h-2.5">
+                                                            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                                                        </svg>
+                                                        欲望档案
+                                                    </button>
+                                                )}
+                                                {(() => {
+                                                    const desire = 获取欲望阶段颜色(currentNPC.id);
+                                                    if (!desire.label) return null;
+                                                    const 关系轨道 = 欲望系统?.NPC欲望档案?.[currentNPC.id]?.关系轨道;
+                                                    return (
+                                                        <span className={`text-[9px] ${desire.bg} border border-white/10 px-1.5 py-0.5 rounded ${desire.text}`}>
+                                                            {desire.label}{关系轨道 ? ` · ${关系轨道}` : ''}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </div>
                                         </div>
                                     </div>

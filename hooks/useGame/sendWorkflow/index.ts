@@ -139,8 +139,51 @@ type 主剧情发送当前状态 = {
     设备状态?: { messages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }> };
     校规系统?: { 校规列表: any[]; 影响日志: any[] };
     催眠系统?: { 催眠记录列表: any[]; app等级: any; 累计使用次数: number };
-    校园系统?: { 欲望系统?: { NPC欲望档案?: Record<string, any>; 后果列表?: any[]; 里程碑列表?: any[]; 桌游状态?: any; 校园祭状态?: any } };
+    校园系统?: { 欲望系统?: { NPC欲望档案?: Record<string, any>; 后果列表?: any[]; 里程碑列表?: any[]; SM场景池?: any[]; 桌游状态?: any; 校园祭状态?: any } };
 };
+
+/** 从当前状态提取校园NSFW运行时参数 */
+function 构建校园NSFW参数(state: 主剧情发送当前状态) {
+    const 欲望系统 = state.校园系统?.欲望系统;
+    if (!欲望系统) return undefined;
+
+    // 取第一个有欲望档案的NPC作为当前焦点（后续可扩展为按上下文选择）
+    const npcIds = Object.keys(欲望系统.NPC欲望档案 || {});
+    if (npcIds.length === 0) return undefined;
+
+    // 取欲望阶段最高的NPC
+    const 阶段权重: Record<string, number> = { '克制': 0, '试探': 1, '渴望': 2, '沉沦': 3, '支配': 4 };
+    const 焦点NpcId = npcIds.reduce((best, id) => {
+        const a = 欲望系统.NPC欲望档案![id];
+        const b = 欲望系统.NPC欲望档案![best];
+        return (阶段权重[a?.当前阶段] || 0) > (阶段权重[b?.当前阶段] || 0) ? id : best;
+    });
+
+    const 焦点档案 = 欲望系统.NPC欲望档案?.[焦点NpcId];
+    if (!焦点档案) return undefined;
+
+    const 校园祭状态 = 欲望系统.校园祭状态;
+    const 桌游状态 = 欲望系统.桌游状态;
+
+    return {
+        欲望阶段: 焦点档案.当前阶段,
+        关系轨道: 焦点档案.关系轨道,
+        暴露风险: 焦点档案.暴露风险值,
+        流言等级: 焦点档案.流言等级,
+        露出偏好等级: 焦点档案.露出状态?.当前等级,
+        紧张度: 焦点档案.紧张度状态?.当前值,
+        权力倾向: 焦点档案.权力倾向,
+        服从度: 焦点档案.服从度?.当前值,
+        已解锁SM场景: 欲望系统.SM场景池?.map((r: any) => r.类型),
+        校园祭阶段: 校园祭状态?.阶段,
+        校园祭主题: 校园祭状态?.主题,
+        摊位类型: 校园祭状态?.班级摊位,
+        后夜祭状态: 校园祭状态?.后夜祭状态,
+        桌游类型: 桌游状态?.桌游类型,
+        密室主题: (桌游状态?.当前桌游 as any)?.当前主题,
+        内容强度: state.gameConfig?.校园NSFW设置?.NSFW内容强度,
+    };
+}
 
 // ─── 主剧情发送依赖 ─────────────────────────────────────────────────────────
 
@@ -503,7 +546,8 @@ export const 执行主剧情发送工作流 = async (
             ),
             playerRole: currentState.角色,
             builtinPromptEntries: currentState.内置提示词列表,
-            worldbooks: currentState.世界书列表
+            worldbooks: currentState.世界书列表,
+            校园NSFW参数: 构建校园NSFW参数(currentState)
         });
         const inputTokens = deps.估算消息Token(orderedMessages, activeApi?.model);
 

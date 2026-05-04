@@ -1502,6 +1502,8 @@ const App: React.FC = () => {
                                     onToggleMajorRole={actions.updateNpcMajorRole}
                                     onTogglePresence={actions.updateNpcPresence}
                                     onDeleteNpc={actions.removeNpc}
+                                    欲望系统={(state as any).校园系统?.欲望系统}
+                                    onOpenCampusDesire={() => setShowCampusDesire(true)}
                                 />
                             ) : (
                                 <SocialModal
@@ -1513,6 +1515,8 @@ const App: React.FC = () => {
                                     onToggleMajorRole={actions.updateNpcMajorRole}
                                     onTogglePresence={actions.updateNpcPresence}
                                     onDeleteNpc={actions.removeNpc}
+                                    欲望系统={(state as any).校园系统?.欲望系统}
+                                    onOpenCampusDesire={() => setShowCampusDesire(true)}
                                 />
                             )}
                         </懒加载边界>
