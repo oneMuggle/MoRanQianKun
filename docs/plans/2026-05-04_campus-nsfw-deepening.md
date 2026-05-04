@@ -2317,11 +2317,16 @@ export interface 校园系统数据 {
 
 ### Phase 5: 核心游戏循环集成
 
-#### Step 13: 将 NSFW 引擎集成到核心游戏循环
+#### Step 13: 将 NSFW 引擎集成到核心游戏循环 [x]
 - 新游戏 -> NPC 互动 -> 欲望推进 -> 首次亲密 -> 后果判定
 - 多 NPC 并行 -> 多角冲突 -> 选择处理 -> 轨道变化
 - 存档/读档 -> 状态恢复 -> 里程碑保留
 - 设置变更 -> 内容强度切换 -> AI 生成适配
+- **Bug Fix**: `时代配置ID` 传播链修复 — 原 `时代配置ID` 未传入 prompt 构建链，导致校园 NSFW 约束在 `nsfw.ts` 的 guard 中被拦截
+  - `hooks/useGame.ts` — 添加 `时代配置ID: currentEra` 到 sendWorkflow 和 contextSnapshot 调用
+  - `hooks/useGame/sendWorkflow/index.ts` — 添加 `时代配置ID` 到状态类型和传递
+  - `hooks/useGame/mainStoryRequest.ts` — 添加 `时代配置ID` 参数并传入 `构建运行时额外提示词`
+  - `hooks/useGame/contextSnapshot.ts` — 添加 `时代配置ID` 到参数类型和传递
 
 #### Step 14: 存档兼容性处理
 - **文件**: `services/dbService.ts` (修改)

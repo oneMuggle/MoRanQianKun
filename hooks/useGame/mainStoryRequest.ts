@@ -127,6 +127,7 @@ export const 构建主剧情请求参数 = (
         playerRole?: 角色数据结构;
         builtinPromptEntries?: 内置提示词条目结构[];
         worldbooks?: 世界书结构[];
+        时代配置ID?: string;
         校园NSFW参数?: {
             欲望阶段?: 欲望阶段;
             关系轨道?: 关系轨道;
@@ -180,9 +181,9 @@ export const 构建主剧情请求参数 = (
         )
         : '';
     const normalizedRuntimeExtraPrompt = !tavernPresetModeEnabled
-        ? 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 校园NSFW参数: params.校园NSFW参数 })
+        ? 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 时代配置ID: params.时代配置ID, 校园NSFW参数: params.校园NSFW参数 })
         : '';
-    const tavernRuntimeExtraPrompt = 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 校园NSFW参数: params.校园NSFW参数 });
+    const tavernRuntimeExtraPrompt = 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 时代配置ID: params.时代配置ID, 校园NSFW参数: params.校园NSFW参数 });
     const recallScriptAppend = params.recallTag ? `\n\n【剧情回忆】\n${params.recallTag}` : '';
     const scriptSectionText = `【即时剧情回顾】\n${formatHistoryToScript(params.updatedContextHistory) || '暂无'}${recallScriptAppend}`;
     const latestUserInputAsModel = [
