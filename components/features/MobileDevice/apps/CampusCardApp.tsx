@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { DeviceMode, MobileApp, DeviceGameContext } from '../../../../models/mobileDevice';
 import { getDeviceConfig, getAppName } from '../../../../models/eraDevice';
+import type { 消费记录 } from '../../../../models/campusPhone';
 
 interface AppProps {
     eraId: string;
@@ -15,22 +16,22 @@ const CampusCardApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCon
     const appName = config ? getAppName(config, appId, mode) : '校园卡';
 
     const balance = useMemo(() => {
-        const 金钱 = gameContext?.角色?.金钱;
-        if (!金钱) return 500;
-        return (金钱.金元宝 || 0) * 100 + (金钱.银子 || 0) * 10 + (金钱.铜钱 || 0) || 500;
-    }, [gameContext?.角色?.金钱]);
+        const systemCard = gameContext?.校园系统?.校园卡;
+        if (systemCard && typeof systemCard.余额 === 'number') return systemCard.余额;
 
-    const 消费记录 = useMemo(() => {
-        const types = ['食堂', '超市', '图书馆', '打印店', '其他'] as const;
-        const locations = ['第一食堂', '校园超市', '图书馆咖啡厅', '东门打印店', '快递站'] as const;
-        const records = Array.from({ length: 8 }, (_, idx) => ({
-            time: `${idx + 1}天前`,
-            location: locations[idx % locations.length],
-            amount: Math.floor(Math.random() * 30) + 5,
-            type: types[idx % types.length],
-        }));
-        return records;
-    }, []);
+        const 金钱 = gameContext?.角色?.金钱;
+        if (!金钱) return 0;
+        const 金元宝 = typeof 金钱.金元宝 === 'number' ? 金钱.金元宝 : 0;
+        const 银子 = typeof 金钱.银子 === 'number' ? 金钱.银子 : 0;
+        const 铜钱 = typeof 金钱.铜钱 === 'number' ? 金钱.铜钱 : 0;
+        return 金元宝 + 银子 + 铜钱;
+    }, [gameContext?.校园系统?.校园卡?.余额, gameContext?.角色?.金钱]);
+
+    const records: 消费记录[] = useMemo(() => {
+        const systemRecords = gameContext?.校园系统?.校园卡?.消费记录;
+        if (systemRecords && systemRecords.length > 0) return systemRecords;
+        return [];
+    }, [gameContext?.校园系统?.校园卡?.消费记录]);
 
     return (
         <div className="flex flex-col h-full">
@@ -48,17 +49,21 @@ const CampusCardApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCon
                 </div>
                 <div className="px-4 mt-6">
                     <h4 className="text-xs font-semibold text-gray-400 mb-3">近期消费</h4>
-                    <ul className="space-y-2">
-                        {消费记录.map((record, idx) => (
-                            <li key={idx} className="flex items-center justify-between py-2 border-b border-gray-800/30">
-                                <div className="flex-1">
-                                    <div className="text-sm text-white">{record.location}</div>
-                                    <div className="text-[10px] text-gray-500">{record.time} &middot; {record.type}</div>
-                                </div>
-                                <span className="text-sm text-red-400 font-medium">-&yen;{record.amount}</span>
-                            </li>
-                        ))}
-                    </ul>
+                    {records.length > 0 ? (
+                        <ul className="space-y-2">
+                            {records.map((record, idx) => (
+                                <li key={idx} className="flex items-center justify-between py-2 border-b border-gray-800/30">
+                                    <div className="flex-1">
+                                        <div className="text-sm text-white">{record.地点}</div>
+                                        <div className="text-[10px] text-gray-500">{record.时间} &middot; {record.类型}</div>
+                                    </div>
+                                    <span className="text-sm text-red-400 font-medium">-&yen;{record.金额}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-sm text-gray-500 text-center py-8">暂无消费记录</p>
+                    )}
                 </div>
             </div>
         </div>

@@ -283,3 +283,103 @@ export async function 生成设备联系人(
         lastContact: Date.now(),
     }));
 }
+
+// ============================================================
+// 校园内容解析辅助函数
+// ============================================================
+
+import type { 论坛帖子, 论坛分类, 聊天消息, 课程, 消费记录, 社团活动 } from '../../models/campusPhone';
+
+const 取文本 = (v: unknown, fallback = ''): string =>
+    typeof v === 'string' ? v : fallback;
+
+const 取数值 = (v: unknown, fallback = 0): number =>
+    typeof v === 'number' && Number.isFinite(v) ? v : fallback;
+
+export function 解析AI论坛帖子(rawItems: unknown[]): 论坛帖子[] {
+    return rawItems.map((item, idx) => {
+        const obj = item as Record<string, unknown>;
+        const replyList = (obj.replyList as unknown[]) || [];
+        return {
+            id: `ai-forum-${Date.now()}-${idx}`,
+            作者: 取文本(obj.author, '匿名'),
+            标题: 取文本(obj.title, '未命名帖子'),
+            内容: 取文本(obj.content, ''),
+            分类: (取文本(obj.category, '校园资讯') as 论坛分类) || '校园资讯',
+            发布时间: 取文本(obj.time, '近日'),
+            回复数: 取数值(obj.replies, 0),
+            浏览数: 取数值(obj.views, 0),
+            点赞数: 取数值(obj.likes, 0),
+            是否置顶: false,
+            是否精华: false,
+            回复列表: replyList.slice(0, 5).map((r, ri) => {
+                const robj = r as Record<string, unknown>;
+                return {
+                    id: `reply-${idx}-${ri}`,
+                    作者: 取文本(robj.author, '路人'),
+                    内容: 取文本(robj.content, ''),
+                    回复时间: 取文本(robj.time, '近日'),
+                    楼层: ri + 1,
+                };
+            }),
+        };
+    });
+}
+
+export function 解析AI私聊消息(rawItems: unknown[], npc姓名: string): 聊天消息[] {
+    return rawItems.map((item, idx) => {
+        const obj = item as Record<string, unknown>;
+        const sender = 取文本(obj.sender, npc姓名);
+        return {
+            id: `ai-chat-${Date.now()}-${idx}`,
+            发送者: sender,
+            内容: 取文本(obj.content, ''),
+            时间: 取文本(obj.time, '近日'),
+            是否已读: false,
+        };
+    });
+}
+
+export function 解析AI课程表(rawItems: unknown[]): Record<string, 课程[]> {
+    const result: Record<string, 课程[]> = {};
+    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    rawItems.forEach((item) => {
+        const obj = item as Record<string, unknown>;
+        const day = 取文本(obj.day, days[Math.floor(Math.random() * 5)]);
+        if (!result[day]) result[day] = [];
+        result[day].push({
+            名称: 取文本(obj.name, '未知课程'),
+            地点: 取文本(obj.location, '待定'),
+            教师: 取文本(obj.teacher, '未知'),
+            时间段: 取文本(obj.time, '待定'),
+        });
+    });
+    return result;
+}
+
+export function 解析AI消费记录(rawItems: unknown[]): 消费记录[] {
+    return rawItems.map((item) => {
+        const obj = item as Record<string, unknown>;
+        return {
+            时间: 取文本(obj.time, '近日'),
+            地点: 取文本(obj.location, '未知'),
+            金额: 取数值(obj.amount, 0),
+            类型: (取文本(obj.type, '其他') as 消费记录['类型']) || '其他',
+        };
+    });
+}
+
+export function 解析AI社团活动(rawItems: unknown[]): 社团活动[] {
+    return rawItems.map((item, idx) => {
+        const obj = item as Record<string, unknown>;
+        return {
+            id: `ai-club-${Date.now()}-${idx}`,
+            社团名称: 取文本(obj.organizer, obj.name as string) || '未知社团',
+            活动名称: 取文本(obj.name, obj.activityName as string) || '未命名活动',
+            时间: 取文本(obj.time, '待定'),
+            地点: 取文本(obj.location, '待定'),
+            描述: 取文本(obj.description, ''),
+            参与人数: 取数值(obj.participants, 0),
+        };
+    });
+}

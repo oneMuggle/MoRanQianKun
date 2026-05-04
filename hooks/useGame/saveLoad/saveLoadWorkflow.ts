@@ -19,7 +19,7 @@ import type {
     提示词结构,
     时代信息结构
 } from '../../../types';
-import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../models/campusPhone';
+import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级, 校园系统数据 } from '../../../models/campusPhone';
 import { 执行手动存档, 执行自动存档, 执行读取存档 } from '../saveCoordinator';
 import type { 自动存档快照结构 } from '../saveCoordinator';
 
@@ -54,8 +54,10 @@ type 存档编排工作流依赖 = {
     获取当前时代信息: () => 时代信息结构 | undefined;
     校规系统?: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] };
     催眠系统?: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number };
+    校园系统?: 校园系统数据;
     设置校规系统: (value: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     设置催眠系统: (value: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
+    设置校园系统: (value: 校园系统数据) => void;
     规范化环境信息: (envLike?: any) => 环境信息结构;
     构建完整地点文本: (envLike?: any) => string;
     规范化世界状态: (raw?: any) => 世界数据结构;
@@ -145,7 +147,8 @@ export const 创建存读档工作流 = (deps: 存档编排工作流依赖) => {
         当前角色锚点ID: deps.获取当前角色锚点ID(),
         时代信息: deps.获取当前时代信息(),
         校规系统: deps.校规系统,
-        催眠系统: deps.催眠系统
+        催眠系统: deps.催眠系统,
+        校园系统: deps.校园系统
     });
 
     const 构建协调依赖 = () => ({
@@ -188,6 +191,7 @@ export const 创建存读档工作流 = (deps: 存档编排工作流依赖) => {
         设置时代信息: deps.设置时代信息,
         设置校规系统: deps.设置校规系统,
         设置催眠系统: deps.设置催眠系统,
+        设置校园系统: deps.设置校园系统,
         setView: deps.setView,
         setShowSaveLoad: deps.setShowSaveLoad,
         设置最近开局配置: deps.设置最近开局配置,

@@ -12,6 +12,8 @@ interface MobileDeviceModalProps {
     gameContext?: DeviceGameContext;
     onRulesChange?: (updater: (prev: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     onHypnosisChange?: (updater: (prev: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
+    onRefresh?: () => void;
+    onSendMessage?: (npcId: string, npcName: string, content: string) => void;
 }
 
 const MobileDeviceModal: React.FC<MobileDeviceModalProps> = ({
@@ -23,6 +25,8 @@ const MobileDeviceModal: React.FC<MobileDeviceModalProps> = ({
     gameContext,
     onRulesChange,
     onHypnosisChange,
+    onRefresh,
+    onSendMessage,
 }) => {
     return (
         <div
@@ -42,6 +46,8 @@ const MobileDeviceModal: React.FC<MobileDeviceModalProps> = ({
                     gameContext={gameContext}
                     onRulesChange={onRulesChange}
                     onHypnosisChange={onHypnosisChange}
+                    onRefresh={onRefresh}
+                    onSendMessage={onSendMessage}
                 />
             </div>
         </div>

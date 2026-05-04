@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { DeviceMode, MobileApp, DeviceGameContext } from '../../../../models/mobileDevice';
 import { getDeviceConfig, getAppName } from '../../../../models/eraDevice';
+import type { 社团活动 } from '../../../../models/campusPhone';
 
 interface AppProps {
     eraId: string;
@@ -14,40 +15,11 @@ const CampusClubApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCon
     const config = getDeviceConfig(eraId);
     const appName = config ? getAppName(config, appId, mode) : '社团活动';
 
-    const activities = useMemo(() => {
-        const result: Array<{
-            id: string; clubName: string; activityName: string;
-            time: string; location: string; description: string; participants: number;
-        }> = [];
-
-        const 世界 = gameContext?.世界;
-        if (世界?.进行中事件) {
-            世界.进行中事件.slice(0, 6).forEach((event, idx) => {
-                result.push({
-                    id: `club-${idx}`,
-                    clubName: event.关联人物?.[0] || '学生会',
-                    activityName: event.事件名,
-                    time: event.开始时间 || '本周末',
-                    location: event.关联地点?.[0] || '活动中心',
-                    description: event.事件说明,
-                    participants: Math.floor(Math.random() * 100) + 10,
-                });
-            });
-        }
-
-        const 模板活动 = [
-            { clubName: '文学社', activityName: '读书分享会', time: '周五 19:00', location: '图书馆报告厅', description: '本月共读《百年孤独》，欢迎参加讨论。', participants: 45 },
-            { clubName: '动漫社', activityName: '新番观影夜', time: '周六 20:00', location: '活动中心A101', description: '集体观看本季热门新番，提供零食饮料。', participants: 60 },
-            { clubName: '街舞社', activityName: '街舞交流会', time: '周日 15:00', location: '体育馆舞蹈室', description: '新老社员交流，零基础也可参加。', participants: 30 },
-            { clubName: '摄影社', activityName: '校园采风', time: '周六 09:00', location: '校门口集合', description: '春季校园摄影活动，设备自备。', participants: 25 },
-        ];
-
-        模板活动.forEach((a, idx) => {
-            result.push({ id: `template-${idx}`, ...a });
-        });
-
-        return result;
-    }, [gameContext?.世界]);
+    const activities: 社团活动[] = useMemo(() => {
+        const systemActivities = gameContext?.校园系统?.社团活动列表;
+        if (systemActivities && systemActivities.length > 0) return systemActivities;
+        return [];
+    }, [gameContext?.校园系统?.社团活动列表]);
 
     return (
         <div className="flex flex-col h-full">
@@ -62,15 +34,15 @@ const CampusClubApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCon
                             <div key={activity.id} className="rounded-lg bg-gray-800/40 border border-gray-700/30 p-3 hover:bg-gray-800/60 transition-colors">
                                 <div className="flex items-start justify-between mb-2">
                                     <div className="flex-1">
-                                        <span className="text-[10px] text-purple-400/60 bg-purple-400/10 px-1.5 py-0.5 rounded">{activity.clubName}</span>
-                                        <h4 className="text-sm text-white font-medium mt-1">{activity.activityName}</h4>
+                                        <span className="text-[10px] text-purple-400/60 bg-purple-400/10 px-1.5 py-0.5 rounded">{activity.社团名称}</span>
+                                        <h4 className="text-sm text-white font-medium mt-1">{activity.活动名称}</h4>
                                     </div>
-                                    <span className="text-[10px] text-gray-500 ml-2">{activity.participants}人参与</span>
+                                    <span className="text-[10px] text-gray-500 ml-2">{activity.参与人数}人参与</span>
                                 </div>
-                                <p className="text-xs text-gray-400 mb-2">{activity.description}</p>
+                                <p className="text-xs text-gray-400 mb-2">{activity.描述}</p>
                                 <div className="flex items-center gap-4 text-[10px] text-gray-500">
-                                    <span>时间：{activity.time}</span>
-                                    <span>地点：{activity.location}</span>
+                                    <span>时间：{activity.时间}</span>
+                                    <span>地点：{activity.地点}</span>
                                 </div>
                             </div>
                         ))}

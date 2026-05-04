@@ -28,6 +28,8 @@ interface AppProps {
     // 校园系统回调（可选）
     onRulesChange?: (updater: (prev: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     onHypnosisChange?: (updater: (prev: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
+    onRefresh?: () => void;
+    onSendMessage?: (npcId: string, npcName: string, content: string) => void;
 }
 
 interface MobileHomeProps {
@@ -40,6 +42,8 @@ interface MobileHomeProps {
     // 校园系统回调
     onRulesChange?: (updater: (prev: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     onHypnosisChange?: (updater: (prev: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
+    onRefresh?: () => void;
+    onSendMessage?: (npcId: string, npcName: string, content: string) => void;
 }
 
 const appIcons: Record<MobileApp, string> = {
@@ -67,6 +71,8 @@ const MobileHome: React.FC<MobileHomeProps> = ({
     gameContext,
     onRulesChange,
     onHypnosisChange,
+    onRefresh,
+    onSendMessage,
 }) => {
     const [config, setConfig] = useState<DeviceConfig | null>(null);
     const [liModeName, setLiModeName] = useState<string | undefined>();
@@ -101,12 +107,14 @@ const MobileHome: React.FC<MobileHomeProps> = ({
             gameContext,
             onRulesChange,
             onHypnosisChange,
+            onRefresh,
+            onSendMessage,
         };
         switch (deviceState.activeApp) {
-            case 'chat': return <ChatApp {...appProps} />;
+            case 'chat': return <CampusChatApp {...appProps} />;
             case 'map': return <MapApp {...appProps} />;
             case 'contacts': return <ContactsApp {...appProps} />;
-            case 'forum': return <ForumApp {...appProps} />;
+            case 'forum': return <CampusForumApp {...appProps} />;
             case 'news': return <NewsApp {...appProps} />;
             case 'album': return <AlbumApp {...appProps} />;
             case 'tools': return <ToolsApp {...appProps} />;
