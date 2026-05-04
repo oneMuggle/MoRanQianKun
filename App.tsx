@@ -1720,6 +1720,7 @@ const App: React.FC = () => {
                                     历史记录: state.历史记录 || [],
                                     校规系统: (state as any).校规系统,
                                     催眠系统: (state as any).催眠系统,
+                                    校园系统: (state as any).校园系统,
                                 }}
                                 onRulesChange={(updater) => {
                                     const prev = (state as any).校规系统 || { 校规列表: [], 影响日志: [] };
@@ -1728,6 +1729,24 @@ const App: React.FC = () => {
                                 onHypnosisChange={(updater) => {
                                     const prev = (state as any).催眠系统 || { 催眠记录列表: [], app等级: { 当前等级: 1, 已使用次数: 0, 升级阈值: 5, 解锁能力: [] }, 累计使用次数: 0 };
                                     setters.set催眠系统?.(updater(prev));
+                                }}
+                                onRefresh={() => {
+                                    const activeApp = meta.deviceState.activeApp;
+                                    if (!activeApp) return;
+                                    const appPromptMap: Record<string, string> = {
+                                        forum: '/手机 刷新论坛内容',
+                                        chat: '/手机 刷新私聊消息',
+                                        schedule: '/手机 刷新课程表',
+                                        campus_card: '/手机 刷新校园卡消费记录',
+                                        club: '/手机 刷新社团活动',
+                                        confession: '/手机 刷新表白墙',
+                                        news: '/手机 刷新新闻',
+                                    };
+                                    const prompt = appPromptMap[activeApp] || '/手机 刷新设备内容';
+                                    actions.handleSend(prompt);
+                                }}
+                                onSendMessage={(npcId: string, npcName: string, content: string) => {
+                                    actions.handleSend(content);
                                 }}
                             />
                         </懒加载边界>

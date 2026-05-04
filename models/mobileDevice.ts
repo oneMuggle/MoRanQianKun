@@ -153,6 +153,7 @@ import type { 世界数据结构 } from './game/world';
 import type { 剧情系统结构 } from './game/story';
 import type { 角色数据结构 } from './domain/character';
 import type { 聊天记录结构, 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../types';
+import type { 校园系统数据 } from './campusPhone';
 
 export interface DeviceGameContext {
     角色: 角色数据结构 | null;
@@ -163,4 +164,5 @@ export interface DeviceGameContext {
     // 校园系统
     校规系统?: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] };
     催眠系统?: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number };
+    校园系统?: 校园系统数据;
 }

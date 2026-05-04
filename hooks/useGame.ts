@@ -318,7 +318,8 @@ export const useGame = () => {
 
         // Campus Systems
         校规系统, 设置校规系统,
-        催眠系统, 设置催眠系统
+        催眠系统, 设置催眠系统,
+        校园系统, 设置校园系统
     } = gameState;
 
     // Mobile Device
@@ -1812,6 +1813,7 @@ export const useGame = () => {
         设置时代信息: 应用时代信息到状态,
         设置校规系统: 设置校规系统,
         设置催眠系统: 设置催眠系统,
+        设置校园系统: 设置校园系统,
         setView,
         setShowSaveLoad,
         设置最近开局配置,
@@ -2123,7 +2125,8 @@ export const useGame = () => {
             setActiveTab, setCurrentTheme, setCurrentEra,
             setApiConfig, setVisualConfig, setImageManagerConfig, setPrompts,
             set校规系统: 设置校规系统,
-            set催眠系统: 设置催眠系统
+            set催眠系统: 设置催眠系统,
+            set校园系统: 设置校园系统
         },
         actions: {
             handleSend,

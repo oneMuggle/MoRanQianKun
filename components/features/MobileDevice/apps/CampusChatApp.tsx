@@ -8,14 +8,7 @@ interface AppProps {
     appId: MobileApp;
     onBack: () => void;
     gameContext?: DeviceGameContext;
-}
-
-interface ChatMessage {
-    id: string;
-    sender: string;
-    content: string;
-    time: string;
-    isMe: boolean;
+    onSendMessage?: (npcId: string, npcName: string, content: string) => void;
 }
 
 interface ChatSession {
@@ -28,29 +21,97 @@ interface ChatSession {
     messages: ChatMessage[];
 }
 
-const CampusChatApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext }) => {
+interface ChatMessage {
+    id: string;
+    sender: string;
+    content: string;
+    time: string;
+    isMe: boolean;
+}
+
+const 问候语模板: string[] = [
+    '最近还好吗？',
+    '好久不见，有空聊聊吗？',
+    '上次那件事后来怎么样了？',
+    '你好呀~',
+];
+
+const CampusChatApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext, onSendMessage }) => {
     const config = getDeviceConfig(eraId);
     const appName = config ? getAppName(config, appId, mode) : '私聊';
     const [activeSession, setActiveSession] = useState<ChatSession | null>(null);
+    const [inputText, setInputText] = useState('');
+
+    const 关系类型映射: Record<string, string> = {
+        '恋人': '恋人', '室友': '室友', '同学': '同学',
+        '师兄': '学长学姐', '师姐': '学长学姐',
+    };
 
     const sessions: ChatSession[] = useMemo(() => {
         if (!gameContext?.社交?.length) return [];
 
-        const 关系类型映射: Record<string, string> = {
-            '恋人': '恋人', '室友': '室友', '同学': '同学',
-            '师兄': '学长学姐', '师姐': '学长学姐',
-        };
+        return gameContext.社交.slice(0, 15).map((npc, idx) => {
+            const history = gameContext.历史记录 || [];
+            const 相关消息 = history
+                .filter(h => h.role === 'assistant' && typeof h.content === 'string')
+                .filter(h => h.content.includes(npc.姓名))
+                .slice(-5);
 
-        return gameContext.社交.slice(0, 15).map((npc, idx) => ({
-            id: `chat-${idx}`,
-            name: npc.姓名,
-            lastMessage: npc.简介?.slice(0, 20) || '暂无消息',
-            lastTime: '近日',
-            unread: Math.floor(Math.random() * 5),
-            relation: 关系类型映射[npc.关系状态] || '同学',
-            messages: [],
-        }));
-    }, [gameContext?.社交]);
+            const messages: ChatMessage[] = 相关消息.map((h, mi) => ({
+                id: `hist-${idx}-${mi}`,
+                sender: npc.姓名,
+                content: h.content.slice(0, 80),
+                time: '近日',
+                isMe: false,
+            }));
+
+            if (messages.length === 0) {
+                messages.push({
+                    id: `greet-${idx}`,
+                    sender: npc.姓名,
+                    content: npc.简介?.slice(0, 30) || 问候语模板[idx % 问候语模板.length],
+                    time: '近日',
+                    isMe: false,
+                });
+            }
+
+            const lastMsg = messages[messages.length - 1];
+            const 有未回复 = messages.some(m => !m.isMe);
+
+            return {
+                id: `chat-${idx}`,
+                name: npc.姓名,
+                lastMessage: lastMsg.content,
+                lastTime: lastMsg.time,
+                unread: 有未回复 ? 1 : 0,
+                relation: 关系类型映射[npc.关系状态] || '同学',
+                messages,
+            };
+        });
+    }, [gameContext?.社交, gameContext?.历史记录]);
+
+    const handleSend = () => {
+        if (!inputText.trim() || !activeSession) return;
+        const npcName = activeSession.name;
+        onSendMessage?.(activeSession.id, npcName, inputText.trim());
+        setInputText('');
+        setActiveSession(prev => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                messages: [...prev.messages, {
+                    id: `sent-${Date.now()}`,
+                    sender: '我',
+                    content: inputText.trim(),
+                    time: '刚刚',
+                    isMe: true,
+                }],
+                lastMessage: inputText.trim(),
+                lastTime: '刚刚',
+                unread: 0,
+            };
+        });
+    };
 
     if (activeSession) {
         return (
@@ -64,18 +125,29 @@ const CampusChatApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCon
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     <div className="text-center text-[10px] text-gray-500 py-2">--- {activeSession.name} 的聊天 ---</div>
-                    {activeSession.messages.length > 0 ? (
-                        activeSession.messages.map(msg => (
-                            <div key={msg.id} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${msg.isMe ? 'bg-blue-600/60 text-white' : 'bg-gray-700/50 text-gray-200'}`}>
-                                    <p>{msg.content}</p>
-                                    <span className="text-[9px] text-gray-400 mt-1 block">{msg.time}</span>
-                                </div>
+                    {activeSession.messages.map(msg => (
+                        <div key={msg.id} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${msg.isMe ? 'bg-blue-600/60 text-white' : 'bg-gray-700/50 text-gray-200'}`}>
+                                {!msg.isMe && <div className="text-[9px] text-gray-400 mb-0.5">{msg.sender}</div>}
+                                <p>{msg.content}</p>
+                                <span className="text-[9px] text-gray-400 mt-1 block">{msg.time}</span>
                             </div>
-                        ))
-                    ) : (
-                        <div className="text-center text-sm text-gray-500 py-8">暂无消息，等待互动...</div>
-                    )}
+                        </div>
+                    ))}
+                </div>
+                <div className="flex gap-2 px-4 py-3 border-t border-gray-700/50">
+                    <input
+                        className="flex-1 bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500"
+                        placeholder="输入消息..."
+                        value={inputText}
+                        onChange={e => setInputText(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleSend()}
+                    />
+                    <button
+                        onClick={handleSend}
+                        disabled={!inputText.trim()}
+                        className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >发送</button>
                 </div>
             </div>
         );
