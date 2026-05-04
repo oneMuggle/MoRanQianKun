@@ -140,6 +140,7 @@ type 主剧情发送当前状态 = {
     校规系统?: { 校规列表: any[]; 影响日志: any[] };
     催眠系统?: { 催眠记录列表: any[]; app等级: any; 累计使用次数: number };
     校园系统?: { 欲望系统?: { NPC欲望档案?: Record<string, any>; 后果列表?: any[]; 里程碑列表?: any[]; SM场景池?: any[]; 桌游状态?: any; 校园祭状态?: any } };
+    时代配置ID?: string;
 };
 
 /** 从当前状态提取校园NSFW运行时参数 */
@@ -547,6 +548,7 @@ export const 执行主剧情发送工作流 = async (
             playerRole: currentState.角色,
             builtinPromptEntries: currentState.内置提示词列表,
             worldbooks: currentState.世界书列表,
+            时代配置ID: currentState.时代配置ID,
             校园NSFW参数: 构建校园NSFW参数(currentState)
         });
         const inputTokens = deps.估算消息Token(orderedMessages, activeApi?.model);
