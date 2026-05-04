@@ -1,5 +1,6 @@
 import type { NPC结构 } from './social';
 import type { 里象功法 } from '../data/cultivation/lixiang';
+import type { 欲望阶段 } from './campusNSFW';
 
 /**
  * 亲密互动系统类型定义
@@ -19,6 +20,28 @@ export type 亲密互动类型 =
   | '抚摸'   // Lv3: 抚摸、亲密接触
   | '亲密'    // Lv4: 亲密互动
   | '双修';   // Lv5: 深度亲密/双修
+
+/** 校园亲密互动类型（校园时代专用，更细粒度的互动阶梯） */
+export type 校园亲密互动类型 =
+  // Lv0: 暧昧前期
+  | '眼神交流' | '递笔记' | '并肩走路'
+  // Lv1
+  | '牵手' | '靠肩膀' | '摸头'
+  // Lv2
+  | '拥抱' | '轻吻' | '耳语'
+  // Lv3
+  | '深吻' | '抚摸' | '独处过夜'
+  // Lv4-5
+  | '完全亲密';
+
+/** 里程碑解锁配置 */
+export interface 里程碑解锁配置 {
+  互动类型: 校园亲密互动类型;
+  所需亲密度: number;
+  所需欲望阶段: 欲望阶段;
+  所需地点?: string;
+  冷却回合: number;
+}
 
 /** 亲密互动记录 */
 export interface 亲密互动记录 {

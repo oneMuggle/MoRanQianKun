@@ -8,6 +8,19 @@ import type {
 } from '../../types';
 import type { 当前可用接口结构 } from '../../utils/apiConfig';
 import { 规范化游戏设置 } from '../../utils/gameSettings';
+import type {
+    欲望阶段,
+    关系轨道,
+    露出偏好等级,
+    权力倾向,
+    SM场景类型,
+    校园祭阶段,
+    校园祭主题,
+    摊位类型,
+    后夜祭状态,
+    桌游类型,
+    密室主题,
+} from '../../models/campusNSFW';
 import { formatHistoryToScript } from './historyUtils';
 import {
     构建COT伪装提示词,
@@ -114,6 +127,24 @@ export const 构建主剧情请求参数 = (
         playerRole?: 角色数据结构;
         builtinPromptEntries?: 内置提示词条目结构[];
         worldbooks?: 世界书结构[];
+        校园NSFW参数?: {
+            欲望阶段?: 欲望阶段;
+            关系轨道?: 关系轨道;
+            暴露风险?: number;
+            流言等级?: number;
+            露出偏好等级?: 露出偏好等级;
+            紧张度?: number;
+            权力倾向?: 权力倾向;
+            服从度?: number;
+            已解锁SM场景?: SM场景类型[];
+            校园祭阶段?: 校园祭阶段;
+            校园祭主题?: 校园祭主题;
+            摊位类型?: 摊位类型;
+            后夜祭状态?: 后夜祭状态;
+            桌游类型?: 桌游类型;
+            密室主题?: 密室主题;
+            内容强度?: '微暗' | '暧昧' | '露骨';
+        };
     }
 ): 主剧情请求构建结果 => {
     const runtimeGameConfig = 规范化游戏设置(params.gameConfig);
@@ -149,9 +180,9 @@ export const 构建主剧情请求参数 = (
         )
         : '';
     const normalizedRuntimeExtraPrompt = !tavernPresetModeEnabled
-        ? 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', runtimeGameConfig)
+        ? 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 校园NSFW参数: params.校园NSFW参数 })
         : '';
-    const tavernRuntimeExtraPrompt = 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', runtimeGameConfig);
+    const tavernRuntimeExtraPrompt = 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 校园NSFW参数: params.校园NSFW参数 });
     const recallScriptAppend = params.recallTag ? `\n\n【剧情回忆】\n${params.recallTag}` : '';
     const scriptSectionText = `【即时剧情回顾】\n${formatHistoryToScript(params.updatedContextHistory) || '暂无'}${recallScriptAppend}`;
     const latestUserInputAsModel = [

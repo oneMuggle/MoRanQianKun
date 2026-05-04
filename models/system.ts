@@ -3,6 +3,7 @@
 
 import { 角色数据结构 } from './character';
 import { 环境信息结构 } from './environment';
+import type { 校园NSFW设置 } from './campusNSFW';
 import { 生图目标类型, 生图筛选性别类型, 生图筛选重要性类型, 场景图片档案 } from './imageGeneration';
 import { NPC结构 } from './social';
 import { 世界数据结构 } from './world';
@@ -1550,6 +1551,7 @@ export interface 游戏设置结构 {
     启用NSFW模式: boolean; // Gate NSFW prompt and heroine privacy UI
     nsfw场景类型: NSFW场景类型; // NSFW scene description level (mirrored from OpeningConfig for runtime use)
     成人内容?: boolean; // Unlock nsfw等级 2 qiyun entries; default false
+    校园NSFW设置?: 校园NSFW设置; // Campus NSFW subsystem toggles (contemporary_campus only)
     启用饱腹口渴系统: boolean; // Toggle hunger/thirst prompt injection and UI visibility
     启用修炼体系: boolean; // Toggle cultivation/realm/kungfu prompt injection and related UI visibility
     启用里武侠模式: boolean; // Toggle inner martial arts (里武侠) world: dual-cultivation personality, revealing clothing, 武根 system
