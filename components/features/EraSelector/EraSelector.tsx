@@ -33,6 +33,8 @@ export const EraSelector: React.FC<Props> = ({ value, onChange, onCancel }) => {
     const [selectedSubEra, setSelectedSubEra] = useState<string | null>(value || null);
     // 移动端标签：0=大类, 1=时代, 2=子纪元
     const [mobileTab, setMobileTab] = useState(0);
+    // 是否在本轮交互中主动选择过子纪元（打开时已有 value 不显示预览，只有主动选择后才出现）
+    const [hasSelected, setHasSelected] = useState(false);
 
     const eraTreeData = useMemo(() => {
         return eraTree.children.map((epoch: EraNode) => ({
@@ -45,9 +47,10 @@ export const EraSelector: React.FC<Props> = ({ value, onChange, onCancel }) => {
     }, []);
 
     const currentPath = useMemo(() => {
-        const id = selectedSubEra || value;
-        return id ? findPath(id) : null;
-    }, [selectedSubEra, value]);
+        // 只有用户主动选择后才计算预览路径
+        if (!hasSelected || !selectedSubEra) return null;
+        return findPath(selectedSubEra);
+    }, [selectedSubEra, hasSelected]);
 
     const handleConfirm = () => {
         if (selectedSubEra) {
@@ -57,6 +60,7 @@ export const EraSelector: React.FC<Props> = ({ value, onChange, onCancel }) => {
 
     const handleSubEraSelect = (id: string) => {
         setSelectedSubEra(id);
+        setHasSelected(true);
         const node = allEraNodes.find((n: EraNode) => n.id === id);
         if (node?.parent) {
             const era = allEraNodes.find((n: EraNode) => n.id === node.parent);
@@ -247,33 +251,20 @@ export const EraSelector: React.FC<Props> = ({ value, onChange, onCancel }) => {
                     </div>
 
                     {/* 当前选中预览（移动端） */}
-                    {selectedSubEra && currentPath && (
+                    {hasSelected && currentPath && (
                         <div className="border-t border-gray-800/60 bg-black/30 p-3">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between mb-2">
                                 <div className="text-xs text-gray-400">
                                     <span className="text-wuxia-gold">{currentPath.subEra.name}</span>
                                     <span className="mx-1">·</span>
                                     {currentPath.era.name}
                                 </div>
-                                {mobileTab < 2 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setMobileTab(2)}
-                                        className="text-xs text-wuxia-cyan hover:text-white"
-                                    >
-                                        查看预览 →
-                                    </button>
-                                )}
                             </div>
-                            {mobileTab === 2 && (
-                                <div className="mt-2">
-                                    <EraPreviewCard
-                                        epoch={currentPath.epoch}
-                                        era={currentPath.era}
-                                        subEra={currentPath.subEra}
-                                    />
-                                </div>
-                            )}
+                            <EraPreviewCard
+                                epoch={currentPath.epoch}
+                                era={currentPath.era}
+                                subEra={currentPath.subEra}
+                            />
                         </div>
                     )}
                 </div>
