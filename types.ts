@@ -17,6 +17,7 @@ export * from './models/battle';
 export * from './models/worldbook';
 export * from './models/novelDecomposition';
 export * from './models/campusPhone';
+export * from './models/campusNSFW';
 
 // New types for the advanced chat system
 

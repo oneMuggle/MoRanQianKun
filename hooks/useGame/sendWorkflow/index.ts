@@ -139,6 +139,7 @@ type 主剧情发送当前状态 = {
     设备状态?: { messages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }> };
     校规系统?: { 校规列表: any[]; 影响日志: any[] };
     催眠系统?: { 催眠记录列表: any[]; app等级: any; 累计使用次数: number };
+    校园系统?: { 欲望系统?: { NPC欲望档案?: Record<string, any>; 后果列表?: any[]; 里程碑列表?: any[]; 桌游状态?: any; 校园祭状态?: any } };
 };
 
 // ─── 主剧情发送依赖 ─────────────────────────────────────────────────────────

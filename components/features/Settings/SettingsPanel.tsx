@@ -27,6 +27,9 @@ const CurrentNovelDecompositionInjectionSettings = React.lazy(() => import('./Cu
 const MusicSettings = React.lazy(() => import('./MusicSettings'));
 const NpcManager = React.lazy(() => import('./NpcManager'));
 const VariableManager = React.lazy(() => import('./VariableManager'));
+const CampusNSFWSettings = React.lazy(() => import('./CampusNSFWSettings'));
+import { 默认校园NSFW设置 } from '../../../models/campusNSFW';
+import type { 校园NSFW设置 } from '../../../models/campusNSFW';
 
 type RuntimeStateSections = Record<'角色' | '环境' | '社交' | '世界' | '战斗' | '剧情' | '女主剧情规划' | '玩家门派' | '任务列表' | '约定列表' | '记忆系统', unknown>;
 
@@ -55,7 +58,7 @@ export type SettingsTabId =
     | 'api' | 'image_generation' | 'integrated_models'
     | 'independent_api_gpt' | 'novel_decomposition' | 'novel_decomposition_runtime'
     | 'prompt' | 'storage' | 'theme' | 'visual' | 'world'
-    | 'game' | 'reality' | 'tavern_preset' | 'memory'
+    | 'game' | 'campus_nsfw' | 'reality' | 'tavern_preset' | 'memory'
     | 'history' | 'context' | 'music' | 'npc_management' | 'variable_manager';
 
 export interface SettingsTabItem {
@@ -185,6 +188,15 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             );
         }
         if (activeTab === 'game' && gameConfig && onSaveGame) return <GameSettings settings={gameConfig} onSave={onSaveGame} currentEra={currentEra} onEraChange={onEraChange} availableEras={availableEras} eraTheme={eraTheme} />;
+        if (activeTab === 'campus_nsfw' && gameConfig && onSaveGame) {
+            const campusSettings = gameConfig.校园NSFW设置 ?? 默认校园NSFW设置;
+            return (
+                <CampusNSFWSettings
+                    settings={campusSettings}
+                    onChange={(s: 校园NSFW设置) => onSaveGame({ ...gameConfig, 校园NSFW设置: s })}
+                />
+            );
+        }
         if (activeTab === 'reality' && gameConfig && onSaveGame) return <RealitySettings settings={gameConfig} onSave={onSaveGame} />;
         if (activeTab === 'tavern_preset' && gameConfig && onSaveGame) return <TavernPresetSettings settings={gameConfig} onSave={onSaveGame} />;
         if (activeTab === 'memory' && memoryConfig && onSaveMemory) return <MemorySettings settings={memoryConfig} onSave={onSaveMemory} />;

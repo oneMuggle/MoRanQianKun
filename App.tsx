@@ -42,6 +42,8 @@ const BattleModal = 创建可预加载懒组件(() => import('./components/featu
 const MobileBattleModal = 创建可预加载懒组件(() => import('./components/features/Battle/MobileBattleModal'));
 const SocialModal = 创建可预加载懒组件(() => import('./components/features/Social/SocialModal'));
 const MobileSocial = 创建可预加载懒组件(() => import('./components/features/Social/MobileSocial'));
+const CampusDesireDashboard = 创建可预加载懒组件(() => import('./components/features/CampusDesireDashboard'));
+const MobileCampusDesireApp = 创建可预加载懒组件(() => import('./components/features/MobileCampusDesireApp'));
 const ImageManagerModal = 创建可预加载懒组件(() => import('./components/features/Social/ImageManagerModal'));
 const MobileImageManagerModal = 创建可预加载懒组件(() => import('./components/features/Social/mobile/MobileImageManagerModal'));
 const WorldbookManagerModal = 创建可预加载懒组件(() => import('./components/features/Worldbook/WorldbookManagerModal'));
@@ -97,6 +99,7 @@ const App: React.FC = () => {
     const [showWorldbookManager, setShowWorldbookManager] = React.useState(false);
     const [showNovelDecompositionWorkbench, setShowNovelDecompositionWorkbench] = React.useState(false);
     const [showMobileMusic, setShowMobileMusic] = React.useState(false);
+    const [showCampusDesire, setShowCampusDesire] = React.useState(false);
     const [chatContentHidden, setChatContentHidden] = React.useState(false);
     const [sceneQuickGenHint, setSceneQuickGenHint] = React.useState(false);
     const [sceneQuickGenToastVisible, setSceneQuickGenToastVisible] = React.useState(false);
@@ -1510,6 +1513,44 @@ const App: React.FC = () => {
                                     onToggleMajorRole={actions.updateNpcMajorRole}
                                     onTogglePresence={actions.updateNpcPresence}
                                     onDeleteNpc={actions.removeNpc}
+                                />
+                            )}
+                        </懒加载边界>
+                    )}
+
+                    {showCampusDesire && (
+                        <懒加载边界>
+                            {isMobile ? (
+                                <MobileCampusDesireApp
+                                    NPC欲望档案={(state as any).校园系统?.欲望系统?.NPC欲望档案 ?? {}}
+                                    后果列表={(state as any).校园系统?.欲望系统?.后果列表 ?? []}
+                                    NPC姓名映射={Object.fromEntries(
+                                        Object.keys((state as any).校园系统?.欲望系统?.NPC欲望档案 ?? {}).map(id => {
+                                            const npc = state.社交.find((n: any) => n.id === id);
+                                            return [id, npc?.姓名 ?? id];
+                                        })
+                                    )}
+                                    onClose={() => setShowCampusDesire(false)}
+                                />
+                            ) : (
+                                <CampusDesireDashboard
+                                    NPC欲望档案={(state as any).校园系统?.欲望系统?.NPC欲望档案 ?? {}}
+                                    后果列表={(state as any).校园系统?.欲望系统?.后果列表 ?? []}
+                                    里程碑数={Object.fromEntries(
+                                        Object.entries((state as any).校园系统?.欲望系统?.NPC欲望档案 ?? {}).map(([id]) => {
+                                            const milestones = ((state as any).校园系统?.欲望系统?.里程碑列表 ?? []).filter(
+                                                (m: any) => m.NPC姓名 === id || id.includes(m.NPC姓名)
+                                            );
+                                            return [id, milestones.length];
+                                        })
+                                    )}
+                                    NPC姓名映射={Object.fromEntries(
+                                        Object.keys((state as any).校园系统?.欲望系统?.NPC欲望档案 ?? {}).map(id => {
+                                            const npc = state.社交.find((n: any) => n.id === id);
+                                            return [id, npc?.姓名 ?? id];
+                                        })
+                                    )}
+                                    onClose={() => setShowCampusDesire(false)}
                                 />
                             )}
                         </懒加载边界>
