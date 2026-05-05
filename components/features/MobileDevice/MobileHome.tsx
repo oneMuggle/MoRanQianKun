@@ -19,6 +19,7 @@ import CampusHypnosisApp from './apps/CampusHypnosisApp';
 
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../types';
 import type { NPC结构 } from '../../../models/domain/social';
+import type { BDSM论坛帖子 } from '../../../models/campusNSFW/bdsm-forum';
 
 interface AppProps {
     eraId: string;
@@ -29,10 +30,11 @@ interface AppProps {
     // 校园系统回调（可选）
     onRulesChange?: (updater: (prev: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     onHypnosisChange?: (updater: (prev: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
-    onRefresh?: () => void;
+    onRefresh?: (board?: 'bdsn') => void;
     isRefreshing?: boolean;
     onSendMessage?: (npcId: string, npcName: string, content: string) => void;
     onUnlockNPC?: (npc: NPC结构) => void;
+    onBDSM帖子更新?: (帖子ID: string, updater: (post: BDSM论坛帖子) => BDSM论坛帖子) => void;
 }
 
 interface MobileHomeProps {
@@ -45,10 +47,11 @@ interface MobileHomeProps {
     // 校园系统回调
     onRulesChange?: (updater: (prev: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     onHypnosisChange?: (updater: (prev: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
-    onRefresh?: () => void;
+    onRefresh?: (board?: 'bdsn') => void;
     isRefreshing?: boolean;
     onSendMessage?: (npcId: string, npcName: string, content: string) => void;
     onUnlockNPC?: (npc: NPC结构) => void;
+    onBDSM帖子更新?: (帖子ID: string, updater: (post: BDSM论坛帖子) => BDSM论坛帖子) => void;
 }
 
 const appIcons: Record<MobileApp, string> = {
@@ -81,6 +84,7 @@ const MobileHome: React.FC<MobileHomeProps> = ({
     isRefreshing,
     onSendMessage,
     onUnlockNPC,
+    onBDSM帖子更新,
 }) => {
     const [config, setConfig] = useState<DeviceConfig | null>(null);
     const [liModeName, setLiModeName] = useState<string | undefined>();
@@ -119,6 +123,7 @@ const MobileHome: React.FC<MobileHomeProps> = ({
             isRefreshing,
             onSendMessage,
             onUnlockNPC,
+            onBDSM帖子更新,
         };
         switch (deviceState.activeApp) {
             case 'chat': return <CampusChatApp {...appProps} />;

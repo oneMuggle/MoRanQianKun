@@ -80,7 +80,6 @@ const BDSMContactModal: React.FC<Props> = ({ post, onBack, onConfirm }) => {
         // 模拟 NPC 回复
         setTimeout(() => {
             const newRound = round + 1;
-            const npcReply = generateNPCReply(招募方角色, newRound);
 
             // 判定结果
             let 新状态: '沟通中' | '已确认' | '已拒绝' = '沟通中';
@@ -88,6 +87,8 @@ const BDSMContactModal: React.FC<Props> = ({ post, onBack, onConfirm }) => {
                 新状态 = Math.random() > 0.3 ? '已确认' : '已拒绝';
                 setStatus(新状态);
             }
+
+            const npcReply = generateNPCReply(招募方角色, newRound, 新状态);
 
             const npcMsg: 联系对话 = {
                 发送者: 'NPC',
@@ -253,13 +254,14 @@ function generateInitialMessage(角色: string): string {
     return 不限招呼[Math.floor(Math.random() * 不限招呼.length)];
 }
 
-function generateNPCReply(角色: string, round: number): string {
+function generateNPCReply(角色: string, round: number, 状态: '沟通中' | '已确认' | '已拒绝'): string {
     const pool = NPC回复话术池[角色] || NPC回复话术池['不限'];
     if (round >= 3) {
         // 最终轮判定回复
-        return Math.random() > 0.3
-            ? '经过这几轮交流，我觉得你可能是合适的人。我们可以进一步接触。'
-            : '抱歉，我觉得我们可能不太合适。祝你好运。';
+        if (状态 === '已确认') {
+            return '经过这几轮交流，我觉得你可能是合适的人。我们可以进一步接触。';
+        }
+        return '抱歉，我觉得我们可能不太合适。祝你好运。';
     }
     return pool[Math.min(round - 1, pool.length - 1)] || pool[pool.length - 1];
 }

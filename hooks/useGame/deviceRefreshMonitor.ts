@@ -86,8 +86,8 @@ export const use后台设备刷新监控 = (deps: Use后台设备刷新监控Dep
             if (需要刷新论坛) {
                 try {
                     const forumRawItems = await 生成设备原始消息({
-                        eraId, mode, appType: 'forum', context: appContext, count: 5,
-                    }, apiConfig, apiSettings, 5);
+                        eraId, mode, appType: 'forum', context: appContext, count: 8,
+                    }, apiConfig, apiSettings, 8);
                     const parsed = 解析AI论坛帖子(forumRawItems);
                     if (parsed.length > 0) {
                         deps.set校园系统(prev => {
@@ -101,21 +101,25 @@ export const use后台设备刷新监控 = (deps: Use后台设备刷新监控Dep
                 }
             }
 
-            if (需要刷新BDSM && nsfw设置.启用BDSM论坛 && nsfw设置.BDSM内容强度 !== '关闭') {
-                try {
-                    const bdsmRawItems = await 生成设备原始消息({
-                        eraId, mode, appType: 'bdsn', context: appContext, count: 5,
-                    }, apiConfig, apiSettings, 5);
-                    const parsed = 解析AIBDSM帖子(bdsmRawItems);
-                    if (parsed.length > 0) {
-                        deps.set校园系统(prev => {
-                            const existing = prev.BDSM帖子列表 || [];
-                            return { ...prev, BDSM帖子列表: [...parsed, ...existing].slice(0, 50) };
-                        });
-                        BDSM帖子数 = parsed.length;
+            if (需要刷新BDSM) {
+                if (!nsfw设置.启用BDSM论坛 || nsfw设置.BDSM内容强度 === '关闭') {
+                    errors.push('深夜板块内容未启用：请在游戏设置中开启「启用BDSM论坛」并设置内容强度');
+                } else {
+                    try {
+                        const bdsmRawItems = await 生成设备原始消息({
+                            eraId, mode, appType: 'bdsn', context: appContext, count: 8,
+                        }, apiConfig, apiSettings, 8);
+                        const parsed = 解析AIBDSM帖子(bdsmRawItems);
+                        if (parsed.length > 0) {
+                            deps.set校园系统(prev => {
+                                const existing = prev.BDSM帖子列表 || [];
+                                return { ...prev, BDSM帖子列表: [...parsed, ...existing].slice(0, 50) };
+                            });
+                            BDSM帖子数 = parsed.length;
+                        }
+                    } catch (err) {
+                        errors.push(`BDSM生成失败: ${err instanceof Error ? err.message : String(err)}`);
                     }
-                } catch (err) {
-                    errors.push(`BDSM生成失败: ${err instanceof Error ? err.message : String(err)}`);
                 }
             }
 

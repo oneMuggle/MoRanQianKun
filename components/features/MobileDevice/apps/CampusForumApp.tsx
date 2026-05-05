@@ -2,10 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { DeviceMode, MobileApp, DeviceGameContext } from '../../../../models/mobileDevice';
 import { getDeviceConfig, getAppName } from '../../../../models/eraDevice';
 import type { 论坛帖子 } from '../../../../models/campusPhone';
-import type { BDSM论坛帖子, BDSM帖子分类, 联系对话 } from '../../../../models/campusNSFW/bdsm-forum';
+import type { BDSM论坛帖子, BDSM帖子分类, 联系对话, 联系状态 } from '../../../../models/campusNSFW/bdsm-forum';
 import type { NPC结构 } from '../../../../models/domain/social';
 import { 从BDSM帖子创建NPC } from '../../../../hooks/useGame/bdsmForumEngine';
 import BDSMContactModal from './BDSMContactModal';
+import BDSMMeetingModal from './BDSMMeetingModal';
 
 interface AppProps {
     eraId: string;
@@ -13,9 +14,10 @@ interface AppProps {
     appId: MobileApp;
     onBack: () => void;
     gameContext?: DeviceGameContext;
-    onRefresh?: () => void;
+    onRefresh?: (board?: 'bdsn') => void;
     isRefreshing?: boolean;
     onUnlockNPC?: (npc: NPC结构) => void;
+    onBDSM帖子更新?: (帖子ID: string, updater: (post: BDSM论坛帖子) => BDSM论坛帖子) => void;
 }
 
 const 论坛分类 = ['全部', '校园资讯', '学术交流', '社团活动', '情感树洞', '匿名灌水', '求助答疑'];
@@ -31,14 +33,15 @@ const 回复话术池 = [
     '感谢分享，学到了。',
 ];
 
-const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext, onRefresh, isRefreshing, onUnlockNPC }) => {
+const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext, onRefresh, isRefreshing, onUnlockNPC, onBDSM帖子更新 }) => {
     const config = getDeviceConfig(eraId);
     const appName = config ? getAppName(config, appId, mode) : '校园论坛';
 
     // 当前激活的主分类（普通论坛 / BDSM）
-    const [activeBoard, setActiveBoard] = useState<'forum' | 'bdsm'>('forum');
+    const [activeBoard, setActiveBoard] = useState<'forum' | 'bdsm'>(appId === 'bdsn' ? 'bdsm' : 'forum');
     const [selectedPost, setSelectedPost] = useState<论坛帖子 | BDSM论坛帖子 | null>(null);
     const [contactingPost, setContactingPost] = useState<BDSM论坛帖子 | null>(null);
+    const [meetingPost, setMeetingPost] = useState<BDSM论坛帖子 | null>(null);
     const [activeCategory, setActiveCategory] = useState('全部');
     const [activeBDSMSub, setActiveBDSMSub] = useState<BDSM帖子分类 | '全部'>('全部');
 
@@ -51,8 +54,27 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
         结果: '建立关系' | '已拒绝' | '沟通中'
     ) => {
         if (contactingPost && 结果 === '建立关系') {
+            // 更新帖子状态
+            onBDSM帖子更新?.(contactingPost.id, post => ({
+                ...post,
+                寻主召奴信息: post.寻主召奴信息 ? {
+                    ...post.寻主召奴信息,
+                    是否已联系: true,
+                    联系状态: '关系建立' as 联系状态,
+                } : post.寻主召奴信息,
+            }));
             const newNpc = 从BDSM帖子创建NPC(contactingPost);
             onUnlockNPC?.(newNpc);
+        } else if (contactingPost) {
+            // 沟通中或已拒绝也要更新状态
+            onBDSM帖子更新?.(contactingPost.id, post => ({
+                ...post,
+                寻主召奴信息: post.寻主召奴信息 ? {
+                    ...post.寻主召奴信息,
+                    是否已联系: true,
+                    联系状态: 结果 === '沟通中' ? '沟通中' as 联系状态 : '已拒绝' as 联系状态,
+                } : post.寻主召奴信息,
+            }));
         }
         setContactingPost(null);
     };
@@ -108,7 +130,21 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
         return '子分类' in post && '影响等级' in post;
     };
 
-    // ========== 帖子详情页 ==========
+    const handleMeetingConfirm = (post: BDSM论坛帖子) => {
+        // 见面后推进关系深度
+        onBDSM帖子更新?.(post.id, p => ({
+            ...p,
+            影响等级: p.影响等级 === '轻微' ? '中等' : '严重',
+        }));
+        // 可能触发新事件或NPC属性更新（通过 onUnlockNPC 传递更新后的 NPC）
+        const updatedNpc = 从BDSM帖子创建NPC({
+            ...post,
+            内容: `见面后的${post.寻主召奴信息?.解锁NPC姓名 || post.作者}，关系更进一步。${post.内容}`,
+        });
+        onUnlockNPC?.(updatedNpc);
+        setMeetingPost(null);
+    };
+
     // ========== 联系对话框 ==========
     if (contactingPost) {
         return (
@@ -116,6 +152,17 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
                 post={contactingPost}
                 onBack={() => setContactingPost(null)}
                 onConfirm={handleContactConfirm}
+            />
+        );
+    }
+
+    // ========== 见面对话框 ==========
+    if (meetingPost) {
+        return (
+            <BDSMMeetingModal
+                post={meetingPost}
+                onBack={() => setMeetingPost(null)}
+                onConfirm={() => handleMeetingConfirm(meetingPost)}
             />
         );
     }
@@ -156,26 +203,45 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
                         </div>
                         <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">{selectedPost.内容}</p>
                     </div>
-                    {isBDSM && (selectedPost as BDSM论坛帖子).寻主召奴信息 && (
-                        <div className="rounded-lg border border-purple-700/40 bg-purple-950/30 p-3">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <span className="text-xs text-purple-300">寻主召奴帖</span>
-                                    <p className="text-[10px] text-gray-400 mt-1">
-                                        方向：{(selectedPost as BDSM论坛帖子).寻主召奴信息!.招募方角色} &middot; 关系：{(selectedPost as BDSM论坛帖子).寻主召奴信息!.期望关系类型}
-                                    </p>
+                    {isBDSM && (selectedPost as BDSM论坛帖子).寻主召奴信息 && (() => {
+                        const info = (selectedPost as BDSM论坛帖子).寻主召奴信息!;
+                        const 已建立关系 = info.是否已联系 && info.联系状态 === '关系建立';
+                        return (
+                            <div className="rounded-lg border border-purple-700/40 bg-purple-950/30 p-3">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <span className="text-xs text-purple-300">寻主召奴帖</span>
+                                        <p className="text-[10px] text-gray-400 mt-1">
+                                            方向：{info.招募方角色} &middot; 关系：{info.期望关系类型}
+                                        </p>
+                                        {已建立关系 && (
+                                            <p className="text-[10px] text-green-400 mt-1">
+                                                ✓ 已建立关系
+                                            </p>
+                                        )}
+                                        {!info.是否已联系 && (
+                                            <p className="text-[10px] text-gray-500 mt-1">
+                                                尚未联系
+                                            </p>
+                                        )}
+                                    </div>
+                                    {!info.是否已联系 ? (
+                                        <button
+                                            onClick={() => handleContactPost(selectedPost as BDSM论坛帖子)}
+                                            className="text-xs bg-purple-600/80 hover:bg-purple-500 text-white px-3 py-1.5 rounded transition-colors"
+                                        >联系TA</button>
+                                    ) : 已建立关系 ? (
+                                        <button
+                                            onClick={() => setMeetingPost(selectedPost as BDSM论坛帖子)}
+                                            className="text-xs bg-green-600/80 hover:bg-green-500 text-white px-3 py-1.5 rounded transition-colors"
+                                        >见面</button>
+                                    ) : (
+                                        <span className="text-[10px] text-gray-500 px-2 py-1">{info.联系状态}</span>
+                                    )}
                                 </div>
-                                {(selectedPost as BDSM论坛帖子).寻主召奴信息!.是否已联系 ? (
-                                    <span className="text-[10px] text-gray-500 px-2 py-1">已联系</span>
-                                ) : (
-                                    <button
-                                        onClick={() => handleContactPost(selectedPost as BDSM论坛帖子)}
-                                        className="text-xs bg-purple-600/80 hover:bg-purple-500 text-white px-3 py-1.5 rounded transition-colors"
-                                    >联系TA</button>
-                                )}
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
                     {selectedPost.回复列表.length > 0 && (
                         <div>
                             <h4 className="text-xs font-semibold text-gray-400 mb-2">{selectedPost.回复列表.length} 条回复</h4>
@@ -206,7 +272,7 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
                 <h3 className="font-semibold text-white flex-1">{appName}</h3>
                 {onRefresh && (
                     <button
-                        onClick={onRefresh}
+                        onClick={() => onRefresh?.(activeBoard === 'bdsm' ? 'bdsn' : undefined)}
                         disabled={isRefreshing}
                         className={`text-xs px-2 py-1 rounded transition-colors flex items-center gap-1 ${
                             isRefreshing
@@ -289,13 +355,21 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
                             );
                         })}
                     </ul>
+                ) : isRefreshing ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                        <svg className="animate-spin h-10 w-10 text-purple-500 mb-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <p className="text-sm text-gray-400">AI 正在生成内容，请稍候...</p>
+                    </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full text-center p-8">
                         <span className="text-4xl text-gray-600 mb-3">&#128203;</span>
                         <p className="text-sm text-gray-400">{activeBoard === 'bdsm' ? '深夜板块暂无帖子' : '暂无帖子'}</p>
                         {onRefresh && (
                             <button
-                                onClick={onRefresh}
+                                onClick={() => onRefresh?.(activeBoard === 'bdsm' ? 'bdsn' : undefined)}
                                 disabled={isRefreshing}
                                 className={`mt-3 text-xs px-4 py-2 rounded transition-colors flex items-center gap-1 ${
                                     isRefreshing

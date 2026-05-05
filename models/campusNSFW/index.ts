@@ -147,7 +147,7 @@ export const 默认校园NSFW设置: 校园NSFW设置 = {
   启用舞台NSFW: false,
   校园祭频率: '每学年一次',
   // v1.5 BDSM 论坛
-  启用BDSM论坛: false,
+  启用BDSM论坛: true,
   BDSM内容强度: '轻度',
   启用BDSM_NPC影响: true,
   启用BDSM_流言传播: true,
