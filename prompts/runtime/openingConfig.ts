@@ -6,12 +6,22 @@ export const 构建开局配置提示词 = (openingConfig?: OpeningConfig | null
     const 关系侧重 = Array.isArray(openingConfig.关系侧重) && openingConfig.关系侧重.length > 0
         ? openingConfig.关系侧重.join('、')
         : '无';
-    return [
+    const blocks: string[] = [
         '【本次开局配置约束】',
         `- 关系侧重：${关系侧重}。生成初始社交网时，应优先让人物结构与关系情绪落在这些方向上。`,
         `- 开局切入偏好：${openingConfig.开局切入偏好}。第一幕镜头与气氛优先贴近该切入方式，不要无痕偏离。`,
-        '- 若开局偏好与建档、世界观存在冲突，以建档硬约束和 world_prompt 为上位，但仍应尽量保留关系侧重与切入偏好的方向。'
-    ].join('\n');
+    ];
+    if (openingConfig.selectedSceneId) {
+        blocks.push(`- 用户已选定开局场景（ID: ${openingConfig.selectedSceneId}），请以该场景为第一幕切入点。`);
+    }
+    if (openingConfig.selectedArchetypeIds && openingConfig.selectedArchetypeIds.length > 0) {
+        blocks.push(`- 角色原型倾向：${openingConfig.selectedArchetypeIds.join('、')}。初始 NPC 的性格、行为模式可参考对应原型特征。`);
+    }
+    if (openingConfig.selectedWritingSampleIds && openingConfig.selectedWritingSampleIds.length > 0) {
+        blocks.push(`- 写作风格参考（ID: ${openingConfig.selectedWritingSampleIds.join('、')}）。叙事语气与文风应贴近所选示例的笔调。`);
+    }
+    blocks.push('- 若开局偏好与建档、世界观存在冲突，以建档硬约束和 world_prompt 为上位，但仍应尽量保留关系侧重与切入偏好的方向。');
+    return blocks.join('\n');
 };
 
 export const 构建世界观同人融合提示词 = (openingConfig?: OpeningConfig | null): string => {
