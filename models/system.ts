@@ -1766,6 +1766,8 @@ export interface 提示词结构 {
     内容: string;
     类型: PromptCategory;
     启用: boolean;
+    版本?: string;
+    更新时间?: string;
 }
 
 export interface 节日结构 {

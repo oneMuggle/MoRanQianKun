@@ -5,6 +5,8 @@ import { 构建修炼体系附加块 } from '../../utils/promptFeatureToggles';
 export const 核心_记忆法则: 提示词结构 = {
     id: 'core_memory_rules',
     标题: 'NPC记忆写入法则',
+    版本: '1.0.0',
+    更新时间: '2026-05-02',
     内容: `<NPC记忆写入法则>
 【NPC 记忆写入法则】
 **核心职责**: NPC 不是只会说话的木偶，他们拥有基于 \`NPC结构\` 的持久化记忆。
