@@ -3,6 +3,7 @@ import MobileHome from './MobileHome';
 import { DeviceState, MobileApp, DeviceGameContext } from '../../../models/mobileDevice';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../types';
 import type { NPC结构 } from '../../../models/domain/social';
+import type { BDSM论坛帖子 } from '../../../models/campusNSFW/bdsm-forum';
 
 interface MobileDeviceProps {
     eraId: string;
@@ -13,10 +14,11 @@ interface MobileDeviceProps {
     gameContext?: DeviceGameContext;
     onRulesChange?: (updater: (prev: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     onHypnosisChange?: (updater: (prev: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
-    onRefresh?: () => void;
+    onRefresh?: (board?: 'bdsn') => void;
     isRefreshing?: boolean;
     onSendMessage?: (npcId: string, npcName: string, content: string) => void;
     onUnlockNPC?: (npc: NPC结构) => void;
+    onBDSM帖子更新?: (帖子ID: string, updater: (post: BDSM论坛帖子) => BDSM论坛帖子) => void;
 }
 
 const MobileDevice: React.FC<MobileDeviceProps> = ({
@@ -32,6 +34,7 @@ const MobileDevice: React.FC<MobileDeviceProps> = ({
     isRefreshing,
     onSendMessage,
     onUnlockNPC,
+    onBDSM帖子更新,
 }) => {
     return (
         <div className="w-full h-full bg-gray-900/95 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl border border-gray-700/50">
@@ -48,6 +51,7 @@ const MobileDevice: React.FC<MobileDeviceProps> = ({
                 isRefreshing={isRefreshing}
                 onSendMessage={onSendMessage}
                 onUnlockNPC={onUnlockNPC}
+                onBDSM帖子更新={onBDSM帖子更新}
             />
         </div>
     );

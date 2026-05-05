@@ -1775,7 +1775,7 @@ const App: React.FC = () => {
                                     const prev = (state as any).催眠系统 || { 催眠记录列表: [], app等级: { 当前等级: 1, 已使用次数: 0, 升级阈值: 5, 解锁能力: [] }, 累计使用次数: 0 };
                                     setters.set催眠系统?.(updater(prev));
                                 }}
-                                onRefresh={() => {
+                                onRefresh={(board) => {
                                     const activeApp = meta.deviceState.activeApp;
                                     if (!activeApp) return;
                                     // 防止重复提交
@@ -1783,9 +1783,11 @@ const App: React.FC = () => {
                                         (t: any) => t.status === 'pending' || t.status === 'processing'
                                     );
                                     if (hasPending) return;
+                                    // 深夜板块传入时，使用 'bdsn' 覆盖默认 app
+                                    const refreshApp = board === 'bdsn' ? 'bdsn' : activeApp;
                                     setters.set设备刷新队列?.(prev => [...prev, {
                                         id: `refresh-${Date.now()}`,
-                                        app: activeApp,
+                                        app: refreshApp,
                                         status: 'pending' as const,
                                         创建时间: Date.now(),
                                     }]);
@@ -1803,6 +1805,13 @@ const App: React.FC = () => {
                                     if (!exists) {
                                         setters.set社交?.([...prev, newNpc]);
                                     }
+                                }}
+                                onBDSM帖子更新={(帖子ID, updater) => {
+                                    const campusSystem = (state as any).校园系统 || { BDSM帖子列表: [] };
+                                    const updatedPosts = (campusSystem.BDSM帖子列表 || []).map((post: any) =>
+                                        post.id === 帖子ID ? updater(post) : post
+                                    );
+                                    setters.set校园系统?.({ ...campusSystem, BDSM帖子列表: updatedPosts });
                                 }}
                             />
                         </懒加载边界>

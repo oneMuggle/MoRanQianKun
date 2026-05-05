@@ -117,7 +117,7 @@ export function 构建设备消息系统提示词(
         },
         bdsn: {
             角色: 'BDSM 论坛帖子生成器',
-            输出格式: 'JSON 数组，每个帖子包含 author（匿名昵称）、title（标题）、content（正文）、category（子分类）、time（时间）、replies（回复数）、views（浏览数）、replyList（回复列表，2-4条）、impactLevel（影响等级：轻微/中等/严重）、bdsmCategory（BDSM子分类：匿名讨论/经验交流/物品话题/心理探索/安全科普/寻主召奴）。寻主召奴帖子额外包含 recruiterRole（寻主/召奴/不限）、relationshipType（期望关系类型）',
+            输出格式: 'JSON 数组，每个帖子包含 author（匿名昵称）、title（标题）、content（正文）、time（时间）、replies（回复数，0-3）、views（浏览数，50-5000）、replyList（回复列表，2-4条）、impactLevel（影响等级：轻微/中等/严重）。category 字段必须从以下子分类中选择且只能选一个：匿名讨论、经验交流、物品话题、心理探索、安全科普、寻主召奴。约 1/5 的帖子应为寻主召奴类型，此类额外包含 recruiterRole（寻主/召奴/不限）、relationshipType（期望关系类型，如 DS关系/主奴关系/玩伴关系等）',
         },
     };
 
