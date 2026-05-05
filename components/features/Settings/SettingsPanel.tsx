@@ -28,8 +28,11 @@ const MusicSettings = React.lazy(() => import('./MusicSettings'));
 const NpcManager = React.lazy(() => import('./NpcManager'));
 const VariableManager = React.lazy(() => import('./VariableManager'));
 const CampusNSFWSettings = React.lazy(() => import('./CampusNSFWSettings'));
+const UrbanDriverNSFWSettings = React.lazy(() => import('./UrbanDriverNSFWSettings'));
 import { 默认校园NSFW设置 } from '../../../models/campusNSFW';
 import type { 校园NSFW设置 } from '../../../models/campusNSFW';
+import { 默认都市网约车NSFW设置 } from '../../../models/urbanDriverNSFW';
+import type { 都市网约车NSFW设置 } from '../../../models/urbanDriverNSFW';
 
 type RuntimeStateSections = Record<'角色' | '环境' | '社交' | '世界' | '战斗' | '剧情' | '女主剧情规划' | '玩家门派' | '任务列表' | '约定列表' | '记忆系统', unknown>;
 
@@ -58,7 +61,7 @@ export type SettingsTabId =
     | 'api' | 'image_generation' | 'integrated_models'
     | 'independent_api_gpt' | 'novel_decomposition' | 'novel_decomposition_runtime'
     | 'prompt' | 'storage' | 'theme' | 'visual' | 'world'
-    | 'game' | 'campus_nsfw' | 'reality' | 'tavern_preset' | 'memory'
+    | 'game' | 'campus_nsfw' | 'urban_driver_nsfw' | 'reality' | 'tavern_preset' | 'memory'
     | 'history' | 'context' | 'music' | 'npc_management' | 'variable_manager';
 
 export interface SettingsTabItem {
@@ -194,6 +197,15 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 <CampusNSFWSettings
                     settings={campusSettings}
                     onChange={(s: 校园NSFW设置) => onSaveGame({ ...gameConfig, 校园NSFW设置: s })}
+                />
+            );
+        }
+        if (activeTab === 'urban_driver_nsfw' && gameConfig && onSaveGame) {
+            const driverSettings = gameConfig.都市网约车NSFW设置 ?? 默认都市网约车NSFW设置;
+            return (
+                <UrbanDriverNSFWSettings
+                    settings={driverSettings}
+                    onChange={(s: 都市网约车NSFW设置) => onSaveGame({ ...gameConfig, 都市网约车NSFW设置: s })}
                 />
             );
         }

@@ -3,6 +3,7 @@ import { SettingsTabItem } from './SettingsPanel';
 export const desktopTabs: SettingsTabItem[] = [
     { id: 'game', label: '游戏设定' },
     { id: 'campus_nsfw', label: '校园 NSFW' },
+    { id: 'urban_driver_nsfw', label: '都市 NSFW' },
     { id: 'reality', label: '真实世界' },
     { id: 'tavern_preset', label: '酒馆预设' },
     { id: 'world', label: '世界设定' },
@@ -27,6 +28,7 @@ export const desktopTabs: SettingsTabItem[] = [
 export const mobileTabs: SettingsTabItem[] = [
     { id: 'game', label: '游戏' },
     { id: 'campus_nsfw', label: '校园' },
+    { id: 'urban_driver_nsfw', label: '都市 NSFW' },
     { id: 'reality', label: '真实' },
     { id: 'tavern_preset', label: '酒馆' },
     { id: 'world', label: '世界' },
