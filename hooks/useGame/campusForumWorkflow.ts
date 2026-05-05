@@ -4,7 +4,6 @@
  */
 
 import type { 当前可用接口结构 } from '../../utils/apiConfig';
-import type { 接口设置结构 } from '../../models/system';
 import type { DeviceMode, DeviceGameContext } from '../../models/mobileDevice';
 import type { 校园系统数据, 论坛帖子 } from '../../models/campusPhone';
 import type { 校园NSFW设置 } from '../../models/campusNSFW';
@@ -23,7 +22,7 @@ export async function 刷新校园论坛(
         eraId: string;
         mode: DeviceMode;
         apiConfig: 当前可用接口结构;
-        apiSettings: 接口设置结构;
+        apiSettings: 当前可用接口结构;
         gameContext: DeviceGameContext;
         校园系统: 校园系统数据;
         nsfw设置: 校园NSFW设置;
