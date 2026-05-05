@@ -13,6 +13,7 @@ import type {
     角色数据结构,
     记忆系统结构
 } from '../../types';
+import { 修复世界状态孤立引用 } from './worldStateIntegrity';
 
 export type 开场命令基态 = {
     角色: 角色数据结构;
