@@ -50,6 +50,12 @@ type VariableGenerationProgress = {
     commandTexts?: string[];
 };
 
+type DeviceMessageProgress = {
+    phase: 'start' | 'done' | 'error' | 'skipped';
+    text?: string;
+    rawText?: string;
+};
+
 type IndependentStageId = 'polish' | 'world' | 'planning' | 'variable';
 type IndependentStageFailureDecision = 'retry' | 'skip';
 type IndependentStageFailureParams = {
@@ -68,6 +74,7 @@ interface Props {
             onWorldEvolutionProgress?: (progress: WorldEvolutionProgress) => void;
             onPlanningProgress?: (progress: PlanningProgress) => void;
             onVariableGenerationProgress?: (progress: VariableGenerationProgress) => void;
+            onDeviceMessageProgress?: (progress: DeviceMessageProgress) => void;
             onStageFailureDecision?: (params: IndependentStageFailureParams) => Promise<IndependentStageFailureDecision> | IndependentStageFailureDecision;
         }
     ) => Promise<SendResult> | SendResult;
@@ -119,6 +126,7 @@ const InputArea: React.FC<Props> = ({
     const [worldEvolutionProgress, setWorldEvolutionProgress] = useState<WorldEvolutionProgress | null>(null);
     const [planningProgress, setPlanningProgress] = useState<PlanningProgress | null>(null);
     const [variableGenerationProgress, setVariableGenerationProgress] = useState<VariableGenerationProgress | null>(null);
+    const [deviceMessageProgress, setDeviceMessageProgress] = useState<DeviceMessageProgress | null>(null);
     const [expandedRawStageId, setExpandedRawStageId] = useState<string | null>(null);
     const [expandedCommandStageId, setExpandedCommandStageId] = useState<string | null>(null);
     const [queueCollapsed, setQueueCollapsed] = useState(true);
@@ -156,6 +164,7 @@ const InputArea: React.FC<Props> = ({
         setWorldEvolutionProgress(null);
         setPlanningProgress(null);
         setVariableGenerationProgress(null);
+        setDeviceMessageProgress(null);
         setExpandedRawStageId(null);
         setExpandedCommandStageId(null);
         setQueueCollapsed(true);
@@ -169,6 +178,7 @@ const InputArea: React.FC<Props> = ({
                 onWorldEvolutionProgress: (progress) => setWorldEvolutionProgress(progress),
                 onPlanningProgress: (progress) => setPlanningProgress(progress),
                 onVariableGenerationProgress: (progress) => setVariableGenerationProgress(progress),
+                onDeviceMessageProgress: (progress) => setDeviceMessageProgress(progress),
                 onStageFailureDecision: async (params) => {
                     const message = `${params.stageLabel}请求失败：\n\n${params.errorText || '未知错误'}\n\n选择“重试”会重新执行当前阶段；选择“跳过”会继续后续阶段。`;
                     if (requestConfirm) {
@@ -401,7 +411,8 @@ const InputArea: React.FC<Props> = ({
         { id: 'polish', label: '文章优化', progress: polishProgress },
         { id: 'variable', label: '变量生成', progress: effectiveVariableGenerationProgress },
         { id: 'world', label: '动态世界', progress: effectiveWorldEvolutionProgress },
-        { id: 'planning', label: '规划分析', progress: effectivePlanningProgress }
+        { id: 'planning', label: '规划分析', progress: effectivePlanningProgress },
+        { id: 'device', label: '设备消息', progress: deviceMessageProgress }
     ];
     const queueVisible = pipelineStages.some((stage) => Boolean(stage.progress));
     const historyStages = pipelineStages.filter((stage) => {

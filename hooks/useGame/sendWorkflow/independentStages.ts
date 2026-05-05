@@ -44,6 +44,12 @@ export type 规划分析进度 = {
     commandTexts?: string[];
 };
 
+export type 设备消息进度 = {
+    phase: 'start' | 'done' | 'error' | 'skipped';
+    text?: string;
+    rawText?: string;
+};
+
 export type 世界演变进度 = {
     phase: 'start' | 'done' | 'error' | 'skipped';
     text?: string;

@@ -62,6 +62,7 @@ export type 发送选项 = {
     onWorldEvolutionProgress?: (progress: import('./independentStages').世界演变进度) => void;
     onPlanningProgress?: (progress: import('./independentStages').规划分析进度) => void;
     onVariableGenerationProgress?: (progress: import('./independentStages').变量生成进度) => void;
+    onDeviceMessageProgress?: (progress: import('./independentStages').设备消息进度) => void;
     onStageFailureDecision?: (params: import('./independentStages').独立阶段失败决策参数) =>
         Promise<import('./independentStages').独立阶段失败决策> |
         import('./independentStages').独立阶段失败决策;
@@ -307,7 +308,8 @@ type 主剧情发送依赖 = {
         finalState: any;
         rawAiText: string;
         sendInput: string;
-    }) => Promise<void>;
+        signal?: AbortSignal;
+    }) => Promise<{ summary?: string; rawText?: string } | void>;
 };
 
 // ─── 主工作流 ───────────────────────────────────────────────────────────────
@@ -667,7 +669,10 @@ export const 执行主剧情发送工作流 = async (
                     isStreaming
                 },
                 turnSnapshot,
-                options
+                options: {
+                    ...options,
+                    abortSignal: controller.signal,
+                }
             },
             {
                 深拷贝: deps.深拷贝,

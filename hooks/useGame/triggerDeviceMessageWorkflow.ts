@@ -29,6 +29,8 @@ export interface 设备消息触发参数 {
     persistToDb?: boolean;
     /** 里模式强度级别（仅在 mode='li' 时生效） */
     liIntensity?: LiModeIntensity;
+    /** 用于取消生成的信号 */
+    signal?: AbortSignal;
 }
 
 export interface 设备消息触发结果 {
@@ -105,7 +107,7 @@ export function 构建设备通讯摘要(params: {
 export async function 触发设备消息生成(
     params: 设备消息触发参数
 ): Promise<设备消息触发结果> {
-    const { eraId, mode, apiConfig, apiSettings, context, targetApps, messagesPerApp = 3, persistToDb = true, liIntensity } = params;
+    const { eraId, mode, apiConfig, apiSettings, context, targetApps, messagesPerApp = 3, persistToDb = true, liIntensity, signal } = params;
     const result: 设备消息触发结果 = {
         generatedMessages: {},
         newNotifications: [],
@@ -139,6 +141,7 @@ export async function 触发设备消息生成(
                 context: appContext,
                 count: messagesPerApp,
                 liIntensity,
+                signal,
             }, apiConfig, apiSettings, messagesPerApp);
 
             if (genResult.messages.length > 0) {

@@ -1721,7 +1721,7 @@ export const useGame = () => {
                 文章优化功能已开启,
                 后台执行统一规划分析,
                 执行变量生成并合并响应: 执行变量生成并合并响应,
-                触发设备消息生成: async ({ finalState }) => {
+                触发设备消息生成: async ({ finalState, signal }) => {
                     try {
                         const 当前时代 = currentEra;
                         if (!当前时代) return;
@@ -1729,7 +1729,7 @@ export const useGame = () => {
                         const 主接口 = 获取主剧情接口配置(apiConfig);
                         if (!主接口?.baseUrl || !主接口?.apiKey) return;
                         const liIntensity = gameConfig?.子纪元里模式强度?.[当前时代];
-                        await 触发设备消息生成({
+                        const result = await 触发设备消息生成({
                             eraId: 当前时代,
                             mode,
                             apiConfig: 主接口,
@@ -1741,9 +1741,18 @@ export const useGame = () => {
                                 世界状态: '',
                             },
                             liIntensity,
+                            signal,
                         });
+                        const allMessages = Object.values(result.generatedMessages || {}).flat();
+                        return {
+                            summary: allMessages.length > 0
+                                ? `生成 ${allMessages.length} 条设备消息`
+                                : '设备消息生成完成',
+                            rawText: result.errors?.join('; ') || '',
+                        };
                     } catch (err) {
                         console.warn('[设备消息生成] 失败:', err);
+                        throw err;
                     }
                 },
             },

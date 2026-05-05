@@ -15,7 +15,7 @@ import {
 } from '../memoryUtils';
 import { 规范化记忆配置 } from '../memoryUtils';
 import type { GameResponse, 聊天记录结构, 剧情系统结构, 记忆系统结构 } from '../../../types';
-import type { 世界演变进度, 规划分析进度, 正文润色进度, 变量生成进度 } from './independentStages';
+import type { 世界演变进度, 规划分析进度, 正文润色进度, 变量生成进度, 设备消息进度 } from './independentStages';
 import type { 回合快照结构 } from './index';
 import type { 世界演变执行结果, 世界演变触发参数 } from '../worldEvolutionWorkflow';
 
@@ -135,7 +135,8 @@ export type 响应处理阶段依赖 = {
         finalState: any;
         rawAiText: string;
         sendInput: string;
-    }) => Promise<void>;
+        signal?: AbortSignal;
+    }) => Promise<{ summary?: string; rawText?: string } | void>;
 };
 
 // ─── 响应处理阶段输入 ────────────────────────────────────────────────────────
@@ -181,6 +182,8 @@ export type 响应处理阶段输入 = {
         onWorldEvolutionProgress?: (progress: 世界演变进度) => void;
         onPlanningProgress?: (progress: 规划分析进度) => void;
         onVariableGenerationProgress?: (progress: 变量生成进度) => void;
+        onDeviceMessageProgress?: (progress: 设备消息进度) => void;
+        abortSignal?: AbortSignal;
     };
 };
 
@@ -671,11 +674,31 @@ export const 执行响应处理阶段 = async (
 
     // ─── 设备消息生成（回合末尾） ────────────────────────────────────────────
     if (deps.触发设备消息生成) {
-        await deps.触发设备消息生成({
-            finalState,
-            rawAiText,
-            sendInput,
-        });
+        try {
+            options?.onDeviceMessageProgress?.({ phase: 'start' });
+            const deviceResult = await deps.触发设备消息生成({
+                finalState,
+                rawAiText,
+                sendInput,
+                signal: options?.abortSignal,
+            });
+            if (deviceResult) {
+                const deviceText = deviceResult.summary || deviceResult.rawText;
+                options?.onDeviceMessageProgress?.({
+                    phase: 'done',
+                    text: deviceText?.substring(0, 200),
+                    rawText: deviceResult.rawText,
+                });
+            } else {
+                options?.onDeviceMessageProgress?.({ phase: 'done' });
+            }
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : String(err);
+            options?.onDeviceMessageProgress?.({
+                phase: 'error',
+                text: `设备消息生成失败: ${errorMessage}`,
+            });
+        }
     }
 
     return {
