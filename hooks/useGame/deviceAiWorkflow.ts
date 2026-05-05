@@ -182,7 +182,7 @@ function 解析JSON数组(text: string): unknown[] | null {
 export async function 生成设备原始消息(
     options: DeviceMessageOptions,
     apiConfig: 当前可用接口结构,
-    settings: 接口设置结构,
+    _settings: 当前可用接口结构,
     count?: number
 ): Promise<unknown[]> {
     const messageCount = count ?? options.count ?? 5;
@@ -213,7 +213,7 @@ export async function 生成设备原始消息(
 export async function 生成设备消息(
     options: DeviceMessageOptions,
     apiConfig: 当前可用接口结构,
-    settings: 接口设置结构,
+    _settings: 当前可用接口结构,
     count?: number
 ): Promise<DeviceMessageGenerationResult> {
     const messageCount = count ?? options.count ?? 5;
@@ -267,7 +267,7 @@ export async function 生成设备群组(
     mode: DeviceMode,
     context: DeviceMessageOptions['context'],
     apiConfig: 当前可用接口结构,
-    settings: 接口设置结构,
+    _settings: 当前可用接口结构,
     count?: number
 ): Promise<DeviceGroup[]> {
     const options: DeviceMessageOptions = {
@@ -278,7 +278,7 @@ export async function 生成设备群组(
         count: count ?? 5,
     };
 
-    const result = await 生成设备消息(options, apiConfig, settings, count);
+    const result = await 生成设备消息(options, apiConfig, _settings, count);
     const config = getDeviceConfig(eraId);
     const groupType = config?.deviceForm === 'smartphone' ? 'modern'
         : config?.deviceForm === 'neural_interface' ? 'neural'
@@ -300,7 +300,7 @@ export async function 生成设备联系人(
     mode: DeviceMode,
     context: DeviceMessageOptions['context'],
     apiConfig: 当前可用接口结构,
-    settings: 接口设置结构,
+    _settings: 当前可用接口结构,
     count?: number
 ): Promise<DeviceContact[]> {
     const options: DeviceMessageOptions = {
@@ -311,7 +311,7 @@ export async function 生成设备联系人(
         count: count ?? 8,
     };
 
-    const result = await 生成设备消息(options, apiConfig, settings, count);
+    const result = await 生成设备消息(options, apiConfig, _settings, count);
 
     return result.messages.map((msg, i) => ({
         id: `ai-contact-${Date.now()}-${i}`,

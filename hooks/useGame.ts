@@ -607,7 +607,7 @@ export const useGame = () => {
         eraId: currentEra,
         mode: 派生设备模式(),
         apiConfig: 设备消息接口!,
-        apiSettings: apiConfig as any,
+        apiSettings: 设备消息接口!,
         gameContext: 设备刷新GameContext,
         nsfw设置,
         推送右下角提示,
