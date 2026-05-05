@@ -197,7 +197,14 @@ export const 规范化开局配置 = (raw?: any): OpeningConfig => {
             附加角色替换规则列表: 规范化角色替换规则列表(raw?.同人融合?.附加角色替换规则列表),
             启用附加小说: raw?.同人融合?.启用附加小说 === true,
             附加小说数据集ID: 读取文本(raw?.同人融合?.附加小说数据集ID)
-        }
+        },
+        selectedSceneId: raw?.selectedSceneId ? 读取文本(raw.selectedSceneId) || undefined : undefined,
+        selectedArchetypeIds: Array.isArray(raw?.selectedArchetypeIds)
+            ? raw.selectedArchetypeIds.map(读取文本).filter(Boolean)
+            : undefined,
+        selectedWritingSampleIds: Array.isArray(raw?.selectedWritingSampleIds)
+            ? raw.selectedWritingSampleIds.map(读取文本).filter(Boolean)
+            : undefined
     };
 };
 

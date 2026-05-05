@@ -1484,6 +1484,12 @@ export interface OpeningConfig {
     关系侧重: 关系侧重类型[];
     开局切入偏好: 开局切入偏好类型;
     同人融合: 同人融合配置结构;
+    /** 选中的开局场景 ID（来自当前子纪元的 openingScenes） */
+    selectedSceneId?: string;
+    /** 选中的角色原型 ID 列表（来自当前子纪元的 characterArchetypes） */
+    selectedArchetypeIds?: string[];
+    /** 选中的写作示例 ID 列表（来自当前子纪元的 writingSamples） */
+    selectedWritingSampleIds?: string[];
 }
 
 export interface WorldGenConfig {

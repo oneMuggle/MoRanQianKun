@@ -540,7 +540,7 @@ export const 执行开场剧情生成工作流 = async (
                     openingTaskPromptWithFandom,
                     openingNovelDecompositionSystemPrompt,
                     构建开局配置提示词(options?.开局配置),
-                    构建时代开局场景注入(options?.eraId),
+                    构建时代开局场景注入(options?.eraId, undefined, options?.开局配置?.selectedSceneId),
                     typeof options?.开局额外要求 === 'string' ? options.开局额外要求 : ''
                 ],
                 openingConfig: options?.开局配置,

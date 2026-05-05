@@ -4,7 +4,7 @@ import { 读取小说拆分数据集列表 } from '../../../services/novel-decom
 import { randomQiyun, 气运数据, 气运数据列表 } from '../../../data/qiyun';
 import { 预设天赋, 预设背景 } from '../../../data/presets';
 import { 背景推荐映射 } from '../../../data/recommendations';
-import { resolveEraNode } from '../../../models/eraTheme';
+import { resolveEraNode, allEraNodes } from '../../../models/eraTheme';
 import { 开局预设方案结构 } from '../../../data/newGamePresets';
 import { 获取子纪元默认预设, 获取子纪元默认预设列表, 子纪元默认预设结构 } from '../../../data/subEraDefaultPresets';
 import { OpeningConfig, WorldGenConfig, 小说拆分数据集结构, 角色数据结构, 天赋结构, 背景结构, 游戏难度 } from '../../../types';
@@ -27,7 +27,7 @@ import {
 } from '../../../utils/openingConfig';
 import { 默认境界母板提示词 } from '../../../prompts/runtime/fandom';
 import { LiModeIntensity } from '../../../prompts/runtime/eraLiMode';
-import type { LiModeStage } from '../../../models/eraTheme/types';
+import type { LiModeStage, EraOpeningScene, EraCharacterArchetype, EraWritingSample } from '../../../models/eraTheme/types';
 import { 设置键 } from '../../../utils/settingsSchema';
 import { 内置时代配置, 获取时代背景 } from '../../../models/system';
 import { 时代主题方案列表, 获取时代主题方案 } from '../../../models/eraTheme';
@@ -112,6 +112,13 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         }
     }, [currentEra]);
 
+    // 切换时代时清空环境剧情预设选择
+    useEffect(() => {
+        setSelectedSceneId('');
+        setSelectedArchetypeIds([]);
+        setSelectedWritingSampleIds([]);
+    }, [worldConfig.时代配置ID]);
+
     // 子纪元里模式开关：默认开启，用户可手动关闭
 
     const [selectedQiyun, setSelectedQiyun] = useState<气运数据[]>([]);
@@ -149,6 +156,11 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
     const [子纪元里模式强度, 设置子纪元里模式强度] = useState<LiModeIntensity>('暧昧');
     const [子纪元里模式阶段, 设置子纪元里模式阶段] = useState<LiModeStage>('羞耻');
     const [古代体系选择, 设置古代体系选择] = useState<体系类型>('武侠');
+
+    // 环境剧情预设
+    const [selectedSceneId, setSelectedSceneId] = useState<string>('');
+    const [selectedArchetypeIds, setSelectedArchetypeIds] = useState<string[]>([]);
+    const [selectedWritingSampleIds, setSelectedWritingSampleIds] = useState<string[]>([]);
 
     // Search & filter
     const [背景搜索词, set背景搜索词] = useState('');
@@ -240,6 +252,13 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         setSelectedBackground(bg);
         setSelectedTalents(talents);
         setSelectedQiyun(qiyunList);
+        // 自动选中第一个可用开局场景
+        const eraNode = allEraNodes.find((n) => n.id === worldConfig.时代配置ID);
+        if (eraNode?.openingScenes?.[0]) {
+            setSelectedSceneId(eraNode.openingScenes[0].id);
+        }
+        setSelectedArchetypeIds([]);
+        setSelectedWritingSampleIds([]);
     };
 
     const 全部背景选项 = useMemo(() => {
@@ -507,12 +526,41 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         setOpeningConfigEnabled(Boolean(normalizedOpeningConfig));
         setOpeningConfig(normalizedOpeningConfig || 默认开局配置());
         setOpeningExtraRequirement(preset.openingExtraRequirement || '');
+        // 从预设方案提取场景/原型（若预设定义了的话）
+        setSelectedSceneId(normalizedOpeningConfig?.selectedSceneId || '');
+        setSelectedArchetypeIds(normalizedOpeningConfig?.selectedArchetypeIds || []);
+        setSelectedWritingSampleIds(normalizedOpeningConfig?.selectedWritingSampleIds || []);
         setStep(1);
     };
 
     const 当前性别模式: '男' | '女' | '自定义' = charGender.trim() === '男' || charGender.trim() === '女'
         ? charGender.trim() as '男' | '女'
         : '自定义';
+
+    // 当前子纪元的环境剧情预设数据
+    const 当前子纪元环境预设 = useMemo(() => {
+        const eraId = worldConfig.时代配置ID || '';
+        if (!eraId) return { openingScenes: [], characterArchetypes: [], writingSamples: [], liModeSceneTypes: [] };
+        const node = allEraNodes.find((n) => n.id === eraId);
+        return {
+            openingScenes: node?.openingScenes || [],
+            characterArchetypes: node?.characterArchetypes || [],
+            writingSamples: node?.writingSamples || [],
+            liModeSceneTypes: (node?.liMode && 'sceneTypes' in node.liMode ? node.liMode.sceneTypes : []) as string[]
+        };
+    }, [worldConfig.时代配置ID]);
+
+    const toggleArchetype = (id: string) => {
+        setSelectedArchetypeIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
+    };
+
+    const toggleWritingSample = (id: string) => {
+        setSelectedWritingSampleIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
+    };
 
     const 选择性别 = (next: '男' | '女' | '自定义') => {
         if (next === '自定义') {
@@ -894,7 +942,12 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
             天赋名称列表: selectedTalents.map(item => item.名称).slice(0, 3),
             气运列表: selectedQiyun
         },
-        openingConfig: openingConfigEnabled ? 规范化开局配置(openingConfig) : undefined,
+        openingConfig: openingConfigEnabled ? 规范化开局配置({
+            ...openingConfig,
+            selectedSceneId: selectedSceneId || undefined,
+            selectedArchetypeIds: selectedArchetypeIds.length > 0 ? selectedArchetypeIds : undefined,
+            selectedWritingSampleIds: selectedWritingSampleIds.length > 0 ? selectedWritingSampleIds : undefined
+        }) : undefined,
         openingStreaming: true,
         openingExtraRequirement: openingExtraRequirement.trim()
     });
@@ -950,7 +1003,12 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         const effectiveWorldConfig = preset ? { ...worldConfig, ...preset.worldConfig, 古代体系选择 } : { ...worldConfig, 古代体系选择 };
         const effectiveOpeningConfig = preset
             ? 规范化可选开局配置(preset.openingConfig)
-            : (openingConfigEnabled ? 规范化开局配置(openingConfig) : undefined);
+            : (openingConfigEnabled ? 规范化开局配置({
+                ...openingConfig,
+                selectedSceneId: selectedSceneId || undefined,
+                selectedArchetypeIds: selectedArchetypeIds.length > 0 ? selectedArchetypeIds : undefined,
+                selectedWritingSampleIds: selectedWritingSampleIds.length > 0 ? selectedWritingSampleIds : undefined
+            }) : undefined);
         const effectiveName = preset?.character.姓名 ?? charName;
         const effectiveGender = preset?.character.性别 ?? charGender;
         const effectiveRoleReplaceRules = 获取同人角色替换规则列表(effectiveOpeningConfig, effectiveName);
@@ -1014,6 +1072,9 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         monthRef, dayRef, manualWorldPromptInputRef, manualRealmPromptInputRef,
         stats, setStats,
         openingConfig, setOpeningConfig, openingConfigEnabled, setOpeningConfigEnabled,
+        selectedSceneId, setSelectedSceneId,
+        selectedArchetypeIds, toggleArchetype,
+        selectedWritingSampleIds, toggleWritingSample,
         selectedBackground, setSelectedBackground,
         selectedTalents, setSelectedTalents,
         自定义天赋列表, 设置自定义天赋列表,
@@ -1048,6 +1109,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         全部背景选项, 全部天赋选项, 全部气运选项,
         过滤后背景选项, 过滤后天赋选项, 过滤后气运选项,
         当前子纪元默认预设, 当前子纪元默认预设列表,
+        当前子纪元环境预设,
         当前性别模式,
         totalStatBudget, usedPoints, remainingPoints,
         stepProgress, currentStepLabel, selectedTalentNames,

@@ -196,6 +196,10 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         selectedTalents,
         selectedQiyun,
         openingConfig, setOpeningConfig, openingConfigEnabled, setOpeningConfigEnabled,
+        selectedSceneId, setSelectedSceneId,
+        selectedArchetypeIds, toggleArchetype,
+        selectedWritingSampleIds, toggleWritingSample,
+        当前子纪元环境预设,
         openingExtraRequirement, setOpeningExtraRequirement,
         自定义天赋列表, 自定义背景列表,
         小说拆分数据集列表,
@@ -1319,6 +1323,108 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             </div>
                         </OrnateBorder>
 
+                        {/* 环境剧情预设 */}
+                        <OrnateBorder className="p-6 md:p-7">
+                            <div className="border-b border-wuxia-gold/30 pb-4 mb-5">
+                                <div className="text-[11px] uppercase tracking-[0.35em] text-wuxia-cyan/70 font-mono">Opening Presets</div>
+                                <h3 className="text-2xl font-serif font-bold text-wuxia-gold mt-2">环境剧情预设</h3>
+                                <p className="text-xs text-gray-400 mt-2 leading-6">从当前时代中选取开局场景、角色原型与写作风格，引导 AI 的开局叙事方向。</p>
+                            </div>
+
+                            {当前子纪元环境预设.openingScenes.length === 0 && 当前子纪元环境预设.characterArchetypes.length === 0 ? (
+                                <p className="text-sm text-gray-500 py-4">该时代暂无环境剧情预设，可按默认逻辑自然开局。</p>
+                            ) : (
+                                <div className="space-y-8">
+                                    {/* 开局场景 */}
+                                    {当前子纪元环境预设.openingScenes.length > 0 && (
+                                        <div>
+                                            <label className="text-sm text-wuxia-cyan font-bold">开局场景（单选）</label>
+                                            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                {当前子纪元环境预设.openingScenes.map((scene) => {
+                                                    const active = selectedSceneId === scene.id;
+                                                    return (
+                                                        <button
+                                                            key={scene.id}
+                                                            type="button"
+                                                            onClick={() => setSelectedSceneId(active ? '' : scene.id)}
+                                                            className={`rounded-xl border px-4 py-3 text-left transition-all ${
+                                                                active
+                                                                    ? 'border-wuxia-gold bg-wuxia-gold/10 text-wuxia-gold'
+                                                                    : 'border-gray-700 bg-black/30 text-gray-300 hover:border-wuxia-gold/40'
+                                                            }`}
+                                                        >
+                                                            <div className="text-sm font-bold">{scene.name}</div>
+                                                            <div className="text-xs text-gray-400 mt-1">{scene.description}</div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* 角色原型 */}
+                                    {当前子纪元环境预设.characterArchetypes.length > 0 && (
+                                        <div>
+                                            <label className="text-sm text-wuxia-cyan font-bold">角色原型（多选）</label>
+                                            <div className="mt-3 flex flex-wrap gap-3">
+                                                {当前子纪元环境预设.characterArchetypes.map((arch) => {
+                                                    const active = selectedArchetypeIds.includes(arch.id);
+                                                    return (
+                                                        <button
+                                                            key={arch.id}
+                                                            type="button"
+                                                            onClick={() => toggleArchetype(arch.id)}
+                                                            className={`rounded-full border px-4 py-2 text-sm transition-all ${
+                                                                active
+                                                                    ? 'border-wuxia-gold bg-wuxia-gold/10 text-wuxia-gold'
+                                                                    : 'border-gray-700 bg-black/30 text-gray-300 hover:border-wuxia-gold/40'
+                                                            }`}
+                                                        >
+                                                            {arch.name}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            {当前子纪元环境预设.characterArchetypes.find(a => selectedArchetypeIds.includes(a.id)) && (
+                                                <div className="mt-2 text-[11px] text-gray-500">
+                                                    已选：{当前子纪元环境预设.characterArchetypes.filter(a => selectedArchetypeIds.includes(a.id)).map(a => a.name).join('、')}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* 写作示例 */}
+                                    {当前子纪元环境预设.writingSamples.length > 0 && (
+                                        <div>
+                                            <label className="text-sm text-wuxia-cyan font-bold">写作风格参考（多选）</label>
+                                            <div className="mt-3 space-y-2">
+                                                {当前子纪元环境预设.writingSamples.map((sample) => {
+                                                    const active = selectedWritingSampleIds.includes(sample.id);
+                                                    return (
+                                                        <button
+                                                            key={sample.id}
+                                                            type="button"
+                                                            onClick={() => toggleWritingSample(sample.id)}
+                                                            className={`w-full rounded-xl border px-4 py-3 text-left transition-all ${
+                                                                active
+                                                                    ? 'border-wuxia-gold bg-wuxia-gold/10'
+                                                                    : 'border-gray-700 bg-black/30 hover:border-wuxia-gold/40'
+                                                            }`}
+                                                        >
+                                                            <div className={`text-sm font-bold ${active ? 'text-wuxia-gold' : 'text-gray-200'}`}>
+                                                                《{sample.title}》
+                                                            </div>
+                                                            <div className="text-xs text-gray-500 mt-1 line-clamp-2">{sample.excerpt}</div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </OrnateBorder>
+
                         <OrnateBorder className="p-6 md:p-7">
                             <div className="border-b border-wuxia-gold/30 pb-4 mb-5">
                                 <div className="text-[11px] uppercase tracking-[0.35em] text-wuxia-red/70 font-mono">Fandom Blend</div>
@@ -1554,6 +1660,20 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             <p>开局配置: <span className="text-white">{openingConfigEnabled ? '已启用' : '未启用'}</span></p>
                             <p>关系侧重: <span className="text-white">{openingConfigEnabled ? (openingConfig.关系侧重.join('、') || '无') : '未设置'}</span></p>
                             <p>开局切入: <span className="text-white">{openingConfigEnabled ? openingConfig.开局切入偏好 : '未设置'}</span></p>
+                            {(() => {
+                                const hasEnvPresets = selectedSceneId || selectedArchetypeIds.length > 0 || selectedWritingSampleIds.length > 0;
+                                if (!hasEnvPresets) return null;
+                                const sceneName = selectedSceneId ? (当前子纪元环境预设.openingScenes.find(s => s.id === selectedSceneId)?.name || selectedSceneId) : null;
+                                const archetypeNames = 当前子纪元环境预设.characterArchetypes.filter(a => selectedArchetypeIds.includes(a.id)).map(a => a.name);
+                                const writingSampleNames = 当前子纪元环境预设.writingSamples.filter(w => selectedWritingSampleIds.includes(w.id)).map(w => w.title);
+                                return (
+                                    <>
+                                        {sceneName && <p>选定开局场景: <span className="text-white">{sceneName}</span></p>}
+                                        {archetypeNames.length > 0 && <p>角色原型倾向: <span className="text-white">{archetypeNames.join('、')}</span></p>}
+                                        {writingSampleNames.length > 0 && <p>写作风格参考: <span className="text-white">{writingSampleNames.join('、')}</span></p>}
+                                    </>
+                                );
+                            })()}
                             <p>同人融合: <span className="text-white">{openingConfigEnabled ? (openingConfig.同人融合.enabled ? `${openingConfig.同人融合.作品名 || '未命名作品'} / ${openingConfig.同人融合.融合强度}` : '关闭') : '未设置'}</span></p>
                             <p>角色替换: <span className="text-white">{openingConfigEnabled ? (openingConfig.同人融合.启用角色替换 ? (格式化角色替换规则摘要(当前角色替换规则列表) || '未填写规则') : '关闭') : '未设置'}</span></p>
                             <p>附加小说: <span className="text-white">{openingConfigEnabled ? (openingConfig.同人融合.启用附加小说 ? (当前附加小说数据集?.作品名 || 当前附加小说数据集?.标题 || '未选择数据集') : '关闭') : '未设置'}</span></p>
