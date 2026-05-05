@@ -33,6 +33,8 @@ export interface DeviceMessageOptions {
     count?: number;
     /** 里模式强度级别 */
     liIntensity?: LiModeIntensity;
+    /** 用于取消生成的信号 */
+    signal?: AbortSignal;
 }
 
 // ============================================================
@@ -194,7 +196,7 @@ export async function 生成设备消息(
         const rawText = await 请求模型文本(
             apiConfig,
             normalizedMessages,
-            { temperature: 0.7, responseFormat: 'json_object' }
+            { temperature: 0.7, responseFormat: 'json_object', signal: options.signal }
         );
 
         const items = 解析JSON数组(rawText);
