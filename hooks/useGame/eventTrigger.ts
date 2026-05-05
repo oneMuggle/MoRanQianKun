@@ -14,7 +14,7 @@ import type {
     游戏事件,
     触发条件,
     事件状态,
-    解析事件更新信号,
+    增强条件,
 } from '../../models/eventTrigger';
 
 // ==================== 常量 ====================
@@ -119,7 +119,11 @@ export const 构建事件注入提示词 = (事件: 游戏事件): string => {
  */
 export const 解析事件更新信号 = (
     responseText: string
-): 解析事件更新信号 | null => {
+): {
+    事件ID: string;
+    新状态: string;
+    额外数据?: Record<string, unknown>;
+} | null => {
     const match = responseText.match(/<事件更新>\s*([\s\S]*?)\s*<\/事件更新>/);
     if (!match) return null;
 
@@ -267,6 +271,285 @@ export const 创建条件事件 = (
     过期回合: 选项?.过期回合,
     标签: 选项?.标签,
 });
+
+// ==================== V2 增强条件求值 ====================
+
+/**
+ * 从嵌套对象中获取属性值
+ */
+const 获取嵌套属性 = (obj: unknown, 路径: string): unknown => {
+    const parts = 路径.split('.');
+    let current: unknown = obj;
+    for (const part of parts) {
+        if (current === null || current === undefined) return undefined;
+        if (typeof current === 'object') {
+            current = (current as Record<string, unknown>)[part];
+        } else {
+            return undefined;
+        }
+    }
+    return current;
+};
+
+/**
+ * 比较两个值
+ */
+const 比较值 = (
+    左值: unknown,
+    操作符: '>' | '<' | '>=' | '<=' | '==' | '!=',
+    右值: unknown
+): boolean => {
+    switch (操作符) {
+        case '>': return (左值 as number) > (右值 as number);
+        case '<': return (左值 as number) < (右值 as number);
+        case '>=': return (左值 as number) >= (右值 as number);
+        case '<=': return (左值 as number) <= (右值 as number);
+        case '==': return 左值 == 右值;
+        case '!=': return 左值 != 右值;
+        default: return false;
+    }
+};
+
+/**
+ * 求值增强条件 (V2)
+ *
+ * @param 条件 - 增强条件
+ * @param 游戏状态 - 游戏状态对象
+ * @returns 条件是否满足
+ */
+export const 求值增强条件 = (
+    条件: 增强条件,
+    游戏状态: Record<string, unknown>
+): boolean => {
+    switch (条件.kind) {
+        case '属性比较': {
+            const 实际值 = 获取嵌套属性(游戏状态, 条件.属性路径);
+            return 比较值(实际值, 条件.操作符, 条件.值);
+        }
+        case '状态检查': {
+            const 实际值 = 获取嵌套属性(游戏状态, 条件.检查项);
+            return 实际值 === 条件.期望值;
+        }
+        case '概率': {
+            return Math.random() < 条件.概率;
+        }
+        case '且': {
+            return 条件.条件列表.every(c => 求值增强条件(c, 游戏状态));
+        }
+        case '或': {
+            return 条件.条件列表.some(c => 求值增强条件(c, 游戏状态));
+        }
+        case '非': {
+            return !求值增强条件(条件.条件, 游戏状态);
+        }
+        default:
+            return false;
+    }
+};
+
+// ==================== V2 周期性事件 ====================
+
+/**
+ * 检查周期性事件是否应触发 (V2)
+ *
+ * @param 事件 - 游戏事件
+ * @param 当前回合 - 当前回合
+ * @returns 是否应触发
+ */
+export const 检查周期性触发 = (
+    事件: 游戏事件,
+    当前回合: number
+): boolean => {
+    if (事件.状态 !== '待触发') return false;
+    if (!事件.周期性配置) return false;
+
+    const { 间隔回合, 终止回合, 最大触发次数 } = 事件.周期性配置;
+    const 已触发次数 = 事件.已触发次数 || 0;
+
+    // 检查最大触发次数
+    if (最大触发次数 !== undefined && 已触发次数 >= 最大触发次数) {
+        return false;
+    }
+
+    // 检查终止回合
+    if (终止回合 !== undefined && 当前回合 > 终止回合) {
+        return false;
+    }
+
+    // 检查是否到间隔
+    const 初始触发回合 = 计算触发回合(事件);
+    if (初始触发回合 === null) return false;
+
+    const 距初始触发 = 当前回合 - 初始触发回合;
+    return 距初始触发 > 0 && 距初始触发 % 间隔回合 === 0;
+};
+
+/**
+ * 获取周期性事件的下一触发回合 (V2)
+ */
+export const 获取下一触发回合 = (
+    事件: 游戏事件,
+    当前回合: number
+): number | null => {
+    if (!事件.周期性配置) return null;
+
+    const { 间隔回合, 终止回合, 最大触发次数 } = 事件.周期性配置;
+    const 已触发次数 = 事件.已触发次数 || 0;
+
+    if (最大触发次数 !== undefined && 已触发次数 >= 最大触发次数) {
+        return null;
+    }
+
+    const 初始触发回合 = 计算触发回合(事件);
+    if (初始触发回合 === null) return null;
+
+    let 下一触发 = 初始触发回合 + 间隔回合;
+    while (下一触发 <= 当前回合) {
+        下一触发 += 间隔回合;
+    }
+
+    if (终止回合 !== undefined && 下一触发 > 终止回合) {
+        return null;
+    }
+
+    return 下一触发;
+};
+
+// ==================== V2 事件链 ====================
+
+/**
+ * 查找事件链中应触发的事件 (V2)
+ *
+ * @param 源事件ID - 源事件ID
+ * @param 事件列表 - 所有事件列表
+ * @param 当前回合 - 当前回合
+ * @returns 应触发的事件列表
+ */
+export const 查找链式触发事件 = (
+    源事件ID: string,
+    事件列表: 游戏事件[],
+    当前回合: number
+): 游戏事件[] => {
+    const now = Date.now();
+    return 事件列表.filter(事件 => {
+        if (事件.状态 !== '待触发') return false;
+
+        // 检查是否是链式事件
+        if (!事件.事件链列表 || 事件.事件链列表.length === 0) return false;
+
+        // 查找以源事件ID为起点的链
+        return 事件.事件链列表.some(链 => {
+            if (链.源事件ID !== 源事件ID) return false;
+
+            // 检查延迟
+            const 目标触发回合 = (事件.触发回合 || 0) + 链.触发后延迟;
+            return 当前回合 >= 目标触发回合;
+        });
+    });
+};
+
+/**
+ * 清理已过期事件 (V2)
+ *
+ * @param 事件列表 - 事件列表
+ * @param 当前回合 - 当前回合
+ * @returns 清理后的事件列表
+ */
+export const 清理已过期事件 = (
+    事件列表: 游戏事件[],
+    当前回合: number
+): 游戏事件[] => {
+    return 事件列表.filter(事件 => {
+        // 删除已取消、已过期且已超过保留期限的事件
+        if (事件.状态 === '已取消') return false;
+        if (事件.状态 === '已过期') {
+            // 保留最近过期的，不超过10个
+            const 过期回合 = 事件.过期回合 || (事件.创建回合 + 100);
+            return 当前回合 - 过期回合 < 10;
+        }
+        return true;
+    });
+};
+
+// ==================== V2 事件分组 ====================
+
+/**
+ * 处理事件分组互斥 (V2)
+ * 同一互斥组中只保留最高优先级的事件
+ *
+ * @param 事件列表 - 待处理的事件列表
+ * @param 分组ID - 分组ID
+ * @returns 保留的事件列表
+ */
+export const 处理事件组互斥 = (
+    事件列表: 游戏事件[],
+    分组ID: string
+): 游戏事件[] => {
+    const 分组内事件 = 事件列表.filter(e => e.事件分组ID === 分组ID);
+
+    if (分组内事件.length <= 1) return 事件列表;
+
+    // 按优先级排序，取最高优先级
+    const 排序后 = [...分组内事件].sort(
+        (a, b) => (b.优先级 ?? 0) - (a.优先级 ?? 0)
+    );
+    const 最高优先级事件 = 排序后[0];
+
+    // 从原列表中移除同组事件，保留最高优先级
+    const 其他事件 = 事件列表.filter(e => e.事件分组ID !== 分组ID);
+    return [...其他事件, 最高优先级事件];
+};
+
+/**
+ * 获取分组内所有待触发事件 (V2)
+ */
+export const 获取分组待触发事件 = (
+    事件列表: 游戏事件[],
+    分组ID: string
+): 游戏事件[] => {
+    return 事件列表.filter(
+        e => e.事件分组ID === 分组ID && e.状态 === '待触发'
+    );
+};
+
+// ==================== V2 事件更新辅助 ====================
+
+/**
+ * 更新周期性事件的触发计数 (V2)
+ */
+export const 更新周期触发计数 = (事件: 游戏事件): 游戏事件 => {
+    if (事件.类型 !== '周期') return 事件;
+
+    return {
+        ...事件,
+        已触发次数: (事件.已触发次数 || 0) + 1,
+    };
+};
+
+/**
+ * 检查事件是否应自动过期 (V2)
+ */
+export const 检查事件过期 = (
+    事件: 游戏事件,
+    当前回合: number
+): 游戏事件 | null => {
+    if (事件.状态 !== '待触发') return null;
+
+    // 基于过期回合检查
+    if (事件.过期回合 !== undefined && 当前回合 > 事件.过期回合) {
+        return { ...事件, 状态: '已过期' as const };
+    }
+
+    // 基于周期性配置检查
+    if (事件.周期性配置?.最大触发次数 !== undefined) {
+        const 已触发次数 = 事件.已触发次数 || 0;
+        if (已触发次数 >= 事件.周期性配置.最大触发次数) {
+            return { ...事件, 状态: '已过期' as const };
+        }
+    }
+
+    return null;
+};
 
 // ==================== 工具函数 ====================
 

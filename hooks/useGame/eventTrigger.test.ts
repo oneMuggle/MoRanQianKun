@@ -14,8 +14,17 @@ import {
     创建绝对回合事件,
     创建条件事件,
     获取事件描述,
+    求值增强条件,
+    检查周期性触发,
+    获取下一触发回合,
+    查找链式触发事件,
+    清理已过期事件,
+    处理事件组互斥,
+    获取分组待触发事件,
+    更新周期触发计数,
+    检查事件过期,
 } from './eventTrigger';
-import type { 游戏事件 } from '../../models/eventTrigger';
+import type { 游戏事件, 增强条件 } from '../../models/eventTrigger';
 
 describe('eventTrigger', () => {
     // ==================== 检查到期事件 ====================
