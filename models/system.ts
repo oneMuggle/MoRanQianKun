@@ -1452,6 +1452,53 @@ export const 能力类型描述映射: Record<能力类型, string> = {
 };
 
 export type 游戏难度 = 'relaxed' | 'easy' | 'normal' | 'hard' | 'extreme';
+
+export interface 难度调整记录 {
+    时间: number;
+    原难度: 游戏难度;
+    新难度: 游戏难度;
+    原因: string;
+    玩家表现: {
+        胜率: number;
+        死亡次数: number;
+        任务完成率: number;
+    };
+}
+
+export interface 游戏统计 {
+    总回合数: number;
+    战斗次数: number;
+    胜利次数: number;
+    失败次数: number;
+    死亡次数: number;
+    任务完成次数: number;
+    任务失败次数: number;
+    跨境挑战次数: number;
+    跨境成功次数: number;
+    濒死次数: number;
+    连续失败次数: number;
+    连续胜利次数: number;
+    难度调整历史: 难度调整记录[];
+    上次调整后回合数: number;
+}
+
+export const 默认游戏统计 = (): 游戏统计 => ({
+    总回合数: 0,
+    战斗次数: 0,
+    胜利次数: 0,
+    失败次数: 0,
+    死亡次数: 0,
+    任务完成次数: 0,
+    任务失败次数: 0,
+    跨境挑战次数: 0,
+    跨境成功次数: 0,
+    濒死次数: 0,
+    连续失败次数: 0,
+    连续胜利次数: 0,
+    难度调整历史: [],
+    上次调整后回合数: 0
+});
+
 export type 初始关系模板类型 = '独行少系' | '家族牵引' | '师门牵引' | '世家官门' | '青梅旧识' | '旧仇旧债';
 export type 关系侧重类型 = '亲情' | '友情' | '师门' | '情缘' | '利益' | '仇怨';
 export type 开局切入偏好类型 = '日常低压' | '在途起手' | '家宅起手' | '门派起手' | '风波前夜';
@@ -1596,6 +1643,7 @@ export interface 游戏设置结构 {
         小说拆分: boolean;
     };
     额外提示词: string; // Custom prompt injected at the end
+    启用动态难度?: boolean; // Toggle dynamic difficulty adjustment based on player performance
 }
 
 export interface 记忆配置结构 {
