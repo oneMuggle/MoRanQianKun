@@ -111,3 +111,226 @@ dea6b76 feat(game): 引入里模式强度调节与 NPC 表里人格切换
 ## 结论
 
 **无法执行** - 计划文件从未创建或已被删除。跳过此任务。
+
+---
+
+## Task: docs/plans/2026-05-03_fan-interaction-rewards.md
+
+**执行时间**: 2026-05-07 00:28 UTC
+
+### 状态: ⚠️ 文件不存在
+
+---
+
+## 问题
+
+计划文件 `docs/plans/2026-05-03_fan-interaction-rewards.md` 不存在。
+
+### 检查记录
+
+1. **精确路径检查**: 文件不存在
+2. **模糊搜索** (`*fan*`, `*reward*` in plans dir): 仅发现 `fandom-mode-prompt-plan.md`
+3. **全库内容搜索** (`fan.*interaction`, `fan.*reward`, `粉丝.*互动`, `粉丝.*奖励`):
+   - 找到多个"粉丝互动"相关实现（data/talents/, data/qiyun/, models/contemporary/streaming/, models/contemporary/adultIndustry/）
+   - 但无名为 `fan-interaction-rewards` 的计划文件
+4. **Git 状态检查**: 文件不在版本控制中
+
+### 相近文件
+
+| 文件 | 内容相关性 |
+|------|-----------|
+| `docs/plans/fandom-mode-prompt-plan.md` | 同人模式提示词系统（非粉丝奖励） |
+| `docs/plans/2026-05-06_streaming-nsfw-plan.md` | 直播/粉丝互动 NSFW 计划（部分相关） |
+| `docs/plans/2026-05-06_adult-industry-nsfw-plan.md` | 成人产业计划，含粉丝互动场景 |
+
+### 结论
+
+**无法执行** - 计划文件不存在，可能已被删除、移动或从未创建。
+
+---
+
+## Task: docs/plans/2026-05-02_digital-world-character-system.md
+
+**执行时间**: 2026-05-07 00:29 UTC
+
+### 状态: ⚠️ 文件不存在
+
+---
+
+## 问题
+
+计划文件 `docs/plans/2026-05-02_digital-world-character-system.md` 不存在。
+
+### 检查记录
+
+1. **精确路径检查**: 文件不存在
+2. **通配符搜索** (`*digital*`, `*character*`): 无匹配文件
+3. **2026-05-02* 文件列表**: 无匹配文件
+4. **Git 历史搜索** (`--grep="digital-world"`): 无提交记录
+5. **全库搜索** (`*digital*world*character*`): 无匹配
+
+### 相近文件
+
+| 文件 | 内容相关性 |
+|------|-----------|
+| `docs/plans/2026-04-05_character-archetype-system.md` | 角色原型系统 |
+| `docs/plans/2026-05-05_campus-era-npc-relationship.md` | NPC 关系系统 |
+
+---
+
+## 结论
+
+**无法执行** - 计划文件从未创建或已被删除。跳过此任务。
+
+---
+
+## Task: docs/plans/2026-05-02_night-city-romance-expand.md
+
+**执行时间**: 2026-05-07 00:28 UTC
+
+### 状态: ⚠️ 文件不存在
+
+---
+
+## 问题
+
+计划文件 `docs/plans/2026-05-02_night-city-romance-expand.md` 不存在。
+
+### 检查记录
+
+1. **精确路径检查**: 文件不存在
+2. **文件名搜索** (`*night*city*`, `*night-city*`): 无匹配
+3. **docs/plans/ 目录内容**: 共50+个计划文件，无此文件
+4. **Git 历史搜索**: 无 commit 记录
+
+### 结论
+
+**无法执行** - 计划文件不存在，可能已被删除、移动或从未创建。
+
+---
+
+## Task: docs/plans/2026-05-02_digital-world-character-system.md
+
+**执行时间**: 2026-05-07 00:29 UTC
+
+### 状态: ⚠️ 文件不存在
+
+---
+
+## 问题
+
+计划文件 `docs/plans/2026-05-02_digital-world-character-system.md` 不存在。
+
+### 检查记录
+
+1. **精确路径检查**: 文件不存在
+2. **通配符搜索** (`*digital*`, `*character*`): 无匹配文件
+3. **2026-05-02* 文件列表**: 无匹配文件
+4. **Git 历史搜索** (`--grep="digital-world"`): 无提交记录
+5. **全库搜索** (`*digital*world*character*`): 无匹配
+
+### 相近文件
+
+| 文件 | 内容相关性 |
+|------|-----------|
+| `docs/plans/2026-04-05_character-archetype-system.md` | 角色原型系统 |
+| `docs/plans/2026-05-05_campus-era-npc-relationship.md` | NPC 关系系统 |
+
+---
+
+## 结论
+
+**无法执行** - 计划文件从未创建或已被删除。跳过此任务。
+
+---
+
+## Task: docs/plans/2026-05-03_safer-ai-dialogue-system.md
+
+**执行时间**: 2026-05-07 00:28 UTC
+
+### 状态: ⚠️ 文件不存在
+
+---
+
+## 问题
+
+计划文件 `docs/plans/2026-05-03_safer-ai-dialogue-system.md` 不存在。
+
+### 检查记录
+
+1. **精确路径检查**: 文件不存在
+2. **模糊搜索** (`*safer*`, `*dialogue*`): 无匹配
+3. **docs/plans/ 目录内容**: 已确认无此文件（目录中有 ~100 个计划文件）
+
+---
+
+## 结论
+
+**无法执行** - 计划文件不存在，可能已被删除、移动或从未创建。
+
+---
+
+## Task: docs/plans/2026-05-01_nsfw-permission-system.md
+
+**执行时间**: 2026-05-07 00:30 UTC
+
+### 状态: ⚠️ 文件不存在
+
+---
+
+## 问题
+
+计划文件 `docs/plans/2026-05-01_nsfw-permission-system.md` 不存在。
+
+### 检查记录
+
+1. **精确路径检查**: 文件不存在
+2. **模糊搜索** (`*permission*` in plans dir): 无匹配
+3. **内容搜索** (`nsfw.*permission`, `age.*verif`, `content.*rating`): 无结果
+4. **docs/plans/ 目录内容**: 已确认无此文件（目录中有 ~100 个计划文件）
+   - 最近的 NSFW 相关文件:
+     - `2026-05-04-nsfw-system-optimization.md`
+     - `2026-05-04-campus-era-talent-nsfw-optimization.md`
+     - `2026-05-04_campus-nsfw-deepening.md`
+     - `现代纪元NSFW模块扩展方案.md`
+
+---
+
+## 结论
+
+**无法执行** - 计划文件从未创建或已被删除。
+
+---
+
+## Task: docs/plans/2026-05-02_digital-world-character-system.md
+
+**执行时间**: 2026-05-07 00:29 UTC
+
+### 状态: ⚠️ 文件不存在
+
+---
+
+## 问题
+
+计划文件 `docs/plans/2026-05-02_digital-world-character-system.md` 不存在。
+
+### 检查记录
+
+1. **精确路径检查**: 文件不存在
+2. **通配符搜索** (`*digital*`, `*character*`): 无匹配文件
+3. **2026-05-02* 文件列表**: 无匹配文件
+4. **Git 历史搜索** (`--grep="digital-world"`): 无提交记录
+5. **全库搜索** (`*digital*world*character*`): 无匹配
+
+### 相近文件
+
+| 文件 | 内容相关性 |
+|------|-----------|
+| `docs/plans/2026-04-05_character-archetype-system.md` | 角色原型系统 |
+| `docs/plans/2026-05-05_campus-era-npc-relationship.md` | NPC 关系系统 |
+
+---
+
+## 结论
+
+**无法执行** - 计划文件从未创建或已被删除。跳过此任务。
