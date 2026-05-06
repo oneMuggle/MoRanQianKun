@@ -1,12 +1,15 @@
 import React from 'react';
 import MobileDevice from './MobileDevice';
+import type { 接口设置结构 } from '../../../models/system';
 import type { 当前可用接口结构 } from '../../../utils/apiConfig';
-
-type ApiConfigLike = 当前可用接口结构 | Record<string, unknown>;
 import { DeviceState, MobileApp, DeviceGameContext } from '../../../models/mobileDevice';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../types';
 import type { NPC结构 } from '../../../models/social';
 import type { BDSM论坛帖子 } from '../../../models/campusNSFW/bdsm-forum';
+
+// MobileDeviceModal uses the full 接口设置结构 internally to pass to sub-components
+// that need access to the complete API configuration.
+type ApiConfigLike = 当前可用接口结构 | 接口设置结构 | Record<string, unknown>;
 
 interface MobileDeviceModalProps {
     eraId: string;

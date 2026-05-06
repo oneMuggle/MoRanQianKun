@@ -2103,7 +2103,7 @@ const App: React.FC = () => {
                                     };
                                     setters.set约定列表([...现有约定, 新约定]);
                                 }}
-                                apiConfig={state.apiConfig as any}
+                                apiConfig={state.apiConfig}
                             />
                         </懒加载边界>
                     )}
