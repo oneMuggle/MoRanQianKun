@@ -16,6 +16,7 @@ import { 全部时代配置, 获取时代主题方案 } from './models/system';
 import { MusicProvider } from './components/features/Music/MusicProvider';
 import { 小说拆分后台调度服务 } from './services/novel-decomposition/novelDecompositionScheduler';
 import { desktopTabs, mobileTabs } from './components/features/Settings/tabDefinitions';
+import FPSDisplay from './components/features/Performance/FPSDisplay';
 
 type 可预加载组件<T extends React.ComponentType<any>> = React.LazyExoticComponent<T> & {
     preload?: () => Promise<unknown>;
@@ -2120,6 +2121,7 @@ const App: React.FC = () => {
                 </>
             )}
         </div>
+        <FPSDisplay enabled={actions.performanceConfig?.显示FPS ?? false} />
     </MusicProvider>
     );
 };

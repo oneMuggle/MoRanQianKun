@@ -14,6 +14,8 @@ import type {
     视觉设置结构,
     词组转化器提示词预设结构
 } from '../../../types';
+import { 性能监控配置结构 } from '../../../models/system';
+import { 规范化性能监控设置 } from '../../../utils/performanceMonitorSettings';
 import * as dbService from '../../../services/dbService';
 import { 按场景图上限裁剪档案 } from '../image/sceneImageArchiveWorkflow';
 import { 规范化游戏设置 } from '../../../utils/gameSettings';
