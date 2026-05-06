@@ -224,3 +224,49 @@ All Phase 1, Phase 2, and Phase 3 items specified in the plan are already implem
 ## Verification
 - Git commit: `08d56a9` — "night: conversation-memory-import-export"
 - Files created: 3 new files (808 lines total)
+
+---
+
+## Task: Execute docs/plans/png-image-pipeline.md
+
+## Status: ✅ ALREADY IMPLEMENTED
+
+## Plan Summary
+- **Plan date**: 2026-05-07
+- **Plan status**: ✅ 已实现
+- **Scope**: PNG 图像管线重构 — 导入、生图装配、画师串预设消费逻辑
+
+## Verification Results
+
+### Implementation Status (All 8 items ✅)
+
+| # | Item | Status | Files |
+|---|------|--------|-------|
+| 1 | PNG画风预设结构 | ✅ | `models/system.ts` (line 189) |
+| 2 | 元数据解析 | ✅ | `services/ai/image/pngParser.ts` |
+| 3 | 本地Artist剥离 | ✅ | `services/ai/artistTagExtractor.ts`, `services/ai/artistTagDictionary.ts` |
+| 4 | AI提炼服务 | ✅ | `services/ai/image/anchorExtractor.ts` |
+| 5 | 装配逻辑 | ✅ | `services/ai/image/promptBuilder.ts`, `services/ai/image/backends.ts` |
+| 6 | UI入口与流程 | ✅ | `components/features/Character/CharacterModal.tsx` |
+| 7 | 生图拼接策略 | ✅ | `hooks/useGame/npcImageWorkflow.ts` |
+| 8 | 导出/导入 | ✅ | `utils/apiConfigNormalization.ts` |
+
+### Core Implementation Details
+
+1. **PNG解析** (`pngParser.ts`): NovelAI / SD WebUI 格式解析，提取所有参数 (Model, LoRA, 采样器, 步数, CFG, clip skip, Hires, ADetailer)
+
+2. **Artist剥离** (`artistTagExtractor.ts`): 规则+词库双模式，支持 `::权重::`、`() [] {} <>`、转义字符，保留 token 原顺序
+
+3. **AI提炼** (`anchorExtractor.ts`): 风格清洗，过滤构图/角色标签，保留风格/画师串/质量串
+
+4. **提示词装配** (`promptBuilder.ts`): 前置/主体/后置分层，兼容模式独立处理
+
+5. **NovelAI v4** (`backends.ts`): 完整 `v4_prompt` 结构支持
+
+6. **预设消费** (`npcImageWorkflow.ts`): NPC/场景/秘档三条链路
+
+### Data Structure Verified
+- `PNG画风预设结构` (line 189 in `models/system.ts`): 包含 原始正面提示词、剥离后正面提示词、AI提炼正面提示词、画师串、画师命中项、负面提示词、参数、封面、原始元数据
+
+### Build Verification
+- `npm run build` → ✅ SUCCESS (exit 0, 12.72s)
