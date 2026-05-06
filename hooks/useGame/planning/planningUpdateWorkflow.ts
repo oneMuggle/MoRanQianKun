@@ -9,17 +9,17 @@ import type {
     同人剧情规划结构,
     同人女主剧情规划结构,
     环境信息结构
-} from '../../types';
-import * as textAIService from '../../services/ai/text';
-import { 获取规划分析接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
-import { 规范化游戏设置 } from '../../utils/gameSettings';
-import { applyStateCommand } from '../../utils/stateHelpers';
-import { 构建世界书注入文本 } from '../../utils/worldbook';
+} from '../../../types';
+import * as textAIService from '../../../services/ai/text';
+import { 获取规划分析接口配置, 接口配置是否可用 } from '../../../utils/apiConfig';
+import { 规范化游戏设置 } from '../../../utils/gameSettings';
+import { applyStateCommand } from '../../../utils/stateHelpers';
+import { 构建世界书注入文本 } from '../../../utils/worldbook';
 import { 提取响应规划文本 } from '../quality/thinkingContext';
-import { 构建同人运行时提示词包 } from '../../prompts/runtime/fandom';
-import { 获取激活小说拆分注入文本 } from '../../services/novel-decomposition/novelDecompositionInjection';
-import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../utils/promptFeatureToggles';
-import { 同步剧情小说分解时间校准 } from '../../services/novel-decomposition/novelDecompositionCalibration';
+import { 构建同人运行时提示词包 } from '../../../prompts/runtime/fandom';
+import { 获取激活小说拆分注入文本 } from '../../../services/novel-decomposition/novelDecompositionInjection';
+import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../../utils/promptFeatureToggles';
+import { 同步剧情小说分解时间校准 } from '../../../services/novel-decomposition/novelDecompositionCalibration';
 
 type 规划更新工作流依赖 = {
     apiConfig: any;

@@ -1,5 +1,5 @@
-import type { NPC生图任务记录, 香闺秘档部位类型 } from '../../types';
-import { 获取图片展示地址, 压缩图片资源字段 } from '../../utils/imageAssets';
+import type { NPC生图任务记录, 香闺秘档部位类型 } from '../../../types';
+import { 获取图片展示地址, 压缩图片资源字段 } from '../../../utils/imageAssets';
 
 type NPC图片状态工作流依赖 = {
     设置社交: (updater: any) => void;

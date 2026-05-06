@@ -1,4 +1,4 @@
-import type { GameResponse } from '../../types';
+import type { GameResponse } from '../../../types';
 
 const 清理思考标签 = (text: unknown): string => (
     typeof text === 'string'

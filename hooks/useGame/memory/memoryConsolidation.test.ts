@@ -10,7 +10,7 @@ import {
     自动记忆整合,
     整合记忆系统,
 } from './memoryConsolidation';
-import type { 记忆系统结构 } from '../../types';
+import type { 记忆系统结构 } from '../../../types';
 
 // Mock the memoryUtils functions
 vi.mock('./memoryUtils', () => ({

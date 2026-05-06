@@ -9,7 +9,7 @@ import type {
     环境信息结构,
     聊天记录结构,
     角色数据结构
-} from '../../types';
+} from '../../../types';
 
 type 回合快照结构 = {
     玩家输入: string;

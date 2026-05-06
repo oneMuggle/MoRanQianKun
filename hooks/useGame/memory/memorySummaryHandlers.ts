@@ -1,7 +1,7 @@
 /** 记忆总结处理器 */
 
-import type { 记忆系统结构, NPC结构, 接口设置结构 } from '../../types';
-import * as textAIService from '../../services/ai/text';
+import type { 记忆系统结构, NPC结构, 接口设置结构 } from '../../../types';
+import * as textAIService from '../../../services/ai/text';
 import {
     规范化记忆系统,
     规范化记忆配置,
@@ -11,7 +11,7 @@ import {
     记忆压缩任务结构
 } from '../memory/memoryUtils';
 import { 应用NPC记忆总结, 构建手动NPC记忆总结候选, 构建自动NPC记忆总结候选, 构建NPC记忆总结回退文案 } from '../memory/npcMemorySummary';
-import { 获取记忆总结接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
+import { 获取记忆总结接口配置, 接口配置是否可用 } from '../../../utils/apiConfig';
 
 type 记忆总结阶段类型 = 'idle' | 'remind' | 'processing' | 'review';
 

@@ -3,12 +3,12 @@
  * 处理设备刷新任务队列，依次调用 AI 生成论坛/BDSM 内容并写回校园系统
  */
 import { useEffect, useRef } from 'react';
-import type { 当前可用接口结构 } from '../../utils/apiConfig';
-import type { DeviceMode, DeviceGameContext } from '../../models/mobileDevice';
-import type { 校园系统数据 } from '../../models/campusPhone';
-import type { 校园NSFW设置 } from '../../models/campusNSFW';
+import type { 当前可用接口结构 } from '../../../utils/apiConfig';
+import type { DeviceMode, DeviceGameContext } from '../../../models/mobileDevice';
+import type { 校园系统数据 } from '../../../models/campusPhone';
+import type { 校园NSFW设置 } from '../../../models/campusNSFW';
 import { 生成设备原始消息, 解析AI论坛帖子, 解析AIBDSM帖子 } from '../device/deviceAiWorkflow';
-import { 刷新校园论坛 } from './campusForumWorkflow';
+import { 刷新校园论坛 } from '../campusForumWorkflow';
 
 export interface 设备刷新任务 {
     id: string;

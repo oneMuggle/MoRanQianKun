@@ -1,12 +1,12 @@
 /** 规划原因收集器 */
 
-import type { 剧情规划结构, 女主剧情规划结构, 环境信息结构, 剧情系统结构, TavernCommand } from '../../types';
-import { 环境时间转标准串 } from './timeUtils';
+import type { 剧情规划结构, 女主剧情规划结构, 环境信息结构, 剧情系统结构, TavernCommand } from '../../../types';
+import { 环境时间转标准串 } from '../time/timeUtils';
 import {
     规范化剧情规划状态,
     规范化女主剧情规划状态,
     规范化剧情状态
-} from './storyState';
+} from '../storyState';
 import { 游戏时间转排序值 } from '../response/responseTextHelpers';
 
 const 当前时间已达到 = (currentTime?: string, targetTime?: string): boolean => {

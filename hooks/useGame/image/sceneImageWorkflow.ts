@@ -1,7 +1,7 @@
-import * as imageAIService from '../../services/ai/image';
-import type { 场景生图任务记录, 生图任务来源类型, 接口设置结构 } from '../../types';
-import { 获取词组转化器预设上下文, type 当前可用接口结构 } from '../../utils/apiConfig';
-import type { PNG解析参数结构, 角色锚点结构 } from '../../models/system';
+import * as imageAIService from '../../../services/ai/image';
+import type { 场景生图任务记录, 生图任务来源类型, 接口设置结构 } from '../../../types';
+import { 获取词组转化器预设上下文, type 当前可用接口结构 } from '../../../utils/apiConfig';
+import type { PNG解析参数结构, 角色锚点结构 } from '../../../models/system';
 
 type PNG画风预设摘要 = {
     id?: string;

@@ -15,8 +15,8 @@ import type {
     视觉设置结构,
     场景图片档案,
     NPC结构
-} from '../../types';
-import * as dbService from '../../services/dbService';
+} from '../../../types';
+import * as dbService from '../../../services/dbService';
 
 export type 回合快照结构 = {
     玩家输入: string;

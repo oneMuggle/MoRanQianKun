@@ -1,10 +1,10 @@
 // 地图探索与旅行工作流
 // 处理玩家旅行、地点探索、旅行事件生成
 
-import { 环境信息结构 } from '../../models/environment';
-import { 地图结构, 建筑结构 } from '../../models/world';
-import { 角色数据结构 } from '../../models/character';
-import { normalizeCanonicalGameTime } from './timeUtils';
+import { 环境信息结构 } from '../../../models/environment';
+import { 地图结构, 建筑结构 } from '../../../models/world';
+import { 角色数据结构 } from '../../../models/character';
+import { normalizeCanonicalGameTime } from '../time/timeUtils';
 
 // ---- 旅行状态 ----
 

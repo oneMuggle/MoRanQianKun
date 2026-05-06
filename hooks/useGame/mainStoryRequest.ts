@@ -33,7 +33,7 @@ import type {
 import type {
     网约车后果类型,
 } from '../../models/urbanDriverNSFW/consequences';
-import { formatHistoryToScript } from './historyUtils';
+import { formatHistoryToScript } from './time/historyUtils';
 import {
     构建COT伪装提示词,
     构建酒馆预设消息链,

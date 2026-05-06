@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as textAIService from '../../services/ai/text';
-import * as apiConfig from '../../utils/apiConfig';
-import * as gameSettings from '../../utils/gameSettings';
+import * as textAIService from '../../../services/ai/text';
+import * as apiConfig from '../../../utils/apiConfig';
+import * as gameSettings from '../../../utils/gameSettings';
 import { 执行正文润色 } from './bodyPolish';
 
 vi.mock('../../services/ai/text', () => ({

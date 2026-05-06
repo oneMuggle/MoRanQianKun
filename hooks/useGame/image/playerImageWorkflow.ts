@@ -1,6 +1,6 @@
-import type { 角色数据结构 } from '../../types';
-import type { 当前可用接口结构 } from '../../utils/apiConfig';
-import { 获取图片展示地址 } from '../../utils/imageAssets';
+import type { 角色数据结构 } from '../../../types';
+import type { 当前可用接口结构 } from '../../../utils/apiConfig';
+import { 获取图片展示地址 } from '../../../utils/imageAssets';
 import { 主角角色锚点标识 } from '../image/imagePresetWorkflow';
 import { 合并NPC图片档案 } from '../image/npcImageStateWorkflow';
 

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { DeviceContact } from '../../models/mobileDevice';
+import type { DeviceContact } from '../../../models/mobileDevice';
 
 /**
  * 管理联系人列表、从 NPC 同步

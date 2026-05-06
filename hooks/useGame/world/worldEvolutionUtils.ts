@@ -1,5 +1,5 @@
-import { normalizeStateCommandKey } from '../../utils/stateHelpers';
-import { normalizeCanonicalGameTime, 环境时间转标准串, 结构化时间转标准串 } from './timeUtils';
+import { normalizeStateCommandKey } from '../../../utils/stateHelpers';
+import { normalizeCanonicalGameTime, 环境时间转标准串, 结构化时间转标准串 } from '../time/timeUtils';
 import { 格式化短期记忆展示文本 } from '../memory/memoryUtils';
 
 type 世界演变命令 = {

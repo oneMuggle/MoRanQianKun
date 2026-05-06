@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { 合并变量校准结果到响应 } from './variableCalibrationMerge';
-import type { GameResponse, TavernCommand } from '../../types';
+import type { GameResponse, TavernCommand } from '../../../types';
 
 describe('合并变量校准结果到响应', () => {
     it('merges calibration commands into response', () => {

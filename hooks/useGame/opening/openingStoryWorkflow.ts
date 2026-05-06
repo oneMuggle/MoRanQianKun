@@ -1,5 +1,5 @@
-import * as textAIService from '../../services/ai/text';
-import * as dbService from '../../services/dbService';
+import * as textAIService from '../../../services/ai/text';
+import * as dbService from '../../../services/dbService';
 import type {
     GameResponse,
     OpeningConfig,
@@ -19,52 +19,52 @@ import type {
     详细门派结构,
     内置提示词条目结构,
     世界书结构
-} from '../../types';
-import type { 当前可用接口结构 } from '../../utils/apiConfig';
-import { 获取世界演变接口配置, 获取规划分析接口配置, 获取变量计算接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
-import { 核心_开局思维链, 获取开局思维链提示词 } from '../../prompts/core/cotOpening';
-import { 核心_境界体系 } from '../../prompts/core/realm';
-import { 获取开场初始化任务提示词 } from '../../prompts/runtime/opening';
-import { 气运初始化任务提示词 } from '../../prompts/runtime/qiyun';
-import { 构建时代开局场景注入 } from '../../prompts/runtime/eraOpeningScene';
-import { 构建开局配置提示词 } from '../../prompts/runtime/openingConfig';
-import { 构建同人运行时提示词包, 校验境界体系提示词完整性 } from '../../prompts/runtime/fandom';
-import { 数值_世界演化 } from '../../prompts/stats/world';
-import { 构建字数要求提示词 } from '../../prompts/runtime/protocolDirectives';
-import { 构建剧情风格助手提示词 } from '../../prompts/runtime/storyStyles';
-import { 构建真实世界模式提示词 } from '../../prompts/runtime/realWorldMode';
-import { 构建运行时额外提示词 } from '../../prompts/runtime/nsfw';
-import { 构建世界演变COT提示词, 世界演变COT伪装历史消息提示词 } from '../../prompts/runtime/worldEvolutionCot';
-import { 构建开局世界演变初始化上下文, 开局世界演变初始化附加提示词 } from '../../prompts/runtime/openingWorldEvolutionInit';
+} from '../../../types';
+import type { 当前可用接口结构 } from '../../../utils/apiConfig';
+import { 获取世界演变接口配置, 获取规划分析接口配置, 获取变量计算接口配置, 接口配置是否可用 } from '../../../utils/apiConfig';
+import { 核心_开局思维链, 获取开局思维链提示词 } from '../../../prompts/core/cotOpening';
+import { 核心_境界体系 } from '../../../prompts/core/realm';
+import { 获取开场初始化任务提示词 } from '../../../prompts/runtime/opening';
+import { 气运初始化任务提示词 } from '../../../prompts/runtime/qiyun';
+import { 构建时代开局场景注入 } from '../../../prompts/runtime/eraOpeningScene';
+import { 构建开局配置提示词 } from '../../../prompts/runtime/openingConfig';
+import { 构建同人运行时提示词包, 校验境界体系提示词完整性 } from '../../../prompts/runtime/fandom';
+import { 数值_世界演化 } from '../../../prompts/stats/world';
+import { 构建字数要求提示词 } from '../../../prompts/runtime/protocolDirectives';
+import { 构建剧情风格助手提示词 } from '../../../prompts/runtime/storyStyles';
+import { 构建真实世界模式提示词 } from '../../../prompts/runtime/realWorldMode';
+import { 构建运行时额外提示词 } from '../../../prompts/runtime/nsfw';
+import { 构建世界演变COT提示词, 世界演变COT伪装历史消息提示词 } from '../../../prompts/runtime/worldEvolutionCot';
+import { 构建开局世界演变初始化上下文, 开局世界演变初始化附加提示词 } from '../../../prompts/runtime/openingWorldEvolutionInit';
 import {
     构建开局规划初始化审计重点,
     构建开局规划初始化正文上下文,
     开局规划初始化附加提示词
-} from '../../prompts/runtime/openingPlanningInit';
+} from '../../../prompts/runtime/openingPlanningInit';
 import {
     开局变量生成附加提示词,
     构建开局变量生成审计重点
-} from '../../prompts/runtime/openingVariableGenerationInit';
-import { 规范化游戏设置 } from '../../utils/gameSettings';
-import { 设置键 } from '../../utils/settingsSchema';
+} from '../../../prompts/runtime/openingVariableGenerationInit';
+import { 规范化游戏设置 } from '../../../utils/gameSettings';
+import { 设置键 } from '../../../utils/settingsSchema';
 import {
     世界书本体槽位,
     构建世界书注入文本
-} from '../../utils/worldbook';
-import { 获取内置提示词槽位内容, 获取剧情风格内置槽位 } from '../../utils/builtinPrompts';
+} from '../../../utils/worldbook';
+import { 获取内置提示词槽位内容, 获取剧情风格内置槽位 } from '../../../utils/builtinPrompts';
 import {
     构建COT伪装提示词,
     构建酒馆预设消息链,
     酒馆预设模式可用,
     type 酒馆上下文结构
-} from './promptRuntime';
+} from '../promptRuntime';
 import { 提取响应规划文本 } from './quality/thinkingContext';
-import { 环境时间转标准串 } from './timeUtils';
+import { 环境时间转标准串 } from '../time/timeUtils';
 import { 规范化记忆系统, 规范化记忆配置, 构建即时记忆条目, 构建短期记忆条目, 写入四段记忆 } from './memory/memoryUtils';
-import { 构建世界演变上下文文本 } from './worldEvolutionUtils';
-import { 获取开局小说拆分注入文本, 获取激活小说拆分注入文本 } from '../../services/novel-decomposition/novelDecompositionInjection';
-import { 同步剧情小说分解时间校准 } from '../../services/novel-decomposition/novelDecompositionCalibration';
-import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../utils/promptFeatureToggles';
+import { 构建世界演变上下文文本 } from '../world/worldEvolutionUtils';
+import { 获取开局小说拆分注入文本, 获取激活小说拆分注入文本 } from '../../../services/novel-decomposition/novelDecompositionInjection';
+import { 同步剧情小说分解时间校准 } from '../../../services/novel-decomposition/novelDecompositionCalibration';
+import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../../utils/promptFeatureToggles';
 import { 执行变量模型校准工作流 } from './planning/variableModelWorkflow';
 import { 合并变量校准结果到响应 as 合并变量生成结果到响应 } from './planning/variableCalibrationMerge';
 

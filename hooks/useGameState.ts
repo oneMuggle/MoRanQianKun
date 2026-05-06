@@ -32,7 +32,7 @@ import {
 } from '../types';
 import { 默认中期转长期提示词, 默认短期转中期提示词, 默认NPC记忆总结提示词 } from '../prompts/runtime/defaults';
 import { 节日列表 } from '../data/world';
-import { 初始设备状态, type DeviceState, type MobileApp } from './useGame/mobileDeviceWorkflow';
+import { 初始设备状态, type DeviceState, type MobileApp } from './useGame/device/mobileDeviceWorkflow';
 import type { 校园系统数据 } from '../models/campusPhone';
 import * as dbService from '../services/dbService';
 import { THEMES, 应用主题到根元素, 应用时代主题到根元素 } from '../styles/themes';

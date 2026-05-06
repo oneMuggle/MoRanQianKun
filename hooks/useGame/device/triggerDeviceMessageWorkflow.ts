@@ -3,11 +3,11 @@
  * 每回合结束后，根据时代、模式、当前场景自动生成设备内容
  */
 
-import type { DeviceMessage, DeviceMode, MobileApp, DeviceNotification, DeviceStats } from '../../models/mobileDevice';
-import type { 当前可用接口结构 } from '../../utils/apiConfig';
-import type { LiModeIntensity } from '../../prompts/runtime/eraLiMode';
+import type { DeviceMessage, DeviceMode, MobileApp, DeviceNotification, DeviceStats } from '../../../models/mobileDevice';
+import type { 当前可用接口结构 } from '../../../utils/apiConfig';
+import type { LiModeIntensity } from '../../../prompts/runtime/eraLiMode';
 import { 生成设备消息 } from '../device/deviceAiWorkflow';
-import * as dbService from '../../services/dbService';
+import * as dbService from '../../../services/dbService';
 
 export interface 设备消息触发参数 {
     eraId: string;

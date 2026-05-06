@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 创建规划更新工作流 } from './planningUpdateWorkflow';
-import * as textAIService from '../../services/ai/text';
-import * as apiConfig from '../../utils/apiConfig';
+import * as textAIService from '../../../services/ai/text';
+import * as apiConfig from '../../../utils/apiConfig';
 
 vi.mock('../../services/ai/text', () => ({
     generatePlanningAnalysis: vi.fn(),

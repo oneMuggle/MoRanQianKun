@@ -9,8 +9,8 @@ import type {
     聊天记录结构,
     角色数据结构,
     记忆系统结构
-} from '../../types';
-import { 同步剧情小说分解时间校准 } from '../../services/novel-decomposition/novelDecompositionCalibration';
+} from '../../../types';
+import { 同步剧情小说分解时间校准 } from '../../../services/novel-decomposition/novelDecompositionCalibration';
 
 type 回合快照结构 = {
     玩家输入: string;

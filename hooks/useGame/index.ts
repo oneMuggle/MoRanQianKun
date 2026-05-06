@@ -67,10 +67,10 @@ export { 按世界演变分流净化响应 } from './response/storyResponseGuard
 export { 创建会话生命周期工作流 } from './sessionLifecycleWorkflow';
 
 // 上下文快照
-export { 构建上下文快照数据 } from './contextSnapshot';
+export { 构建上下文快照数据 } from './ui/contextSnapshot';
 
 // 润色
-export { 执行正文润色 } from './bodyPolish';
+export { 执行正文润色 } from './opening/bodyPolish';
 
 // 世界演变
 export { 执行世界演变更新工作流 } from './world/worldEvolutionWorkflow';
@@ -83,7 +83,7 @@ export { 创建图片预设工作流, 提取NPC生图基础数据附带私密描
 export { 创建设置持久化工作流 } from './config/settingsPersistenceWorkflow';
 
 // 历史回合
-export { 创建历史回合工作流 } from './historyTurnWorkflow';
+export { 创建历史回合工作流 } from './time/historyTurnWorkflow';
 
 // 存读档
 export { 创建存读档工作流 } from './saveLoad/saveLoadWorkflow';
@@ -120,14 +120,14 @@ export { 执行变量模型校准工作流 } from './planning/variableModelWorkf
 export { 创建变量生成进度系统 } from './planning/variableGenerationProgress';
 
 // 时间工具
-export { normalizeCanonicalGameTime, 环境时间转标准串, 提取环境月日 } from './timeUtils';
+export { normalizeCanonicalGameTime, 环境时间转标准串, 提取环境月日 } from './time/timeUtils';
 
 // 运行时提示词
 export { 构建COT伪装提示词, 规范化比较文本, 酒馆预设模式可用 } from './promptRuntime';
 
 // 通知系统
-export { 创建通知系统 } from './notificationSystem';
-export type { 右下角提示结构 } from './notificationSystem';
+export { 创建通知系统 } from './ui/notificationSystem';
+export type { 右下角提示结构 } from './ui/notificationSystem';
 
 // 记忆总结
 export { 创建记忆总结处理器 } from './memory/memorySummaryHandlers';
@@ -137,8 +137,8 @@ export type { NPC记忆总结任务结构, 记忆总结阶段类型 } from './me
 export { 应用NPC记忆总结, 构建手动NPC记忆总结候选, 构建自动NPC记忆总结候选, 构建NPC记忆总结回退文案 } from './memory/npcMemorySummary';
 
 // 回档快照
-export { 创建回档快照系统 } from './rollbackSnapshot';
-export type { 回合快照结构 } from './rollbackSnapshot';
+export { 创建回档快照系统 } from './ui/rollbackSnapshot';
+export type { 回合快照结构 } from './ui/rollbackSnapshot';
 
 // 错误格式化
 export { 提取原始报错详情, 格式化错误详情, 提取解析失败原始信息 } from './quality/errorFormatting';

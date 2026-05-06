@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 构建主剧情请求参数 } from './mainStoryRequest';
 import * as gameSettings from '../../utils/gameSettings';
 import * as promptRuntime from './promptRuntime';
-import * as historyUtils from './historyUtils';
+import * as historyUtils from './time/historyUtils';
 
 vi.mock('../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => ({

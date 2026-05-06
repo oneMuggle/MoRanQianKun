@@ -10,10 +10,10 @@ import {
     女主剧情规划结构,
     同人剧情规划结构,
     同人女主剧情规划结构
-} from '../../types';
-import type { 校园系统数据 } from '../../models/campusPhone';
-import type { 校园NSFW系统扩展 } from '../../models/campusNSFW';
-import { applyStateCommand } from '../../utils/stateHelpers';
+} from '../../../types';
+import type { 校园系统数据 } from '../../../models/campusPhone';
+import type { 校园NSFW系统扩展 } from '../../../models/campusNSFW';
+import { applyStateCommand } from '../../../utils/stateHelpers';
 
 const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 

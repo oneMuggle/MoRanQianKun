@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { DeviceMessage, DeviceMode, MobileApp } from '../../models/mobileDevice';
+import type { DeviceMessage, DeviceMode, MobileApp } from '../../../models/mobileDevice';
 
 /**
  * 管理设备消息状态、触发 AI 生成

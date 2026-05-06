@@ -1,10 +1,10 @@
 // 移动设备工作流
 // 负责设备状态管理、提示词构建、AI 消息生成
 
-export type { DeviceState, DeviceMode, MobileApp, DeviceMessage, DeviceContact, DeviceGroup, DeviceStats, DeviceNotification, NotificationType } from '../../models/mobileDevice';
-import { DeviceState, DeviceMode, MobileApp } from '../../models/mobileDevice';
-import { getDeviceConfig, getAppName } from '../../models/eraDevice';
-import { 构建子纪元里模式注入, LiModeIntensity } from '../../prompts/runtime/eraLiMode';
+export type { DeviceState, DeviceMode, MobileApp, DeviceMessage, DeviceContact, DeviceGroup, DeviceStats, DeviceNotification, NotificationType } from '../../../models/mobileDevice';
+import { DeviceState, DeviceMode, MobileApp } from '../../../models/mobileDevice';
+import { getDeviceConfig, getAppName } from '../../../models/eraDevice';
+import { 构建子纪元里模式注入, LiModeIntensity } from '../../../prompts/runtime/eraLiMode';
 
 /** 初始设备统计 */
 export function 初始设备统计(): import('../../models/mobileDevice').DeviceStats {

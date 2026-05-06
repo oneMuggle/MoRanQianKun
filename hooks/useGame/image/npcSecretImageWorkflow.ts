@@ -1,12 +1,12 @@
-import * as imageAIService from '../../services/ai/image';
+import * as imageAIService from '../../../services/ai/image';
 import type {
     接口设置结构,
     香闺秘档部位类型,
     NPC生图任务记录,
     生图任务来源类型,
-} from '../../types';
-import { 获取词组转化器预设上下文, type 当前可用接口结构 } from '../../utils/apiConfig';
-import type { PNG解析参数结构, 角色锚点结构 } from '../../models/system';
+} from '../../../types';
+import { 获取词组转化器预设上下文, type 当前可用接口结构 } from '../../../utils/apiConfig';
+import type { PNG解析参数结构, 角色锚点结构 } from '../../../models/system';
 type 图片功能配置 = {
     总开关: boolean;
     NPC开关: boolean;

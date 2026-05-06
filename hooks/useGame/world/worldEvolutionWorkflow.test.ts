@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 执行世界演变更新工作流 } from './worldEvolutionWorkflow';
-import * as textAIService from '../../services/ai/text';
-import * as apiConfig from '../../utils/apiConfig';
+import * as textAIService from '../../../services/ai/text';
+import * as apiConfig from '../../../utils/apiConfig';
 
 vi.mock('../../services/ai/text', () => ({
     generateWorldEvolutionUpdate: vi.fn(),

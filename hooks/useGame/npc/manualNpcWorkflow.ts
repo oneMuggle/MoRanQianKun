@@ -1,4 +1,4 @@
-import type { NPC结构, 图片记录来源类型, 香闺秘档部位类型 } from '../../types';
+import type { NPC结构, 图片记录来源类型, 香闺秘档部位类型 } from '../../../types';
 import { 生成NPC生图记录ID } from '../image/npcImageStateWorkflow';
 
 type 手动NPC工作流依赖 = {

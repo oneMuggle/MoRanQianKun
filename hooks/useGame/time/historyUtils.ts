@@ -1,4 +1,4 @@
-import { 聊天记录结构 } from '../../types';
+import { 聊天记录结构 } from '../../../types';
 import { 提取响应规划文本 } from './quality/thinkingContext';
 
 const 拼接原始正文行 = (sender: string, text: string): string => {

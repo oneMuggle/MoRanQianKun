@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { 获取世界演变接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
+import { 获取世界演变接口配置, 接口配置是否可用 } from '../../../utils/apiConfig';
 
 type 世界演变控制依赖 = {
     view: string;

@@ -11,7 +11,7 @@ import type {
 import { 规范化记忆配置 } from './memory/memoryUtils';
 import { 格式化短期记忆展示文本 } from './memory/memoryUtils';
 import { 构建NPC上下文 } from './npc/npcContext';
-import { normalizeCanonicalGameTime, 环境时间转标准串, 结构化时间转标准串 } from './timeUtils';
+import { normalizeCanonicalGameTime, 环境时间转标准串, 结构化时间转标准串 } from './time/timeUtils';
 import { 规范化游戏设置 } from '../../utils/gameSettings';
 import {
     构建世界书注入文本,
