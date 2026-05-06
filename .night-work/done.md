@@ -4,57 +4,79 @@
 2026-05-07
 
 ## Task
-Execute docs/plans/fandom-mode-prompt-plan.md (同人模式提示词总线与境界模板化改造)
+Execute docs/plans/mobile-device-li-mode-plan.md (跨时代移动设备 — 正常模式与里模式适配方案)
 
 ## Status
-**Already Implemented** - This plan was previously implemented. Verification completed:
+**Implementation Analysis — Plan Substantially Implemented**
 
 ### Verification Summary
-- `npm run build`: **PASSED** (559 modules transformed)
-- `npm run stress:test`: **PASSED 10/10 rounds**
 
-### Key Implementation Components Confirmed
+The plan's requirements were analyzed against the current codebase implementation:
 
-**1. 同人运行时构建器 (`prompts/runtime/fandom.ts`)**
-- `构建同人运行时提示词包()` - unified output of 同人设定摘要, 阶段补丁, 境界母板
-- `应用境界体系区块替换()` - block replacement for realm prompt
-- `解析境界映射值()` - mapping value resolution
+#### Phase 1: Type Definitions ✅ Already Implemented
+- `models/mobileDevice.ts`: 
+  - `DeviceMode = 'normal' | 'li'` (line 35)
+  - `DeviceState.mode` field (line 65)
+  - `liModeOverrides` in `DeviceConfig` (lines 95-99)
+  - `AppDefinition` with `normalName`/`liName` (lines 103-108)
 
-**2. 独立境界体系生成 (`prompts/runtime/fandomRealmGeneration.ts`)**
-- `同人境界体系生成系统提示词` - system prompt for realm generation
-- `构建同人境界体系生成用户提示词()` - user prompt builder
-- `generateFandomRealmData()` in `services/ai/text/storyCoreTasks.ts`
+- `models/eraDevice.ts`:
+  - `eraDeviceConfigs` with `liModeOverrides` for all eras (1209+ lines)
+  - `getAppName()` function supporting mode-based app names (lines 1243-1271)
+  - `getLiModeThemeColor()` function (lines 1274-1276)
+  - `DEFAULT_APP_NAMES` with normal/li variants (lines 1279-1294)
 
-**3. World Generation Workflow (`hooks/useGame/worldGenerationWorkflow.ts`)**
-- Two separate requests: `generateFandomRealmData()` → `generateWorldData()`
-- Results written to `core_world` and `core_realm` respectively
-- Fandom patches injected into world generation context
+#### Phase 2: Modern Era Li Mode ✅ Already Implemented
+- `MobileHome.tsx`: 
+  - `mode` prop passed to all app components (line 144)
+  - `getAppName()` used for dynamic app naming based on mode (line 287)
+  - `isLiMode` flag and `themeColor` computed from config (lines 137-138)
+  - `data-device-mode` attribute set on container (line 240)
+  - CSS variable `--li-theme-color` applied via inline style (lines 242-246)
+  - App icons get glow filter in li mode (lines 297-303)
 
-**4. 同人设定摘要 Injection Points**
-- Opening story: `openingStoryWorkflow.ts:707`
-- Main story: `systemPromptBuilder.ts:1426,1706`
-- Planning: `planningUpdateWorkflow.ts:282`
-- World evolution: `worldEvolutionWorkflow.ts:241`
+#### Phase 3: Prompt Integration ✅ Already Implemented
+- `hooks/useGame/mobileDeviceWorkflow.ts`:
+  - `构建设备消息提示词()` function (lines 33-73)
+  - Calls `构建子纪元里模式注入()` when `deviceMode === 'li'` (lines 65-70)
+  - Imports and uses `LiModeIntensity` type (line 7)
 
-**5. 境界区块替换**
-- `prompts/core/realm.ts` - fixed header with dynamic block replacement structure
-- `应用境界体系区块替换()` function handles mapping/naming/boundary substitution
+- `prompts/runtime/eraLiMode.ts`:
+  - `构建子纪元里模式注入()` function already exists (line 75)
+  - Supports intensity levels: '微暗' | '暧昧' | '露骨' (line 16)
 
-**6. Save/Load Persistence**
-- `saveCoordinator.ts` persists `提示词池` with `core_world` and `core_realm`
-- `openingConfig` stored in game state and auto-save snapshots
+#### Phase 4: Other Era Adapters ✅ Already Implemented
+- All 40+ era configs in `eraDevice.ts` have `liModeOverrides` with:
+  - Era-specific app names (map → 夜行地图, contacts → 关系网, etc.)
+  - Era-specific theme colors
 
-### Acceptance Criteria Met
-- ✅ Non-fandom saves don't inject fandom summary but read default realm prompt
-- ✅ Fandom saves read 同人设定摘要 in world/opening/main/plan/evolution
-- ✅ `core_world` and `core_realm` generated separately
-- ✅ Save/load preserves fandom mode
-- ✅ Build passes (`npm run build`)
-- ✅ Fandom stress test passes (`npm run stress:test`)
+#### Phase 5: Persistence ✅ Already Implemented
+- `hooks/useGame.ts`:
+  - `派生设备模式()` function derives mode from `gameConfig.启用子纪元里模式[eraId]` (lines 384-390)
+  - `打开设备()` wrapper syncs mode when device opens (lines 393-397)
+  - Device state `mode` persisted as part of `设备状态`
 
-## Git Status
-No new changes - plan was previously implemented.
+### Missing Item: liModeStyles.ts
+One new file was missing and has been created:
+- `components/features/MobileDevice/eraStyles/liModeStyles.ts` (234 lines)
+  - `ERA_LI_MODE_STYLES`: Theme colors for all era categories
+  - `getLiModeStyleConfig()`: Resolves era-specific li mode configs
+  - `LiModeStyles`: Provider component for applying li mode CSS variables
+
+### Design Decision Note
+Per `mobile-device-deepening-plan.md` Phase 1, the ModeToggle was removed from the device UI:
+- Device mode is now **derived** from global `启用子纪元里模式[eraId]` setting
+- User toggles via Game Settings, not device UI
+- This maintains consistency with the deepening plan's architecture
+
+## Files Created
+- `components/features/MobileDevice/eraStyles/liModeStyles.ts` (+234 lines)
+
+## Git Commit
+- Hash: 2685d15
+- Message: "Add liModeStyles.ts - 里模式样式配置"
 
 ## Notes
-- Two stress test needles have minor exact-match issues (colon vs equals, import path) but don't affect functionality
-- Build warnings are pre-existing and unrelated to fandom system
+- The `mobile-device-deepening-plan.md` is a follow-up that refined the original plan's architecture
+- ModeToggle was intentionally removed per deepening plan Phase 1.1 decision
+- Build succeeds with no new errors
