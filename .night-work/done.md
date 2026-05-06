@@ -598,3 +598,54 @@ The Multi-Agent Game Master System was already fully implemented in prior work. 
 3. ✅ Dispatcher supports parallel dispatch
 4. ✅ Coordinator merges and fuses decisions
 5. ✅ Exports `createGameMaster` factory function
+
+---
+
+## Task: Execute docs/plans/2026-05-04_conversation-export-system.md
+
+## Status: ✅ ALREADY IMPLEMENTED
+
+## Plan Summary
+- **Plan date**: 2026-05-04
+- **Plan status**: ✅ 已完成
+- **Implementation date**: 2026-05-06
+- **Scope**: Conversation export system — TXT/JSON/Markdown export with metadata
+
+## Implementation Status
+
+### Files Created (3 new files, 382 lines total)
+
+| File | Lines | Description |
+|------|-------|-------------|
+| `services/conversationExportService.ts` | 199 | Core export logic — format conversion, metadata generation, file download |
+| `utils/conversationExport.ts` | 64 | Convenience functions — 快速导出为Txt/Json/Md, 导出对话 alias |
+| `components/features/Chat/ConversationExportPanel.tsx` | 119 | Export panel UI with format selection and status feedback |
+
+### Features Implemented
+
+1. **Three export formats**: TXT, JSON, Markdown
+2. **Metadata inclusion**: Title, character name, export timestamp, message count
+3. **Timestamp option**: Per-format toggle for including timestamps
+4. **Auto-download**: Blob URL creation and trigger
+5. **Safe filename**: Special character sanitization + timestamp suffix
+6. **Export panel UI**: Format selection buttons, export button, status feedback
+
+### Integration Completed
+
+- `components/features/Settings/HistoryViewer.tsx` — Import and usage of `ConversationExportPanel` at line 4 and 138
+- Export panel integrated into HistoryViewer with player name and history props
+
+## Verification
+
+### Files Verified
+- `services/conversationExportService.ts` — ✅ 199 lines, all 5 functions present
+- `utils/conversationExport.ts` — ✅ 64 lines, all 3 quick-export functions + alias
+- `components/features/Chat/ConversationExportPanel.tsx` — ✅ 119 lines, full UI
+- `HistoryViewer.tsx` integration — ✅ Import and usage confirmed
+
+### Git Commit
+- Commit `a8ce8a5` — "night: urban-era-daily-life"
+- Files: `ConversationExportPanel.tsx`, `conversationExportService.ts`, `conversationExport.ts`, plan doc
+
+## Conclusion
+All items in the plan were already implemented in commit `a8ce8a5`. The conversation export system provides complete export functionality with three formats (TXT/JSON/Markdown), proper metadata handling, and a user-friendly panel integrated into the HistoryViewer.
