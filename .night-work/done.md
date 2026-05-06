@@ -794,3 +794,85 @@ models/campusNSFW/
 
 ✅ TypeScript 编译检查通过（预存的测试文件类型问题 162 个与本次修改无关）
 
+
+---
+
+# 2026-05-07 校园纪元 × 都市纪元融合计划 - 执行记录
+
+## 执行时间
+2026-05-07 00:10
+
+## 执行状态：✅ 已验证完成（先前已实现）
+
+## 验证摘要
+
+### 实现状态确认
+
+| 计划项目 | 状态 | 验证结果 |
+|---------|------|---------|
+| `contemporary_campus_urban` 节点 | ✅ 已存在 | `epoch-contemporary.ts` L583-749 |
+| 融合预设（subEraDefaultPresets.ts） | ✅ 已添加 | L166-190: 通勤学生、校外房东、咖啡店兼职生 |
+| 融合开局方案（newGamePresets.ts） | ✅ 已添加 | L170-227: campus_urban_commuter, campus_urban_landlord, campus_urban_barista |
+| MODERN_ERA_IDS 更新 | ✅ 已存在 | `assembly.ts` L46 包含 `contemporary_campus_urban` |
+| 跨场景开场 | ✅ 已定义 | epoch-contemporary.ts L666-673: 6个开场场景 |
+| 跨场景角色原型 | ✅ 已定义 | epoch-contemporary.ts L674-678: 4个角色原型 |
+| NSFW 框架 | ✅ 已统一 | 现代情感框架覆盖融合子纪元 |
+
+### 构建验证
+- ✅ `npm run build` 成功通过
+- ✅ TypeScript 编译无错误
+- ✅ 工作区干净（无未提交更改）
+
+### 关键文件位置
+- `models/eraTheme/epoch-contemporary.ts` - 融合子纪元节点定义
+- `data/subEraDefaultPresets.ts` - 融合预设数据
+- `data/newGamePresets.ts` - 融合开局方案
+- `models/eraTheme/assembly.ts` - MODERN_ERA_IDS 常量
+
+
+---
+
+# 2026-05-07 都市纪元日常生活系统扩展方案 - 执行记录
+
+## 执行时间
+2026-05-07 00:10
+
+## 执行状态：✅ 已验证完成（先前已实现）
+
+## 验证摘要
+
+### Phase 1: 场景与原型扩充
+| 检查项 | 状态 | 验证结果 |
+|--------|------|----------|
+| `openingScenes` 达到 10 个 | ✅ | `epoch-contemporary.ts` L150-161: urban_1~urban_10 共 10 个开局场景 |
+| `characterArchetypes` 达到 10 个 | ✅ | `epoch-contemporary.ts` L162-173: urban_ceo, urban_martial_artist, urban_hacker, urban_delivery, urban_craftsman, urban_retail_worker, urban_driver, urban_coser, urban_security, urban_courier 共 10 个角色原型 |
+
+### Phase 2: 背景与天赋审计
+| 检查项 | 状态 | 验证结果 |
+|--------|------|----------|
+| `data/backgrounds/modern.ts` 都市职场类 | ✅ | L5-14: 大厂员工、自媒体创业者、都市白领、创业失败者、自由职业者、房产中介、外卖站长、投行分析师、律所新人、MCN运营 |
+| `data/backgrounds/modern.ts` 配送出行类 | ✅ | L16-22: 网约车司机、外卖骑手、快递小哥、代驾司机、网约车队长、众包配送员、货运司机 |
+| `data/backgrounds/modern.ts` 生活服务类 | ✅ | L24-30: 理发师、健身教练、美容师、餐饮店员、推拿按摩师、美甲师、宠物美容师 |
+| `data/backgrounds/modern.ts` 蓝领技工类 | ✅ | L32-38: 装修师傅、汽修工、电工、建筑工人、焊工、管道工、空调维修工 |
+| `data/backgrounds/modern.ts` 零售个体类 | ✅ | L40-46: 便利店老板、夜市摊主、水果摊老板、保险推销员、二手车商、手机店老板、菜贩子 |
+| `data/talents/modern.ts` contemporary_urban 天赋 | ✅ | L5-16: 代码直觉、人脉编织、镜头感、夜猫子、城市地图、商业嗅觉、键盘侠、地铁生存、咖啡体质、租房达人、信息流操盘手、格子间伪装等 12 个专属天赋 |
+| 配送出行专属天赋 | ✅ | L18-21: 活地图、平台算法理解、乘客耳目、夜行直觉 |
+| 生活服务专属天赋 | ✅ | L50-55: 手感精准、察言观色、审美在线、体力充沛、客户黏性、工具精通 |
+| 蓝领技工专属天赋 | ✅ | L57-62: 万能手、听音辨障、力气大、安全意识、材料直觉、工地人脉 |
+| 零售个体专属天赋 | ✅ | L64-69: 算盘脑子、砍价王、识货眼、夜市生存、库存管理、邻里熟客 |
+
+### Phase 3: 都市日常系统设计
+- **状态**: 📋 设计文档（不涉及代码实现）
+- **日程系统、通勤系统、社交APP系统** 为设计研究文档，为后续开发提供参考，不作为代码任务
+
+## 涉及文件
+| 文件 | 变更类型 |
+|------|----------|
+| `docs/plans/2026-05-04_urban-era-daily-life.md` | 状态更新为"✅ 已完成" |
+
+## 提交记录
+- 无新提交（所有计划内容在更早的开发周期中已完成实现）
+
+## 构建验证
+- ✅ `npm run build` 成功通过（之前已验证）
+- ✅ 工作区干净
