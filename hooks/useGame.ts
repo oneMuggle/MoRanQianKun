@@ -919,7 +919,7 @@ export const useGame = () => {
     }, []);
 
     const 场景模式已开启 = (): boolean => {
-        const feature = apiConfig?.功能模型占位 as any;
+        const feature = 规范化接口设置(apiConfig).功能模型占位;
         return Boolean(
             feature?.文生图功能启用
             && feature?.场景生图启用
@@ -1265,7 +1265,7 @@ export const useGame = () => {
     }, [校园系统, apiConfig, 更新BDSM关系状态, 添加BDSM里程碑]);
 
     const 读取文生图功能配置 = () => {
-        const feature = apiConfig?.功能模型占位 as any;
+        const feature = 规范化接口设置(apiConfig).功能模型占位;
         const 当前后端 = feature?.文生图后端类型 === 'novelai' ? 'novelai' : 'other';
         const 场景横竖屏 = feature?.自动场景生图横竖屏 === '竖屏' ? '竖屏' : '横屏';
         const 场景尺寸 = typeof feature?.自动场景生图分辨率 === 'string' && feature.自动场景生图分辨率.trim()
@@ -1453,7 +1453,7 @@ export const useGame = () => {
     };
 
     const 世界演变功能已开启 = (): boolean => {
-        const feature = apiConfig?.功能模型占位 as any;
+        const feature = 规范化接口设置(apiConfig).功能模型占位;
         return Boolean(
             feature?.世界演变独立模型开关
             && typeof feature?.世界演变使用模型 === 'string'
@@ -1462,7 +1462,7 @@ export const useGame = () => {
     };
 
     const 文章优化功能已开启 = (): boolean => {
-        const feature = apiConfig?.功能模型占位 as any;
+        const feature = 规范化接口设置(apiConfig).功能模型占位;
         return Boolean(
             feature?.文章优化独立模型开关
             && typeof feature?.文章优化使用模型 === 'string'
