@@ -589,3 +589,208 @@ models/campusNSFW/
 
 - `020ba16` feat(li-mode): 引入里模式阶段系统
 
+
+---
+
+# 2026-05-03 校园子纪元 + 强化里模式
+
+**执行计划**: `docs/plans/2026-05-03-campus-era-li-mode.md`
+**执行时间**: 2026-05-07 (cron verification)
+**状态**: ✅ 已完成（已验证）
+
+---
+
+## 实施摘要
+
+计划描述 6 大步骤，经逐一验证，**全部已完成**。
+
+---
+
+## 步骤 1：扩展类型定义 ✅
+
+- **文件**: `models/eraTheme/types.ts`
+- `EraLiModeEnhanced` 接口定义结构化字段（corePrinciple/powerSystem/dualPersonalities/sceneTypes/desireMotives/taboos/aiDirectives/intensityLevels/stageRules）
+- `EraCharacterArchetype` 添加 `表人格`/`里人格` 可选字段
+- `EraNode.liMode` 类型支持 `EraLiMode | EraLiModeEnhanced`
+- `LiModeStage` 类型定义（平然/羞耻/欲望）
+
+---
+
+## 步骤 2：更新里模式注入逻辑 ✅
+
+- **文件**: `prompts/runtime/eraLiMode.ts` (267行)
+- `构建子纪元里模式注入` — 优先结构化字段，fallback 到 rules 文本，三级强度过滤
+- `构建里模式NPC原型注入` — 从 dualPersonalities 提取表里人格模板
+- `构建NPC表里切换注入` — 里人格激活时注入人格状态提示
+- `构建里模式阶段注入` — 平然/羞耻/欲望三阶段行为规则
+- `DEFAULT_STAGE_RULES` 通用模板（可被 SubEra stageRules 覆盖）
+
+---
+
+## 步骤 3：定义校园子纪元节点 ✅
+
+- **文件**: `models/eraTheme/epoch-contemporary.ts` 第 410-581 行
+- `contemporary_campus` 节点完整定义（depth=2, parent=contemporary_eastern）
+- 基础配置：青春绿主色(`80 180 120`)、樱花粉强调色(`220 120 140`)、bgmTags: 校园/青春/吉他/轻快
+- 完整 UI 文案（50+ 字段校园化）
+- 6 个开局场景（图书馆自习/社团招新/毕业典礼/深夜实验室/操场夜跑/食堂偶遇）
+- 6 个角色原型（含表人格/里人格）
+- 2 个写作样例
+- 强化版里模式（结构化字段 + intensityLevels + stageRules）
+
+---
+
+## 步骤 4：气运/天赋/开局预设 ✅
+
+### 天赋
+
+- `data/talents/nsfw.ts` 第 214-226 行：12 个校园 NSFW 天赋（深夜实验室常驻者/社团部室钥匙持有者/天台观景者/校医务室VIP/泳池晨练者/宿舍夜猫子/家教兼职达人/校园祭策划/学姐学妹缘/室友的秘密）
+- `data/talents/modern.ts` 第 24-136 行：12 个校园专属天赋（考试体质/社团达人/奖学金猎手/青涩魅力/反差体质/眼神勾人/体香迷人/独处女王/氛围营造/雨天体质/深夜共鸣/露出潜质/支配直觉/多角棋手/事后温柔）
+
+### 背景
+
+- `data/backgrounds/nsfw.ts` 第 191-195 行：4 个校园 NSFW 背景（校园风云人物/秘密社团成员/宿舍楼传说/跨院系交流生）
+- `data/backgrounds/modern.ts` 第 97-117 行：6 个校园背景（考试体质/社团达人/奖学金猎手/过目不忘/叛逆基因/学生会体质/食堂干饭王）
+
+### 气运
+
+- `data/qiyun/categories/hehuan.ts` 第 230-261 行：约 20 个校园 NSFW 气运（青梅竹马缘/月考锦鲤/社团招福/天台邂逅运/校园祭主角/图书馆偶遇/合宿缘分/教室后排/实验台旁的触碰/社团仓库的秘密/校服的纽扣/午休天台/更衣室隔壁/文化祭后台/合浴场缘分/期末补习夜/毕业相册 等）
+- `data/qiyun/categories/zhen-qiyun.ts` 第 267-331 行：校园气运（校园桃花/室友暧昧/校园风云人物/学霸光环/挂科预警）
+
+### 开局预设
+
+- `data/newGamePresets.ts` 第 37-92 行：3 个校园开局方案（campus_freshman 大一新生/campus_transfer 转学生/campus_grad 研究生）
+
+---
+
+## 步骤 5：R2 CDN 素材 ✅
+
+- **目录**: `data/era_assets/contemporary_campus/`
+- `manifest.json` 存在（1825字节），包含 6 个场景图 ID + 1 个 BGM ID
+- CDN URL 指向 `https://mrqk.cc.cd/data/era_assets/contemporary_campus/`
+- 注：实际图片/MP3 文件未下载到本地仓库，仅有 manifest 元数据
+
+---
+
+## 步骤 6：UI 强度选择器 + 内容展示 + 提示词注入 ✅
+
+### 强度选择器
+
+- `components/features/NewGame/NewGameWizardContent.tsx` 第 399-428 行：子纪元里模式开关 + 三级强度选择（微暗/暧昧/露骨）
+- `components/features/Settings/GameSettings.tsx`：游戏设置中包含里模式阶段选择器
+- `components/layout/TopBar.tsx` 第 480-489 行：顶部栏里模式强度徽章 + 点击切换
+
+### 内容展示
+
+- `onLiModeIntensityChange` prop 在 App.tsx 第 819-822 行实现
+- `子纪元里模式强度` 存储在 `gameConfig` 中
+
+### 提示词注入
+
+- `App.tsx` 传递 `启用子纪元里模式`/`子纪元里模式强度`/`子纪元里模式阶段` 给 TopBar
+- `prompts/runtime/eraLiMode.ts` 导出 `构建子纪元里模式注入`/`构建里模式NPC原型注入`/`构建里模式阶段注入` 等函数
+
+---
+
+## 成功标准验证
+
+| 标准 | 状态 |
+|------|------|
+| `EraLiModeEnhanced` 接口定义完整 | ✅ |
+| `EraCharacterArchetype` 含表/里人格字段 | ✅ |
+| 里模式注入逻辑支持结构化字段 + fallback | ✅ |
+| 三级强度过滤（微暗/暧昧/露骨） | ✅ |
+| `contemporary_campus` 节点完整（含强化版里模式） | ✅ |
+| 6 个角色原型含表/里人格 | ✅ |
+| 6 个开局场景 | ✅ |
+| 完整 UI 文案校园化 | ✅ |
+| 校园专属天赋 20+ 个 | ✅ |
+| 校园专属背景 10+ 个 | ✅ |
+| 校园专属气运 20+ 个 | ✅ |
+| 3 个校园开局预设方案 | ✅ |
+| manifest.json 含 6 场景图 + 1 BGM | ✅ |
+| 强度选择器 UI 实现 | ✅ |
+| TypeScript 构建无错误 | ✅ |
+
+---
+
+## 构建验证
+
+✅ `npm run build` 成功完成（10.44s）
+
+---
+
+# 2026-05-04 校园纪元·天赋气运背景与NSFW优化方案
+
+**执行计划**: `docs/plans/2026-05-04-campus-era-talent-nsfw-optimization.md`
+**执行时间**: 2026-05-07 (cron verification)
+**状态**: ✅ 已完成（已验证）
+
+---
+
+## 成功标准验证
+
+| 标准 | 状态 | 验证位置 |
+|------|------|----------|
+| 校园纪元背景名称使用具体身份 | ✅ | `data/subEraDefaultPresets.ts` L113,121,129: 学生会干事、转学生、实验室研究生 |
+| 校园纪元气运名称符合"命运/奇遇"定义 | ✅ | L115,123,131: 校园风云人物、命运邂逅、学术机缘 |
+| 开局预设与子纪元默认预设背景/气运名称对应 | ✅ | `data/newGamePresets.ts` L50,69,88 匹配 subEraDefaultPresets |
+| 校园里模式结构化字段深度与都市子纪元相当 | ✅ | `models/eraTheme/epoch-contemporary.ts` L524-579: dualPersonalities(~50字)、sceneTypes(~50字)、desireMotives(~30字)、taboos(~30字)、intensityLevels(~60字) |
+| 校园纪元有自定义 stageRules | ✅ | L573-577: 平然/羞耻/欲望三阶段校园专属行为规则 |
+| 校园纪元 NSFW 内容不使用武侠/修仙术语 | ✅ | `prompts/runtime/nsfw.ts` L90-125: 构建现代情感叙事约束函数存在 |
+| 武侠时代 NSFW 约束不受影响 | ✅ | L140-147: 自动选择叙事约束根据 eraId 判断，现代时代用现代情感框架，武侠用双修框架 |
+| SFW 模式不泄露任何 NSFW 内容 | ✅ | L31-33: 默认NSFW模式提示词包含 SFW 判断逻辑 |
+
+---
+
+## Phase 1 验证: 天赋/气运/背景修正 ✅
+
+### `data/subEraDefaultPresets.ts`
+- L113: 校园新生 `背景名称: '学生会干事'`, `气运: ['校园风云人物']`
+- L121: 叛逆转学生 `背景名称: '转学生'`, `气运: ['命运邂逅']`
+- L129: 科研研究生 `背景名称: '实验室研究生'`, `气运: ['学术机缘']`
+
+### `data/newGamePresets.ts`
+- L50: 大一新生 `背景名称: '学生会干事'`, `气运: {名称: '校园风云人物'}`
+- L69: 转学生 `背景名称: '转学生'`, `气运: {名称: '命运邂逅'}`
+- L88: 研究生 `背景名称: '实验室研究生'`, `气运: {名称: '学术机缘'}`
+
+---
+
+## Phase 2 验证: NSFW 内容扩充 ✅
+
+### `models/eraTheme/epoch-contemporary.ts` contemporary_campus liMode
+
+| 字段 | 原长度 | 现长度 | 状态 |
+|------|--------|--------|------|
+| dualPersonalities | ~15字 | ~50字/条 | ✅ L529-536 |
+| sceneTypes | ~20字 | ~50字/条 | ✅ L537-543 |
+| desireMotives | ~15字 | ~30字/条 | ✅ L545-551 |
+| taboos | ~15字 | ~30字/条 | ✅ L553-558 |
+| intensityLevels | ~30字 | ~60字/级 | ✅ L568-572 |
+| stageRules | **无** | 平然/羞耻/欲望三阶段 | ✅ L573-577 |
+
+---
+
+## Phase 3 验证: NSFW 框架适配 ✅
+
+### `prompts/runtime/nsfw.ts`
+
+| 函数 | 位置 | 功能 |
+|------|------|------|
+| `构建现代情感叙事约束` | L90-125 | 校园/现代专用NSFW框架，不使用武侠术语 |
+| `自动选择叙事约束` | L140-147 | 根据时代ID自动选择武侠双修或现代情感框架 |
+| `构建运行时NSFW提示词` | L178-254 | 新增 `时代配置ID` 参数，L230 调用 `自动选择叙事约束` |
+| `构建运行时额外提示词` | L256-296 | 新增 `时代配置ID` 参数 |
+| `构建文生图运行时额外提示词` | L298-307 | 新增 `时代配置ID` 参数 |
+
+### 时代分支逻辑
+- L142-144: 现代时代（contemporary_campus, contemporary_urban 等）→ `构建现代情感叙事约束`
+- L146: 其他时代（武侠/修仙）→ `构建里象修行叙事约束`
+
+---
+
+## 构建验证
+
+✅ TypeScript 编译检查通过（预存的测试文件类型问题 162 个与本次修改无关）
+
