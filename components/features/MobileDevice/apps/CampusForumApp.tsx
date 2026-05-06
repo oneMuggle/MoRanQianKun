@@ -24,8 +24,11 @@ interface AppProps {
     apiConfig?: ApiConfigLike;
 }
 
-const 论坛分类 = ['全部', '校园资讯', '学术交流', '社团活动', '情感树洞', '匿名灌水', '求助答疑'];
+const 论坛分类 = ['全部', '校园资讯', '学术交流', '社团活动', '情感树洞', '匿名灌水', '求助答疑', 'BDSM'];
 const BDSM子分类: BDSM帖子分类[] = ['匿名讨论', '经验交流', '物品话题', '心理探索', '安全科普', '寻主召奴'];
+
+// 表白墙专用分类（不与普通论坛混用）
+const 表白墙分类 = ['全部', '暗恋表白', '恋爱心得', '单身求助', '情感倾诉'];
 
 const 回复话术池 = [
     '确实如此，深有同感。',
@@ -41,12 +44,15 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
     const config = getDeviceConfig(eraId);
     const appName = config ? getAppName(config, appId, mode) : '校园论坛';
 
-    // 当前激活的主分类（普通论坛 / BDSM）
-    const [activeBoard, setActiveBoard] = useState<'forum' | 'bdsm'>(appId === 'bdsn' ? 'bdsm' : 'forum');
+    // 当前激活的主分类（普通论坛 / 表白墙 / BDSM）
+    const [activeBoard, setActiveBoard] = useState<'forum' | 'confession' | 'bdsm'>(
+        appId === 'bdsn' ? 'bdsm' : appId === 'confession' ? 'confession' : 'forum'
+    );
     const [selectedPost, setSelectedPost] = useState<论坛帖子 | BDSM论坛帖子 | null>(null);
     const [contactingPost, setContactingPost] = useState<BDSM论坛帖子 | null>(null);
     const [activeCategory, setActiveCategory] = useState('全部');
     const [activeBDSMSub, setActiveBDSMSub] = useState<BDSM帖子分类 | '全部'>('全部');
+    const [activeConfessionSub, setActiveConfessionSub] = useState<string>('全部');
 
     // 懒加载分页状态（不同板块独立管理）
     const PAGE_SIZE = 10;
@@ -58,18 +64,15 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
     // 切换板块/分类时重置显示数量
     useEffect(() => {
         setForumDisplayCount(PAGE_SIZE);
-    }, [activeBoard, activeCategory]);
-
-    useEffect(() => {
         setBdsmDisplayCount(PAGE_SIZE);
-    }, [activeBoard, activeBDSMSub]);
+    }, [activeBoard, activeCategory, activeBDSMSub, activeConfessionSub]);
 
     // IntersectionObserver：滚动到底部时加载更多
     const handleLoadMore = useCallback(() => {
         if (isLazyLoading) return;
         setIsLazyLoading(true);
         setTimeout(() => {
-            if (activeBoard === 'forum') {
+            if (activeBoard === 'forum' || activeBoard === 'confession') {
                 setForumDisplayCount(prev => prev + PAGE_SIZE);
             } else {
                 setBdsmDisplayCount(prev => prev + PAGE_SIZE);
@@ -182,6 +185,11 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
         return result;
     }, [gameContext?.校园系统?.论坛帖子列表, gameContext?.世界?.进行中事件]);
 
+    // 表白墙帖子
+    const confessionPosts: 论坛帖子[] = useMemo(() => {
+        return gameContext?.校园系统?.表白墙帖子列表 || [];
+    }, [gameContext?.校园系统?.表白墙帖子列表]);
+
     // BDSM 帖子
     const bdsmPosts: BDSM论坛帖子[] = useMemo(() => {
         return gameContext?.校园系统?.BDSM帖子列表 || [];
@@ -192,14 +200,24 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
             if (activeBDSMSub === '全部') return bdsmPosts;
             return bdsmPosts.filter(p => p.子分类 === activeBDSMSub);
         }
+        if (activeBoard === 'confession') {
+            if (activeConfessionSub === '全部') return confessionPosts;
+            return confessionPosts.filter(p => p.分类 === activeConfessionSub);
+        }
         if (activeCategory === '全部') return posts;
         return posts.filter(p => p.分类 === activeCategory);
-    }, [activeBoard, activeCategory, activeBDSMSub, posts, bdsmPosts]);
+    }, [activeBoard, activeCategory, activeBDSMSub, activeConfessionSub, posts, bdsmPosts, confessionPosts]);
 
     // 懒加载分页后的帖子列表
-    const displayCount = activeBoard === 'forum' ? forumDisplayCount : bdsmDisplayCount;
+    const displayCount = activeBoard === 'forum' ? forumDisplayCount : activeBoard === 'confession' ? forumDisplayCount : bdsmDisplayCount;
     const paginatedPosts = filteredPosts.slice(0, displayCount);
     const hasMore = filteredPosts.length > displayCount;
+
+    // 切换板块/分类时重置显示数量
+    useEffect(() => {
+        setForumDisplayCount(PAGE_SIZE);
+        setBdsmDisplayCount(PAGE_SIZE);
+    }, [activeBoard, activeCategory, activeBDSMSub, activeConfessionSub]);
 
     const isBDSMPost = (post: 论坛帖子 | BDSM论坛帖子): post is BDSM论坛帖子 => {
         return '子分类' in post && '影响等级' in post;
@@ -344,6 +362,12 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
                     onClick={() => { setActiveBoard('forum'); setActiveCategory('全部'); }}
                     className={`px-3 py-1 rounded-full text-xs transition-colors ${activeBoard === 'forum' ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white'}`}
                 >论坛</button>
+                {appId === 'confession' && (
+                    <button
+                        onClick={() => { setActiveBoard('confession'); setActiveConfessionSub('全部'); }}
+                        className={`px-3 py-1 rounded-full text-xs transition-colors ${activeBoard === 'confession' ? 'bg-pink-500/20 text-pink-400' : 'text-gray-400 hover:text-white'}`}
+                    >表白墙</button>
+                )}
                 <button
                     onClick={() => { setActiveBoard('bdsm'); setActiveBDSMSub('全部'); }}
                     className={`px-3 py-1 rounded-full text-xs transition-colors ${activeBoard === 'bdsm' ? 'bg-red-500/20 text-red-400' : 'text-gray-400 hover:text-white'}`}
@@ -358,6 +382,14 @@ const CampusForumApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameCo
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
                             className={`px-3 py-1 rounded-full text-xs whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white'}`}
+                        >{cat}</button>
+                    ))
+                ) : activeBoard === 'confession' ? (
+                    表白墙分类.map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveConfessionSub(cat)}
+                            className={`px-3 py-1 rounded-full text-xs whitespace-nowrap transition-colors ${activeConfessionSub === cat ? 'bg-pink-500/20 text-pink-400' : 'text-gray-400 hover:text-white'}`}
                         >{cat}</button>
                     ))
                 ) : (

@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { DeviceMode, MobileApp, DeviceGameContext } from '../../../../models/mobileDevice';
 import { getDeviceConfig, getAppName } from '../../../../models/eraDevice';
-import { 催眠进化阶段表 } from '../../../../models/campusPhone';
-import type { 催眠记录, 催眠App等级, 催眠类型 } from '../../../../types';
+import { 催眠进化阶段表, 催眠进化阶段, 催眠能力, 催眠类型 } from '../../../../models/campusPhone';
+import type { 催眠记录, 催眠App等级 } from '../../../../models/campusPhone';
 
 interface AppProps {
     eraId: string;

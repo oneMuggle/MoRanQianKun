@@ -1281,6 +1281,7 @@ export const useGame = () => {
                 const safe = 深拷贝(raw || {});
                 return {
                     论坛帖子列表: Array.isArray(safe.论坛帖子列表) ? safe.论坛帖子列表 : [],
+                    表白墙帖子列表: Array.isArray(safe.表白墙帖子列表) ? safe.表白墙帖子列表 : [],
                     BDSM帖子列表: Array.isArray(safe.BDSM帖子列表) ? safe.BDSM帖子列表 : [],
                     私聊会话列表: Array.isArray(safe.私聊会话列表) ? safe.私聊会话列表 : [],
                     课程表: (safe.课程表 && typeof safe.课程表 === 'object') ? safe.课程表 : {},
@@ -1290,6 +1291,7 @@ export const useGame = () => {
                     } : { 余额: 0, 消费记录: [] },
                     社团活动列表: Array.isArray(safe.社团活动列表) ? safe.社团活动列表 : [],
                     欲望系统: safe.欲望系统 ?? undefined,
+                    见面预约列表: Array.isArray(safe.见面预约列表) ? safe.见面预约列表 : undefined,
                 };
             },
             战斗结束自动清空,
