@@ -102,3 +102,39 @@ export const 运行时_规划分析: 提示词结构 = {
     类型: '运行时',
     启用: false
 };
+
+// Backward compatibility alias for services/ai/text/novelDecomposition.ts
+export const 构建统一规划分析用户提示词 = (params: {
+    currentStoryJson: string;
+    currentHeroinePlanJson: string;
+    worldJson: string;
+    socialJson: string;
+    envJson: string;
+    recentBodiesText: string;
+    currentPlanText: string;
+    auditFocusText: string;
+    heroineEnabled?: boolean;
+}): string => {
+    // Returns a user-facing task prompt template
+    return [
+        '【本次规划分析任务】',
+        '',
+        `【当前剧情状态】\n${params.currentStoryJson || '(无)'}`,
+        '',
+        params.heroineEnabled ? `【女主剧情规划】\n${params.currentHeroinePlanJson || '(无)'}` : '',
+        '',
+        `【世界状态】\n${params.worldJson || '(无)'}`,
+        '',
+        `【社交状态】\n${params.socialJson || '(无)'}`,
+        '',
+        `【环境状态】\n${params.envJson || '(无)'}`,
+        '',
+        params.recentBodiesText ? `【最近正文】\n${params.recentBodiesText}` : '',
+        '',
+        params.currentPlanText ? `【当前规划】\n${params.currentPlanText}` : '',
+        '',
+        params.auditFocusText ? `【审计重点】\n${params.auditFocusText}` : '',
+        '',
+        '请开始任务'
+    ].filter(Boolean).join('\n');
+};
