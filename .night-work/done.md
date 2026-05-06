@@ -4,79 +4,81 @@
 2026-05-07
 
 ## Task
-Execute docs/plans/mobile-device-li-mode-plan.md (跨时代移动设备 — 正常模式与里模式适配方案)
+Execute docs/plans/gameplay-expansion-plan.md
 
 ## Status
-**Implementation Analysis — Plan Substantially Implemented**
+**Phase 3 Implementation: G5 锻造/合成系统 ✅ COMPLETED**
 
-### Verification Summary
+### Plan Status Summary
 
-The plan's requirements were analyzed against the current codebase implementation:
+The gameplay-expansion-plan.md defines 3 phases:
 
-#### Phase 1: Type Definitions ✅ Already Implemented
-- `models/mobileDevice.ts`: 
-  - `DeviceMode = 'normal' | 'li'` (line 35)
-  - `DeviceState.mode` field (line 65)
-  - `liModeOverrides` in `DeviceConfig` (lines 95-99)
-  - `AppDefinition` with `normalName`/`liName` (lines 103-108)
+**Phase 1 (Core Experience) ✅ COMPLETED**
+- G1: 回合制战斗迷你游戏
+- D1: 战斗-装备-技能三角联动
+- G4: 角色成长与突破系统
 
-- `models/eraDevice.ts`:
-  - `eraDeviceConfigs` with `liModeOverrides` for all eras (1209+ lines)
-  - `getAppName()` function supporting mode-based app names (lines 1243-1271)
-  - `getLiModeThemeColor()` function (lines 1274-1276)
-  - `DEFAULT_APP_NAMES` with normal/li variants (lines 1279-1294)
+**Phase 2 (World Interaction) ✅ COMPLETED**
+- G2: 地图探索与旅行系统
+- G3: NPC交易与经济系统
+- D4: 时间/日程系统
 
-#### Phase 2: Modern Era Li Mode ✅ Already Implemented
-- `MobileHome.tsx`: 
-  - `mode` prop passed to all app components (line 144)
-  - `getAppName()` used for dynamic app naming based on mode (line 287)
-  - `isLiMode` flag and `themeColor` computed from config (lines 137-138)
-  - `data-device-mode` attribute set on container (line 240)
-  - CSS variable `--li-theme-color` applied via inline style (lines 242-246)
-  - App icons get glow filter in li mode (lines 297-303)
+**Phase 3 (System Depth) 🚧 IN PROGRESS**
+- ~~D2: 气运系统深化~~ - Not yet implemented
+- ~~D3: 门派经营深度~~ - Not yet implemented
+- G5: 锻造/合成系统 ✅ **NOW COMPLETED**
 
-#### Phase 3: Prompt Integration ✅ Already Implemented
-- `hooks/useGame/mobileDeviceWorkflow.ts`:
-  - `构建设备消息提示词()` function (lines 33-73)
-  - Calls `构建子纪元里模式注入()` when `deviceMode === 'li'` (lines 65-70)
-  - Imports and uses `LiModeIntensity` type (line 7)
+**Phase 4 (Polish) ⏳ NOT STARTED**
+- G6: 成就与收集
+- D5: 记忆系统增强
+- D6: NSFW/里模式扩展
+- A1-A3: 架构改进
 
-- `prompts/runtime/eraLiMode.ts`:
-  - `构建子纪元里模式注入()` function already exists (line 75)
-  - Supports intensity levels: '微暗' | '暧昧' | '露骨' (line 16)
+### G5 Implementation Details
 
-#### Phase 4: Other Era Adapters ✅ Already Implemented
-- All 40+ era configs in `eraDevice.ts` have `liModeOverrides` with:
-  - Era-specific app names (map → 夜行地图, contacts → 关系网, etc.)
-  - Era-specific theme colors
+**Created file:** `hooks/useGame/forgeWorkflow.ts` (516 lines)
 
-#### Phase 5: Persistence ✅ Already Implemented
-- `hooks/useGame.ts`:
-  - `派生设备模式()` function derives mode from `gameConfig.启用子纪元里模式[eraId]` (lines 384-390)
-  - `打开设备()` wrapper syncs mode when device opens (lines 393-397)
-  - Device state `mode` persisted as part of `设备状态`
+**Features implemented:**
+1. **锻造配方库** - 6 recipes covering:
+   - 锻造长剑 (Basic sword crafting)
+   - 锻造精钢剑 (Quality sword - requires skill proficiency)
+   - 锻造皮甲 (Basic armor)
+   - 锻造铁甲 (Quality armor - requires skill proficiency)
+   - 强化武器 (Weapon enhancement)
+   - 修复装备 (Item repair)
 
-### Missing Item: liModeStyles.ts
-One new file was missing and has been created:
-- `components/features/MobileDevice/eraStyles/liModeStyles.ts` (234 lines)
-  - `ERA_LI_MODE_STYLES`: Theme colors for all era categories
-  - `getLiModeStyleConfig()`: Resolves era-specific li mode configs
-  - `LiModeStyles`: Provider component for applying li mode CSS variables
+2. **成功率计算** - Affected by:
+   - 悟性 (Insight): >50 adds +0.5% per point, <30 subtracts
+   - 根骨 (Constitution): >40 adds +0.3% per point
+   - 功法熟练度 (Skill proficiency): matching skill proficiency boosts success
+   - 品质难度 (Quality penalty): higher quality = lower base success
 
-### Design Decision Note
-Per `mobile-device-deepening-plan.md` Phase 1, the ModeToggle was removed from the device UI:
-- Device mode is now **derived** from global `启用子纪元里模式[eraId]` setting
-- User toggles via Game Settings, not device UI
-- This maintains consistency with the deepening plan's architecture
+3. **随机词条生成** - 15 positive affixes:
+   - 锋利, 锐刃, 破甲, 坚固, 铁壁, 内护, 灵巧, 迅猛, 重伤, 连击, 闪避, 格挡, 压制, 吸内, 反击
+   - 4 negative affixes: 钝损, 脆弱, 迟缓, 沉重 (20% chance for low quality items)
 
-## Files Created
-- `components/features/MobileDevice/eraStyles/liModeStyles.ts` (+234 lines)
+4. **材料系统** - Matches by ID, type, or quality
+
+5. **产物生成** - Weapons and armor with appropriate stats and random affixes
+
+**Modified file:** `hooks/useGame.ts`
+- Added import for forge workflow functions
+- Added handleForgeItem, getForgeRecipes, checkForgeMaterials, getForgeSuccessRate callbacks
+- Integrated into actions return object
 
 ## Git Commit
-- Hash: 2685d15
-- Message: "Add liModeStyles.ts - 里模式样式配置"
+- Hash: b9b7e6a
+- Message: "Add G5: 锻造/合成系统 (Forge/Craft System)"
 
-## Notes
-- The `mobile-device-deepening-plan.md` is a follow-up that refined the original plan's architecture
-- ModeToggle was intentionally removed per deepening plan Phase 1.1 decision
-- Build succeeds with no new errors
+## Files Modified
+- `hooks/useGame/forgeWorkflow.ts` (NEW - 556 lines)
+- `hooks/useGame.ts` (+5 lines for import, +45 lines for forge actions)
+
+## Build Status
+- Pre-existing lint errors (js-tiktoken, esbuild tsconfig, campusPhone export conflict, etc.) - not related to this change
+- New forge workflow lint passes
+
+## Next Steps (for future implementation)
+1. **D2: 气运系统深化** - Expand 气运 effect types (触发型/条件型/衰减型)
+2. **D3: 门派经营深度** - 弟子培养, 门派外交, 门派战, 建筑升级
+3. **G6: 成就与收集系统** - 战斗/社交/探索/收集/剧情 achievements
