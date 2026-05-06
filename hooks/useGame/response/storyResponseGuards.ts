@@ -1,5 +1,5 @@
-import type { GameResponse, TavernCommand } from '../../types';
-import { normalizeStateCommandKey } from '../../utils/stateHelpers';
+import type { GameResponse, TavernCommand } from '../../../types';
+import { normalizeStateCommandKey } from '../../../utils/stateHelpers';
 
 const 命令属于世界域 = (key: string): boolean => {
     const normalized = normalizeStateCommandKey(typeof key === 'string' ? key : '');

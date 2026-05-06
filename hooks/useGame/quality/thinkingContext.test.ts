@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { 提取响应规划文本, 提取响应变量规划文本, 提取响应思考上下文 } from './thinkingContext';
-import type { GameResponse } from '../../types';
+import type { GameResponse } from '../../../types';
 
 describe('提取响应规划文本', () => {
     it('returns planning text from t_plan', () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 执行剧情回忆检索 } from './recallWorkflow';
 import * as textAIService from '../../services/ai/text';
 import * as apiConfig from '../../utils/apiConfig';
-import * as memoryRecall from './memoryRecall';
+import * as memoryRecall from './memory/memoryRecall';
 
 vi.mock('../../services/ai/text', () => ({
     generateMemoryRecall: vi.fn(),

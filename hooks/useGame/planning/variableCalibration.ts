@@ -9,8 +9,8 @@ import type {
     女主剧情规划结构,
     同人剧情规划结构,
     同人女主剧情规划结构
-} from '../../types';
-import type { 校园系统数据 } from '../../models/campusPhone';
+} from '../../../types';
+import type { 校园系统数据 } from '../../../models/campusPhone';
 
 export type 变量校准状态 = {
     角色: 角色数据结构;

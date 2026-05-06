@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { 执行开场剧情生成工作流 } from './openingStoryWorkflow';
-import * as textAIService from '../../services/ai/text';
-import * as apiConfig from '../../utils/apiConfig';
-import * as gameSettings from '../../utils/gameSettings';
+import * as textAIService from '../../../services/ai/text';
+import * as apiConfig from '../../../utils/apiConfig';
+import * as gameSettings from '../../../utils/gameSettings';
 
 vi.mock('../../services/ai/text', () => ({
     generateStoryResponse: vi.fn(),

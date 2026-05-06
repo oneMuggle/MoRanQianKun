@@ -1,5 +1,5 @@
-import type { PNG画风预设结构, 接口设置结构, 角色锚点结构 } from '../../types';
-import { 获取主剧情接口配置, 获取生图词组转化器接口配置, 接口配置是否可用, 规范化接口设置 } from '../../utils/apiConfig';
+import type { PNG画风预设结构, 接口设置结构, 角色锚点结构 } from '../../../types';
+import { 获取主剧情接口配置, 获取生图词组转化器接口配置, 接口配置是否可用, 规范化接口设置 } from '../../../utils/apiConfig';
 import { 提取NPC生图基础数据, 提取主角生图基础数据 } from '../npc/npcContext';
 
 type 右下角提示参数 = {

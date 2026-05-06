@@ -1,6 +1,6 @@
-import { GameResponse, 记忆系统结构, 记忆配置结构 } from '../../types';
-import { 默认中期转长期提示词, 默认短期转中期提示词, 默认NPC记忆总结提示词 } from '../../prompts/runtime/defaults';
-import { normalizeCanonicalGameTime } from './timeUtils';
+import { GameResponse, 记忆系统结构, 记忆配置结构 } from '../../../types';
+import { 默认中期转长期提示词, 默认短期转中期提示词, 默认NPC记忆总结提示词 } from '../../../prompts/runtime/defaults';
+import { normalizeCanonicalGameTime } from '../time/timeUtils';
 
 export const 即时短期分隔标记 = '\n<<SHORT_TERM_SYNC>>\n';
 

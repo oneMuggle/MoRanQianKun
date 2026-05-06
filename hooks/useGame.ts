@@ -213,9 +213,9 @@ type 发送选项 = {
 };
 
 const 加载图片AI服务 = () => import('../services/ai/image/runtime');
-const 加载NPC生图工作流 = () => import('./useGame/npcImageWorkflow');
-const 加载NPC香闺秘档生图工作流 = () => import('./useGame/npcSecretImageWorkflow');
-const 加载场景生图工作流 = () => import('./useGame/sceneImageWorkflow');
+const 加载NPC生图工作流 = () => import('./useGame/image/npcImageWorkflow');
+const 加载NPC香闺秘档生图工作流 = () => import('./useGame/image/npcSecretImageWorkflow');
+const 加载场景生图工作流 = () => import('./useGame/image/sceneImageWorkflow');
 
 
 type 最近开局配置结构 = {

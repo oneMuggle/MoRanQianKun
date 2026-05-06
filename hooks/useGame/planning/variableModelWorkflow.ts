@@ -1,16 +1,16 @@
-import * as textAIService from '../../services/ai/text';
-import type { GameResponse, OpeningConfig, TavernCommand, 世界书结构, 内置提示词条目结构, 提示词结构 } from '../../types';
-import { 获取变量计算接口配置, 接口配置是否可用, 变量校准功能已启用 } from '../../utils/apiConfig';
-import { 规范化游戏设置 } from '../../utils/gameSettings';
-import { normalizeStateCommandKey } from '../../utils/stateHelpers';
-import { 构建世界书注入文本 } from '../../utils/worldbook';
-import { 构建运行时额外提示词 } from '../../prompts/runtime/nsfw';
+import * as textAIService from '../../../services/ai/text';
+import type { GameResponse, OpeningConfig, TavernCommand, 世界书结构, 内置提示词条目结构, 提示词结构 } from '../../../types';
+import { 获取变量计算接口配置, 接口配置是否可用, 变量校准功能已启用 } from '../../../utils/apiConfig';
+import { 规范化游戏设置 } from '../../../utils/gameSettings';
+import { normalizeStateCommandKey } from '../../../utils/stateHelpers';
+import { 构建世界书注入文本 } from '../../../utils/worldbook';
+import { 构建运行时额外提示词 } from '../../../prompts/runtime/nsfw';
 import {
     构建变量相关规则提示词
-} from '../../prompts/runtime/variableCalibrationReference';
+} from '../../../prompts/runtime/variableCalibrationReference';
 import type { 响应命令处理状态 } from '../npc/responseCommandProcessor';
-import { 构建同人运行时提示词包 } from '../../prompts/runtime/fandom';
-import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../utils/promptFeatureToggles';
+import { 构建同人运行时提示词包 } from '../../../prompts/runtime/fandom';
+import { 按功能开关过滤提示词内容, 裁剪修炼体系上下文数据 } from '../../../utils/promptFeatureToggles';
 
 type 变量模型基态 = Pick<
     响应命令处理状态,

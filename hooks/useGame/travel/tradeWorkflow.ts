@@ -1,8 +1,8 @@
 // NPC交易与经济系统
 // 处理买卖物品、NPC商店、讨价还价
 
-import { 角色金钱 } from '../../models/character';
-import { NPC结构 } from '../../models/social';
+import { 角色金钱 } from '../../../models/character';
+import { NPC结构 } from '../../../models/social';
 
 // Use the item type that matches the character model (from types.ts re-export)
 // We use a generic shape to avoid import conflict

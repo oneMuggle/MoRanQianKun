@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 创建回档快照系统 } from './ui/rollbackSnapshot';
-import * as dbService from '../../services/dbService';
+import * as dbService from '../../../services/dbService';
 
 vi.mock('../../services/dbService', () => ({
     删除最近自动存档: vi.fn(),

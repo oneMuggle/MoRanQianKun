@@ -1,4 +1,4 @@
-import { 记忆系统结构 } from '../../types';
+import { 记忆系统结构 } from '../../../types';
 import { 规范化记忆系统, 格式化回忆名称, 解析记忆条目时间信息 } from '../memory/memoryUtils';
 
 export type 剧情回忆候选 = {

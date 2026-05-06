@@ -11,8 +11,8 @@ import type {
 } from '../../types';
 import type { 当前可用接口结构 } from '../../utils/apiConfig';
 import { 获取主剧情接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
-import { 执行开场剧情生成工作流 } from './openingStoryWorkflow';
-import { 执行世界生成工作流 } from './worldGenerationWorkflow';
+import { 执行开场剧情生成工作流 } from './opening/openingStoryWorkflow';
+import { 执行世界生成工作流 } from './world/worldGenerationWorkflow';
 
 type 快速重开模式 = 'world_only' | 'opening_only' | 'all';
 

@@ -6,15 +6,15 @@ import type {
     环境信息结构,
     战斗状态结构,
     角色数据结构
-} from '../../types';
-import * as textAIService from '../../services/ai/text';
-import { 获取文章优化接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
-import { 规范化游戏设置 } from '../../utils/gameSettings';
-import { 默认文章优化提示词 } from '../../prompts/runtime/defaults';
-import { 核心_文章优化思维链 } from '../../prompts/core/cotPolish';
-import { 构建COT伪装提示词 } from './promptRuntime';
-import { 环境时间转标准串 } from './timeUtils';
-import { 规范化环境信息, 构建完整地点文本 } from './stateTransforms';
+} from '../../../types';
+import * as textAIService from '../../../services/ai/text';
+import { 获取文章优化接口配置, 接口配置是否可用 } from '../../../utils/apiConfig';
+import { 规范化游戏设置 } from '../../../utils/gameSettings';
+import { 默认文章优化提示词 } from '../../../prompts/runtime/defaults';
+import { 核心_文章优化思维链 } from '../../../prompts/core/cotPolish';
+import { 构建COT伪装提示词 } from '../promptRuntime';
+import { 环境时间转标准串 } from '../time/timeUtils';
+import { 规范化环境信息, 构建完整地点文本 } from '../stateTransforms';
 
 type 正文日志结构 = Array<{ sender: string; text: string }>;
 

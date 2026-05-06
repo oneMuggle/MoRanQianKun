@@ -1,4 +1,4 @@
-import type { 世界数据结构 } from '../../models/world';
+import type { 世界数据结构 } from '../../../models/world';
 
 export type 世界状态问题 = {
   类型: '孤立NPC引用' | '无效地点' | '事件状态异常' | '时间悖论' | '重复实体' | '引用完整性';

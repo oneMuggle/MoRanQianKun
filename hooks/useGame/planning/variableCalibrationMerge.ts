@@ -1,4 +1,4 @@
-import type { GameResponse, TavernCommand } from '../../types';
+import type { GameResponse, TavernCommand } from '../../../types';
 
 export const 合并变量校准结果到响应 = (
     baseResponse: GameResponse,

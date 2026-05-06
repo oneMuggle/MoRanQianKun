@@ -1,8 +1,8 @@
 /** 响应文本和时间辅助函数 */
 
-import type { GameResponse } from '../../types';
-import { countOpenAIChatMessagesTokens, countOpenAITextTokens } from '../../utils/tokenEstimate';
-import { normalizeCanonicalGameTime } from './timeUtils';
+import type { GameResponse } from '../../../types';
+import { countOpenAIChatMessagesTokens, countOpenAITextTokens } from '../../../utils/tokenEstimate';
+import { normalizeCanonicalGameTime } from '../time/timeUtils';
 
 /** 获取原始AI消息 */
 export const 获取原始AI消息 = (rawText: string): string => (typeof rawText === 'string' ? rawText : '');

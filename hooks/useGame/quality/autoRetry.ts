@@ -1,7 +1,7 @@
 /** 自动重试系统 */
 
-import type { 游戏设置结构, 聊天记录结构 } from '../../types';
-import * as textAIService from '../../services/ai/text';
+import type { 游戏设置结构, 聊天记录结构 } from '../../../types';
+import * as textAIService from '../../../services/ai/text';
 
 /** 自动重试最大次数 */
 export const 自动重试最大次数 = 3;

@@ -13,7 +13,7 @@ import {
     预筛剧情回忆候选,
     解析剧情回忆输出,
     根据检索结果构建剧情回忆标签
-} from './memoryRecall';
+} from './memory/memoryRecall';
 
 export type 剧情回忆检索结果 = {
     tagContent: string;

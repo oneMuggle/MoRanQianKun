@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import type { DeviceMode } from '../../models/mobileDevice';
-import { getDeviceConfig, getLiModeThemeColor } from '../../models/eraDevice';
-import { getEraCategory } from '../../components/features/MobileDevice/eraStyles/EraStyleSelector';
+import type { DeviceMode } from '../../../models/mobileDevice';
+import { getDeviceConfig, getLiModeThemeColor } from '../../../models/eraDevice';
+import { getEraCategory } from '../../../components/features/MobileDevice/eraStyles/EraStyleSelector';
 
 /**
  * 根据 eraId + mode 计算主题变量

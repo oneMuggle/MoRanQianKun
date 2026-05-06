@@ -1,4 +1,4 @@
-import type { GameResponse, 生图任务来源类型 } from '../../types';
+import type { GameResponse, 生图任务来源类型 } from '../../../types';
 
 type 场景生图触发参数 = {
     response: GameResponse;

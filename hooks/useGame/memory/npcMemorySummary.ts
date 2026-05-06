@@ -1,7 +1,7 @@
-import type { NPC总结记忆, NPC结构, NPC记忆 } from '../../models/social';
-import type { 记忆配置结构 } from '../../models/system';
+import type { NPC总结记忆, NPC结构, NPC记忆 } from '../../../models/social';
+import type { 记忆配置结构 } from '../../../models/system';
 import { 规范化记忆配置 } from '../memory/memoryUtils';
-import { normalizeCanonicalGameTime } from './timeUtils';
+import { normalizeCanonicalGameTime } from '../time/timeUtils';
 
 export type NPC原始记忆展示项 = {
     标签: string;

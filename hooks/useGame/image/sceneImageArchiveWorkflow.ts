@@ -1,6 +1,6 @@
-import type { 场景图片档案, 视觉设置结构 } from '../../types';
-import { 规范化视觉设置 } from '../../utils/visualSettings';
-import { 获取图片展示地址, 压缩图片资源字段 } from '../../utils/imageAssets';
+import type { 场景图片档案, 视觉设置结构 } from '../../../types';
+import { 规范化视觉设置 } from '../../../utils/visualSettings';
+import { 获取图片展示地址, 压缩图片资源字段 } from '../../../utils/imageAssets';
 
 type 场景图片档案工作流依赖 = {
     获取场景图历史上限: () => number;

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { MobileApp } from '../../models/mobileDevice';
+import type { MobileApp } from '../../../models/mobileDevice';
 
 /**
  * 管理 App 内导航状态、返回栈

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { 执行世界生成工作流 } from './worldGenerationWorkflow';
-import * as textAIService from '../../services/ai/text';
-import * as dbService from '../../services/dbService';
-import * as apiConfig from '../../utils/apiConfig';
-import * as gameSettings from '../../utils/gameSettings';
+import * as textAIService from '../../../services/ai/text';
+import * as dbService from '../../../services/dbService';
+import * as apiConfig from '../../../utils/apiConfig';
+import * as gameSettings from '../../../utils/gameSettings';
 
 vi.mock('../../services/ai/text', () => ({
     generateWorldData: vi.fn(),
