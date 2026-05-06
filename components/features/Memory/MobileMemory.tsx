@@ -12,7 +12,7 @@ interface Props {
     onStartMemorySummary?: (source: '短期' | '中期', startIndex: number, endIndex: number) => void;
 }
 
-type TabType = 'context' | 'short' | 'medium' | 'long';
+type TabType = 'context' | 'short' | 'medium' | 'long' | 'search';
 const 即时短期分隔标记 = '\n<<SHORT_TERM_SYNC>>\n';
 
 type 编辑条目状态 = {
@@ -104,6 +104,9 @@ const MobileMemory: React.FC<Props> = ({
         error: ''
     });
     const [summaryRange, setSummaryRange] = useState<区间总结状态>({ start: '1', end: '1', error: '' });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<记忆搜索结果[]>([]);
+    const [searchTabBefore, setSearchTabBefore] = useState<TabType>('context');
 
     const fallbackImmediateData: 记忆展示条目[] = history
         .filter((msg) => msg.role === 'assistant' && msg.structuredResponse?.shortTerm)
@@ -173,14 +176,71 @@ const MobileMemory: React.FC<Props> = ({
         if (activeTab === 'context') return contextData;
         if (activeTab === 'short') return shortData;
         if (activeTab === 'medium') return mediumData;
+        if (activeTab === 'search') {
+            return searchResults.map((result, idx) => ({
+                id: idx,
+                content: result.匹配片段,
+                rawContent: result.记忆原文 || result.概括,
+                fromMemory: true,
+                rawDate: `${result.层}记忆`,
+                syncedShort: '',
+                timeStart: '',
+                timeEnd: '',
+                层: result.层,
+                回合: result.回合,
+                匹配度: result.匹配度,
+                匹配片段: result.匹配片段,
+                记忆原文: result.记忆原文
+            })) as (typeof contextData[0] & { 层?: string; 回合?: number; 匹配度?: number; 匹配片段?: string; 记忆原文?: string })[];
+        }
         return longData;
-    }, [activeTab, contextData, longData, mediumData, shortData]);
+    }, [activeTab, contextData, longData, mediumData, shortData, searchResults]);
 
     const currentLayerLength = activeTab === 'short'
         ? (memorySystem?.短期记忆?.length || 0)
         : activeTab === 'medium'
             ? (memorySystem?.中期记忆?.length || 0)
             : 0;
+
+    // ==================== 记忆检索功能 ====================
+    const 执行记忆搜索 = useCallback(() => {
+        if (!searchQuery.trim()) {
+            setSearchResults([]);
+            return;
+        }
+        const results = 搜索记忆条目(searchQuery, memorySystem || 创建空记忆系统(), { limit: 20 });
+        setSearchResults(results);
+    }, [searchQuery, memorySystem]);
+
+    const 切换到搜索标签 = () => {
+        if (activeTab !== 'search') {
+            setSearchTabBefore(activeTab);
+            setActiveTab('search');
+        }
+        执行记忆搜索();
+    };
+
+    const 清除搜索 = () => {
+        setSearchQuery('');
+        setSearchResults([]);
+        setActiveTab(searchTabBefore);
+    };
+
+    const 处理搜索输入 = (value: string) => {
+        setSearchQuery(value);
+        if (value.trim()) {
+            const timeoutId = setTimeout(() => {
+                if (activeTab !== 'search') {
+                    setSearchTabBefore(activeTab);
+                    setActiveTab('search');
+                }
+                执行记忆搜索();
+            }, 300);
+            return () => clearTimeout(timeoutId);
+        } else {
+            setSearchResults([]);
+        }
+    };
 
     useEffect(() => {
         if (activeTab !== 'short' && activeTab !== 'medium') return;
@@ -299,16 +359,41 @@ const MobileMemory: React.FC<Props> = ({
 
                 <div className="border-b border-gray-800/60 bg-black/30 px-3 py-2 overflow-x-auto no-scrollbar">
                     <div className="flex gap-2">
+                        {/* 搜索栏 */}
+                        <div className="flex items-center gap-2 mr-2">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => 处理搜索输入(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && 切换到搜索标签()}
+                                    placeholder="搜索..."
+                                    className="w-24 h-7 pl-7 pr-7 rounded-full border border-gray-700 bg-black/60 text-[10px] text-gray-200 outline-none focus:border-wuxia-gold/60 transition-all font-serif"
+                                />
+                                <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                {searchQuery && (
+                                    <button
+                                        onClick={清除搜索}
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-gray-400 hover:text-wuxia-gold transition-all text-[10px]"
+                                    >
+                                        ✕
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                         {[
                             { id: 'context', label: '即时' },
                             { id: 'short', label: '短期' },
                             { id: 'medium', label: '中期' },
-                            { id: 'long', label: '长期' }
+                            { id: 'long', label: '长期' },
+                            { id: 'search', label: '检索' }
                         ].map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as TabType)}
-                                className={`px-3 py-1.5 text-[11px] rounded-full border transition-all ${
+                                className={`px-3 py-1.5 text-[11px] rounded-full border transition-all whitespace-nowrap ${
                                     activeTab === tab.id
                                         ? 'bg-wuxia-gold/15 text-wuxia-gold border-wuxia-gold'
                                         : 'border-gray-800 text-gray-500'
@@ -353,8 +438,11 @@ const MobileMemory: React.FC<Props> = ({
                     {currentData.length > 0 ? currentData.map((mem, idx) => (
                         <div key={`${activeTab}-${mem.id}-${idx}`} className="bg-black/40 border border-gray-800 rounded-xl p-4 relative">
                             {mem.rawDate && (
-                                <div className="text-[9px] text-gray-500 font-mono mb-2 border-b border-gray-800/50 pb-1">
-                                    {mem.rawDate}
+                                <div className="text-[9px] text-gray-500 font-mono mb-2 border-b border-gray-800/50 pb-1 flex items-center justify-between">
+                                    <span>{mem.rawDate}</span>
+                                    {'匹配度' in mem && mem.匹配度 !== undefined && (
+                                        <span className="text-wuxia-gold/70">匹配度: {mem.匹配度.toFixed(1)}</span>
+                                    )}
                                 </div>
                             )}
                             <p className="text-gray-300 font-serif leading-relaxed text-sm whitespace-pre-wrap">
@@ -368,7 +456,7 @@ const MobileMemory: React.FC<Props> = ({
                                     </p>
                                 </div>
                             )}
-                            {onSaveMemory && mem.fromMemory && (
+                            {onSaveMemory && mem.fromMemory && !('匹配度' in mem) && (
                                 <button
                                     type="button"
                                     onClick={() => 打开条目编辑(mem)}
@@ -380,7 +468,7 @@ const MobileMemory: React.FC<Props> = ({
                         </div>
                     )) : (
                         <div className="text-center py-16 text-gray-600 italic font-serif">
-                            此记忆层暂无内容。
+                            {activeTab === 'search' ? '灵台澄空，未寻得相关神念' : '此记忆层暂无内容。'}
                         </div>
                     )}
                 </div>
