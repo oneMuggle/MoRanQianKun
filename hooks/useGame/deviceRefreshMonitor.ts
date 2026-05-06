@@ -8,6 +8,7 @@ import type { DeviceMode, DeviceGameContext } from '../../models/mobileDevice';
 import type { 校园系统数据 } from '../../models/campusPhone';
 import type { 校园NSFW设置 } from '../../models/campusNSFW';
 import { 生成设备原始消息, 解析AI论坛帖子, 解析AIBDSM帖子 } from './deviceAiWorkflow';
+import { 刷新校园论坛 } from './campusForumWorkflow';
 
 export interface 设备刷新任务 {
     id: string;
@@ -80,6 +81,35 @@ export const useDeviceRefreshMonitor = (deps: UseDeviceRefreshMonitorDeps) => {
             // 根据当前 app 决定刷新哪些内容
             const 需要刷新论坛 = app === 'forum' || app === 'confession';
             const 需要刷新BDSM = app === 'bdsn';
+            const 需要刷新校园 = app === 'campus';
+
+            // 校园论坛统一刷新路径（普通论坛 + BDSM）
+            if (需要刷新校园) {
+                try {
+                    const 论坛结果 = await 刷新校园论坛({
+                        eraId, mode, apiConfig, apiSettings: apiConfig, gameContext,
+                        校园系统: { 论坛帖子列表: [], 私聊会话列表: [], 欲望系统: null, 暴露风险值: 0, 谣言等级: '无' } as any,
+                        nsfw设置, count: 8,
+                    });
+                    if (论坛结果.论坛帖子.length > 0) {
+                        deps.set校园系统(prev => {
+                            const existing = prev.论坛帖子列表 || [];
+                            return { ...prev, 论坛帖子列表: [...论坛结果.论坛帖子, ...existing].slice(0, 50) };
+                        });
+                        论坛帖子数 = 论坛结果.论坛帖子.length;
+                    }
+                    if (论坛结果.BDSM帖子.length > 0) {
+                        deps.set校园系统(prev => {
+                            const existing = prev.BDSM帖子列表 || [];
+                            return { ...prev, BDSM帖子列表: [...论坛结果.BDSM帖子, ...existing].slice(0, 50) };
+                        });
+                        BDSM帖子数 = 论坛结果.BDSM帖子.length;
+                    }
+                    errors.push(...论坛结果.errors);
+                } catch (err) {
+                    errors.push(`校园刷新失败: ${err instanceof Error ? err.message : String(err)}`);
+                }
+            }
 
             if (需要刷新论坛) {
                 try {
