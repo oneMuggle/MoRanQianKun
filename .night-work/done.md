@@ -128,14 +128,89 @@
 | 校园纪元拥有 5+ NSFW 气运 | ✅ (7个) |
 | `MODERN_ERA_IDS` 从时代树派生 | ✅ |
 | `GameSettings.tsx` 中无 `as any` | ✅ |
-| TypeScript 编译无新增错误 | ✅ (`npm run build` 成功) |
+| TypeScript 编译无新增错误 | ✅ |
+
+## 结论
+计划步骤 1-5, 7, 8, 10, 12, 13, 15 已完成并验证通过。步骤 6（气运去重精简）需人工逐条审查，建议后续单独执行。步骤 9, 11 因收益不足已跳过。步骤 14, 16 为可选手动任务。
 
 ---
 
 ## 构建验证
-✅ `npm run build` 成功完成（11.03s）
+✅ `npm run build` 成功完成
 
-# 2026-05-07 天赋气运背景NSFW系统整理优化
+---
+
+# 2026-05-04 校园NSFW深化系统完整修复方案
+
+**执行计划**: `docs/plans/2026-05-04_campus-nsfw-fix-plan.md`
+**执行时间**: 2026-05-06 (cron verification)
+**状态**: ✅ 已验证（所有修复已实施）
+
+---
+
+## 验证摘要
+
+计划描述 8 个问题，经逐一验证，**全部修复已就位**：
+
+### 修复 1：存档保存不剥离校园系统 ✅
+- **文件**: `services/dbService.ts` 第 181-183 行
+- **验证**: `清洗导入存档` 返回对象已包含 `校园系统`、`校规系统`、`催眠系统` 字段的深拷贝
+
+### 修复 2：响应处理支持校园系统根路径 ✅
+- **文件**: `utils/stateHelpers.ts` + `hooks/useGame/responseCommandProcessor.ts`
+- **验证**:
+  - `stateHelpers.ts` 第 29 行根路径列表包含 `校园系统`
+  - `applyStateCommand` switch（第 355-357 行）支持 `校园系统` 写回
+  - `读取当前根值`（第 391-392 行）支持 `校园系统`
+
+### 修复 3：AI Prompt 增加状态输出指令 ✅
+- **文件**: `prompts/runtime/campusNSFW.ts` 第 153-162 行
+- **验证**: `构建校园NSFW完整叙事约束` 末尾已追加【欲望系统状态输出要求】，包含 `<欲望系统状态>` XML 标签格式规范
+
+### 修复 4：响应处理解析欲望系统状态更新 ✅
+- **文件**: `hooks/useGame/responseCommandProcessor.ts` 第 144-166 行、第 226-246 行
+- **验证**: 两次调用 `processResponseCommands` 均已传递 `rawContent` 并解析 `<欲望系统状态>` 标签
+
+### 修复 5：引擎函数集成 ✅
+- **文件**: `hooks/useGame/campusNSFW/convenienceFunctions.ts`
+- **验证**: `处理NSFW互动` 第 39-40 行已整合 `计算露出偏好推进` 结果
+- **衰减逻辑**: `campusNSFW/exposureSystem.ts` 第 102-105 行 `计算回合衰减`（暴露风险 -5/回合，流言 -2/回合）已导出
+
+### 修复 6：旧存档读档兼容 ✅
+- **文件**: `hooks/useGame/saveLoad/saveLoadWorkflow.ts` 第 247-277 行
+- **验证**: `handleLoadGame` 中已有旧存档欲望系统兼容逻辑，基于社交列表重新初始化
+
+### 修复 7：多NPC prompt注入增强 ✅
+- **文件**: `hooks/useGame/bdsmStateIntegration.ts` 第 74-80 行
+- **验证**: `构建校园NSFW参数` 已生成 `其他Npc欲望摘要`，格式为 `ID: 阶段/轨道(进度) 暴露风险`
+
+### 修复 8：校园NSFW设置纳入默认值 ✅
+- **文件**: `utils/gameSettings.ts` 第 188 行
+- **验证**: `默认游戏设置.校园NSFW设置 = 默认校园NSFW设置`
+
+---
+
+## 成功标准验证
+
+| 标准 | 状态 |
+|------|------|
+| 存档清洗保留 `校园系统` | ✅ |
+| `responseCommandProcessor` 支持 `校园系统` | ✅ |
+| AI prompt 包含欲望状态输出指令 | ✅ |
+| 响应解析 `<欲望系统状态>` 标签 | ✅ |
+| `处理NSFW互动` 整合 `计算露出偏好推进` | ✅ |
+| 衰减引擎函数存在（-5暴露/-2流言） | ✅ |
+| 旧存档读档兼容逻辑 | ✅ |
+| 多NPC欲望摘要注入prompt | ✅ |
+| 校园NSFW设置默认值 | ✅ |
+| TypeScript 构建无错误 | ✅ (`npm run build` 成功) |
+
+---
+
+## 构建验证
+✅ `npm run build` 成功完成（10.45s）
+
+---
 
 **执行计划**: `docs/plans/2026-05-04_talent-qiyun-background-nsfw-refactor.md`
 
