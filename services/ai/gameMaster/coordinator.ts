@@ -285,7 +285,7 @@ export class 游戏大师协调器 {
                 .join('\n') || '';
 
             // 调用世界演变工作流
-            const { 执行世界演变更新工作流 } = await import('../../../hooks/useGame/worldEvolutionWorkflow');
+            const { 执行世界演变更新工作流 } = await import('../../../hooks/useGame/world/worldEvolutionWorkflow');
             
             // 注意：这里需要完整的依赖，实际使用时从 useGame 获取
             // 简化版本，实际应该传递完整依赖

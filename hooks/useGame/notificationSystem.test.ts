@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { 创建通知系统 } from './notificationSystem';
+import { 创建通知系统 } from './ui/notificationSystem';
 
 function makeSetter() {
     let state: any[] = [];

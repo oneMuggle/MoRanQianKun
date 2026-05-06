@@ -1,10 +1,10 @@
 // 战斗数值计算模块
 // 负责将装备属性、功法熟练度、角色六维属性综合为战斗可用数值
 
-import { 角色数据结构 } from '../../models/domain/character';
-import { 功法结构 } from '../../models/domain/kungfu';
-import { 游戏物品, 武器, 防具 } from '../../models/domain/item';
-import { 战斗敌方信息 } from '../../models/domain/battle';
+import { 角色数据结构 } from '../../models/character';
+import { 功法结构 } from '../../models/kungfu';
+import { 游戏物品, 武器, 防具 } from '../../models/item';
+import { 战斗敌方信息 } from '../../models/battle';
 
 // ---- 装备属性提取 ----
 

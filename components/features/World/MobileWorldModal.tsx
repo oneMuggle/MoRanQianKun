@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { 世界数据结构 } from '../../../models/world';
-import { normalizeCanonicalGameTime, 结构化时间转标准串 } from '../../../hooks/useGame/timeUtils';
+import { normalizeCanonicalGameTime, 结构化时间转标准串 } from '../../../hooks/useGame/time/timeUtils';
 import { IconMapPin } from '../../ui/Icons';
 
 interface Props {

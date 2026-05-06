@@ -23,7 +23,7 @@ import BDSMContractPanel from './apps/BDSMContractPanel';
 import BDSMSafetySettings from './apps/BDSMSafetySettings';
 
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../types';
-import type { NPC结构 } from '../../../models/domain/social';
+import type { NPC结构 } from '../../../models/social';
 import type { BDSM论坛帖子 } from '../../../models/campusNSFW/bdsm-forum';
 
 interface AppProps {

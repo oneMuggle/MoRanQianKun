@@ -1,6 +1,6 @@
 import React from 'react';
 import type { NPC结构, NPC记忆, 记忆配置结构, 香闺秘档部位类型 } from '../../../types';
-import { 构建NPC记忆展示结果, 构建手动NPC记忆总结候选 } from '../../../hooks/useGame/npcMemorySummary';
+import { 构建NPC记忆展示结果, 构建手动NPC记忆总结候选 } from '../../../hooks/useGame/memory/npcMemorySummary';
 import { 获取图片展示地址 } from '../../../utils/imageAssets';
 
 type 图片槽位类型 = '头像' | '立绘' | '背景' | 香闺秘档部位类型;

@@ -8,7 +8,7 @@ import type { DeviceMode, DeviceGameContext } from '../../models/mobileDevice';
 import type { 校园系统数据, 论坛帖子 } from '../../models/campusPhone';
 import type { 校园NSFW设置 } from '../../models/campusNSFW';
 import type { BDSM论坛帖子 } from '../../models/campusNSFW/bdsm-forum';
-import { 生成设备原始消息, 解析AI论坛帖子, 解析AIBDSM帖子 } from './deviceAiWorkflow';
+import { 生成设备原始消息, 解析AI论坛帖子, 解析AIBDSM帖子 } from './device/deviceAiWorkflow';
 
 export interface 论坛刷新结果 {
     论坛帖子: 论坛帖子[];

@@ -4,7 +4,7 @@
  */
 
 import type { 记忆系统结构, 回忆条目结构 } from '../types';
-import { 规范化记忆系统 } from '../hooks/useGame/memoryUtils';
+import { 规范化记忆系统 } from '../hooks/useGame/memory/memoryUtils';
 
 export type 记忆导出格式 = 'json' | 'txt';
 

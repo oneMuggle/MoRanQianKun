@@ -1,4 +1,4 @@
-import type { NPC结构 } from '../../../models/domain/social';
+import type { NPC结构 } from '../../../models/social';
 import type { NPC欲望档案, 亲密里程碑, 后果记录, 里程碑类型 } from '../../../models/campusNSFW';
 import type { 校园亲密互动类型 } from '../../../models/intimacy';
 import { 计算欲望阶段推进, 检查欲望阶段升级, 计算互动冷却, 计算暴露风险, 判定后果, 判定关系轨道, 生成里程碑 } from './desireStateMachine';
