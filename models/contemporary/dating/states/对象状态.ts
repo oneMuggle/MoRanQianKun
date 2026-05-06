@@ -3,13 +3,13 @@
  */
 
 import type {
-  对象核心状态,
+  相亲对象核心状态,
   外貌类型,
   相亲动机,
   骗婚类型,
   相亲对象类型,
   家庭背景,
-} from './types';
+} from '../types';
 
 // 默认化名池
 const 化名池 = [
@@ -26,7 +26,7 @@ const 职业池 = [
 const 学历池 = ['本科', '硕士', '博士', 'MBA', '海归硕士', '双学位'];
 
 // 创建默认相亲对象
-export function 创建默认相亲对象(partial?: Partial<对象核心状态>): 对象核心状态 {
+export function 创建默认相亲对象(partial?: Partial<相亲对象核心状态>): 相亲对象核心状态 {
   return {
     ID: partial?.ID || `对象_${Date.now()}`,
     昵称: partial?.昵称 || 化名池[Math.floor(Math.random() * 化名池.length)],
@@ -70,7 +70,7 @@ export function 创建默认相亲对象(partial?: Partial<对象核心状态>):
 export function 创建骗子对象(
   骗子类型: 骗婚类型,
   性别: '男' | '女'
-): 对象核心状态 {
+): 相亲对象核心状态 {
   const base = 创建默认相亲对象({ 性别 });
 
   switch (骗子类型) {
@@ -148,7 +148,7 @@ export function 创建骗子对象(
 export function 创建真诚对象(
   类型: 相亲对象类型,
   性别: '男' | '女'
-): 对象核心状态 {
+): 相亲对象核心状态 {
   const base = 创建默认相亲对象({ 性别, 真实动机: '真心想结婚' });
 
   switch (类型) {
@@ -189,7 +189,6 @@ export function 创建真诚对象(
       base.职业 = '程序员/医生';
       base.收入 = 30 + Math.floor(Math.random() * 20);
       base.家庭背景 = '农村';
-      base.户籍 = '农村';
       break;
     case '海归':
       base.学历 = '海归硕士';
@@ -203,17 +202,17 @@ export function 创建真诚对象(
 
 // 更新对象状态
 export function 更新对象状态(
-  state: 对象核心状态,
-  updates: Partial<对象核心状态>
-): 对象核心状态 {
+  state: 相亲对象核心状态,
+  updates: Partial<相亲对象核心状态>
+): 相亲对象核心状态 {
   return { ...state, ...updates };
 }
 
 // 提升好感度
 export function 提升好感度(
-  state: 对象核心状态,
+  state: 相亲对象核心状态,
   增量: number
-): 对象核心状态 {
+): 相亲对象核心状态 {
   return 更新对象状态(state, {
     好感度: Math.min(100, state.好感度 + 增量),
   });
@@ -221,9 +220,9 @@ export function 提升好感度(
 
 // 降低好感度
 export function 降低好感度(
-  state: 对象核心状态,
+  state: 相亲对象核心状态,
   减量: number
-): 对象核心状态 {
+): 相亲对象核心状态 {
   return 更新对象状态(state, {
     好感度: Math.max(0, state.好感度 - 减量),
   });
@@ -231,9 +230,9 @@ export function 降低好感度(
 
 // 提升信任度
 export function 提升信任度(
-  state: 对象核心状态,
+  state: 相亲对象核心状态,
   增量: number
-): 对象核心状态 {
+): 相亲对象核心状态 {
   return 更新对象状态(state, {
     信任度: Math.min(100, state.信任度 + 增量),
   });
@@ -241,9 +240,9 @@ export function 提升信任度(
 
 // 降低信任度
 export function 降低信任度(
-  state: 对象核心状态,
+  state: 相亲对象核心状态,
   减量: number
-): 对象核心状态 {
+): 相亲对象核心状态 {
   return 更新对象状态(state, {
     信任度: Math.max(0, state.信任度 - 减量),
   });
@@ -251,9 +250,9 @@ export function 降低信任度(
 
 // 提升投入度
 export function 提升投入度(
-  state: 对象核心状态,
+  state: 相亲对象核心状态,
   增量: number
-): 对象核心状态 {
+): 相亲对象核心状态 {
   return 更新对象状态(state, {
     投入度: Math.min(100, state.投入度 + 增量),
   });
@@ -261,16 +260,16 @@ export function 提升投入度(
 
 // 物质要求提升
 export function 物质要求提升(
-  state: 对象核心状态,
+  state: 相亲对象核心状态,
   增量: number
-): 对象核心状态 {
+): 相亲对象核心状态 {
   return 更新对象状态(state, {
     物质要求: Math.min(100, state.物质要求 + 增量),
   });
 }
 
 // 判断是否为骗子（玩家视角）
-export function 是否可疑对象(state: 对象核心状态): {
+export function 是否可疑对象(state: 相亲对象核心状态): {
   可疑: boolean;
   原因: string[];
 } {
@@ -308,7 +307,7 @@ export function 是否可疑对象(state: 对象核心状态): {
 }
 
 // 获取对象摘要
-export function 获取对象摘要(state: 对象核心状态): string {
+export function 获取对象摘要(state: 相亲对象核心状态): string {
   const 骗子标记 = state.是骗子 ? `【骗子:${state.骗子类型}】` : '';
   return `${state.昵称}（${state.性别}，${state.年龄}岁）${骗子标记}`
     + `| ${state.职业} | 年收${state.收入}万`

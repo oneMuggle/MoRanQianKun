@@ -4,9 +4,9 @@
  * 骗婚类型、识别方法、应对策略
  */
 
-import type { 对象核心状态, 相亲者核心状态, 骗婚类型 } from './types';
-import { 杀猪盘流程, 酒托特征, 骗婚类型配置 } from './types';
-import { 是否可疑对象 } from './states/对象状态';
+import type { 相亲对象核心状态, 相亲者核心状态, 骗婚类型 } from '../types';
+import { 杀猪盘流程, 酒托特征, 骗婚类型配置 } from '../types';
+import { 是否可疑对象 } from '../states/对象状态';
 
 // ==================== 骗子识别 ====================
 
@@ -21,7 +21,7 @@ export interface 骗子识别结果 {
 /**
  * 识别是否为骗子
  */
-export function 识别骗子(对象: 对象核心状态): 骗子识别结果 {
+export function 识别骗子(对象: 相亲对象核心状态): 骗子识别结果 {
   const 可疑结果 = 是否可疑对象(对象);
   const 线索: string[] = [...可疑结果.原因];
   const 可能骗术: 骗婚类型[] = [];
@@ -119,7 +119,7 @@ export interface 骗局阶段 {
 /**
  * 分析杀猪盘当前阶段
  */
-export function 分析杀猪盘阶段(对象: 对象核心状态): 骗局阶段 | null {
+export function 分析杀猪盘阶段(对象: 相亲对象核心状态): 骗局阶段 | null {
   if (!对象.是骗子 || 对象.骗子类型 !== '杀猪盘') {
     return null;
   }
@@ -162,7 +162,7 @@ export function 分析杀猪盘阶段(对象: 对象核心状态): 骗局阶段 
 /**
  * 分析酒托当前阶段
  */
-export function 分析酒托阶段(对象: 对象核心状态): 骗局阶段 | null {
+export function 分析酒托阶段(对象: 相亲对象核心状态): 骗局阶段 | null {
   if (!对象.是骗子 || 对象.骗子类型 !== '酒托') {
     return null;
   }
@@ -210,7 +210,7 @@ export interface 被骗风险评估 {
  */
 export function 评估被骗风险(
   相亲者: 相亲者核心状态,
-  对象: 对象核心状态
+  对象: 相亲对象核心状态
 ): 被骗风险评估 {
   const 主要风险: string[] = [];
   let 风险值 = 0;
@@ -304,7 +304,7 @@ export function 评估被骗风险(
 /**
  * 生成反诈建议
  */
-export function 生成反诈建议(对象: 对象核心状态): string[] {
+export function 生成反诈建议(对象: 相亲对象核心状态): string[] {
   const 建议: string[] = [];
 
   if (对象.是骗子) {
