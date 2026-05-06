@@ -82,6 +82,9 @@ export const 构建原创剧情规划协议 = (): string => [
     '</剧情规划协议>'
 ].join('\n');
 
+// Alias for planUpdateReference.ts compatibility
+export const 剧情规划变量结构提示词 = 构建原创剧情规划协议();
+
 export const 运行时_剧情规划Schema: 提示词结构 = {
     id: 'runtime_story_plan_schema',
     标题: '剧情规划Schema',
