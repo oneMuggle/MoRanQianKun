@@ -43,7 +43,8 @@ import { 默认游戏设置, 规范化游戏设置 } from '../utils/gameSettings
 import { 设置键 } from '../utils/settingsSchema';
 import { 规范化视觉设置 } from '../utils/visualSettings';
 import { 默认图片管理设置, 规范化图片管理设置 } from '../utils/imageManagerSettings';
-import { 获取时代信息 } from '../models/system';
+import { 获取时代信息, 默认性能监控配置, type 性能监控配置结构 } from '../models/system';
+import { 规范化性能监控设置 } from '../utils/performanceMonitorSettings';
 import {
     创建开场空白世界,
     创建开场空白剧情,
@@ -229,6 +230,7 @@ export const useGameState = () => {
     }));
     const [imageManagerConfig, setImageManagerConfig] = useState<图片管理设置结构>(默认图片管理设置);
     const [gameConfig, setGameConfig] = useState<游戏设置结构>(默认游戏设置);
+    const [performanceConfig, setPerformanceConfig] = useState<性能监控配置结构>(默认性能监控配置);
 
     const 默认记忆配置: 记忆配置结构 = {
         短期记忆阈值: 30,
@@ -332,6 +334,8 @@ export const useGameState = () => {
                 if (savedGameConfig) setGameConfig(规范化游戏设置(savedGameConfig as Partial<游戏设置结构>));
                 const savedMemoryConfig = await dbService.读取设置(设置键.记忆设置);
                 if (savedMemoryConfig) setMemoryConfig(规范化记忆配置(savedMemoryConfig as Partial<记忆配置结构>));
+                const savedPerformanceConfig = await dbService.读取设置(设置键.性能监控设置);
+                if (savedPerformanceConfig) setPerformanceConfig(规范化性能监控设置(savedPerformanceConfig as Partial<性能监控配置结构>));
 
                 const savedEra = await dbService.读取设置(设置键.应用时代);
                 if (savedEra && typeof savedEra === 'string') {
@@ -456,6 +460,7 @@ export const useGameState = () => {
         imageManagerConfig, setImageManagerConfig,
         gameConfig, setGameConfig, 
         memoryConfig, setMemoryConfig, 
+        performanceConfig, setPerformanceConfig, 
         
         prompts, setPrompts,
         promptsReady,

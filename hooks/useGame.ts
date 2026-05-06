@@ -317,6 +317,7 @@ export const useGame = () => {
         imageManagerConfig, setImageManagerConfig,
         gameConfig, setGameConfig,
         memoryConfig, setMemoryConfig,
+        performanceConfig, setPerformanceConfig,
         prompts, setPrompts,
         ensurePromptsLoaded,
         festivals, setFestivals,
@@ -2987,7 +2988,9 @@ export const useGame = () => {
             closeDevice: 设备关闭,
             openDeviceApp: 设备打开应用,
             returnDeviceHome: 设备返回主页,
-            setDeviceState: 设置设备状态
+            setDeviceState: 设置设备状态,
+            // Performance
+            performanceConfig
         }
     };
 };
