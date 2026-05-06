@@ -6,7 +6,7 @@ import {
     剧情回忆检索输出格式提示词,
     构建剧情回忆检索用户提示词
 } from '../../prompts/runtime/recall';
-import { 规范化记忆系统 } from './memoryUtils';
+import { 规范化记忆系统 } from './memory/memoryUtils';
 import {
     构建剧情回忆检索上下文,
     基于候选生成回忆回退结果,

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { 环境信息结构, 节日结构, 视觉设置结构 } from '../../types';
 import { 构建区域文字样式 } from '../../utils/visualSettings';
-import { normalizeCanonicalGameTime } from '../../hooks/useGame/timeUtils';
+import { normalizeCanonicalGameTime } from '../../hooks/useGame/time/timeUtils';
 import { useUIText } from '../../hooks/useUIText';
 
 interface Props {

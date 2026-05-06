@@ -5,7 +5,7 @@ import type { 当前可用接口结构 } from '../../../utils/apiConfig';
 type ApiConfigLike = 当前可用接口结构 | Record<string, unknown>;
 import { DeviceState, MobileApp, DeviceGameContext } from '../../../models/mobileDevice';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../types';
-import type { NPC结构 } from '../../../models/domain/social';
+import type { NPC结构 } from '../../../models/social';
 import type { BDSM论坛帖子 } from '../../../models/campusNSFW/bdsm-forum';
 
 interface MobileDeviceProps {

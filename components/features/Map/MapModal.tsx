@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { 世界数据结构, 地图结构, 建筑结构 } from '../../../models/game/world';
+import { 世界数据结构, 地图结构, 建筑结构 } from '../../../models/world';
 import { 环境信息结构 } from '../../../models/environment';
-import { 角色数据结构 } from '../../../models/domain/character';
-import { 旅行事件, 评估旅行可行性 } from '../../../hooks/useGame/travelWorkflow';
+import { 角色数据结构 } from '../../../models/character';
+import { 旅行事件, 评估旅行可行性 } from '../../../hooks/useGame/travel/travelWorkflow';
 
 interface Props {
     world: 世界数据结构;

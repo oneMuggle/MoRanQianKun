@@ -6,7 +6,7 @@
 
 import { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './hooks/useGame/bdsmTaskWorkflow';
 import type { 当前可用接口结构 } from './utils/apiConfig';
-import { 生成设备原始消息, 解析AIBDSM帖子 } from './hooks/useGame/deviceAiWorkflow';
+import { 生成设备原始消息, 解析AIBDSM帖子 } from './hooks/useGame/device/deviceAiWorkflow';
 import { 计算BDSM帖子总影响, 应用BDSM帖子影响, 判定寻主召奴联系结果, 生成联系初始对话 } from './hooks/useGame/bdsmForumEngine';
 import { 构建见面场景提示词, 解析见面结果 } from './hooks/useGame/bdsmMeetingWorkflow';
 import { 请求模型文本 } from './services/ai/chatCompletionClient';

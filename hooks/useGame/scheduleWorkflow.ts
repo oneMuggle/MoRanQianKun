@@ -1,7 +1,7 @@
 // 时间/日程系统增强
 // 时辰换算、NPC日程检查、时间敏感事件
 
-import { 活跃NPC结构 } from '../../models/game/world';
+import { 活跃NPC结构 } from '../../models/world';
 import { normalizeCanonicalGameTime, 标准时间串转结构化 } from './timeUtils';
 
 // ---- 时辰系统 ----

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { 聊天记录结构, 记忆系统结构 } from '../../../types';
-import { 构建带时间戳的记忆条目, 解析记忆条目时间信息 } from '../../../hooks/useGame/memoryUtils';
-import { 搜索记忆条目, 记忆搜索结果 } from '../../../hooks/useGame/memoryRecall';
+import { 构建带时间戳的记忆条目, 解析记忆条目时间信息 } from '../../../hooks/useGame/memory/memoryUtils';
+import { 搜索记忆条目, 记忆搜索结果 } from '../../../hooks/useGame/memory/memoryRecall';
 import MemoryImportExportPanel from './MemoryImportExportPanel';
 
 interface Props {

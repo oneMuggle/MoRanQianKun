@@ -8,7 +8,7 @@ import type {
   联系状态,
 } from '../../models/campusNSFW/bdsm-forum';
 import type { NPC欲望档案, 欲望阶段 } from '../../models/campusNSFW/core';
-import type { NPC结构 } from '../../models/domain/social';
+import type { NPC结构 } from '../../models/social';
 
 // ==================== 常量定义 ====================
 

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { NPC结构 } from '../../../models/social';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';
-import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/npcMemorySummary';
+import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/memory/npcMemorySummary';
 import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import { 获取图片展示地址 } from '../../../utils/imageAssets';
 import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';

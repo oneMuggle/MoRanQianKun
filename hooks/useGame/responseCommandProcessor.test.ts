@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { 执行响应命令处理 } from './responseCommandProcessor';
+import { 执行响应命令处理 } from './npc/responseCommandProcessor';
 import * as stateHelpers from '../../utils/stateHelpers';
 
 vi.mock('../../utils/stateHelpers', () => ({

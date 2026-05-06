@@ -1,7 +1,7 @@
 // 角色成长与突破工作流
 // 管理经验值获取、升级、属性点分配、境界突破
 
-import { 角色数据结构 } from '../../models/domain/character';
+import { 角色数据结构 } from '../../models/character';
 
 // ---- 经验值系统 ----
 

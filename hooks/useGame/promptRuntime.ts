@@ -16,7 +16,7 @@ import {
 import { 写作_防止说话 } from '../../prompts/writing/noControl';
 import { 获取酒馆预设顺序 } from '../../utils/tavernPreset';
 import { 按功能开关过滤提示词内容 } from '../../utils/promptFeatureToggles';
-import { 提取响应规划文本 } from './thinkingContext';
+import { 提取响应规划文本 } from './quality/thinkingContext';
 import { 变量命令提示词ID集合 } from '../../prompts/runtime/promptOwnership';
 
 type 消息角色 = 'system' | 'user' | 'assistant';

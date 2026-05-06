@@ -11,7 +11,7 @@ import type {
     世界书类型,
     聊天记录结构
 } from '../types';
-import { normalizeCanonicalGameTime, 环境时间转标准串 } from '../hooks/useGame/timeUtils';
+import { normalizeCanonicalGameTime, 环境时间转标准串 } from '../hooks/useGame/time/timeUtils';
 import { 构建AI角色声明提示词 } from '../prompts/runtime/roleIdentity';
 import { 构建真实世界模式提示词 } from '../prompts/runtime/realWorldMode';
 import { 构建变量校准提示词 } from '../prompts/runtime/variableCalibration';

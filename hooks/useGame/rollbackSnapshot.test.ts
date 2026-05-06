@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { 创建回档快照系统 } from './rollbackSnapshot';
+import { 创建回档快照系统 } from './ui/rollbackSnapshot';
 import * as dbService from '../../services/dbService';
 
 vi.mock('../../services/dbService', () => ({
