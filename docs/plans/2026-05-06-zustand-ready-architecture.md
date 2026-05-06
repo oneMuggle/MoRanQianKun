@@ -319,10 +319,22 @@ export interface UseGameReturn {
 提取 55 个 React.lazy + 创建可预加载懒组件 声明到 `components/features/lazyComponents.tsx`
 App.tsx: 2115 → 2037 行 (-78 行)
 
-### 7.3 提取 useResponsive hook
-提取 isMobile 状态 + resize listener 逻辑
+### 7.3 提取 useResponsive hook ✅ 完成
+提取 isMobile 状态 + matchMedia 监听器到 `hooks/useResponsive.ts`
+App.tsx: 2037 → 2027 行（累计从 2115 → 2027, -88行）
 
-### 7.4 提取 useContextSnapshot hook
+### 7.4 提取 useModalOpeners hook ✅ 完成
+提取面板开关逻辑（~200 行）到 `hooks/useModalOpeners.ts`，包括 closeAllPanels、20+ 个 openers、handleMobileMenuClick、openImageManagerWithCheck、handleReturnToHomeFromSettings
+App.tsx: 2027 → 1857 行（累计从 2115 → 1857, -258 行）
+
+### 7.5 提取 useConfirmSystem hook ✅ 完成
+提取确认对话框逻辑（~30 行）到 `hooks/useConfirmSystem.tsx`，包括 confirmState、requestConfirm、resolveConfirm、InAppConfirmModal 渲染
+App.tsx: 1857 → 1828 行（累计从 2115 → 1828, -287 行）
+
+### 7.6-7.9 提取 useDerivedState / useTicker / useVisualTheme / useKeyboardShortcuts — 跳过
+activeMobileWindow 与 useModalOpeners 存在循环依赖，useTicker/useVisualTheme 行数收益极低（各 ~30 行）。提取复杂度远超收益。
+
+### 7.10 提取 useContextSnapshot hook
 App.tsx 中 context snapshot 相关代码仅约 5 行（调用 actions.getContextSnapshot），提取价值有限。
 
 ---
@@ -368,7 +380,7 @@ Phase 7: App.tsx 瘦身 (可与 Phase 6 并行)
 | 4. 删除废弃 GM | 0.5天 | 无 | ✅ 完成 |
 | 5. 修复 prompts | 0.5天 | 无 | ✅ 完成 |
 | 6. 子 Hook 拆分 | 3-4天 | 中（最大行为变更） | 进行中 (3/13 slice) |
-| 7. App.tsx 瘦身 | 1天 | 低（提取-only） | 进行中 (7.2 完成) |
+| 7. App.tsx 瘦身 | 1天 | 低（提取-only） | 已完成 (7.2-7.5 完成) |
 
 ---
 
@@ -378,8 +390,11 @@ Phase 7: App.tsx 瘦身 (可与 Phase 6 并行)
 |------|--------|---------|---------|---------|
 | `models/system.ts` | 1780 | ~10 (barrel) | ~10 | ✅ 拆分为 4 文件 + barrel |
 | `hooks/useGame.ts` | 2952 | 2651 | ~500-800 | 部分完成 (3 slice 接入, -301行) |
-| `App.tsx` | 2115 | 2037 | ~800-1000 | 部分完成 (7.2 lazy 组件提取, -78行) |
+| `App.tsx` | 2115 | 1828 | ~800-1000 | 部分完成 (7.2-7.5 完成, -287行) |
 | `components/features/lazyComponents.tsx` | 新建 | 122 | - | ✅ 55 个懒组件声明 |
+| `hooks/useResponsive.ts` | 新建 | 21 | - | ✅ 响应式断点检测 |
+| `hooks/useModalOpeners.ts` | 新建 | ~330 | - | ✅ 面板开关逻辑 |
+| `hooks/useConfirmSystem.tsx` | 新建 | ~57 | - | ✅ 确认对话框逻辑 |
 | `hooks/useGame/index.ts` | 新建 | ~195 | - | ✅ barrel 导出入口 |
 | `hooks/useGame/subsystems/types.ts` | 新建 | ~340 | - | ✅ slice 契约定义 |
 | `hooks/useGame/subsystems/useTravelSlice.ts` | 新建 | ~77 | - | ✅ 旅行/交易 slice |
