@@ -171,6 +171,23 @@ export const 构建主剧情请求参数 = (
             内容强度?: '微暗' | '暧昧' | '露骨';
             后果?: { 类型: 网约车后果类型; 严重程度: '轻微' | '中等' | '严重' | '毁灭'; NPC信息?: string };
         };
+        写真NSFW参数?: {
+            活跃拍摄项目?: {
+                id: string;
+                模特ID: string;
+                摄影师ID: string;
+                约定尺度: string;
+                实际尺度: string;
+                拍摄阶段: string;
+                泄露风险值: number;
+            };
+            模特数量?: number;
+            摄影师数量?: number;
+            泄露事件数量?: number;
+            内容强度?: '微暗' | '暧昧' | '露骨';
+            主要玩法层?: '经营管理' | '人际关系' | '灰色地带';
+            启用道德选择?: boolean;
+        };
     }
 ): 主剧情请求构建结果 => {
     const runtimeGameConfig = 规范化游戏设置(params.gameConfig);

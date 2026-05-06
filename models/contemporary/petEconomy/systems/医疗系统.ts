@@ -195,7 +195,7 @@ export function 检测过度医疗(
   return {
     是否过度: 过度类型.length > 0,
     过度类型,
-    合理检查: [...new Set(合理检查)],
+    合理检查: Array.from(new Set(合理检查)),
     不必要检查,
     节省建议,
   };

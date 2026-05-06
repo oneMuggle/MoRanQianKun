@@ -32,20 +32,11 @@ export type {
   泄露事件状态,
 } from './types';
 
-import type {
-  玩法层类型,
-  NSFW内容强度,
-  模特核心状态,
-  摄影师核心状态,
-  拍摄项目状态,
-  泄露事件状态,
-} from './types';
-
 // 设置接口
 export interface 写真NSFW设置 {
   启用写真NSFW系统: boolean;
-  NSFW内容强度: NSFW内容强度;
-  主要玩法层: 玩法层类型;
+  NSFW内容强度: '微暗' | '暧昧' | '露骨';
+  主要玩法层: '经营管理' | '人际关系' | '灰色地带';
   次要玩法权重: number;
   启用道德选择: boolean;
   启用尺度递进: boolean;
@@ -74,9 +65,9 @@ export const 默认写真NSFW设置: 写真NSFW设置 = {
 
 // 系统扩展接口（state mount 类型）
 export interface 写真系统扩展 {
-  模特档案?: Record<string, 模特核心状态>;
-  摄影师档案?: Record<string, 摄影师核心状态>;
-  进行中的拍摄项目?: 拍摄项目状态[];
-  历史拍摄记录?: 拍摄项目状态[];
-  泄露事件列表?: 泄露事件状态[];
+  模特档案?: Record<string, import('./types').模特核心状态>;
+  摄影师档案?: Record<string, import('./types').摄影师核心状态>;
+  进行中的拍摄项目?: import('./types').拍摄项目状态[];
+  历史拍摄记录?: import('./types').拍摄项目状态[];
+  泄露事件列表?: import('./types').泄露事件状态[];
 }

@@ -148,6 +148,7 @@ type 主剧情发送当前状态 = {
 
 import { 构建校园NSFW参数, type BDSM状态更新回调 } from '../bdsmStateIntegration';
 import { 构建都市网约车NSFW参数 } from '../urbanDriverNSFWIntegration';
+import { 构建写真NSFW参数 } from '../photographyNSFWIntegration';
 
 // ─── 主剧情发送依赖 ─────────────────────────────────────────────────────────
 
@@ -521,7 +522,20 @@ export const 执行主剧情发送工作流 = async (
               gameConfig: currentState.gameConfig,
               角色: { 出身背景: currentState.角色?.出身背景 },
               时代配置ID: currentState.时代配置ID,
-            })
+            }),
+            写真NSFW参数: (0, () => {
+              try {
+                const { 构建写真NSFW参数 } = require('../photographyNSFWIntegration');
+                return 构建写真NSFW参数({
+                  写真系统: (currentState as any).写真系统,
+                  gameConfig: currentState.gameConfig,
+                  角色: { 出身背景: currentState.角色?.出身背景 },
+                  时代配置ID: currentState.时代配置ID,
+                });
+              } catch {
+                return undefined;
+              }
+            })(),
         });
         const inputTokens = deps.估算消息Token(orderedMessages, activeApi?.model);
 
