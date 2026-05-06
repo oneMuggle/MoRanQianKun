@@ -4,6 +4,57 @@
 
 ---
 
+### 里模式阶段系统方案 (li-mode-stages)
+
+**计划文件**: `docs/plans/2026-05-04-li-mode-stages.md` (文件名日期为 05-04，实际计划名含 05-05)  
+**执行时间**: 2026-05-07 01:41 AM  
+**状态**: ✅ 已完成（2026-05-04 实施，2026-05-07 验证）
+
+---
+
+#### 一、验证结果
+
+##### Phase 1: 数据模型扩展 ✅
+
+| 文件 | 验证 |
+|------|------|
+| `models/eraTheme/types.ts` | ✅ `LiModeStage` 类型定义 (line 77) + `EraLiModeEnhanced.stageRules` (lines 105-110) |
+| `models/system.ts` | ✅ `子纪元里模式阶段` 字段 (line 1644) |
+| `models/social.ts` | ✅ `NPC结构.里模式阶段` 字段 (line 121) |
+
+##### Phase 2: 阶段规则数据填充 ✅
+
+| 文件 | 验证 |
+|------|------|
+| `prompts/runtime/eraLiMode.ts` | ✅ `DEFAULT_STAGE_RULES` 常量 (lines 19-22) + `构建里模式阶段注入` 函数 (lines 238-266) |
+
+##### Phase 3: Prompt 注入链路 ✅
+
+| 文件 | 验证 |
+|------|------|
+| `hooks/useGame/systemPromptBuilder.ts` | ✅ 阶段读取 (line 1446) + 注入调用 (line 1447) |
+| `hooks/useGame/npcContext/contextBuilder.ts` | ✅ NPC个体阶段注入 (lines 456-457)，优先 NPC 个体，回退全局 |
+
+##### Phase 4: UI 体系 ✅
+
+| 文件 | 验证 |
+|------|------|
+| `NewGameWizardContent.tsx` | ✅ 阶段选择器 (lines 444-468)，平然/羞耻/欲望三档按钮 |
+| `useNewGameWizardState.ts` | ✅ `子纪元里模式阶段` 状态 (line 157)，默认 '羞耻' |
+| `GameSettings.tsx` | ✅ 设置面板阶段选择器 (lines 533-558) |
+| `TopBar.tsx` | ✅ 徽章显示格式 `阶段·强度` (line 479: `${里模式状态.stage}·${里模式状态.intensity}`) |
+| `App.tsx` | ✅ 传递 `子纪元里模式阶段` 到 TopBar (line 818) |
+
+---
+
+#### 二、注意事项
+
+- 计划文件名实际为 `2026-05-04-li-mode-stages.md`（不是 `2026-05-05`）
+- 实施日期为 2026-05-04，commit: `020ba1691e2ecf3108c0cad0fe3ec5b7fcc6db7a`
+- 已有验证记录在 commit: `cc49f8b315bbb4de2c57f3f684745ebda311fd1e`
+
+---
+
 ### 墨染江湖架构分析与重构方案
 
 **计划文件**: `docs/plans/2026-05-06_architecture-analysis.md`  
