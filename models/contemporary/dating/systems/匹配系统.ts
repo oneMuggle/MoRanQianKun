@@ -4,16 +4,16 @@
  * 相亲条件权重、成功率评估、匹配逻辑
  */
 
-import type { 相亲者核心状态, 对象核心状态 } from './types';
-import { 相亲条件权重 } from './types';
-import { 计算个人综合条件 } from './states/相亲者状态';
+import type { 相亲者核心状态, 相亲对象核心状态 } from '../types';
+import { 相亲条件权重 } from '../types';
+import { 计算个人综合条件 } from '../states/相亲者状态';
 
 // ==================== 条件评分 ====================
 
 /**
  * 计算男性视角条件评分
  */
-export function 计算男性视角评分(对象: 对象核心状态): number {
+export function 计算男性视角评分(对象: 相亲对象核心状态): number {
   const 权重 = 相亲条件权重['男性视角'];
   let score = 0;
 
@@ -55,7 +55,7 @@ export function 计算男性视角评分(对象: 对象核心状态): number {
 /**
  * 计算女性视角条件评分
  */
-export function 计算女性视角评分(对象: 对象核心状态): number {
+export function 计算女性视角评分(对象: 相亲对象核心状态): number {
   const 权重 = 相亲条件权重['女性视角'];
   let score = 0;
 
@@ -116,7 +116,7 @@ export interface 匹配结果 {
  */
 export function 评估相亲成功率(
   男方: 相亲者核心状态,
-  女方: 对象核心状态
+  女方: 相亲对象核心状态
 ): 匹配结果 {
   const 男方总分 = 计算个人综合条件(男方);
   const 女方总分 = 计算女性视角评分(女方);
@@ -207,7 +207,7 @@ export function 评估相亲成功率(
  */
 export function 快速筛选(
   男方: 相亲者核心状态,
-  女方: 对象核心状态
+  女方: 相亲对象核心状态
 ): {
   通过: boolean;
   原因: string[];

@@ -6,7 +6,7 @@ import type {
   婚恋平台状态,
   婚恋平台类型,
   骗婚类型,
-} from './types';
+} from '../types';
 
 // 创建默认婚恋平台
 export function 创建默认婚恋平台(partial?: Partial<婚恋平台状态>): 婚恋平台状态 {

@@ -8,7 +8,7 @@ import type {
   相亲动机,
   相亲渠道,
   外貌类型,
-} from './types';
+} from '../types';
 
 // 默认化名池
 const 化名池 = [
