@@ -81,3 +81,140 @@
 1. **优先实施 P0-2**: 修复 App.tsx 第1952行对 `meta.deviceRefreshQueue` 的正确使用
 2. **实施 P1-1**: 创建 DeviceRefreshContext 消除属性穿透
 3. **拆分大型文件**: useGame.ts 和 App.tsx 需要模块化拆分
+
+---
+
+# 验证报告: 2026-05-03-li-mode-enhancement.md
+
+> 验证时间: 2026-05-08
+> 计划文件: docs/plans/2026-05-03-li-mode-enhancement.md
+
+---
+
+## 总体状态: ✅ 全部完成
+
+里模式强化深化与体系化方案 Phase 1-4 全部完成并验证通过。
+
+---
+
+## 详细验证
+
+### Phase 1: 数据体系化 — 全量子纪元增强版转换 ✅
+
+#### 核心类型
+**文件**: `models/eraTheme/types.ts`
+
+✅ `EraLiModeEnhanced` 接口已定义（第80行），包含：
+- name, description, corePrinciple, powerSystem
+- dualPersonalities (角色表里人格)
+- sceneTypes (亲密场景类型)
+- desireMotives (欲望动机)
+- taboos (禁忌与边界)
+- aiDirectives (AI 指令)
+- intensityLevels (三级强度定义)
+
+#### Epoch 文件验证
+
+| Epoch 文件 | 里模式数据 | 验证 |
+|-----------|-----------|------|
+| `epoch-ancient.ts` | ✅ 里武侠/里志怪/里修仙 | 第166/373/847行 |
+| `epoch-contemporary.ts` | ✅ 里都市/里废土/里校园 | 第179/859行 |
+| `epoch-modern.ts` | ✅ P1 次优先级纪元 | 已转换 |
+| `epoch-near-future.ts` | ✅ 里赛博/里反乌托邦/里星际 | 已转换 |
+| `epoch-far-future.ts` | ✅ 里星际帝国/里赛博格/里虚拟 | 已转换 |
+| `epoch-post-human.ts` | ✅ 里超验/里维度/里数学 | 已转换 |
+| `epoch-primordial.ts` | ✅ 里图腾/里血祭/里萨满 | 已转换 |
+
+**结论**: 31个 SubEra 全部完成 `EraLiModeEnhanced` 转换。
+
+---
+
+### Phase 2: 运行时绑定 ✅
+
+#### 2.1 NPC 原型表里人格注入
+**文件**: `prompts/runtime/eraLiMode.ts` + `hooks/useGame/systemPromptBuilder.ts`
+
+✅ `构建里模式NPC原型注入` 函数已实现（eraLiMode.ts 第123行）
+✅ `systemPromptBuilder.ts` 已接入（第1449行）
+
+#### 2.2 设备工作流强度参数修复
+**文件**: `hooks/useGame/deviceAiWorkflow.ts` + `hooks/useGame/mobileDeviceWorkflow.ts`
+
+✅ `liIntensity` 参数全链路传递：
+- `deviceAiWorkflow.ts` 第34/47行：`liIntensity?: LiModeIntensity`
+- `mobileDeviceWorkflow.ts` 第42行：`liIntensity?: LiModeIntensity`
+
+#### 2.3 Legacy 里武侠/里志怪清理
+**文件**: `hooks/useGame/systemPromptBuilder.ts`
+
+✅ 已实现 fallback 逻辑（第1450行注释）
+
+---
+
+### Phase 3: 玩法融合 ✅
+
+#### 3.1 NPC 表里切换
+**文件**: `prompts/runtime/eraLiMode.ts` + `hooks/useGame/npcContext/contextBuilder.ts`
+
+✅ `构建NPC表里切换注入` 函数已实现（eraLiMode.ts 第179行）
+✅ `npcContext/contextBuilder.ts` 已集成（第455行）
+
+#### 3.2 里模式事件池
+**文件**: `prompts/runtime/eraLiMode.ts`
+
+✅ `filterByIntensity` 函数已实现（第26行），暧昧/露骨级别追加事件引导区块（第100行）
+
+#### 3.3 强度动态调节
+**文件**: `components/features/Settings/GameSettings.tsx` + `hooks/useGame/systemPromptBuilder.ts`
+
+✅ `GameSettings.tsx` 第503-519行实现三档强度选择器
+✅ `systemPromptBuilder.ts` 已传递强度参数到 NPC 生成
+
+---
+
+### Phase 4: UI 体系化 ✅
+
+#### 4.1 全时代强度选择器
+**文件**: `components/features/NewGame/NewGameWizardContent.tsx`
+
+✅ 新游戏向导中里模式强度选择器完整（第239/424/434行）
+
+#### 4.2 设置面板同步
+**文件**: `components/features/Settings/GameSettings.tsx`
+
+✅ 已实现里模式强度三档选择器（第503-519行）
+
+#### 4.3 游戏内状态提示
+**文件**: `components/layout/TopBar.tsx`
+
+✅ TopBar 右侧增加里模式徽章（第191/297/300/481行）
+
+---
+
+## 实施进度核对
+
+| 阶段 | 计划状态 | 验证状态 |
+|------|---------|---------|
+| Phase 1.1 P0 核心纪元（6个） | ✅ 完成 | ✅ 已验证 |
+| Phase 1.2 P1 次优先级（~10个） | ✅ 完成 | ✅ 已验证 |
+| Phase 1.3 P2 其余（~15个） | ✅ 完成 | ✅ 已验证 |
+| Phase 2.1 NPC 档案注入 | ✅ 完成 | ✅ 已验证 |
+| Phase 2.2 设备工作流修复 | ✅ 完成 | ✅ 已验证 |
+| Phase 2.3 Legacy 清理 | ✅ 完成 | ✅ 已验证 |
+| Phase 3.1 NPC 表里切换 | ✅ 完成 | ✅ 已验证 |
+| Phase 3.2 里模式事件池 | ✅ 完成 | ✅ 已验证 |
+| Phase 3.3 强度动态调节 | ✅ 完成 | ✅ 已验证 |
+| Phase 4.1 全时代强度选择 | ✅ 完成 | ✅ 已验证 |
+| Phase 4.2 设置面板同步 | ✅ 完成 | ✅ 已验证 |
+| Phase 4.3 游戏内状态提示 | ✅ 完成 | ✅ 已验证 |
+
+---
+
+## Conclusion
+
+里模式强化深化与体系化方案 Phase 1-4 全部完成并验证通过：
+- 31 个 SubEra 全部转换为 `EraLiModeEnhanced` 结构化定义
+- 运行时绑定完整（NPC 原型注入、设备工作流强度修复、Legacy fallback）
+- 玩法融合完成（NPC 表里切换、事件池、强度动态调节）
+- UI 体系化完成（强度选择器、设置面板、游戏内状态提示）
+
