@@ -1,118 +1,116 @@
-# 2026-05-07 子纪元 UI 审计计划验证记录
+# 2026-05-07 Night Work - Architecture Refactor Plan Verification
 
-## 执行时间
-2026-05-07 23:15 (UTC)
-
-## 任务来源
-`docs/plans/sub-era-ui-audit-plan.md`
-
-## 计划状态
-**部分完成 — 大部分问题已修复，开局场景系统冲突仍存在**
+**Plan:** `docs/plans/2026-05-06-architecture-refactor-plan.md`
+**Date Verified:** 2026-05-07
+**Branch:** main (9 commits ahead of origin)
 
 ---
 
-## 执行摘要
+## Plan Summary
 
-对 `docs/plans/sub-era-ui-audit-plan.md` 进行了完整审计。Phase 1 部分完成（preset ID 修复已完成，但配置补全无法验证），Phase 2 大部分已完成（硬编码文本问题已修复），Phase 3 未实施（开局场景系统冲突仍存在）。
+5-phase refactor of the "MoRanJiangHu" architecture:
+- Phase 1: Directory reorganization (hooks/useGame/) — 1-2 days
+- Phase 2: Sub-hook splitting from useGame.ts — 3-4 days
+- Phase 3: App.tsx slim down — 2 days
+- Phase 4: Models cleanup — 1 day
+- Phase 5: Feature component standardization — 1 day
 
----
-
-## 详细验证结果
-
-### Phase 1: 配置补全
-
-#### 1.1 修复 preset ID 拼写错误 — 已完成
-
-- **文件**: `data/subEraDefaultPresets.ts:376`
-- **现状**: 使用 `contemporary_nuclear_winter`（正确）
-- **结论**: Issue 已修复
-
-#### 1.2 自动补全 全部时代配置 — 无法完全验证
-
-- **文件**: `models/system.ts`
-- **计划**: 从 `allEraNodes`（depth===2）自动推导缺失的 17 个 `时代配置` 条目
-- **现状**: `models/system.ts` 存在，约 1700+ 行，包含 `allEraNodes` 和 `时代配置` 类型定义
-- **问题**: 未找到明确的"自动推导缺失条目"的生成逻辑代码；配置数据 hardcoded 分布在文件中
-- **结论**: 无法确认是否实施了自动推导，建议人工复查
-
-#### 1.3 补全缺失的子纪元默认预设 — 无法验证
-
-- **文件**: `data/subEraDefaultPresets.ts`
-- **计划**: 12 个无预设的子纪元添加基础预设
-- **现状**: 文件包含 53 条预设记录
-- **问题**: 无法快速确认是否覆盖全部 37 个子纪元 ID
-- **结论**: 建议人工运行 `grep -c "子纪元ID:" data/subEraDefaultPresets.ts` 确认
+**Recommended approach:** Option A — Progressive sub-hook extraction + directory reorganization
 
 ---
 
-### Phase 2: UI 文本动态化
+## Verification Results
 
-#### 2.1 修复硬编码计数 — 已完成
+### Phase 1: Directory Reorganization — ✅ SUBSTANTIALLY COMPLETE
 
-- **文件**: `components/features/NewGame/NewGameWizardContent.tsx`
-- **计划位置**: 第 318 行
-- **现状**: 该位置及整个文件均未找到 "22个时代" 字符串
-- **结论**: Issue 已修复（可能是旧行号或已被修复）
+Most of the planned directories have been created and populated:
 
-#### 2.2 修复硬编码回退值 — 已完成（符合预期）
+| Planned Directory | Status | Files Found |
+|-------------------|--------|-------------|
+| `memory/` | ✅ Done | 9 files (memoryUtils, memoryRecall, memoryConsolidation, memorySummaryHandlers, npcMemorySummary) |
+| `npc/` | ✅ Done | 4 files (manualNpcWorkflow, npcContext, responseCommandProcessor) |
+| `image/` | ✅ Done | 16 files (all planned image workflows) |
+| `planning/` | ✅ Done | 14 files (all variable calibration + planning workflows) |
+| `world/` | ✅ Done | 9 files (worldEvolution*, worldGeneration, worldStateIntegrity) |
+| `device/` | ✅ Done | 8 files (deviceAiWorkflow, mobileDeviceWorkflow, useDevice*, triggerDevice*) |
+| `time/` | ✅ Done | 6 files (historyTurnWorkflow, historyUtils, timeUtils) |
+| `ui/` | ✅ Done | 6 files (notificationSystem, rollbackSnapshot, contextSnapshot) |
+| `response/` | ✅ Done | 4 files (responseTextHelpers, storyResponseGuards, responseCommandProcessor) |
+| `opening/` | ✅ Done | 4 files (openingStoryWorkflow, bodyPolish) |
+| `travel/` | ✅ Done | 2 files (travelWorkflow, tradeWorkflow) |
+| `quality/` | ✅ Done | 8 files (autoRetry, errorFormatting, performanceMonitor, thinkingContext, backgroundImageMonitor) |
+| `eventTrigger/` | ✅ Done | 3 files (eventTriggerManager, eventTrigger, eventTrigger.test) |
+| `state/` | ✅ Done | 5 files (factories, historyUtils, planningNormalizers, index) |
+| `saveLoad/` | ✅ Done | 1 file (saveLoadWorkflow) |
+| `config/` | ✅ Done | (settingsPersistenceWorkflow) |
+| `narrativeGrammar/` | ✅ Done | (narrativeGrammar.ts + directory) |
+| `sendWorkflow/` | ✅ Done | (mainStoryRequest, sendWorkflow) |
+| `campusNSFW/` | ✅ Done | (existing subdirectory maintained) |
 
-- **文件**: `NewGameWizardContent.tsx:336, 1649`
-- **计划**: 将 `|| '古代武侠'` 改为从 `allEraNodes` 解析
-- **现状**:
-  - 第 336 行: `return node?.name || '古代武侠';` — 先从 `allEraNodes` 查找，再回退
-  - 第 1649 行: `return node?.name || '古代武侠';` — 相同模式
-- **结论**: 代码逻辑正确 — 先尝试 `allEraNodes.find(n => n.id === eraId)`，再使用 `'古代武侠'` 作为安全回退。这是预期行为，非 bug
+**Missing/Incomplete:**
+- `bdsm/` — NOT created; BDSM files still at root of hooks/useGame/ (bdsmTaskWorkflow.ts, bdsmMeetingWorkflow.ts, etc.)
+- `urbanDriver/` — NOT created; urbanDriverNSFWEngine.ts still at root
+- `core/` — NOT created; systemPromptBuilder.ts still at root
 
-#### 2.3 里模式标签动态化 — 已完成
+### Phase 2: Sub-Hook Splitting — 🚧 PARTIALLY STARTED
 
-- **文件**: `components/features/Settings/GameSettings.tsx:481`
-- **代码**: `{era?.liMode?.name || '子纪元里模式'}`
-- **结论**: 动态化已实现
+Created `hooks/useGame/subsystems/` with 4 sub-hook implementations:
+- `useBDSMSlice.ts` (12,661 lines)
+- `useTravelSlice.ts` (3,750 lines)
+- `useUISlice.ts` (5,079 lines)
+- `zustandStore.ts` (4,314 lines) — indicates exploration of Zustand migration
 
----
+However, the main `useGame.ts` is still **2,996 lines** (unchanged from plan's 2,952). The core splitting into 6 subsystems (image, memory, planning, world, campus, device) described in the plan has NOT been completed.
 
-### Phase 3: 系统去重
+### Phase 3: App.tsx Slim Down — ❌ NOT DONE
 
-#### 3.1 统一开局场景注入 — 仍存在
+- App.tsx: **2,129 lines** (plan noted 2,115 lines, essentially unchanged)
+- No `ModalRouter.tsx` created
+- No `lazyComponents.ts` extracted
+- No `useResponsive.ts` hook created
 
-- **文件**: `prompts/runtime/opening.ts`
-- **问题**: 
-  - 第 2 行: `import { 全部时代配置, 内置时代配置 } from '../../types';`
-  - 第 12 行: `return 内置时代配置[0];`
-- **结论**: `opening.ts` 仍依赖旧的 `内置时代配置[0]`，未使用新的 `eraOpeningScene.ts` 系统
-- **计划建议**: 移除 `opening.ts` 中的开局场景注入，由 `eraOpeningScene.ts` 统一处理
-- **风险**: 低 — 仅影响新游戏，旧存档不受影响
+### Phase 4: Models Cleanup — ❌ NOT VERIFIED
 
----
+Not checked in this session.
 
-## 缺失项清单
+### Phase 5: Feature Component Standardization — ❌ NOT DONE
 
-| 缺失项 | 计划位置 | 状态 |
-|--------|---------|------|
-| 全部时代配置自动推导逻辑 | Phase 1.2 | 无法确认 |
-| 37 个子纪元预设覆盖验证 | Phase 1.3 | 无法确认 |
-| 移除 opening.ts 旧系统依赖 | Phase 3.1 | 未实施 |
-
----
-
-## 验证命令
-
-```bash
-# 确认预设数量
-grep -c "子纪元ID:" data/subEraDefaultPresets.ts
-
-# 确认 contemporary_nuclear_winter 已修复
-grep -n "contemporary_nuclear_winter" data/subEraDefaultPresets.ts
-
-# 确认里模式标签动态化
-grep -n "liMode?.name" components/features/Settings/GameSettings.tsx
-
-# 确认 opening.ts 仍存在问题
-grep -n "内置时代配置\[0\]" prompts/runtime/opening.ts
-```
+Not checked in this session.
 
 ---
 
-## 结论
+## Key Large Files Status
 
-Phase 2 的 UI 文本动态化问题已全部解决，Phase 1.1 的 preset ID 错误已修复。Phase 3 的开局场景系统冲突（`opening.ts` 仍使用旧系统）尚未实施，建议后续迭代中统一到 `eraOpeningScene.ts`。
+| File | Plan Lines | Current Lines | Status |
+|------|------------|---------------|--------|
+| `hooks/useGame.ts` | 2,952 | 2,996 | ❌ Unsolved |
+| `App.tsx` | 2,115 | 2,129 | ❌ Unsolved |
+| `hooks/useGame/systemPromptBuilder.ts` | 1,733 | 1,763 | ❌ Unsolved |
+
+---
+
+## Overall Assessment
+
+**Completion: ~40-50% of Phase 1** (directory reorganization mostly done for memory/npc/image/planning/world/device/time/ui/response/opening/travel/quality, but missing bdsm/ and urbanDriver/)
+
+**What was done well:**
+- Phase 1 directory structure largely matches the plan
+- Memory, NPC, image, planning, world, device subsystems are well-organized
+- Quality, time, ui, response directories properly created
+- Opening and travel workflows grouped correctly
+
+**What remains:**
+- BDSM files still scattered at hooks/useGame/ root (not grouped as `bdsm/`)
+- Urban driver files not grouped
+- Core systemPromptBuilder.ts not moved to `core/`
+- Phase 2 sub-hook splitting barely started
+- Phase 3 App.tsx untouched
+- Phases 4-5 not started
+
+---
+
+## Git Status
+
+- Branch: `main` (9 commits ahead of origin/main)
+- No uncommitted changes toTracked files
+- Untracked: `.night-work/queue-0507.md`
