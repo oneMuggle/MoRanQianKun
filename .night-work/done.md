@@ -540,4 +540,85 @@ Phase 4 扩展系统（繁育/比赛/保险/克隆）仅有类型定义，无独
 
 ---
 
+## 计划文件
+`docs/plans/2026-05-04-li-mode-stages.md`
+
+## 计划日期
+2026-05-04
+
+## 验收结果
+
+### ✅ 已完成
+
+#### 里模式阶段系统 — 全部实现
+
+##### Phase 1: 数据模型扩展 ✅
+
+**`models/eraTheme/types.ts`**
+- ✅ `LiModeStage` 类型: `'平然' | '羞耻' | '欲望'`
+- ✅ `EraLiModeEnhanced.stageRules?: { 平然, 羞耻, 欲望 }`
+
+**`models/system.ts` / `models/game-settings.ts`**
+- ✅ `游戏设置结构` 增加 `子纪元里模式阶段?: Record<string, LiModeStage>`
+
+**`models/social.ts`**
+- ✅ `NPC结构` 增加 `里模式阶段?: LiModeStage` — NPC个体可覆盖全局设置
+
+---
+
+##### Phase 2: 阶段规则数据填充 ✅
+
+**`prompts/runtime/eraLiMode.ts`**
+- ✅ `DEFAULT_STAGE_RULES` 通用阶段规则常量（3阶段完整描述）
+- ✅ `构建里模式阶段注入(eraId, stage, enabled)` 函数实现（优先SubEra自定义stageRules，回退通用模板）
+
+---
+
+##### Phase 3: Prompt注入链路 ✅
+
+**`hooks/useGame/systemPromptBuilder.ts`**
+- ✅ 从 `normalizedGameConfig.子纪元里模式阶段[eraId]` 读取阶段（默认'羞耻'）
+- ✅ 调用 `构建里模式阶段注入` 追加到prompt
+
+**`hooks/useGame/npcContext/contextBuilder.ts`**
+- ✅ NPC个体阶段注入: `npc.里模式阶段 ?? 游戏全局阶段 ?? '羞耻'`
+- ✅ 支持NPC个体覆盖全局阶段设置
+
+---
+
+##### Phase 4: UI体系 ✅
+
+**`components/features/NewGame/NewGameWizardContent.tsx`**
+- ✅ 新游戏向导中里模式强度选择器下方增加阶段选择器（三档按钮）
+- ✅ 带描述标签: 平然(视作日常)/羞耻(害羞不抗拒)/欲望(主动引导)
+
+**`components/features/NewGame/useNewGameWizardState.ts`**
+- ✅ `子纪元里模式阶段` 状态 + 持久化
+
+**`components/features/Settings/GameSettings.tsx`**
+- ✅ 游戏设置面板中里模式强度选择器下方增加阶段选择器（三档按钮样式）
+
+**`components/layout/TopBar.tsx`**
+- ✅ 徽章显示格式: `"${stage}·${intensity}"` (如"羞耻·暧昧")
+- ✅ 阶段优先于强度展示，符合计划要求
+
+**`App.tsx`**
+- ✅ 传递 `子纪元里模式阶段` 到 TopBar
+
+---
+
+### 验证摘要
+
+| 计划检查项 | 状态 |
+|-----------|------|
+| Phase 1: 数据模型扩展 (3文件) | ✅ |
+| Phase 2: 阶段规则常量 + 构建函数 | ✅ |
+| Phase 3: Prompt注入链路 (systemPromptBuilder + npcContext) | ✅ |
+| Phase 4: UI选择器 + TopBar徽章 | ✅ |
+| 默认阶段预设 '羞耻' | ✅ |
+| NPC个体覆盖全局阶段 | ✅ |
+| 通用模板回退机制 | ✅ |
+
+**结论**: 计划 `2026-05-04-li-mode-stages.md` 全部4个Phase已实现，所有实施进度检查项验证通过。里模式"阶段"维度已与现有"强度"维度正交实现，符合需求规范。
+
 *验证时间: 2026-05-08*
