@@ -750,3 +750,80 @@ No action needed. The requested plan file does not exist. No implementation veri
 ---
 
 *验证时间: 2026-05-08*
+
+---
+
+# 2026-05-08 Plan Verification: 2026-03-15_initial-era-system-design.md
+
+**Plan**: `docs/plans/2026-03-15_initial-era-system-design.md`
+**Status**: ❌ FILE NOT FOUND
+
+---
+
+## Verification Result
+
+The requested plan file `docs/plans/2026-03-15_initial-era-system-design.md` does **not exist** in the repository.
+
+### Search Results
+
+| File | Status |
+|------|--------|
+| `docs/plans/2026-03-15_initial-era-system-design.md` | ❌ NOT FOUND |
+| `docs/plans/2026-04-01_mobile-ui-optimization.md` | ✅ Exists (closest before) |
+| `docs/plans/2026-04-05_character-archetype-system.md` | ✅ Exists (closest after) |
+
+### Git History Check
+
+No commits found referencing `2026-03-15` or `initial-era-system-design`.
+
+### Conclusion
+
+No action needed. The requested plan file does not exist. No implementation verification possible.
+
+---
+
+*验证时间: 2026-05-08*
+
+
+---
+
+# 2026-05-08 Plan Verification: 2026-03-20_story-planning-framework.md
+
+**Plan**: `docs/plans/2026-03-20_story-planning-framework.md`
+**Status**: ❌ FILE NOT FOUND
+
+---
+
+## Verification Result
+
+The requested plan file `docs/plans/2026-03-20_story-planning-framework.md` does **not exist** in the repository.
+
+### Search Results
+
+| File | Status |
+|------|--------|
+| `docs/plans/2026-03-20_story-planning-framework.md` | ❌ NOT FOUND |
+| Closest before: `docs/plans/2026-04-01_mobile-ui-optimization.md` | ✅ Exists |
+| Closest after: `docs/plans/2026-04-05_character-archetype-system.md` | ✅ Exists |
+
+### Git History Check
+
+No commits found referencing `2026-03-20` or `story-planning-framework`.
+
+### Related Story-Planning Files in Codebase
+
+| File | Description |
+|------|-------------|
+| `docs/plans/2026-04-27_novel-writing-assistant.md` | Novel writing assistant plan |
+| `docs/plans/2026-05-03_story-slots-framework.md` | Story slots framework |
+| `docs/plans/2026-05-04_narrative-grammar-engine.md` | Narrative grammar engine |
+| `hooks/useGame/world/worldEvolutionWorkflow.ts` | World evolution (story progression) |
+| `prompts/runtime/worldEvolution.ts` | World evolution prompts |
+
+### Conclusion
+
+No action needed. The requested plan file does not exist. No implementation verification possible.
+
+---
+
+*验证时间: 2026-05-08*
