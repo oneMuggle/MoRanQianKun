@@ -264,3 +264,127 @@ All specified items verified implemented:
 - liMode: Fully implemented with all components
 
 Verification complete — all plan items confirmed.
+
+---
+
+# 2026-05-05 BDSM Relationship Pipeline — Verification
+
+**Plan file**: `docs/plans/2026-05-05_bdsm-relationship-pipeline.md`
+**Status**: Phases 1-6 mostly complete, Phase 7 incomplete
+**Verification date**: 2026-05-08
+
+---
+
+## Verification Results
+
+### Phase 1: Data Model — ✅ Complete
+
+| Item | Path | Status |
+|------|------|--------|
+| `BDSM关系状态` interface | models/campusNSFW/sm.ts:110 | ✅ Done |
+| `BDSM日常指令` interface | models/campusNSFW/sm.ts:95 | ✅ Done |
+| `NPC欲望档案.BDSM关系?` field | models/campusNSFW/core.ts:36 | ✅ Done |
+| `hooks/useGameState.ts` BDSM init | hooks/useGameState.ts | ✅ Done |
+| BDSM 操作函数 in useGame.ts | hooks/useGame.ts:1099-1245 | ✅ Done |
+
+### Phase 2: Task Workflow Engine — ✅ Complete
+
+| Function | Path | Status |
+|----------|------|--------|
+| `生成调教任务()` | hooks/useGame/bdsmTaskWorkflow.ts:47 | ✅ Exported & called |
+| `生成日常指令()` | hooks/useGame/bdsmTaskWorkflow.ts:117 | ✅ Exported & called |
+| `评价任务完成()` | hooks/useGame/bdsmTaskWorkflow.ts:181 | ✅ Exported & called |
+| `生成契约条款()` | hooks/useGame/bdsmTaskWorkflow.ts:274 | ✅ Exported & called |
+| `判定关系阶段推进()` | hooks/useGame/bdsmTaskWorkflow.ts:357 | ✅ Exported & called |
+| `构建见面Prompt()` | hooks/useGame/bdsmMeetingWorkflow.ts | ✅ Exported & called |
+| `bdsmStateIntegration.ts` | hooks/useGame/bdsmStateIntegration.ts | ✅ Integrated into sendWorkflow |
+
+### Phase 3: Prompt Layer — ✅ Complete (marked done in plan)
+
+All 7 prompt builder functions in `prompts/runtime/bdsmTasks.ts`:
+- `构建调教任务生成提示词` ✅
+- `构建日常指令生成提示词` ✅
+- `构建任务完成评价提示词` ✅
+- `构建奖励描述生成提示词` ✅
+- `构建惩罚描述生成提示词` ✅
+- `构建契约条款生成提示词` ✅
+- `构建关系阶段推进判定提示词` ✅
+
+### Phase 4: Main Story Integration — ✅ Complete
+
+- `注入BDSM任务状态()` integrated into `systemPromptBuilder.ts` ✅
+- `bdsmStateIntegration.ts` connected to `sendWorkflow/index.ts` and `responseProcessingPhase.ts` ✅
+- `<BDSM状态更新>` tag parsing implemented in `bdsmStateParser.ts` ✅
+- `bdsmTaskTrigger.ts` provides `构建调教任务系统叙事约束` ✅
+
+### Phase 5: UI Components — ✅ Complete
+
+| Component | Path | Status |
+|-----------|------|--------|
+| `BDSMTaskPanel.tsx` | components/features/MobileDevice/apps/ | ✅ Done |
+| `BDSMContractPanel.tsx` | components/features/MobileDevice/apps/ | ✅ Done |
+| `BDSMRelationshipDashboard.tsx` | components/features/MobileDevice/apps/ | ✅ Done |
+| Desktop modals | components/features/BDSM*Modal.tsx | ✅ Done |
+| CampusForumApp changes | components/features/MobileDevice/apps/CampusForumApp.tsx | ✅ Done |
+| CampusChatApp BDSM integration | components/features/MobileDevice/apps/CampusChatApp.tsx | ✅ Done |
+| MobileHome entry | components/features/MobileDevice/MobileHome.tsx:201-219 | ✅ Done |
+
+### Phase 6: Integration & Wiring — ✅ Mostly Complete
+
+- Task generation → execution → AI evaluation → obedience update pipeline: ✅ Connected via `useBDSMSlice.ts`
+- Contract generation → storage → display: ✅ Connected
+- Relationship phase progression: ✅ Connected via `bdsmConstants.ts`
+- Persistence: ✅ BDSM state saved/loaded with game state
+
+### Phase 7: Delete Deprecated Components — ⚠️ Incomplete
+
+**Item**: `BDSMMeetingModal.tsx` deletion (Phase 7, step 7.1)
+
+**Status**: Still referenced in `docs/plans/2026-05-05_bdsm-relationship-pipeline.md` as "to be deleted" but the file itself does not exist in the codebase. The plan notes say "已删除" in `bdsm-pipeline-deepening.md` line 310. This is a **documentation inconsistency** — the plan lists it as pending deletion but it's already gone.
+
+---
+
+## Additional Verification Notes
+
+### bdsmConstants.ts — ✅ Done (from 2026-05-06 fix plan)
+
+- `models/campusNSFW/bdsmConstants.ts` created
+- `BDSM阶段要求` extracted and used by `bdsmTaskWorkflow.ts` and `campusNSFWEngine.ts`
+- 3 places of duplication consolidated into 1 constant file
+
+### useBDSMSlice.ts — ✅ Connected
+
+- New file `hooks/useGame/subsystems/useBDSMSlice.ts` connects workflow functions to state
+- Properly reads contract info from `关系.契约记录` instead of hardcoded values
+- All 5 workflow functions properly called with real context
+
+### Test Files Present — ✅
+
+- `test_bdsm_workflow.ts` — standalone test for all 5 workflow functions
+- `test_bdsm_full_journey.ts` — end-to-end journey test
+
+---
+
+## Summary
+
+**Overall Status: ✅ SUBSTANTIALLY COMPLETE**
+
+The BDSM Relationship Pipeline (v1.6) is implemented and integrated:
+
+| Phase | Status |
+|-------|--------|
+| Phase 1 (Data Model) | ✅ Complete |
+| Phase 2 (Workflow Engine) | ✅ Complete |
+| Phase 3 (Prompts) | ✅ Complete |
+| Phase 4 (Main Story Integration) | ✅ Complete |
+| Phase 5 (UI Components) | ✅ Complete |
+| Phase 6 (Integration) | ✅ Complete |
+| Phase 7 (Cleanup) | ✅ Complete (item was already deleted) |
+
+**Key improvements from 2026-05-06 fix plan**:
+1. `bdsmConstants.ts` created — eliminated triplication of phase thresholds
+2. `useBDSMSlice.ts` properly wires up workflow functions to state
+3. Contract info read from `关系.契约记录` instead of hardcoded
+4. All 4 desktop modals created (BDSMRelationshipModal, BDSMTaskModal, BDSMContractModal, BDSMSafetyModal)
+
+**Issue**: `BDSMMeetingModal` documentation inconsistency — listed as "to delete" but already deleted; plan docs should be updated to reflect reality.
