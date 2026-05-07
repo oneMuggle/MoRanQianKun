@@ -137,3 +137,66 @@ grep -n "storyModule\|故事模块上下文\|构建故事模块提示词" prompt
 **Phase 1 和 Phase 2 已完整实现**，故事模块管理系统的核心基础设施（类型定义、注册表、编排器、模块注册）已正确构建并可通过启动流程加载。
 
 **Phase 3（集成到提示词运行时）尚未实施** — `prompts/runtime/nsfw.ts` 仍使用硬编码的 if 分支处理校园和网约车 NSFW，模块编排器虽已就绪但未被调用。若需要新模块通过注册表自动贡献提示词，需完成 Phase 3 的集成工作。
+
+---
+
+# 2026-05-06-zustand-ready-architecture.md 验证记录
+
+**验证时间**: 2026-05-08 00:12
+
+## 总体结论: 部分完成 (Phase 0-5 ✅, Phase 6 ⏳, Phase 7 ⏳)
+
+---
+
+## 逐 Phase 验证
+
+### Phase 0: 准备 — 创建 barrel index ✅ 完成
+- `hooks/useGame/index.ts` 存在 (7084 字节)
+
+### Phase 1: 拆分 models/system.ts ❌ **未按计划实施**
+- **计划**: 拆分为 4 文件 + barrel 重导出
+- **实际**: `models/system.ts` 仍为完整单体文件 (1785 行)
+- **但**: 拆分后的 4 个文件已存在 (`api-config.ts`, `era-config.ts`, `game-settings.ts`, `theme-visual.ts`)
+- **问题**: `models/system.ts` 未改造为 barrel，4 个文件内容独立存在而非来自拆分
+
+### Phase 2: 清理 models/ 重复文件 ✅ 完成
+- `models/domain/` 和 `models/game/` 已删除
+
+### Phase 3: hooks/useGame/ 目录重组 ✅ 完成
+- 14 个子目录已创建并填充文件
+
+### Phase 4: 删除废弃 GameMaster 系统 ✅ 完成
+- `services/gameMaster/` 已删除
+
+### Phase 5: 修复 prompts/ 导出断裂 ✅ 完成
+- `prompts/index.ts` 正确导出 runtime 模块
+
+### Phase 6: 子 Hook 拆分 — Zustand 就绪 ⚠️ **部分完成**
+| 检查项 | 状态 |
+|--------|------|
+| `zustand@5.0.13` 安装 | ✅ |
+| `zustandStore.ts` 存在 | ✅ (4314 字节) |
+| `useTravelSlice.ts` 存在 | ✅ (3750 字节) |
+| `useBDSMSlice.ts` 存在 | ✅ (12661 字节) |
+| `useUISlice.ts` 存在 | ✅ (5079 字节) |
+| **slice 接入 useGame.ts** | ❌ 未集成 (grep 结果: 0) |
+| `useGame.ts` 行数减少 | ❌ 仍为 2996 行 |
+
+**核心问题**: slice 文件已创建但 useGame.ts 未集成，useGame.ts 仍是单体文件
+
+### Phase 7: App.tsx 瘦身 ⚠️ **提取文件存在但未实际替换**
+| 提取项 | 状态 |
+|--------|------|
+| `lazyComponents.tsx` | ✅ 存在 |
+| `useResponsive.ts` | ✅ 存在 |
+| `useModalOpeners.ts` | ✅ 存在 |
+| `useConfirmSystem.tsx` | ✅ 存在 |
+| **App.tsx 行数减少** | ❌ 仍为 2129 行 |
+
+---
+
+## 下一步建议
+
+1. **Phase 1**: 将 `models/system.ts` 改为 barrel 模式（内容已准备好）
+2. **Phase 6**: 将 3 个 slice 真正集成到 `useGame.ts` 中
+3. **Phase 7**: 从 App.tsx 移除已提取代码，替换为 hook 调用
