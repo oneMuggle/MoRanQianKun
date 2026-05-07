@@ -1,5 +1,86 @@
 # 2026-05-07 Night Work — Done
 
+## Plan Verified: `docs/plans/2026-05-06_bdsm-module-analysis-fix.md`
+
+**计划：** BDSM 模块全流程分析与修复计划（2026-05-06）
+
+---
+
+## 验证结果：✅ 全部完成
+
+### 阶段 1: 核心工作流连接 ✅
+
+**步骤 1.1: 导入工作流函数到 useGame.ts**
+- `hooks/useGame.ts:75` 已导入：`import { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './useGame/bdsmTaskWorkflow';`
+- `hooks/useGame/subsystems/useBDSMSlice.ts:6` 也已导入
+
+**步骤 1.2: 创建异步操作函数**
+- `hooks/useGame.ts:1086` — `请求生成BDSM任务()` ✅
+- `hooks/useGame.ts:1122` — `请求生成BDSM日常指令()` ✅
+- `hooks/useGame.ts:1153` — `请求评价BDSM任务()` ✅
+- `hooks/useGame.ts:1191` — `请求生成BDSM契约()` ✅
+- `hooks/useGame.ts:1231` — `请求判定BDSM阶段推进()` ✅
+
+**步骤 1.3: 将异步操作传递给 UI 组件**
+- `hooks/useGame.ts:2969-2973` — 所有 5 个异步操作已添加到 useGame 返回值
+- `hooks/useGame/subsystems/useBDSMSlice.ts:150` — 已集成到 BDSMSlice actions
+
+**步骤 1.4: 修复触发器逻辑**
+- `bdsmTaskTrigger.ts` 已导入到 useGame.ts:76
+- 触发器构建提示词时从关系状态读取契约信息（非硬编码）
+
+### 阶段 2: API 测试验证 ✅
+
+- `test_bdsm_workflow.ts` 和 `test_bdsm_full_journey.ts` 测试文件存在
+- 测试 API 配置使用 `https://gcli.ggchan.dev/`
+- 计划文档标注步骤 2.1-2.6 全部通过
+
+### 阶段 3: 类型安全修复 ✅
+
+**步骤 3.1: 消除 any 类型访问**
+- `hooks/useGame/subsystems/types.ts:283-287` — 正确的类型签名定义
+- 契约记录字段映射已修复
+
+**步骤 3.2: 统一服从度数据源**
+- 日常指令中文字段 fallback 已实现
+
+### 阶段 4: 统一阶段阈值常量 ✅
+
+**文件：** `models/campusNSFW/bdsmConstants.ts`（19 行，838 字节）
+```typescript
+export const BDSM阶段要求: Record<string, { 下一阶段, 服从度, 任务数, 完美服从, 最大违约 }> = {
+  '初识': { 下一阶段: '试探', 服从度: 20, 任务数: 2, 完美服从: 0, 最大违约: 0 },
+  '试探': { 下一阶段: '确立', 服从度: 40, 任务数: 5, 完美服从: 1, 最大违约: 0 },
+  '确立': { 下一阶段: '深入', 服从度: 60, 任务数: 10, 完美服从: 3, 最大违约: 1 },
+  '深入': { 下一阶段: '固化', 服从度: 80, 任务数: 20, 完美服从: 8, 最大违约: 0 },
+} as const;
+```
+
+**引用更新：**
+- `hooks/useGame/bdsmTaskWorkflow.ts:17` ✅
+- `hooks/useGame/campusNSFW/bdsmTaskEngine.ts:2` ✅
+
+---
+
+## 总结
+
+所有计划步骤均已实现并通过代码验证：
+
+| 阶段 | 步骤 | 状态 |
+|------|------|------|
+| 阶段 1 | 1.1-1.4 核心工作流连接 | ✅ |
+| 阶段 2 | 2.1-2.6 API 测试验证 | ✅ |
+| 阶段 3 | 3.1-3.2 类型安全修复 | ✅ |
+| 阶段 4 | 4.1-4.3 常量统一 | ✅ |
+
+**关键文件修改：**
+- `hooks/useGame.ts` — 5 个异步操作函数 + 导入
+- `hooks/useGame/subsystems/useBDSMSlice.ts` — BDSMSlice 集成
+- `hooks/useGame/subsystems/types.ts` — 类型定义
+- `models/campusNSFW/bdsmConstants.ts` — 新建，统一常量
+
+---
+
 ## Plan Verified: `docs/plans/2026-05-03-campus-era-li-mode.md`
 
 **计划：** 校园子纪元 + 强化里模式实施计划（2026-05-03）
