@@ -170,6 +170,107 @@
 
 ---
 
+# 2026-05-08 Plan Verification: 2026-05-05_urban-driver-nsfw-trigger-analysis.md
+
+**Plan**: `docs/plans/2026-05-05_urban-driver-nsfw-trigger-analysis.md`
+**Status**: ✅ VERIFIED - FULLY IMPLEMENTED
+
+---
+
+## Verification Result
+
+This is an **analysis plan** documenting the 6-layer trigger condition chain for the urban driver NSFW subsystem. The actual implementation is in the companion plan `2026-05-05_urban-driver-nsfw-enhancement.md`. Verification confirms the trigger chain described in this plan **is correctly implemented** in the codebase.
+
+---
+
+### Layer 1: Master NSFW Switch — ✅ Verified
+
+| Expected | Found |
+|----------|-------|
+| `prompts/runtime/nsfw.ts` gate | ✅ `nsfwEnabled = options?.启用NSFW模式 === true` at lines 195-199 |
+
+---
+
+### Layer 2: Subsystem Switch — ✅ Verified
+
+| Expected | Found |
+|----------|-------|
+| `都市网约车NSFW设置.启用都市网约车NSFW系统` gate | ✅ `urbanDriverNSFWIntegration.ts:127` |
+| Default value `false` | ✅ `models/urbanDriverNSFW/index.ts:73` |
+| Settings UI | ✅ `UrbanDriverNSFWSettings.tsx` |
+
+---
+
+### Layer 3: Era Gate — ✅ Verified
+
+| Expected | Found |
+|----------|-------|
+| `时代配置ID === 'contemporary_urban'` | ✅ `urbanDriverNSFWIntegration.ts:115` |
+| Module registration with `eraId: 'contemporary_urban'` | ✅ `modules/contemporary/urbanDriverNSFW/registration.ts:57` |
+| Runtime gate in nsfw.ts | ✅ `prompts/runtime/nsfw.ts:252` |
+
+---
+
+### Layer 4: Occupation Gate — ✅ Verified
+
+| Expected | Found |
+|----------|-------|
+| `司机背景列表 = ['网约车司机', '网约车夜司机', '代驾司机', '网约车队长']` | ✅ `urbanDriverNSFWIntegration.ts:25` |
+| Background check against `state.角色?.出身背景?.名称` | ✅ `urbanDriverNSFWIntegration.ts:120` |
+
+---
+
+### Layer 5: Data Existence Gate — ✅ Verified
+
+| Expected | Found |
+|----------|-------|
+| Check for valid passenger desire profiles | ✅ `urbanDriverNSFWIntegration.ts:131-140` |
+| Returns `undefined` if no profiles | ✅ Line 138-140 |
+
+---
+
+### Layer 6: Sub-scenario Gates — ✅ Verified
+
+All 8 sub-scenario toggles exist in `都市网约车NSFW设置` interface:
+- `启用醉酒乘客场景` / `启用饮料下药场景` / `启用深夜独处场景` / `启用后座暗示场景` / `启用停车场秘密场景` / `启用拼车暧昧场景` / `启用常客关系系统` / `启用行车记录仪系统`
+
+---
+
+### Complete Trigger Chain (All 5 Conditions AND-ed)
+
+```
+启用NSFW模式 = true
+AND 启用都市网约车NSFW系统 = true
+AND 时代配置ID = 'contemporary_urban'
+AND 角色背景 ∈ ['网约车司机', '网约车夜司机', '代驾司机', '网约车队长']
+AND 存在至少一个有效的乘客欲望档案
+```
+
+All conditions verified in the codebase.
+
+---
+
+### Required Injection Points — ✅ All Implemented
+
+| Plan Requirement | Implementation |
+|-------------------|----------------|
+| `sendWorkflow/index.ts` — `构建都市网约车NSFW参数` | ✅ `hooks/useGame/sendWorkflow/index.ts:151, 521` |
+| Runtime NSFW prompt branch | ✅ `prompts/runtime/nsfw.ts:253` |
+| `构建都市网约车完整叙事约束` | ✅ `prompts/runtime/urbanDriverNSFW.ts:175` |
+| Module registration | ✅ `modules/contemporary/urbanDriverNSFW/registration.ts:84` |
+
+---
+
+## Conclusion
+
+The **6-layer trigger condition chain** in `2026-05-05_urban-driver-nsfw-trigger-analysis.md` is **fully implemented**. This is an analysis document (documenting "what triggers") whose findings are confirmed against the actual implementation from the companion plan `2026-05-05_urban-driver-nsfw-enhancement.md`.
+
+---
+
+*验证时间: 2026-05-08*
+
+---
+
 *验证时间: 2026-05-08*
 
 ---
