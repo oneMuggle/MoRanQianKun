@@ -1,7 +1,7 @@
 # 写真 NSFW 模块测试方案
 
 > **执行状态：已完成** ✅
-> **最终结果：92/92 测试通过，覆盖率 90.32%**
+> **最终结果：98/98 测试通过，覆盖率 90.32%**
 
 ## 概述
 
@@ -23,7 +23,7 @@
 | Phase 1: 测试工厂函数 | ✅ 完成 | - | - | mockStateFactory.ts + xmlParserTestHelper.ts |
 | Phase 2: 单元测试 | ✅ 完成 | 73 | 100% | normalization(10) + engine(38) + shootWorkflow(10) + leakWorkflow(12) + promptBuilders(16) |
 | Phase 3: 集成测试 | ✅ 完成 | 7 | 100% | integration.test.ts |
-| Phase 4: E2E 测试 | ⏸️ 暂缓 | - | - | 需应用运行在 localhost:3000 |
+| Phase 4: E2E 测试 | ✅ 完成 | 6 | 100% | settings.spec.ts (PHOTO-01~06) |
 | Phase 5: AI 响应测试 | ✅ 完成 | 3 | 100% | aiResponse.test.ts (gemini-2.5-pro) |
 | Phase 6: 覆盖率验证 | ✅ 完成 | - | - | Statements: 90.23%, Lines: 90.32% |
 
