@@ -151,3 +151,86 @@
 - P2 数据校验机制和待深入修复项目未实施，但计划已明确标注为"待实现/待深入修复"
 
 Verification time: 2026-05-08
+
+---
+
+# 验证报告: 2026-05-05_forum-refresh-backend-queue.md
+
+> 验证时间: 2026-05-08
+> 计划文件: docs/plans/2026-05-05_forum-refresh-backend-queue.md
+
+---
+
+## 总体状态: ✅ 全部完成
+
+所有 4 个实施步骤均已完成（步骤 5 为可选 UI 反馈，未强制要求）。
+
+---
+
+## 详细验证
+
+### 文件变更检查
+
+| 文件 | 操作 | 状态 | 验证位置 |
+|------|------|------|----------|
+| `hooks/useGame/device/deviceRefreshMonitor.ts` | 新建 | ✅ | 184 行，完整实现 |
+| `hooks/useGame.ts` | 修改 | ✅ | L164 导入, L477 队列 state, L639 监控接入 |
+| `App.tsx` | 修改 | ✅ | L1958 `set设备刷新队列` 队列提交 |
+| `hooks/useGame/campusForumWorkflow.ts` | 检查 | ✅ | L50/L63 解析逻辑完整 |
+| `hooks/useGame/device/deviceAiWorkflow.ts` | 检查 | ✅ | L331/L435 解析函数存在 |
+
+### 步骤 1: 创建 `hooks/useGame/deviceRefreshMonitor.ts`
+
+✅ **完成** — 184 行 hook 文件：
+- `设备刷新任务` 接口定义完整 (L13-19)
+- `useDeviceRefreshMonitor` hook 完整实现 (L34-184)
+- 队列监控 + 依次执行逻辑正确
+- API 配置检查、错误处理、toast 提示完整
+- 复用 `刷新校园论坛()` 而非死代码
+
+### 步骤 2: 在 `useGame.ts` 中新增队列 state + 监控接入
+
+✅ **完成**：
+- L476-477: `设备刷新任务队列` state 定义
+- L640-641: `set设备刷新队列` 暴露给 setters
+- L164: 导入 `useDeviceRefreshMonitor`
+- L639: 监控 hook 接入，传入所有必需依赖
+
+### 步骤 3: 修改 `App.tsx` 的 `onRefresh`
+
+✅ **完成** — L1958 确认使用 `set设备刷新队列` 提交任务而非发送文本命令到主剧情。
+
+### 步骤 4: 验证解析逻辑
+
+✅ **完成** — `campusForumWorkflow.ts` 中：
+- L50: `解析AI论坛帖子(forumRawItems)` 调用
+- L63: `解析AIBDSM帖子(bdsmRawItems)` 调用
+- 两函数均在 `deviceAiWorkflow.ts` 中正确定义 (L331, L435)
+
+### 步骤 5: UI 刷新状态显示
+
+⏸️ **可选** — 计划中标注为可选，未强制要求。
+
+---
+
+## 风险缓解验证
+
+| 风险 | 级别 | 缓解措施 | 验证结果 |
+|------|------|----------|----------|
+| API 配置不存在时刷新崩溃 | 中 | L54-67: 执行前检查 `apiConfig/apiSettings`，失败则标记 failed + toast | ✅ 已实施 |
+| 并发刷新导致状态覆盖 | 中 | L38-42: `处理中Ref` 单任务执行完后才取下一个 | ✅ 已实施 |
+| JSON 解析失败 | 低 | try/catch + errors 数组返回机制 | ✅ 已实施 |
+
+---
+
+## 关键发现
+
+1. **deviceRefreshMonitor.ts 位于 `device/` 子目录** — 计划写在 `hooks/useGame/deviceRefreshMonitor.ts`，实际文件在 `hooks/useGame/device/deviceRefreshMonitor.ts`（目录重构后位置）
+2. **刷新校园论坛不再是死代码** — L89 在 deviceRefreshMonitor 中被调用
+3. **监控架构复用正确** — 参考 `NPC生图任务队列` 模式，`处理中Ref` 防止并发
+
+---
+
+## 下一步建议
+
+无需修复项，核心功能已完整实现并验证。
