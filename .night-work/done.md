@@ -1,351 +1,156 @@
-# 计划验收记录
+# 2026-05-08 Plan Verification: 2026-05-05_开局环境剧情预设.md
 
-## 计划文件
-`docs/plans/fandom-mode-prompt-plan.md` (原计划文件，可能曾计划命名为 `2026-03-18_fandom-mode-implementation.md`)
-
-## 计划日期
-2026-03-18 (推测)
-
----
-
-## 验收结果
-
-### ✅ 已完成
-
-#### 1. openingConfig 存档级状态
-- `openingConfig` 已存在于 `data/newGamePresets.ts` 类型定义
-- 新游戏向导 `NewGameWizardContent.tsx` 已实现完整 UI
-  - 同人融合开关 (`同人融合.enabled`)
-  - 作品名、来源类型、融合强度选项
-  - 保留原著角色 (`同人融合.保留原著角色`)
-  - 启用角色替换 (`同人融合.启用角色替换`)
-- 状态通过 `state.开局配置` 在应用内传递 (App.tsx:1170)
-
-#### 2. core_realm 独立境界体系
-- `prompts/core/realm.ts` 已实现
-  - 标识: `id: 'core_realm'`
-  - 策略: "固定头部 + 动态区块替换"
-  - 回退逻辑: 优先当前存档专属境界，未记录时回退默认体系
-- `core_realm` 在以下位置被引用:
-  - `systemPromptBuilder.ts` - 提示词构建
-  - `variableModelWorkflow.ts` - 变量生成
-  - `planningUpdateWorkflow.ts` - 规划分析
-  - `worldEvolutionWorkflow.ts` - 世界演变
-  - 测试文件: `saveCoordinator.test.ts`, `planningUpdateWorkflow.test.ts`, `worldGenerationWorkflow.test.ts`, `worldEvolutionWorkflow.test.ts`
-
-#### 3. fandomStoryPlan / fandomHeroinePlan 状态
-- 类型已在 `types.ts` 导出
-- 状态帮助函数 `stateHelpers.ts` 处理深拷贝
-- 测试文件 `stateHelpers.test.ts` 覆盖相关逻辑
-
-#### 4. 同人设定 UI 入口
-- `NewGameWizardContent.tsx` 完整实现同人融合配置面板
-- 同人融合强度选项已定义并使用
-
-### ⚠️ 需进一步确认
-
-#### 5. 运行时构建器
-- 未找到独立的 `同人运行时构建器` 模块
-- 同人设定摘要可能分散在现有提示词构建流程中
-- 建议检查 `hooks/useGame/promptRuntime.ts` 是否已整合同人补丁
-
-#### 6. 世界观与境界体系拆分请求
-- 计划要求拆成两次独立请求写入 `core_world` 与 `core_realm`
-- 需确认 worldGenerationWorkflow 是否分别生成这两个 prompt
-
-#### 7. 压测用例
-- `scripts/promptStressTest.js` 包含 fandom 相关检测 needle:
-  - `'构建运行时提示词池'`, `'openingConfig'`, `'构建女主剧情规划协议'`, `'应用境界体系区块替换'`, `'core_realm'`
-  - `'核心提示词快照'`, `'core_world'`, `'core_realm'`, `'设置提示词池'`
-  - `'core_realm'`, `'固定头部 + 动态区块替换'`, `'境界使用策略'`
-- 确认是否已执行压测并通过
-
----
-
-## 总体结论
-
-**大部分功能已实现。**
-
-核心机制 (openingConfig 存档级状态、core_realm 独立境界体系、同人配置 UI) 已落地。`fandomStoryPlan` 和 `fandomHeroinePlan` 状态已定义并有测试覆盖。
-
-需要人工验证:
-1. 压测是否执行并通过
-2. 运行时构建器是否完整整合同人补丁
-3. 世界观生成是否真正拆分为 `core_world` + `core_realm` 两次请求
-
----
-
-## 验证日期
-2026-05-07
-
----
-
-# 2026-05-08 Plan Verification: 2026-04-04_era-content-audit.md
-
-**Plan**: `docs/plans/2026-04-04_era-content-audit.md`
-**Status**: ❌ FILE NOT FOUND
+**Plan**: `docs/plans/2026-05-05_开局环境剧情预设.md`
+**Status**: ⚠️ PARTIALLY IMPLEMENTED - Mobile UI Missing
 
 ---
 
 ## Verification Result
 
-The requested plan file `docs/plans/2026-04-04_era-content-audit.md` does **not exist** in the repository.
+### Summary
 
-### Search Results
-
-| File | Status |
-|------|--------|
-| `docs/plans/2026-04-04_era-content-audit.md` | ❌ NOT FOUND |
-| `docs/plans/era-content-outlines.md` | ✅ Exists (similar era content doc) |
-| `docs/plans/sub-era-ui-audit-plan.md` | ✅ Exists (UI audit related) |
-| `docs/plans/2026-04-03_modern-era-expansion.md` | ✅ Exists (closest date) |
-
-### Git History Check
-
-No commits found referencing `2026-04-04_era-content-audit.md`.
-No deleted files with this name found in git history.
-
-### Related Era Content Files in Codebase
-
-| File | Description |
-|------|-------------|
-| `docs/plans/era-content-outlines.md` | Four-era content outlines (近代/现代/近未来/未来) |
-| `docs/plans/sub-era-ui-audit-plan.md` | Sub-era UI text matching fix plan |
-| `docs/plans/2026-04-03_modern-era-expansion.md` | Modern era expansion plan |
-| `data/subEraDefaultPresets.ts` | Sub-era default presets |
-| `models/system.ts` | Era configuration models |
-
-### Conclusion
-
-No action needed. The requested plan file `2026-04-04_era-content-audit.md` does not exist. Related era content work is covered by other plan files.
+| Component | Status | Files |
+|-----------|--------|-------|
+| Types (OpeningConfig extension) | ✅ Done | `models/system.ts`, `models/game-settings.ts` |
+| Utils (normalization) | ✅ Done | `utils/openingConfig.ts` |
+| Wizard State | ✅ Done | `useNewGameWizardState.ts` |
+| Desktop UI | ✅ Done | `NewGameWizardContent.tsx` |
+| Mobile UI | ❌ Missing | `MobileNewGameWizard.tsx` |
+| Prompt Integration | ✅ Done | `prompts/runtime/openingConfig.ts`, `eraOpeningScene.ts` |
+| Era Data (contemporary_campus) | ✅ Done | `epoch-contemporary.ts` |
 
 ---
 
-*验证时间: 2026-05-08*
+## Detailed Check
 
----
+### 1. Types - OpeningConfig Extension ✅
 
-# 2026-05-08 Plan Verification: 2026-04-05_character-archetype-system.md
-
-**Plan**: `docs/plans/2026-04-05_character-archetype-system.md`
-**Status**: ✅ VERIFIED - FULLY IMPLEMENTED
-
----
-
-## Verification Result
-
-### 1. Type Definition (`models/eraTheme/types.ts`)
-
-| Expected | Found |
-|----------|-------|
-| `EraCharacterArchetype` interface | ✅ Lines 50-60: `id`, `name`, `description`, `appearance`, `abilities`, `表人格?`, `里人格?` |
-
-### 2. Era Data Files
-
-All epoch files contain `characterArchetypes` field:
-
-| File | Status |
-|------|--------|
-| `models/eraTheme/epoch-ancient.ts` | ✅ Multiple `characterArchetypes` arrays |
-| `models/eraTheme/epoch-modern.ts` | ✅ Multiple `characterArchetypes` arrays |
-| `models/eraTheme/epoch-contemporary.ts` | ✅ Multiple `characterArchetypes` arrays |
-| `models/eraTheme/epoch-near-future.ts` | ✅ Multiple `characterArchetypes` arrays |
-| `models/eraTheme/epoch-far-future.ts` | ✅ Multiple `characterArchetypes` arrays |
-| `models/eraTheme/epoch-post-human.ts` | ✅ Multiple `characterArchetypes` arrays |
-| `models/eraTheme/epoch-primordial.ts` | ✅ Multiple `characterArchetypes` arrays |
-
-**Example data (武侠, ancient_eastern_wuxia):**
+**`models/system.ts` lines 1554-1558:**
 ```typescript
-characterArchetypes: [
-    { id: 'wuxia_wandering_swordsman', name: '流浪剑客', description: '江湖独行侠，剑术高超却不求名利', appearance: '一袭青衫，腰间佩剑，面容冷峻', abilities: ['快剑', '轻功', '酒量过人'] },
-    { id: 'wuxia_sect_leader', name: '掌门人', description: '名门正派的领袖，德高望重', appearance: '身着门派服饰，手持拂尘，仙风道骨', abilities: ['镇派绝学', '门派威望', '内力深厚'] },
-    { id: 'wuxia_poison_master', name: '毒医双修', description: '精通毒药与医术的神秘人物', appearance: '面色苍白，手指常年染着药草之色', abilities: ['毒术', '医术', '药物辨识'] }
-]
+selectedSceneId?: string;
+selectedArchetypeIds?: string[];
+selectedWritingSampleIds?: string[];
 ```
 
-### 3. Prompt Integration (`prompts/runtime/eraTheme.ts`)
+**`models/game-settings.ts` lines 181-185:** Same fields present.
 
-| Expected | Found |
-|----------|-------|
-| `构建时代角色原型注入()` function | ✅ Lines 86-102 |
+### 2. Utils - OpeningConfig Normalization ✅
 
-Function correctly:
-- Resolves era node via `resolveEraNode(eraId)`
-- Maps `inherited.characterArchetypes` to formatted prompt text
-- Returns empty string if no archetypes
-
-**Used in:** `prompts/runtime/opening.ts` line 197:
+**`utils/openingConfig.ts` lines 201-206:**
 ```typescript
-const archetypeBlock = 构建时代角色原型注入(eraId);
+selectedSceneId: raw?.selectedSceneId ? 读取文本(raw.selectedSceneId) || undefined : undefined,
+selectedArchetypeIds: Array.isArray(raw?.selectedArchetypeIds)
+    ? raw.selectedArchetypeIds.map(读取文本).filter(Boolean)
+    : [],
+selectedWritingSampleIds: Array.isArray(raw?.selectedWritingSampleIds)
+    ? raw.selectedWritingSampleIds.map(读取文本).filter(Boolean)
+    : [],
 ```
 
-### 4. UI Integration
+### 3. Wizard State ✅
 
-| Expected | Found |
-|----------|-------|
-| `NewGameWizardContent.tsx` - display archetypes | ✅ Line 1334, 1366-1390 |
-| `useNewGameWizardState.ts` - get archetype list | ✅ Lines 543, 547 |
+**`useNewGameWizardState.ts`:**
+- Line 161-163: State declarations (`selectedSceneId`, `selectedArchetypeIds`, `selectedWritingSampleIds`)
+- Line 530-532: Initialization from normalizedOpeningConfig
+- Line 947-949, 1008-1010: Export in config objects
+- Line 1075-1077: Return object with toggle functions
 
-### 5. Era Assembly Inheritance (`assembly.ts`)
+### 4. Desktop UI ✅
 
-| Expected | Found |
-|----------|-------|
-| `characterArchetypes` merged in `resolveEraNode` | ✅ Lines 105, 144, 163 |
+**`NewGameWizardContent.tsx`:**
+- Lines 199-201: Import state and toggle functions
+- Lines 1334-1408: Scene card selection (single-select), archetype tags (multi-select), writing sample selection
+- Lines 1664-1668: Confirmation page display of selected presets
+- Grid layout with OrnateBorder component for "环境剧情预设" section
 
-Sub-erasis inherit `characterArchetypes` from parent epochs.
+### 5. Mobile UI ❌ NOT IMPLEMENTED
 
-### 6. Test Coverage
+**`MobileNewGameWizard.tsx`:**
+- Only 5 steps defined: `['世界观', '角色基础', '天赋背景', '开局配置', '确认生成']`
+- No `selectedSceneId`, `selectedArchetypeIds`, `selectedWritingSampleIds` state
+- No scene/archetype/writing sample selection UI
+- OpeningConfig passed as prop but not decomposed for mobile-specific UI
 
-`prompts/runtime/__tests__/eraPromptInjection.test.ts` line 86-99 tests `构建时代角色原型注入()`.
+### 6. Prompt Integration ✅
+
+**`prompts/runtime/openingConfig.ts` lines 14-22:**
+```typescript
+if (openingConfig.selectedSceneId) {
+    blocks.push(`- 用户已选定开局场景（ID: ${openingConfig.selectedSceneId}），请以该场景为第一幕切入点。`);
+}
+if (openingConfig.selectedArchetypeIds && openingConfig.selectedArchetypeIds.length > 0) {
+    blocks.push(`- 角色原型倾向：${openingConfig.selectedArchetypeIds.join('、')}。初始 NPC 的性格、行为模式可参考对应原型特征。`);
+}
+if (openingConfig.selectedWritingSampleIds && openingConfig.selectedWritingSampleIds.length > 0) {
+    blocks.push(`- 写作风格参考（ID: ${openingConfig.selectedWritingSampleIds.join('、')}）。叙事语气与文风应贴近所选示例的笔调。`);
+}
+```
+
+**`prompts/runtime/eraOpeningScene.ts`:**
+- `构建时代开局场景注入()` function accepts `selectedSceneId` parameter
+
+### 7. Era Data (contemporary_campus) ✅
+
+**`models/eraTheme/epoch-contemporary.ts` lines 494-579:**
+
+| Field | Count | Status |
+|-------|-------|--------|
+| `openingScenes` | 6 | ✅ (图书馆自习, 社团招新, 毕业典礼, 深夜实验室, 操场夜跑, 食堂偶遇) |
+| `characterArchetypes` | 6 | ✅ (学霸, 社团达人, 隐形大佬, 叛逆者, 温柔学长, 神秘转学生) |
+| `writingSamples` | 2 | ✅ (期末图书馆, 社团招新日) |
+| `liMode.sceneTypes` | 6 | ✅ (图书馆自习室, 社团活动室, 天台约会, 实验室独处, 操场夜跑, 毕业晚会后) |
 
 ---
 
-## Extension Plans (未完成项)
+## Missing Items
 
-The plan lists three extension items that remain unimplemented:
+### ❌ Step 4 of Implementation Plan - Mobile UI
 
-- [ ] 为角色原型添加更多维度（背景故事、人物关系）
-- [ ] 实现角色原型选择对 NPC 生成的影响
-- [ ] 添加角色原型搜索和筛选功能
+**Plan states:**
+> **步骤 4：Mobile UI 实现**
+> - 在 `MobileNewGameWizard.tsx` 中同步新增 UI
+
+**Current status:**
+- `MobileNewGameWizard.tsx` does not have the environment preset selection UI
+- Mobile wizard has 5 steps but step 4 ("开局配置") lacks scene/archetype/writing sample components
+- No `当前子纪元环境预设` computation in mobile state
+
+### ⚠️ Plan Scope Note
+
+The plan mentions:
+> 先从**校园纪元**（`contemporary_campus`）开始实施，后续可复用到其他纪元。
+
+This is correctly followed - only `contemporary_campus` (and `contemporary_campus_urban`) have the environment preset data in the UI picker. Other eras have the data in era definitions but it's not surfaced in the wizard UI yet.
+
+---
+
+## Implementation Complete Items
+
+| Step | Description | Status |
+|------|-------------|--------|
+| 步骤 1 | 类型扩展 (types/index.ts) | ✅ (models/system.ts, models/game-settings.ts) |
+| 步骤 2 | Wizard 状态扩展 (useNewGameWizardState.ts) | ✅ |
+| 步骤 3 | Desktop UI 实现 (NewGameWizardContent.tsx) | ✅ |
+| 步骤 4 | Mobile UI 实现 | ❌ NOT DONE |
+| 步骤 5 | 开局故事生成集成 (openingStoryWorkflow.ts) | ✅ (prompts/runtime/openingConfig.ts) |
+| 步骤 6 | 确认页展示 | ✅ (NewGameWizardContent.tsx lines 1664-1668) |
 
 ---
 
 ## Conclusion
 
-The **Character Archetype System (角色原型系统)** is **fully implemented** as specified in the plan dated 2026-04-05. All documented implementation points exist and function correctly in the codebase. The three extension items are noted but were not committed scope for this plan.
+**Status: ⚠️ PARTIALLY IMPLEMENTED**
 
----
+The plan is ~83% complete (5 of 6 steps). All core functionality is implemented:
+- Type definitions
+- Configuration normalization
+- Desktop UI with full scene/archetype/writing sample selection
+- Prompt injection into opening story generation
+- Confirmation page display
 
-*验证时间: 2026-05-08*
+**Missing:** Mobile UI implementation for environment preset selection in step 4 of the new game wizard.
 
----
-
-# 2026-05-08 Plan Verification: 2026-03-10_npc-interaction-system.md
-
-**Plan**: `docs/plans/2026-03-10_npc-interaction-system.md`
-**Status**: ❌ FILE NOT FOUND
-
----
-
-## Verification Result
-
-The requested plan file `docs/plans/2026-03-10_npc-interaction-system.md` does **not exist** in the repository.
-
-### Search Results
-
-| Search | Result |
-|--------|--------|
-| `docs/plans/2026-03-10_npc-interaction-system.md` | ❌ NOT FOUND |
-| Git history for this file | No commits found |
-| "npc-interaction" anywhere in codebase | 0 matches |
-| "NPCInteraction" anywhere | 0 matches |
-
-### Related NPC/Interaction Files in Codebase
-
-| File | Description |
-|------|-------------|
-| `docs/plans/2026-04-05_character-archetype-system.md` | ✅ Exists (character archetypes) |
-| `docs/plans/2026-05-05_campus-era-npc-relationship.md` | ✅ Exists (NPC relationship system) |
-| `docs/plans/2026-04-10_event-trigger-system.md` | ✅ Exists (event triggers) |
-| `hooks/useGame/sendWorkflow.ts` | NPC interaction flow handling |
-
-### Conclusion
-
-No action needed. The plan file `2026-03-10_npc-interaction-system.md` does not exist. NPC interaction functionality is likely covered by other plan files or is already implemented as part of the core game system.
-
----
-
-*验证时间: 2026-05-08*
-
----
-
-# 2026-05-08 Plan Verification: 2026-03-05_character-card-system.md
-
-**Plan**: `docs/plans/2026-03-05_character-card-system.md`
-**Status**: ❌ FILE NOT FOUND
-
----
-
-## Verification Result
-
-The requested plan file `docs/plans/2026-03-05_character-card-system.md` does **not exist** in the repository.
-
-### Search Results
-
-| Search | Result |
-|--------|--------|
-| `docs/plans/2026-03-05_character-card-system.md` | ❌ NOT FOUND |
-| Git history for this file | No commits found |
-| "character-card" in codebase | 0 matches |
-| "characterCard" in codebase | 0 matches |
-
-### Related Character Card Files in Codebase
-
-| File | Description |
-|------|-------------|
-| `prompts/runtime/nsfwCard.ts` | NSFW card related prompts |
-| `components/features/Settings/TavernPresetSettings.tsx` | Tavern preset settings (character cards) |
-| `hooks/useGame/systemPromptBuilder.ts` | System prompt building |
-| `hooks/useGame/promptRuntime.ts` | Prompt runtime (references 角色卡) |
-
-### Character Card Context
-
-The codebase does contain references to "角色卡" (character card) in several locations:
-- `prompts/runtime/nsfwCard.ts` - NSFW card system
-- `hooks/useGame/promptRuntime.ts` - References 角色卡 construction
-
-However, no plan file `2026-03-05_character-card-system.md` exists.
-
-### Conclusion
-
-No action needed. The plan file `2026-03-05_character-card-system.md` does not exist. Character card functionality (角色卡) may be covered by other plan files or is already implemented as part of the core system.
-
----
-
-*验证时间: 2026-05-08*
-
----
-
-# 2026-05-08 Plan Verification: 2026-05-06_time-utils-refactor-plan.md
-
-**Plan**: `docs/plans/2026-05-06_time-utils-refactor-plan.md`
-**Status**: ❌ FILE NOT FOUND
-
----
-
-## Verification Result
-
-The requested plan file `docs/plans/2026-05-06_time-utils-refactor-plan.md` does **not exist** in the repository.
-
-### Search Results
-
-| Search | Result |
-|--------|--------|
-| `docs/plans/2026-05-06_time-utils-refactor-plan.md` | ❌ NOT FOUND |
-| Git history for this file | No commits found |
-
-### Related Time System Implementation
-
-The `hooks/useGame/time/` directory exists and contains the time utilities as specified in the **related** plan `docs/plans/2026-05-06-architecture-refactor-plan.md`:
-
-**Files in `hooks/useGame/time/`:**
-- `timeUtils.ts` ✅ Exists (94 lines, exports `normalizeCanonicalGameTime`, `环境时间转标准串`, `结构化时间转标准串`, `标准时间串转结构化`, etc.)
-- `timeUtils.test.ts` ✅ Exists (test coverage)
-- `historyTurnWorkflow.ts` ✅ Exists (491 lines)
-- `historyTurnWorkflow.test.ts` ✅ Exists (test coverage)
-- `historyUtils.ts` ✅ Exists (44 lines)
-- `historyUtils.test.ts` ✅ Exists (test coverage)
-
-**Referenced by 28+ modules** across the codebase.
-
-### Conclusion
-
-The specific `time-utils-refactor-plan.md` plan file does not exist. However, the time/ directory reorganization described in the **related** architecture refactor plan (`2026-05-06-architecture-refactor-plan.md`, Phase 1) has already been implemented:
-- `timeUtils.ts` ✅
-- `historyTurnWorkflow.ts` ✅
-- `historyUtils.ts` ✅
-
-No action needed — time system utilities are already organized under `hooks/useGame/time/`.
+Core mechanism is functional. The desktop UI can fully select and persist environment presets which then flow into the AI prompt. Mobile parity is not yet complete.
 
 ---
 
