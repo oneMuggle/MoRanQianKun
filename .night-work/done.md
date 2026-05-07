@@ -1,127 +1,115 @@
-# 2026-05-08 novel-decomposition.md 验证记录
+# 2026-05-07 手机通讯工具深化计划验证记录
 
 ## 执行时间
-2026-05-08 23:05 (UTC)
+2026-05-07 23:05 (UTC)
 
 ## 任务来源
-`docs/plans/novel-decomposition.md`
+`docs/plans/mobile-device-deepening-plan.md`
 
 ## 计划状态
-**✅ 主体已实施（阶段 1-6, 8 完成，阶段 7 部分进行中）**
+**⚠️ 部分完成 — Phase 1-4 已实施，Phase 5 未完成，Phase 6 未测试**
 
 ## 执行摘要
 
-对 `docs/plans/novel-decomposition.md` 进行了审计，确认**大部分功能已实现**。该计划描述的"小说分解附加功能"包括：独立工作台、任务系统、AI 分解链路、树状注入、导入导出、同人专用提示词等核心模块。
-
-## 已验证的实施内容
-
-### 阶段 1：基础骨架 ✅
-- `models/novelDecomposition.ts` — 数据类型定义（任务状态、分段模式、注入目标、树节点类型等）
-- `components/features/Settings/NovelDecompositionSettings.tsx` (209KB) — 设置页小说分解配置
-- `components/features/Settings/NovelDecompositionApiSettings.tsx` (12KB) — 独立 API 配置
-- `components/features/Settings/CurrentNovelDecompositionInjectionSettings.tsx` (6.5KB) — 注入配置
-- `components/features/NovelDecomposition/NovelDecompositionWorkbenchModal.tsx` — 首页工作台入口
-- `components/features/NovelDecomposition/MobileNovelDecompositionWorkbenchModal.tsx` — 移动端工作台
-
-### 阶段 2：任务系统 ✅
-- `services/novel-decomposition/novelDecompositionStore.ts` (57KB) — 核心存储与任务管理
-- `services/novel-decomposition/novelDecompositionPipeline.ts` (42KB) — 批处理推进管道
-- `services/novel-decomposition/novelDecompositionScheduler.ts` (11KB) — 后台调度骨架
-- `services/novel-decomposition/novelDecompositionRuntime.ts` (29KB) — 任务状态机与断点恢复
-
-### 阶段 3：AI 分解链路 ✅
-- `prompts/runtime/novelDecomposition.ts` (11KB) — 系统提示词 / COT / 结构化输出 schema
-- `prompts/runtime/novelDecompositionCot.ts` (7.5KB) — 思维链提示词
-- 支持时间线字段格式 `YYYY:MM:DD:HH:MM`
-
-### 阶段 4：树状条目与查看器 ✅
-- `services/novel-decomposition/novelDecompositionInjection.ts` (42KB) — 注入快照查看与树状结构
-- `components/features/Settings/NovelDecompositionSettings/DatasetManagerPanel.tsx` — 条目管理
-- 支持章节/N 章分组展示
-
-### 阶段 5：运行时注入 ✅
-- `services/novel-decomposition/novelDecompositionInjection.ts` — 三层注入：
-  - 主剧情 → 轻量概括树
-  - 规划分析 → 结构化剧情树
-  - 世界演变 → 时间线事件树
-- `prompts/runtime/fandomPlanning.ts` — 同人规划分析链路
-- `prompts/runtime/fandomWorldEvolution.ts` — 同人世界演变链路
-
-### 阶段 6：导入导出 ✅
-- `components/features/Settings/NovelDecompositionSettings/ImportExportPanel.tsx` (19KB) — JSON 导入导出
-- `services/epubImport.ts` — EPUB 导入支持
-
-### 阶段 7：体验与收尾（进行中）
-- ✅ TXT / EPUB / JSON 文件导入
-- ✅ 章节删除重建、失败分段重置续跑
-- ✅ 注入快照截断和全局概括拼接修复
-- ⏳ 进度条与阶段提示
-- ⏳ 失败提示与恢复入口
-- ⏳ 最小验证与回归检查
-
-### 阶段 8：同人专用提示词 ✅
-- `prompts/runtime/fandomPlanningAnalysis.ts` — 同人规划分析专用提示词
-- `prompts/runtime/fandomWorldEvolution.ts` — 同人世界演变专用提示词
-- `prompts/runtime/worldEvolutionCot.ts` — 世界演变 COT 提示词
-
-## 关键文件清单
-
-### 模型层
-| 文件 | 说明 |
-|------|------|
-| `models/novelDecomposition.ts` | 数据模型：任务状态、分段结构、树节点、时间线事件等 |
-
-### 服务层 (services/novel-decomposition/)
-| 文件 | 说明 |
-|------|------|
-| `novelDecompositionStore.ts` (57KB) | 核心存储、任务状态、持久化 |
-| `novelDecompositionPipeline.ts` (42KB) | 批处理推进管道 |
-| `novelDecompositionInjection.ts` (42KB) | 三层注入逻辑、快照查看 |
-| `novelDecompositionRuntime.ts` (29KB) | 任务运行时、状态机 |
-| `novelDecompositionScheduler.ts` (11KB) | 后台调度 |
-| `novelDecompositionCalibration.ts` | 校准逻辑 |
-| `novelDecompositionTime.ts` | 时间线工具 |
-
-### 提示词层
-| 文件 | 说明 |
-|------|------|
-| `prompts/runtime/novelDecomposition.ts` | 小说分解系统提示词 |
-| `prompts/runtime/novelDecompositionCot.ts` | 思维链提示词 |
-| `prompts/runtime/fandomPlanningAnalysis.ts` | 同人规划分析提示词 |
-| `prompts/runtime/fandomWorldEvolution.ts` | 同人世界演变提示词 |
-
-### UI 组件
-| 文件 | 说明 |
-|------|------|
-| `NovelDecompositionWorkbenchModal.tsx` | 桌面端工作台 |
-| `MobileNovelDecompositionWorkbenchModal.tsx` | 移动端工作台 |
-| `NovelDecompositionSettings.tsx` (209KB) | 设置主面板 |
-| `NovelDecompositionApiSettings.tsx` | API 配置 |
-| `CurrentNovelDecompositionInjectionSettings.tsx` | 注入配置 |
-| `NovelDecompositionSettings/DatasetManagerPanel.tsx` | 数据集管理 |
-| `NovelDecompositionSettings/ImportExportPanel.tsx` | 导入导出面板 |
-| `NovelDecompositionSettings/ChapterBrowserPanel.tsx` | 章节浏览 |
-
-## 未完成项目（计划中标注）
-
-### 阶段 3 待完善
-- AI 解析失败时的重试与人工校对入口
-
-### 阶段 4 待完善
-- 时间线 / 角色关系树节点级手工编辑
-
-### 阶段 6 待完善
-- Schema 校验与兼容修复
-
-### 阶段 7 进行中
-- 进度条与阶段提示
-- 失败提示与恢复入口
-- 最小验证与回归检查
-
-## 验证结论
-
-**主体功能已完成。** 阶段 1-6、8 全部实现，阶段 7 部分完成（已实现导入导出、章节管理、注入修复等，进度条/失败恢复 UI 仍在进行中）。核心服务层、提示词层、UI 层均已完整实现。
+对 `docs/plans/mobile-device-deepening-plan.md` 进行了完整审计。Phase 1-4 已全部实现，Phase 5（深化功能）标记为未完成，Phase 6（测试验收）未执行。
 
 ---
 
-*验证完成*
+## 已验证的实施内容
+
+### Phase 1：里模式开关迁移 ✅ 已完成
+
+- `MobileHome.tsx` — 已移除 `ModeToggle` 组件
+- `MobileDeviceModal.tsx` — 已移除 `onModeToggle` prop 和 `liModeGlobalEnabled`
+- `SettingsModal.tsx` — per-era 里模式开关已存在（第487-507行）
+- `hooks/useGame.ts` — `打开设备()` wrapper 函数自动合成模式设定（第425行），`toggleDeviceMode` 已删除
+- `hooks/useGameState.ts` — mode 改为派生状态
+- `DeviceState.mode` 现在从 `gameConfig.启用子纪元里模式[eraId]` 自动推导
+
+### Phase 2：基础设施（UI 入口 + 消息持久化）✅ 已完成
+
+**UI 入口：**
+- `RightPanel.tsx` — 「通讯」按钮（第77行）
+- `MobileQuickMenu.tsx` — 「通讯」菜单项（第95行）
+- `App.tsx` — 已绑定 `actions.openDevice`
+
+**消息持久化：**
+- `dbService.ts` — `device_messages` IndexedDB 存储存在（VERSION 3），CRUD 方法完整
+- `services/dbService.ts:11` — `const DEVICE_MESSAGES_STORE = 'device_messages';`
+
+**DeviceState 扩展：**
+- `models/mobileDevice.ts` — `DeviceStats`（第41行）、`DeviceNotification`、`NotificationType` 类型已定义
+- `DeviceState` 包含 `messages`、`stats`、`notifications` 字段
+
+### Phase 3：AI 工作流激活 ✅ 已完成（大部分）
+
+- `hooks/useGame/device/triggerDeviceMessageWorkflow.ts` — 完整实现（70行 `构建设备通讯摘要`，106行 `触发设备消息生成`）
+- `hooks/useGame/sendWorkflow/responseProcessingPhase.ts:691-694` — 回合末尾触发设备消息生成
+- `hooks/useGame.ts:2063-2071` — 回调实现，解析时代/模式/场景
+- 通知系统：`hooks/useGame/deviceNotificationWorkflow.ts` — 137行，通知生成工作流完整
+- UI 通知角标：RightPanel 和 MobileQuickMenu 显示未读数量
+
+**⚠️ 部分项未验证（Step 3.3）：**
+- `deviceAiWorkflow.ts` 有 `生成设备联系人` 和 `生成设备群组`
+- `ContactsApp` 数据不足时是否自动调用 — **未确认**
+- `ChatApp` 群聊为空时是否自动调用 — **未确认**
+
+### Phase 4：正文联动 ✅ 已完成
+
+- `hooks/useGame/systemPromptBuilder.ts:1431` — `构建设备通讯摘要` 注入系统提示词
+- 回合内有未读/新消息时，摘要被注入，AI 可以在正文中引用
+
+### Phase 5：深化功能（1v1 私聊 + 相册连接）❌ 未完成
+
+**以下文件不存在：**
+- `components/features/MobileDevice/apps/PrivateChatApp.tsx` — ❌ 未找到
+- `models/domain/deviceVariables.ts` — ❌ 未找到
+
+**相册连接部分：**
+- `AlbumApp.tsx` 存在，但是否读取 `state.历史记录` 中的 AI 生图结果 — **未验证**
+
+### Phase 6：测试与验收 ⚠️ 未执行
+
+未运行构建测试或功能验收。
+
+---
+
+## 缺失项清单
+
+| 缺失项 | 计划位置 | 状态 |
+|--------|---------|------|
+| `PrivateChatApp.tsx` | Phase 5 Step 5.1 | ❌ 不存在 |
+| `models/domain/deviceVariables.ts` | Phase 5 Step 5.1 | ❌ 不存在 |
+| ContactsApp 自动调用 AI 联系人 | Phase 3 Step 3.3 | ⚠️ 未确认 |
+| ChatApp 自动调用 AI 群组 | Phase 3 Step 3.3 | ⚠️ 未确认 |
+| 构建验证 | Phase 6 | ⚠️ 未执行 |
+
+---
+
+## 关键文件清单
+
+### 已实现的文件
+| 文件 | 说明 |
+|------|------|
+| `hooks/useGame/device/triggerDeviceMessageWorkflow.ts` | 设备消息触发 + 摘要构建（176行） |
+| `hooks/useGame/device/deviceAiWorkflow.ts` | 设备 AI 工作流 |
+| `hooks/useGame/device/deviceNotificationWorkflow.ts` | 通知生成工作流（137行） |
+| `hooks/useGame/device/mobileDeviceWorkflow.ts` | 设备状态工作流 |
+| `hooks/useGame/device/useDeviceMessages.ts` | 设备消息 hook |
+| `hooks/useGame/device/useDeviceTheme.ts` | 设备主题 |
+| `hooks/useGame/device/useDeviceNavigation.ts` | 设备导航 |
+| `hooks/useGame/device/deviceRefreshMonitor.ts` | 设备刷新监控 |
+| `services/dbService.ts` | device_messages IndexedDB 存储 |
+| `models/mobileDevice.ts` | DeviceStats、DeviceNotification 等类型 |
+
+### 不存在的文件
+| 文件 | 说明 |
+|------|------|
+| `models/domain/deviceVariables.ts` | 通讯行为变量绑定（Phase 5） |
+| `components/features/MobileDevice/apps/PrivateChatApp.tsx` | 私聊组件（Phase 5） |
+
+---
+
+## 结论
+
+Phase 1-4 的核心功能已实现并可投入使用。Phase 5 的 1v1 私聊功能和变量绑定系统尚未实现，Phase 6 测试验收未执行。计划状态应更新为 **"Phase 1-4 已完成，Phase 5 待实施"**。
