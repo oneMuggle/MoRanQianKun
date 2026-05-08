@@ -523,6 +523,7 @@ export const 执行主剧情发送工作流 = async (
               gameConfig: currentState.gameConfig,
               角色: { 出身背景: currentState.角色?.出身背景 },
               时代配置ID: currentState.时代配置ID,
+              社交列表: currentState.社交,
             }),
             写真NSFW参数: (0, () => {
               try {

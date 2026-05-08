@@ -24,6 +24,31 @@ import type { 都市网约车NSFW设置 } from '../../models/urbanDriverNSFW';
 // 司机相关背景列表
 const 司机背景列表 = ['网约车司机', '网约车夜司机', '代驾司机', '网约车队长'];
 
+// 场景类型列表（用于随机分配初始行程）
+const 行程类型列表 = ['深夜独处', '后座暗示', '停车场秘密', '醉酒搭车', '拼车暧昧', '常客关系', '行车记录仪', '饮料下药'] as const;
+
+/**
+ * 为单个 NPC 创建初始乘客欲望档案（含随机初始值）
+ */
+function 创建初始乘客档案(
+  nsfw设置: 都市网约车NSFW设置,
+): 乘客欲望档案 {
+  // 根据设置的内容强度分配随机初始进度
+  const 强度基数: Record<string, number> = { '微暗': 5, '暧昧': 15, '露骨': 25 };
+  const 基数 = 强度基数[nsfw设置.NSFW内容强度 ?? '暧昧'] ?? 10;
+  const 随机偏移 = Math.floor(Math.random() * 10);
+  return {
+    当前阶段: '克制' as 乘客欲望阶段,
+    阶段进度: 基数 + 随机偏移,
+    关系轨道: '暧昧' as 行程关系轨道,
+    轨道进度: 基数 + 随机偏移,
+    暴露风险值: Math.floor(Math.random() * 15),
+    紧张度: Math.floor(Math.random() * 10),
+    已解锁互动: [],
+    里程碑列表: [],
+  };
+}
+
 /**
  * 解析都市网约车系统状态更新标签
  * 格式: <都市网约车系统状态>{"更新档案":{"NPC_ID":{...}}}</都市网约车系统状态>
@@ -148,6 +173,7 @@ export const 构建都市网约车NSFW参数 = (state: {
     };
   };
   时代配置ID?: string;
+  社交列表?: Array<{ id: string; 姓名?: string }>;
 }): {
   行程类型?: 行程NSFW类型;
   乘客欲望阶段?: 乘客欲望阶段;
@@ -183,14 +209,40 @@ export const 构建都市网约车NSFW参数 = (state: {
     return undefined;
   }
 
+  // 兜底：当档案为空但社交列表有 NPC 时，内联创建初始档案
   const npcIds = Object.keys(行程系统.乘客欲望档案);
-  if (npcIds.length === 0) {
+  if (npcIds.length === 0 && Array.isArray(state.社交列表) && state.社交列表.length > 0) {
+    for (const npc of state.社交列表) {
+      行程系统.乘客欲望档案[npc.id] = 创建初始乘客档案(nsfw设置);
+    }
+  }
+
+  const finalNpcIds = Object.keys(行程系统.乘客欲望档案);
+  if (finalNpcIds.length === 0) {
     return undefined;
+  }
+
+  // 随机分配一个行程类型（当尚未有行程时）
+  if (!行程系统.当前行程类型 && state.社交列表 && state.社交列表.length > 0) {
+    const 启用的行程类型 = 行程类型列表.filter(t => {
+      if (t === '醉酒搭车') return nsfw设置.启用醉酒乘客场景;
+      if (t === '饮料下药') return nsfw设置.启用饮料下药场景;
+      if (t === '深夜独处') return nsfw设置.启用深夜独处场景;
+      if (t === '后座暗示') return nsfw设置.启用后座暗示场景;
+      if (t === '停车场秘密') return nsfw设置.启用停车场秘密场景;
+      if (t === '拼车暧昧') return nsfw设置.启用拼车暧昧场景;
+      if (t === '常客关系') return nsfw设置.启用常客关系系统;
+      if (t === '行车记录仪') return nsfw设置.启用行车记录仪系统;
+      return false;
+    });
+    if (启用的行程类型.length > 0) {
+      行程系统.当前行程类型 = 启用的行程类型[Math.floor(Math.random() * 启用的行程类型.length)] as 行程NSFW类型;
+    }
   }
 
   // 找出欲望阶段最高的 NPC 作为焦点
   const 阶段权重: Record<乘客欲望阶段, number> = { '克制': 0, '试探': 1, '渴望': 2, '沉沦': 3, '支配': 4 };
-  const 焦点NpcId = npcIds.reduce((best, id) => {
+  const 焦点NpcId = finalNpcIds.reduce((best, id) => {
     const a = 行程系统.乘客欲望档案[id];
     const b = 行程系统.乘客欲望档案[best];
     return (阶段权重[a?.当前阶段] || 0) > (阶段权重[b?.当前阶段] || 0) ? id : best;

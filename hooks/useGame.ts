@@ -952,13 +952,11 @@ export const useGame = () => {
         if (!nsfw设置?.启用都市网约车NSFW系统 || !行程系统) return;
 
         const 乘客档案 = 行程系统.乘客欲望档案 || {};
-        const 缺失档案的主要角色 = 社交.filter((npc: NPC结构) =>
-            npc.是否主要角色 && !乘客档案[npc.id]
-        );
-        if (缺失档案的主要角色.length === 0) return;
+        const 缺失档案的角色 = 社交.filter((npc: NPC结构) => !乘客档案[npc.id]);
+        if (缺失档案的角色.length === 0) return;
 
         const 新档案: Record<string, any> = {};
-        缺失档案的主要角色.forEach(npc => {
+        缺失档案的角色.forEach(npc => {
             新档案[npc.id] = 创建乘客欲望档案();
         });
 
