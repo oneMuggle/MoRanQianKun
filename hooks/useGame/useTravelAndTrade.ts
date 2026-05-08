@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { 评估旅行可行性, 执行旅行, 执行探索 } from './travel/travelWorkflow';
 import { 执行购买, 执行出售, 计算购买价格, 计算出售价格, 出售结果 } from './travel/tradeWorkflow';
 import { 执行锻造, 计算锻造成功率, 检查锻造材料, 锻造配方库, 获取可锻造配方, 材料检查结果 } from './forgeWorkflow';
@@ -6,8 +6,8 @@ import type { 旅行事件 } from './travel/travelWorkflow';
 import type { 地图结构, 建筑结构 } from '../../models/world';
 import type { 游戏物品 } from '../../models/item';
 import type { 角色数据结构, 环境信息结构, 游戏设置结构 } from '../../types';
-import type { DeviceState } from '../../models/mobileDevice';
 import type { NPC结构 } from '../../models/social';
+import { useGameStore } from './subsystems/zustandStore';
 
 interface TravelAndTradeDeps {
     角色: 角色数据结构 | null;
@@ -16,16 +16,14 @@ interface TravelAndTradeDeps {
     设置环境: React.Dispatch<React.SetStateAction<环境信息结构 | null>>;
     gameConfig: 游戏设置结构 | null;
     currentEra: number;
-    设备状态: DeviceState;
-    设置设备状态: React.Dispatch<React.SetStateAction<DeviceState>>;
-    设备打开: () => void;
 }
 
 export function useTravelAndTrade(deps: TravelAndTradeDeps) {
-    const { 角色, 环境, 设置角色, 设置环境, gameConfig, currentEra, 设备状态, 设置设备状态, 设备打开 } = deps;
+    const { 角色, 环境, 设置角色, 设置环境, gameConfig, currentEra } = deps;
 
-    // 旅行系统
-    const [旅行事件列表, set旅行事件列表] = useState<旅行事件[]>([]);
+    // 旅行系统 — Zustand managed
+    const 旅行事件列表 = useGameStore(s => s.旅行事件列表);
+    const 设置旅行事件列表 = useGameStore(s => s.设置旅行事件列表);
 
     const handleTravel = useCallback((目标地图: 地图结构, 目标建筑: 建筑结构 | null) => {
         const 当前位置 = { 大地点: 环境?.大地点 || '', 中地点: 环境?.中地点 || '', 小地点: 环境?.小地点 || '' };
@@ -37,7 +35,7 @@ export function useTravelAndTrade(deps: TravelAndTradeDeps) {
         const 结果 = 执行旅行(角色, 环境, 目标地图, 目标建筑);
         if (结果.成功) {
             设置环境(结果.新环境);
-            set旅行事件列表(结果.事件);
+            设置旅行事件列表(结果.事件);
         }
     }, [角色, 环境, 设置环境]);
 
@@ -102,22 +100,6 @@ export function useTravelAndTrade(deps: TravelAndTradeDeps) {
         return 计算锻造成功率(配方, 角色);
     }, [角色]);
 
-    /** 根据 gameConfig 推导设备模式 */
-    const 派生设备模式 = (): 'normal' | 'li' => {
-        const perEra = gameConfig?.启用子纪元里模式;
-        if (perEra && currentEra in perEra) {
-            return perEra[currentEra] ? 'li' : 'normal';
-        }
-        return 'normal'; // 未设置时默认正常模式
-    };
-
-    // 覆盖 设备打开：打开时同步设置当前时代的里模式状态
-    const 打开设备 = () => {
-        设备打开();
-        const mode = 派生设备模式();
-        设置设备状态((prev) => ({ ...prev, mode }));
-    };
-
     return {
         handleTravel,
         handleExplore,
@@ -127,8 +109,6 @@ export function useTravelAndTrade(deps: TravelAndTradeDeps) {
         getForgeRecipes,
         checkForgeMaterials,
         getForgeSuccessRate,
-        派生设备模式,
-        打开设备,
         旅行事件列表,
     };
 }

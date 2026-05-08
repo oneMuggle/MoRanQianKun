@@ -404,17 +404,16 @@ Phase 7: App.tsx 瘦身 (可与 Phase 6 并行)
 | 文件 | 原行数 | 当前行数 | 目标行数 | 变更类型 |
 |------|--------|---------|---------|---------|
 | `models/system.ts` | 1780 | ~10 (barrel) | ~10 | ✅ 拆分为 4 文件 + barrel |
-| `hooks/useGame.ts` | 2952 | ~2800 | ~500-800 | 部分完成 (10 slice 接入, useState 清零) |
+| `hooks/useGame.ts` | 2952 | 2980 | ~500-800 | 部分完成 (兼容层清理, useState 清零, 直接 store 访问) |
 | `App.tsx` | 2115 | 1828 | ~800-1000 | 部分完成 (7.2-7.5 完成, -287行) |
 | `components/features/lazyComponents.tsx` | 新建 | 122 | - | ✅ 55 个懒组件声明 |
 | `hooks/useResponsive.ts` | 新建 | 21 | - | ✅ 响应式断点检测 |
 | `hooks/useModalOpeners.ts` | 新建 | ~330 | - | ✅ 面板开关逻辑 |
 | `hooks/useConfirmSystem.tsx` | 新建 | ~57 | - | ✅ 确认对话框逻辑 |
 | `hooks/useGame/index.ts` | 新建 | ~195 | - | ✅ barrel 导出入口 |
-| `hooks/useGame/subsystems/zustandStore.ts` | 新建 | ~500 | - | ✅ Zustand 主 store (10 slices + 兼容层) |
-| `hooks/useGame/subsystems/useTravelSlice.ts` | ~~新建~~ | ~~77~~ | - | ~~旅行/交易 slice~~ → Phase 6.9 删除 (迁移到 zustandStore) |
-| `hooks/useGame/subsystems/useBDSMSlice.ts` | ~~新建~~ | ~~151~~ | - | ~~BDSM 关系 slice~~ → Phase 6.9 删除 (未接入) |
-| `hooks/useGame/subsystems/useUISlice.ts` | ~~新建~~ | ~~92~~ | - | ~~UI/通知/回档 slice~~ → Phase 6.9 删除 (迁移到 zustandStore) |
+| `hooks/useGame/subsystems/zustandStore.ts` | 新建 | 432 | - | ✅ Zustand 主 store (10 slices, 兼容层已清理) |
+| `hooks/useGame/useTravelAndTrade.ts` | 134 | 114 | - | ✅ 迁移到 Zustand, 移除 useState + 设备重复逻辑 |
+| `hooks/useGame/useDevice.ts` | 123 | 122 | - | ✅ 直接 store 选择器访问 |
 
 ## Phase 1-3 变更统计
 
@@ -504,15 +503,36 @@ Phase 7: App.tsx 瘦身 (可与 Phase 6 并行)
 4. 在 `useGame.ts` 中替换原有 hook 调用
 5. 验证 `npx tsc --noEmit` + `npx vite build`
 
-### Phase 6.9: 清理兼容层，完成迁移 (1天)
+### Phase 6.9: 清理兼容层，完成迁移 (1天) ✅ 完成
 
-**目标：** 所有 slice 迁移到 Zustand 后，移除 hook-based 实现
+**目标：** 移除所有 `useXxxFromStore()` 兼容层函数，改为直接通过 `useGameStore` 选择器访问，完成最后的状态迁移
 
 **步骤：**
-1. 删除所有 hook-based slice 文件 (`useUISlice.ts`、`useTravelSlice.ts` 等)
-2. `useGame()` 变为薄适配层 (~100-200行)，仅做 `{ state, meta, setters, actions }` 格式转换
-3. 使用 Zustand `persist` 中间件替代手动 `saveSettings()` / `loadSettings()`
-4. 最终验证
+
+1. ~~删除所有 hook-based slice 文件~~ (`useUISlice.ts`、`useTravelSlice.ts` 等) — ✅ 已完成 (已 staged)
+2. 删除 zustandStore.ts 中 10 个 `useXxxFromStore()` 兼容层函数 (-174行)
+3. 更新 useGame.ts 导入和状态获取，改用 `const store = useGameStore()` + 局部变量别名 (-98行)
+4. 迁移 useTravelAndTrade.ts 到 Zustand，移除 useState 和设备重复逻辑 (-24行)
+5. 更新 useDevice.ts 直接访问 Store (-8行)
+6. 持久化策略：维持现状（不引入 persist 中间件，原因见下方）
+7. 最终验证
+
+**持久化决策：** 不在本阶段引入 Zustand `persist` 中间件。原因：
+- 当前 8 个手动 save 函数写入独立 IndexedDB key，粒度精细
+- Zustand persist 会合并为单个 JSON blob，需迁移/回滚方案
+- 部分 Zustand 状态（滚动令牌、重Roll计数、草稿）不应持久化
+- 等剩余核心状态（角色、环境等）全部迁移后再统一规划
+
+**预期行数变化：**
+
+| 文件 | 当前 | 之后 | 变化 |
+|------|------|------|------|
+| `zustandStore.ts` | 606 | ~432 | -174 |
+| `useGame.ts` | 2998 | ~2900 | -98 |
+| `useDevice.ts` | 123 | ~115 | -8 |
+| `useTravelAndTrade.ts` | 134 | ~110 | -24 |
+
+> **注意:** useGame.ts 不会在本阶段达到 500-800 行目标。剩余 ~2350 行是业务逻辑和工作流协调器，需要后续阶段提取为独立模块（Phase 6.10）。
 
 ### 迁移后架构
 
@@ -541,9 +561,9 @@ hooks/useGame/
 ### 关键设计决策
 
 1. **单 store 多 slice** — 所有状态在一个 `useGameStore` 中，避免多 store 循环依赖
-2. **兼容层保留** — 每个 slice 提供 `{ state, actions }` 兼容函数，确保 `useGame()` 返回值不变
+2. **直接 store 访问** — 兼容层已清理，`useGame.ts` 和 `useDevice.ts` 直接通过 `useGameStore` 选择器访问，`useGame()` 返回值不变
 3. **跨 slice 访问** — 通过 Zustand `get()` 获取其他 slice 状态
-4. **持久化策略** — Zustand `persist` 中间件替代手动持久化
+4. **持久化策略** — 维持手动 IndexedDB 写入（非 Zustand persist），保持 8 个独立 key 粒度
 5. **不碰 App.tsx** — 迁移期间 App.tsx 完全不变
 
 ### 风险控制
@@ -561,7 +581,7 @@ hooks/useGame/
 |------|------|------|
 | Phase 6.7: 验证通路 | 1天 | ✅ 完成 (2026-05-08) |
 | Phase 6.8: 核心 slices | 3-4天 | ✅ 完成 (10/10: 全部 useState 已迁移) |
-| Phase 6.9: 清理兼容层 | 1天 | ✅ 完成 (删除 5 个废弃 hook 文件) |
+| Phase 6.9: 清理兼容层 | 1天 | ✅ 完成 (删除 10 个 useXxxFromStore, 直接 store 访问, useTravelAndTrade 迁移) |
 | **总计** | **5-6天** | |
 
 ### 单 store vs 多 store 对比

@@ -126,7 +126,7 @@ import { useWorldAndPlanning } from './useGame/useWorldAndPlanning';
 import { useHistoryAndMemory } from './useGame/useHistoryAndMemory';
 import { useOpeningAndSession } from './useGame/useOpeningAndSession';
 import { useImagePresets } from './useGame/useImagePresets';
-import { useUIFromStore, useImageFromStore, useSettingsFromStore, useDeviceFromStore, useWorldFromStore, useMemoryFromStore, useVariableFromStore, useOpeningFromStore, useSceneConfigFromStore } from './useGame/subsystems/zustandStore';
+import { useGameStore } from './useGame/subsystems/zustandStore';
 import { 提取原始报错详情, 格式化错误详情, 提取解析失败原始信息 } from './useGame/quality/errorFormatting';
 import {
     获取原始AI消息,
@@ -326,53 +326,45 @@ export const useGame = () => {
 
     // Mobile Device — managed by useDevice sub-hook (declared below after 推送右下角提示)
 
-    // --- Zustand UI Slice (Phase 6.7) ---
-    const uiZustand = useUIFromStore();
-    const 可重Roll计数 = uiZustand.state.可重Roll计数;
-    const set可重Roll计数 = uiZustand.actions.set可重Roll计数;
-    const 聊天区自动滚动抑制令牌 = uiZustand.state.聊天区自动滚动抑制令牌;
-    const set聊天区自动滚动抑制令牌 = uiZustand.actions.set聊天区自动滚动抑制令牌;
-    const 聊天区强制置底令牌 = uiZustand.state.聊天区强制置底令牌;
-    const set聊天区强制置底令牌 = uiZustand.actions.set聊天区强制置底令牌;
-
-    // --- Zustand Image Slice (Phase 6.8) ---
-    const imageZustand = useImageFromStore();
-    const NPC生图任务队列 = imageZustand.state.NPC生图任务队列;
-    const setNPC生图任务队列 = imageZustand.actions.setNPC生图任务队列;
-    const 场景生图任务队列 = imageZustand.state.场景生图任务队列;
-    const set场景生图任务队列 = imageZustand.actions.set场景生图任务队列;
-
-    // --- Zustand Settings Slice (Phase 6.8) ---
-    const settingsZustand = useSettingsFromStore();
-    const 内置提示词列表 = settingsZustand.state.内置提示词列表;
-    const set内置提示词列表 = settingsZustand.actions.set内置提示词列表;
-    const 世界书列表 = settingsZustand.state.世界书列表;
-    const set世界书列表 = settingsZustand.actions.set世界书列表;
-    const 世界书预设组列表 = settingsZustand.state.世界书预设组列表;
-    const set世界书预设组列表 = settingsZustand.actions.set世界书预设组列表;
-
-    // --- Zustand Device Slice (Phase 6.8) ---
-    const deviceZustand = useDeviceFromStore();
-    const 设备状态 = deviceZustand.state.设备状态;
-    const 设置设备状态 = deviceZustand.actions.set设备状态;
-    const 设备刷新任务队列 = deviceZustand.state.设备刷新任务队列;
-    const set设备刷新任务队列 = deviceZustand.actions.set设备刷新任务队列;
-
-    const 回合快照栈Ref = useRef<回合快照结构[]>([]);
-    const 最近自动存档时间戳Ref = useRef<number>(0);
-    const 最近自动存档签名Ref = useRef<string>('');
-    // --- Zustand World Slice (Phase 6.8) ---
-    const worldZustand = useWorldFromStore();
-    const 世界演变更新中 = worldZustand.state.世界演变更新中;
-    const set世界演变更新中 = worldZustand.actions.set世界演变更新中;
-    const 世界演变状态文本 = worldZustand.state.世界演变状态文本;
-    const set世界演变状态文本 = worldZustand.actions.set世界演变状态文本;
-    const 世界演变最近更新时间 = worldZustand.state.世界演变最近更新时间;
-    const set世界演变最近更新时间State = worldZustand.actions.set世界演变最近更新时间;
-    const 世界演变最近摘要 = worldZustand.state.世界演变最近摘要;
-    const set世界演变最近摘要 = worldZustand.actions.set世界演变最近摘要;
-    const 世界演变最近原始消息 = worldZustand.state.世界演变最近原始消息;
-    const set世界演变最近原始消息 = worldZustand.actions.set世界演变最近原始消息;
+    // --- Zustand Store (Phase 6.9: direct store access) ---
+    const store = useGameStore();
+    // UI Slice
+    const 可重Roll计数 = store.可重Roll计数;
+    const set可重Roll计数 = store.set可重Roll计数;
+    const 聊天区自动滚动抑制令牌 = store.聊天区自动滚动抑制令牌;
+    const set聊天区自动滚动抑制令牌 = store.set聊天区自动滚动抑制令牌;
+    const 聊天区强制置底令牌 = store.聊天区强制置底令牌;
+    const set聊天区强制置底令牌 = store.set聊天区强制置底令牌;
+    const 右下角提示列表 = store.右下角提示列表;
+    const set右下角提示列表 = store.set右下角提示列表;
+    // Image Slice
+    const NPC生图任务队列 = store.NPC生图任务队列;
+    const setNPC生图任务队列 = store.setNPC生图任务队列;
+    const 场景生图任务队列 = store.场景生图任务队列;
+    const set场景生图任务队列 = store.set场景生图任务队列;
+    // Settings Slice
+    const 内置提示词列表 = store.内置提示词列表;
+    const set内置提示词列表 = store.set内置提示词列表;
+    const 世界书列表 = store.世界书列表;
+    const set世界书列表 = store.set世界书列表;
+    const 世界书预设组列表 = store.世界书预设组列表;
+    const set世界书预设组列表 = store.set世界书预设组列表;
+    // Device Slice
+    const 设备状态 = store.设备状态;
+    const 设置设备状态 = store.set设备状态;
+    const 设备刷新任务队列 = store.设备刷新任务队列;
+    const set设备刷新任务队列 = store.set设备刷新任务队列;
+    // World Slice
+    const 世界演变更新中 = store.世界演变更新中;
+    const set世界演变更新中 = store.set世界演变更新中;
+    const 世界演变状态文本 = store.世界演变状态文本;
+    const set世界演变状态文本 = store.set世界演变状态文本;
+    const 世界演变最近更新时间 = store.世界演变最近更新时间;
+    const set世界演变最近更新时间State = store.set世界演变最近更新时间;
+    const 世界演变最近摘要 = store.世界演变最近摘要;
+    const set世界演变最近摘要 = store.set世界演变最近摘要;
+    const 世界演变最近原始消息 = store.世界演变最近原始消息;
+    const set世界演变最近原始消息 = store.set世界演变最近原始消息;
     // 世界演变”最近更新时间”应使用游戏内时间戳（用于展示/归档），而非现实时间。
     // 仍然需要一个现实时间戳用于前端去抖/冷启动保护（避免依赖抖动导致 auto_due 连续触发）。
     const 世界演变最近现实更新时间戳Ref = useRef<number>(0);
@@ -380,42 +372,44 @@ export const useGame = () => {
         set世界演变最近更新时间State(value);
         世界演变最近现实更新时间戳Ref.current = Date.now();
     };
+    // Memory Slice
+    const 待处理记忆总结任务 = store.待处理记忆总结任务;
+    const set待处理记忆总结任务 = store.set待处理记忆总结任务;
+    const 记忆总结阶段 = store.记忆总结阶段;
+    const set记忆总结阶段 = store.set记忆总结阶段;
+    const 记忆总结草稿 = store.记忆总结草稿;
+    const set记忆总结草稿 = store.set记忆总结草稿;
+    const 记忆总结错误 = store.记忆总结错误;
+    const set记忆总结错误 = store.set记忆总结错误;
+    const 待处理NPC记忆总结队列 = store.待处理NPC记忆总结队列;
+    const set待处理NPC记忆总结队列 = store.set待处理NPC记忆总结队列;
+    const NPC记忆总结阶段 = store.NPC记忆总结阶段;
+    const setNPC记忆总结阶段 = store.setNPC记忆总结阶段;
+    const NPC记忆总结草稿 = store.NPC记忆总结草稿;
+    const setNPC记忆总结草稿 = store.setNPC记忆总结草稿;
+    const NPC记忆总结错误 = store.NPC记忆总结错误;
+    const setNPC记忆总结错误 = store.setNPC记忆总结错误;
+    // Variable Slice
+    const 变量生成中 = store.变量生成中;
+    const set变量生成中 = store.set变量生成中;
+    const 开局变量生成进度 = store.开局变量生成进度;
+    const set开局变量生成进度 = store.set开局变量生成进度;
+    const 开局世界演变进度 = store.开局世界演变进度;
+    const set开局世界演变进度 = store.set开局世界演变进度;
+    const 开局规划进度 = store.开局规划进度;
+    const set开局规划进度 = store.set开局规划进度;
+    // Opening Slice
+    const 最近开局配置 = store.最近开局配置;
+    const 设置最近开局配置 = store.set最近开局配置;
+    // Scene Config Slice
+    const 场景图片档案 = store.场景图片档案;
+    const set场景图片档案 = store.set场景图片档案;
+    const 时代信息 = store.时代信息;
+    const set时代信息 = store.set时代信息;
 
-    // --- Zustand Memory Slice (Phase 6.8) ---
-    const memoryZustand = useMemoryFromStore();
-    const 待处理记忆总结任务 = memoryZustand.state.待处理记忆总结任务;
-    const set待处理记忆总结任务 = memoryZustand.actions.set待处理记忆总结任务;
-    const 记忆总结阶段 = memoryZustand.state.记忆总结阶段;
-    const set记忆总结阶段 = memoryZustand.actions.set记忆总结阶段;
-    const 记忆总结草稿 = memoryZustand.state.记忆总结草稿;
-    const set记忆总结草稿 = memoryZustand.actions.set记忆总结草稿;
-    const 记忆总结错误 = memoryZustand.state.记忆总结错误;
-    const set记忆总结错误 = memoryZustand.actions.set记忆总结错误;
-    const 待处理NPC记忆总结队列 = memoryZustand.state.待处理NPC记忆总结队列;
-    const set待处理NPC记忆总结队列 = memoryZustand.actions.set待处理NPC记忆总结队列;
-    const NPC记忆总结阶段 = memoryZustand.state.NPC记忆总结阶段;
-    const setNPC记忆总结阶段 = memoryZustand.actions.setNPC记忆总结阶段;
-    const NPC记忆总结草稿 = memoryZustand.state.NPC记忆总结草稿;
-    const setNPC记忆总结草稿 = memoryZustand.actions.setNPC记忆总结草稿;
-    const NPC记忆总结错误 = memoryZustand.state.NPC记忆总结错误;
-    const setNPC记忆总结错误 = memoryZustand.actions.setNPC记忆总结错误;
-
-    // --- Zustand Variable Slice (Phase 6.8) ---
-    const variableZustand = useVariableFromStore();
-    const 变量生成中 = variableZustand.state.变量生成中;
-    const set变量生成中 = variableZustand.actions.set变量生成中;
-    const 开局变量生成进度 = variableZustand.state.开局变量生成进度;
-    const set开局变量生成进度 = variableZustand.actions.set开局变量生成进度;
-    const 开局世界演变进度 = variableZustand.state.开局世界演变进度;
-    const set开局世界演变进度 = variableZustand.actions.set开局世界演变进度;
-    const 开局规划进度 = variableZustand.state.开局规划进度;
-    const set开局规划进度 = variableZustand.actions.set开局规划进度;
-
-    // --- Zustand Opening Slice (Phase 6.8) ---
-    const openingZustand = useOpeningFromStore();
-    const 最近开局配置 = openingZustand.state.最近开局配置;
-    const 设置最近开局配置 = openingZustand.actions.set最近开局配置;
-
+    const 回合快照栈Ref = useRef<回合快照结构[]>([]);
+    const 最近自动存档时间戳Ref = useRef<number>(0);
+    const 最近自动存档签名Ref = useRef<string>('');
     const apiConfigRef = useRef(apiConfig);
     const visualConfigRef = useRef(visualConfig);
     const imageManagerConfigRef = useRef<图片管理设置结构>(imageManagerConfig || 默认图片管理设置);
@@ -430,12 +424,6 @@ export const useGame = () => {
     const 主角生图进行中Ref = useRef<Set<string>>(new Set());
     const NPC香闺秘档生图进行中Ref = useRef<Set<string>>(new Set());
     const 场景生图自动应用任务Ref = useRef('');
-    // --- Zustand Scene Config Slice (Phase 6.8) ---
-    const sceneConfigZustand = useSceneConfigFromStore();
-    const 场景图片档案 = sceneConfigZustand.state.场景图片档案;
-    const set场景图片档案 = sceneConfigZustand.actions.set场景图片档案;
-    const 时代信息 = sceneConfigZustand.state.时代信息;
-    const set时代信息 = sceneConfigZustand.actions.set时代信息;
     // Refs kept for synchronous access in callbacks (Zustand state is the source of truth)
     const 场景图片档案Ref = useRef<场景图片档案>({});
     const 时代信息Ref = useRef<时代信息结构 | undefined>(undefined);
@@ -447,9 +435,6 @@ export const useGame = () => {
     const 后台场景生图监控Ref = useRef<Array<{ since: number; 摘要: string }>>([]);
     const 已提示后台场景生图任务Ref = useRef<Set<string>>(new Set());
     const performAutoSaveRef = useRef<((...args: any[]) => void) | null>(null);
-    // --- 右下角提示列表 migrated to Zustand UI Slice ---
-    const 右下角提示列表 = uiZustand.state.右下角提示列表;
-    const set右下角提示列表 = uiZustand.actions.set右下角提示列表;
 
     // --- useSettingsActions ---
     const settingsActions = useSettingsActions({
@@ -515,9 +500,6 @@ export const useGame = () => {
         设置环境,
         gameConfig,
         currentEra,
-        设备状态,
-        设置设备状态,
-        设备打开,
     });
     const {
         handleTravel,
@@ -528,9 +510,9 @@ export const useGame = () => {
         getForgeRecipes,
         checkForgeMaterials,
         getForgeSuccessRate,
-        打开设备,
-        旅行事件列表,
     } = travelAndTrade;
+    // 旅行事件列表 now managed by Zustand store (travel slice)
+    const 旅行事件列表 = store.旅行事件列表;
 
     const 回档快照系统 = 创建回档快照系统({
         回合快照栈Ref,
@@ -2986,7 +2968,7 @@ export const useGame = () => {
             checkForgeMaterials,
             getForgeSuccessRate,
             // Mobile Device
-            openDevice: 打开设备,
+            openDevice: 设备打开,
             closeDevice: 设备关闭,
             openDeviceApp: 设备打开应用,
             returnDeviceHome: 设备返回主页,

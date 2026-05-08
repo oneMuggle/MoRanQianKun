@@ -13,7 +13,7 @@ import type { 世界数据结构 } from '../../models/world';
 import type { 剧情系统结构 } from '../../models/story';
 import type { 聊天记录结构 } from '../../types';
 import { useDeviceRefreshMonitor, type 设备刷新任务 } from './device/deviceRefreshMonitor';
-import { useDeviceFromStore } from './subsystems/zustandStore';
+import { useGameStore } from './subsystems/zustandStore';
 import { 获取设备消息接口配置 } from '../../utils/apiConfig';
 
 interface UseDeviceDeps {
@@ -40,12 +40,11 @@ export function useDevice(deps: UseDeviceDeps) {
         设置校园系统, apiConfig, 推送右下角提示,
     } = deps;
 
-    // --- Zustand Device Slice ---
-    const deviceStore = useDeviceFromStore();
-    const 设备状态 = deviceStore.state.设备状态;
-    const set设备状态 = deviceStore.actions.set设备状态;
-    const 设备刷新任务队列 = deviceStore.state.设备刷新任务队列;
-    const set设备刷新任务队列 = deviceStore.actions.set设备刷新任务队列;
+    // --- Zustand Device Slice (direct store access) ---
+    const 设备状态 = useGameStore(s => s.设备状态);
+    const set设备状态 = useGameStore(s => s.set设备状态);
+    const 设备刷新任务队列 = useGameStore(s => s.设备刷新任务队列);
+    const set设备刷新任务队列 = useGameStore(s => s.set设备刷新任务队列);
 
     /** 根据 gameConfig 推导设备模式 */
     const 派生设备模式 = useCallback((): 'normal' | 'li' => {
