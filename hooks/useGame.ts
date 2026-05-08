@@ -1,16 +1,11 @@
 
 import {
     角色数据结构,
-    环境信息结构,
     聊天记录结构,
-    接口设置结构,
-    提示词结构,
     视觉设置结构,
     游戏设置结构,
     记忆系统结构,
     WorldGenConfig,
-    剧情系统结构,
-    剧情规划结构,
     女主剧情规划结构,
     同人剧情规划结构,
     同人女主剧情规划结构,
@@ -26,28 +21,16 @@ import {
     世界书结构,
     世界书预设组结构,
     世界书作用域,
-    TavernCommand,
+    时代信息结构,
     GameResponse,
-    记忆配置结构,
-    详细门派结构,
-    节日结构,
-    世界数据结构,
-    战斗状态结构,
-    时代信息结构
+    提示词结构,
+    详细门派结构
 } from '../types';
-import { 地图结构, 建筑结构 } from '../models/world';
-import { 游戏物品 } from '../models/item';
-import { 旅行事件, 评估旅行可行性, 执行旅行, 执行探索, 推进游戏时间 } from './useGame/travel/travelWorkflow';
-import { 执行购买, 执行出售, 计算购买价格, 计算出售价格, 出售结果 } from './useGame/travel/tradeWorkflow';
-import { 执行锻造, 计算锻造成功率, 检查锻造材料, 锻造配方库, 锻造结果, 预览配方需求, 获取可锻造配方, 材料检查结果, 锻造配方 } from './useGame/forgeWorkflow';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as dbService from '../services/dbService';
-import { 获取时代信息, 获取时代推荐主题, 获取时代主题方案 } from '../models/system';
-import { 应用时代主题到根元素 } from '../styles/themes';
-import { 设置时代UI文案 } from '../utils/eraUIText';
 import * as textAIService from '../services/ai/text';
 import { useGameState } from './useGameState';
-import { 规范化接口设置, 获取记忆总结接口配置, 获取变量计算接口配置, 获取世界演变接口配置, 获取文生图接口配置, 获取场景文生图接口配置, 获取生图词组转化器接口配置, 获取生图画师串预设, 获取词组转化器预设提示词, 获取主剧情接口配置, 获取设备消息接口配置, 接口配置是否可用, 变量校准功能已启用 as 变量生成功能已启用, 获取变量生成并发配置 } from '../utils/apiConfig';
+import { 规范化接口设置, 获取变量计算接口配置, 获取世界演变接口配置, 获取文生图接口配置, 获取场景文生图接口配置, 获取生图词组转化器接口配置, 获取生图画师串预设, 获取词组转化器预设提示词, 获取主剧情接口配置, 获取设备消息接口配置, 接口配置是否可用, 变量校准功能已启用 as 变量生成功能已启用, 获取变量生成并发配置 } from '../utils/apiConfig';
 import type { 当前可用接口结构 } from '../utils/apiConfig';
 import {
     规范化记忆系统,
@@ -55,13 +38,9 @@ import {
     构建即时记忆条目,
     构建短期记忆条目,
     写入四段记忆,
-    构建待处理记忆压缩任务,
-    构建手动记忆压缩任务,
-    应用记忆压缩结果,
     记忆压缩任务结构
 } from './useGame/memory/memoryUtils';
 import { 执行主剧情发送工作流 } from './useGame/sendWorkflow';
-import { 执行正文润色 as 执行正文润色工作流 } from './useGame/opening/bodyPolish';
 import { 构建上下文快照数据 } from './useGame/ui/contextSnapshot';
 import { 执行响应命令处理 } from './useGame/npc/responseCommandProcessor';
 import { 创建会话生命周期工作流 } from './useGame/sessionLifecycleWorkflow';
@@ -69,9 +48,9 @@ import {
     构建系统提示词 as 构建系统提示词工作流,
     type 运行时提示词状态
 } from './useGame/systemPromptBuilder';
-import { 从NPC创建欲望档案, 创建默认欲望档案 } from './useGame/campusNSFWEngine';
+import { 从NPC创建欲望档案 } from './useGame/campusNSFWEngine';
 import { 创建乘客欲望档案 } from './useGame/urbanDriverNSFWEngine';
-import { 构建见面场景提示词, 解析见面结果, 生成任务摘要, type 见面场景上下文, type 日常指令 } from './useGame/bdsmMeetingWorkflow';
+import { 构建见面场景提示词, 解析见面结果, 生成任务摘要, type 日常指令 } from './useGame/bdsmMeetingWorkflow';
 import type { BDSM调教任务, BDSM任务状态, BDSM评价等级, 契约记录, 关系阶段, BDSM日常指令 } from '../models/campusNSFW';
 import { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './useGame/bdsmTaskWorkflow';
 import { 触发任务生成, 触发日常指令刷新 } from './useGame/bdsmTaskTrigger';
@@ -97,15 +76,14 @@ import {
     战斗结束自动清空,
     按回合窗口裁剪历史
 } from './useGame/storyState';
-import type { 开场命令基态 } from './useGame/storyState';
 import { 执行世界演变更新工作流 } from './useGame/world/worldEvolutionWorkflow';
-import { 创建图片预设工作流, 提取NPC生图基础数据附带私密描述 } from './useGame/image/imagePresetWorkflow';
+import { 提取NPC生图基础数据附带私密描述 } from './useGame/image/imagePresetWorkflow';
 import { 创建设置持久化工作流 } from './useGame/config/settingsPersistenceWorkflow';
 import { 创建历史回合工作流 } from './useGame/time/historyTurnWorkflow';
 import { 创建存读档工作流 } from './useGame/saveLoad/saveLoadWorkflow';
 import { 创建规划更新工作流 } from './useGame/planning/planningUpdateWorkflow';
 import { 创建NPC图片状态工作流, 合并NPC图片档案, 生成NPC生图记录ID } from './useGame/image/npcImageStateWorkflow';
-import { 创建场景图片档案工作流, 按场景图上限裁剪档案, 生成场景生图记录ID, 规范化场景图片档案 } from './useGame/image/sceneImageArchiveWorkflow';
+import { 创建场景图片档案工作流, 生成场景生图记录ID, 规范化场景图片档案 } from './useGame/image/sceneImageArchiveWorkflow';
 import { 创建场景生图触发工作流 } from './useGame/image/sceneImageTriggerWorkflow';
 import { 创建手动图片动作工作流 } from './useGame/image/manualImageActionsWorkflow';
 import { 创建手动NPC工作流 } from './useGame/npc/manualNpcWorkflow';
@@ -115,13 +93,11 @@ import { 创建变量校准协调器 as 创建变量生成协调器 } from './us
 import { useWorldEvolutionControl } from './useGame/world/worldEvolutionControl';
 import { normalizeCanonicalGameTime, 环境时间转标准串, 提取环境月日 } from './useGame/time/timeUtils';
 import { 提取NPC生图基础数据, 提取NPC香闺秘档部位生图数据, 提取主角生图基础数据 } from './useGame/npcContext';
-import { 应用NPC记忆总结, 构建手动NPC记忆总结候选, 构建自动NPC记忆总结候选, 构建NPC记忆总结回退文案 } from './useGame/memory/npcMemorySummary';
 import { 规范化游戏设置 } from '../utils/gameSettings';
 import { 规范化视觉设置 } from '../utils/visualSettings';
 import { 默认图片管理设置, 规范化图片管理设置 } from '../utils/imageManagerSettings';
 import { 规范化可选开局配置 } from '../utils/openingConfig';
 import type { DeviceGameContext } from '../models/mobileDevice';
-import { 构建COT伪装提示词, 规范化比较文本, 酒馆预设模式可用 } from './useGame/promptRuntime';
 import { 构建文生图运行时额外提示词 } from '../prompts/runtime/nsfw';
 import { 构建真实世界模式提示词 } from '../prompts/runtime/realWorldMode';
 import { 核心_文章优化思维链 } from '../prompts/core/cotPolish';
@@ -141,6 +117,15 @@ import { 设置键 } from '../utils/settingsSchema';
 import { countOpenAIChatMessagesTokens, countOpenAITextTokens } from '../utils/tokenEstimate';
 
 // 提取的子系统
+import { useSettingsActions } from './useGame/useSettingsActions';
+import { useFeatureFlags } from './useGame/useFeatureFlags';
+import { useTravelAndTrade } from './useGame/useTravelAndTrade';
+import { useSceneImageArchive } from './useGame/useSceneImageArchive';
+import { useNPCWorkflow } from './useGame/useNPCWorkflow';
+import { useWorldAndPlanning } from './useGame/useWorldAndPlanning';
+import { useHistoryAndMemory } from './useGame/useHistoryAndMemory';
+import { useOpeningAndSession } from './useGame/useOpeningAndSession';
+import { useImagePresets } from './useGame/useImagePresets';
 import { 提取原始报错详情, 格式化错误详情, 提取解析失败原始信息 } from './useGame/quality/errorFormatting';
 import {
     获取原始AI消息,
@@ -340,99 +325,30 @@ export const useGame = () => {
     // Mobile Device
     const { 设备状态, 设置设备状态, 设备打开, 设备关闭, 设备打开应用, 设备返回主页 } = gameState;
 
-    // 旅行系统
-    const [旅行事件列表, set旅行事件列表] = useState<旅行事件[]>([]);
-
-    const handleTravel = useCallback((目标地图: 地图结构, 目标建筑: 建筑结构 | null) => {
-        const 当前位置 = { 大地点: 环境?.大地点 || '', 中地点: 环境?.中地点 || '', 小地点: 环境?.小地点 || '' };
-        const 可行性 = 评估旅行可行性(角色, 当前位置, 目标地图);
-        if (!可行性.可行) {
-            return;
-        }
-
-        const 结果 = 执行旅行(角色, 环境, 目标地图, 目标建筑);
-        if (结果.成功) {
-            设置环境(结果.新环境);
-            set旅行事件列表(结果.事件);
-        }
-    }, [角色, 环境, 设置环境]);
-
-    const handleExplore = useCallback((目标建筑: 建筑结构) => {
-        const 结果 = 执行探索(环境, 目标建筑);
-        if (结果.成功) {
-            设置环境((prev) => ({ ...prev, 时间: 结果.新时间 || prev.时间, 具体地点: 目标建筑.名称 }));
-        }
-    }, [环境, 设置环境]);
-
-    // 交易系统
-    const handleBuyItem = useCallback((物品: 游戏物品, 卖家NPC: NPC结构 | null) => {
-        const 价格 = 计算购买价格(物品, 卖家NPC);
-        const 结果 = 执行购买(角色.金钱, 角色.物品列表, 物品, 价格);
-        if (结果.成功) {
-            设置角色((prev) => ({ ...prev, 金钱: 结果.新金钱, 物品列表: 结果.新物品列表 as typeof prev.物品列表 }));
-        }
-        return 结果;
-    }, [角色, 设置角色]);
-
-    const handleSellItem = useCallback((物品ID: string) => {
-        const 物品 = 角色.物品列表.find(i => i.ID === 物品ID);
-        if (!物品) {
-            return { 成功: false, 新金钱: 角色.金钱, 新物品列表: 角色.物品列表, 错误: '物品不存在' } as 出售结果;
-        }
-        const 价格 = 计算出售价格(物品, null);
-        const 结果 = 执行出售(角色.金钱, 角色.物品列表, 物品ID, 价格);
-        if (结果.成功) {
-            设置角色((prev) => ({ ...prev, 金钱: 结果.新金钱, 物品列表: 结果.新物品列表 as typeof prev.物品列表 }));
-        }
-        return 结果;
-    }, [角色, 设置角色]);
-
-    // 锻造系统
-    const handleForgeItem = useCallback((配方ID: string) => {
-        const 结果 = 执行锻造(配方ID, 角色);
-        if (结果.成功 && 结果.产物) {
-            设置角色((prev) => ({
-                ...prev,
-                物品列表: [...prev.物品列表, 结果.产物 as typeof prev.物品列表[number]],
-                当前经验: 结果.经验获得
-                    ? prev.当前经验 + 结果.经验获得
-                    : prev.当前经验,
-            }));
-        }
-        return 结果;
-    }, [角色, 设置角色]);
-
-    const getForgeRecipes = useCallback(() => {
-        return 获取可锻造配方(角色);
-    }, [角色]);
-
-    const checkForgeMaterials = useCallback((配方ID: string): 材料检查结果 | null => {
-        const 配方 = 锻造配方库.find(p => p.ID === 配方ID);
-        if (!配方) return null;
-        return 检查锻造材料(配方, 角色.物品列表);
-    }, [角色]);
-
-    const getForgeSuccessRate = useCallback((配方ID: string): number => {
-        const 配方 = 锻造配方库.find(p => p.ID === 配方ID);
-        if (!配方) return 0;
-        return 计算锻造成功率(配方, 角色);
-    }, [角色]);
-
-    /** 根据 gameConfig 推导设备模式 */
-    const 派生设备模式 = (): 'normal' | 'li' => {
-        const perEra = gameConfig?.启用子纪元里模式;
-        if (perEra && currentEra in perEra) {
-            return perEra[currentEra] ? 'li' : 'normal';
-        }
-        return 'normal'; // 未设置时默认正常模式
-    };
-
-    // 覆盖 设备打开：打开时同步设置当前时代的里模式状态
-    const 打开设备 = () => {
-        设备打开();
-        const mode = 派生设备模式();
-        设置设备状态((prev) => ({ ...prev, mode }));
-    };
+    // 旅行与贸易
+    const travelAndTrade = useTravelAndTrade({
+        角色,
+        环境,
+        设置角色,
+        设置环境,
+        gameConfig,
+        currentEra,
+        设备状态,
+        设置设备状态,
+        设备打开,
+    });
+    const {
+        handleTravel,
+        handleExplore,
+        handleBuyItem,
+        handleSellItem,
+        handleForgeItem,
+        getForgeRecipes,
+        checkForgeMaterials,
+        getForgeSuccessRate,
+        打开设备,
+        旅行事件列表,
+    } = travelAndTrade;
     const 回合快照栈Ref = useRef<回合快照结构[]>([]);
     const 最近自动存档时间戳Ref = useRef<number>(0);
     const 最近自动存档签名Ref = useRef<string>('');
@@ -500,6 +416,22 @@ export const useGame = () => {
     const [世界书列表, set世界书列表] = useState<世界书结构[]>([]);
     const [世界书预设组列表, set世界书预设组列表] = useState<世界书预设组结构[]>([]);
 
+    // --- useSettingsActions ---
+    const settingsActions = useSettingsActions({
+        visualConfigRef,
+        setVisualConfig,
+        场景图片档案Ref,
+        set场景图片档案,
+        时代信息Ref,
+        set时代信息,
+        imageManagerConfigRef,
+        setImageManagerConfig,
+        setCurrentEra,
+        setCurrentTheme,
+        set右下角提示列表,
+    });
+    const { 深拷贝, 应用视觉设置到状态, 应用场景图片档案到状态, 应用时代信息到状态, 处理时代变更, 应用图片管理设置到状态, 关闭右下角提示 } = settingsActions;
+
     useEffect(() => {
         apiConfigRef.current = apiConfig;
     }, [apiConfig]);
@@ -511,48 +443,6 @@ export const useGame = () => {
     useEffect(() => {
         imageManagerConfigRef.current = 规范化图片管理设置(imageManagerConfig);
     }, [imageManagerConfig]);
-
-    // --- Actions (before subsystems) ---
-    const 深拷贝 = <T,>(data: T): T => {
-        if (data === undefined || data === null) {
-            return data;
-        }
-        if (typeof structuredClone === 'function') {
-            return structuredClone(data);
-        }
-        return JSON.parse(JSON.stringify(data)) as T;
-    };
-    const 应用视觉设置到状态 = (value: Partial<视觉设置结构> | null | undefined) => {
-        const normalized = 规范化视觉设置(value || {});
-        visualConfigRef.current = normalized;
-        setVisualConfig(normalized);
-        void dbService.保存设置(设置键.视觉设置, normalized);
-    };
-    const 应用场景图片档案到状态 = (value: 场景图片档案 | null | undefined) => {
-        const normalized = 规范化场景图片档案(value || {});
-        场景图片档案Ref.current = normalized;
-        set场景图片档案(normalized);
-        void dbService.保存设置(设置键.场景图片档案, normalized);
-    };
-    const 应用时代信息到状态 = (value: 时代信息结构 | undefined) => {
-        时代信息Ref.current = value;
-        set时代信息(value);
-    };
-    const 处理时代变更 = async (eraId: string) => {
-        setCurrentEra(eraId);
-        void dbService.保存设置(设置键.应用时代, eraId);
-        const eraInfo = 获取时代信息(eraId);
-        应用时代信息到状态(eraInfo || undefined);
-        const eraTheme = 获取时代主题方案(eraId);
-        if (eraTheme) {
-            应用时代主题到根元素(eraTheme);
-            设置时代UI文案(eraTheme);
-        }
-        const recommendedTheme = 获取时代推荐主题(eraId);
-        if (recommendedTheme) {
-            setCurrentTheme(recommendedTheme);
-        }
-    };
 
     // --- 子系统初始化 ---
     const 通知系统 = 创建通知系统(set右下角提示列表);
@@ -628,6 +518,55 @@ export const useGame = () => {
     });
     const { 构建记忆总结用户提示词, 清理记忆总结输出, handleStartMemorySummary, handleCancelMemorySummary, handleBackToMemorySummaryRemind, handleUpdateMemorySummaryDraft, handleStartManualMemorySummary, handleApplyMemorySummary, 构建NPC记忆总结任务, 构建NPC记忆总结用户提示词, 清空NPC记忆总结流程, 刷新NPC记忆总结队列, 应用并同步社交列表, 清空记忆总结流程, 刷新记忆总结任务, 应用并同步记忆系统, handleStartNpcMemorySummary, handleCancelNpcMemorySummary, handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft, handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary } = 记忆总结处理器;
 
+    // --- useFeatureFlags ---
+    const featureFlags = useFeatureFlags({
+        apiConfig,
+        gameConfig,
+        历史记录,
+        环境,
+        剧情,
+        社交,
+        战斗,
+        角色,
+        prompts,
+        设置角色,
+        设置环境,
+        设置游戏初始时间,
+        设置社交,
+        设置世界,
+        设置战斗,
+        设置玩家门派,
+        设置任务列表,
+        设置约定列表,
+        设置剧情,
+        设置剧情规划,
+        设置女主剧情规划,
+        设置同人剧情规划,
+        设置同人女主剧情规划,
+        应用并同步记忆系统,
+        设置历史记录,
+        设置校规系统,
+        设置催眠系统,
+        清空变量生成上下文缓存,
+        setWorldEvents,
+        规范化剧情状态,
+        规范化角色物品容器映射,
+        规范化环境信息,
+        深拷贝,
+    });
+    const {
+        世界演变功能已开启,
+        文章优化功能已开启,
+        已进入主剧情回合,
+        执行正文润色,
+        规范化剧情规划状态,
+        规范化女主剧情规划状态,
+        规范化同人剧情规划状态,
+        规范化同人女主剧情规划状态,
+        规范化社交列表安全,
+        应用开场基态,
+    } = featureFlags;
+
     const 后台生图监控 = useBackgroundImageMonitor({
         推送右下角提示,
         NPC生图任务队列,
@@ -652,7 +591,7 @@ export const useGame = () => {
         set设备刷新任务队列,
         set校园系统: 设置校园系统,
         eraId: currentEra,
-        mode: 派生设备模式(),
+        mode: travelAndTrade.派生设备模式(),
         apiConfig: 设备消息接口!,
         apiSettings: 设备消息接口!,
         gameContext: 设备刷新GameContext,
@@ -664,19 +603,9 @@ export const useGame = () => {
         刷新NPC记忆总结队列(Array.isArray(社交) ? 社交 : [], { 静默: NPC记忆总结阶段 === 'processing' || NPC记忆总结阶段 === 'review' });
     }, [社交, memoryConfig]);
 
-    // --- Actions ---
-    const 应用图片管理设置到状态 = (value: Partial<图片管理设置结构> | null | undefined) => {
-        const normalized = 规范化图片管理设置(value || 默认图片管理设置);
-        imageManagerConfigRef.current = normalized;
-        setImageManagerConfig(normalized);
-        void dbService.保存设置(设置键.图片管理设置, normalized);
-    };
-    const 关闭右下角提示 = (toastId: string) => {
-        if (!toastId) return;
-        set右下角提示列表(prev => prev.filter(item => item.id !== toastId));
-    };
+    // --- useTravelAndTrade ---
 
-    // Frontend联动：当游戏时间命中节日设定时，自动同步”名称/简介/效果”到环境
+    // Frontend联动：当游戏时间命中节日设定时，自动同步"名称/简介/效果"到环境
     useEffect(() => {
         const md = 提取环境月日(环境);
         const matched = md ? festivals.find(f => f.月 === md.month && f.日 === md.day) : undefined;
@@ -1540,84 +1469,6 @@ export const useGame = () => {
         });
     };
 
-    const 世界演变功能已开启 = (): boolean => {
-        const feature = 规范化接口设置(apiConfig).功能模型占位;
-        return Boolean(
-            feature?.世界演变独立模型开关
-            && typeof feature?.世界演变使用模型 === 'string'
-            && feature.世界演变使用模型.trim().length > 0
-        );
-    };
-
-    const 文章优化功能已开启 = (): boolean => {
-        const feature = 规范化接口设置(apiConfig).功能模型占位;
-        return Boolean(
-            feature?.文章优化独立模型开关
-            && typeof feature?.文章优化使用模型 === 'string'
-            && feature.文章优化使用模型.trim().length > 0
-        );
-    };
-
-    const 已进入主剧情回合 = (): boolean => {
-        return Array.isArray(历史记录)
-            && 历史记录.some(item => item?.role === 'user' && typeof item?.content === 'string' && item.content.trim().length > 0);
-    };
-
-    const 执行正文润色 = async (
-        baseResponse: GameResponse,
-        rawText: string,
-        options?: { manual?: boolean; playerInput?: string }
-    ): Promise<{ response: GameResponse; applied: boolean; error?: string; rawText?: string }> => 执行正文润色工作流(
-        baseResponse,
-        rawText,
-        {
-            apiConfig,
-            gameConfig,
-            prompts,
-            环境,
-            剧情,
-            社交,
-            战斗,
-            角色,
-            文章优化已开启: 文章优化功能已开启(),
-            深拷贝
-        },
-        options
-    );
-
-    const 规范化剧情规划状态 = (raw?: any): 剧情规划结构 => 基础规范化剧情规划状态(raw);
-    const 规范化女主剧情规划状态 = (raw?: any): 女主剧情规划结构 | undefined => 基础规范化女主剧情规划状态(raw);
-    const 规范化同人剧情规划状态 = (raw?: any): 同人剧情规划结构 | undefined => 基础规范化同人剧情规划状态(raw);
-    const 规范化同人女主剧情规划状态 = (raw?: any): 同人女主剧情规划结构 | undefined => 基础规范化同人女主剧情规划状态(raw);
-
-    function 规范化社交列表安全(raw?: any[], options?: { 合并同名?: boolean }) {
-        const list = Array.isArray(raw) ? raw : [];
-        return 规范化社交列表(list, options);
-    }
-
-    const 应用开场基态 = (openingBase: ReturnType<typeof 创建开场基础状态>) => {
-        设置角色(规范化角色物品容器映射(openingBase.角色));
-        设置环境(规范化环境信息(openingBase.环境));
-        设置游戏初始时间(openingBase.游戏初始时间 || '');
-        设置社交(规范化社交列表(openingBase.社交));
-        设置世界(openingBase.世界);
-        设置战斗(openingBase.战斗);
-        设置玩家门派(openingBase.玩家门派);
-        设置任务列表(openingBase.任务列表 || []);
-        设置约定列表(openingBase.约定列表 || []);
-        设置剧情(规范化剧情状态(openingBase.剧情));
-        设置剧情规划(规范化剧情规划状态(openingBase.剧情规划 || 创建空剧情规划()));
-        设置女主剧情规划(openingBase.女主剧情规划);
-        设置同人剧情规划(openingBase.同人剧情规划);
-        设置同人女主剧情规划(openingBase.同人女主剧情规划);
-        应用并同步记忆系统(创建空记忆系统(), { 静默总结提示: true });
-        设置历史记录([]);
-        设置校规系统({ 校规列表: [], 影响日志: [] });
-        设置催眠系统({ 催眠记录列表: [], app等级: { 当前等级: 1, 已使用次数: 0, 升级阈值: 5, 解锁能力: [] }, 累计使用次数: 0 });
-        清空变量生成上下文缓存();
-        setWorldEvents([]);
-    };
-
     const 构建系统提示词 = (
         promptPool: 提示词结构[],
         memoryData: 记忆系统结构,
@@ -2152,7 +2003,7 @@ export const useGame = () => {
                     try {
                         const 当前时代 = currentEra;
                         if (!当前时代) return;
-                        const mode = 派生设备模式();
+                        const mode = travelAndTrade.派生设备模式();
                         const 设备消息接口 = 获取设备消息接口配置(apiConfig);
                         if (!设备消息接口?.baseUrl || !设备消息接口?.apiKey) return;
                         const liIntensity = gameConfig?.子纪元里模式强度?.[当前时代];
@@ -2488,6 +2339,15 @@ export const useGame = () => {
         return { advanced: false };
     };
 
+    const imagePresets = useImagePresets({
+        apiConfigRef,
+        updateApiConfig,
+        加载图片AI服务,
+        set右下角提示列表,
+        社交,
+        角色,
+        isCultivationSystemEnabled: 读取修炼体系开关,
+    });
     const {
         savePngStylePreset: 保存PNG画风预设,
         deletePngStylePreset: 删除PNG画风预设,
@@ -2505,16 +2365,7 @@ export const useGame = () => {
         getSceneCharacterAnchors: 提取场景角色锚点,
         extractCharacterAnchor: 提取角色锚点,
         extractPlayerCharacterAnchor: 提取主角角色锚点
-    } = 创建图片预设工作流({
-        获取接口配置: () => apiConfigRef.current,
-        更新接口配置: updateApiConfig,
-        加载图片AI服务,
-        推送右下角提示,
-        保存图片资源: dbService.保存图片资源,
-        获取社交列表: () => 社交,
-        获取角色: () => 角色,
-        isCultivationSystemEnabled: 读取修炼体系开关
-    });
+    } = imagePresets;
 
     const updateMemorySystem = (nextMemory: 记忆系统结构) => {
         const normalized = 规范化记忆系统(nextMemory);
