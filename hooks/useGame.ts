@@ -1,50 +1,35 @@
 
 import {
-    角色数据结构,
-    视觉设置结构,
     记忆系统结构,
-    WorldGenConfig,
     女主剧情规划结构,
     同人剧情规划结构,
     同人女主剧情规划结构,
     OpeningConfig,
     场景图片档案,
-    场景生图任务记录,
-    NPC生图任务记录,
     香闺秘档部位类型,
     图片管理设置结构,
-    内置提示词条目结构,
-    世界书结构,
-    世界书预设组结构,
     世界书作用域,
     时代信息结构,
     GameResponse,
-    提示词结构,
-    详细门派结构
+    提示词结构
 } from '../types';
 import { useEffect, useRef } from 'react';
 import * as dbService from '../services/dbService';
 import * as textAIService from '../services/ai/text';
 import { useGameState } from './useGameState';
-import { 规范化接口设置, 获取变量计算接口配置, 获取世界演变接口配置, 获取文生图接口配置, 获取场景文生图接口配置, 获取生图词组转化器接口配置, 获取生图画师串预设, 获取词组转化器预设提示词, 获取主剧情接口配置, 接口配置是否可用, 变量校准功能已启用 as 变量生成功能已启用, 获取变量生成并发配置 } from '../utils/apiConfig';
-import type { 当前可用接口结构 } from '../utils/apiConfig';
+import { 规范化接口设置, 获取变量计算接口配置, 获取世界演变接口配置, 获取文生图接口配置, 获取场景文生图接口配置, 获取生图词组转化器接口配置, 获取生图画师串预设, 获取词组转化器预设提示词, 接口配置是否可用, 变量校准功能已启用 as 变量生成功能已启用, 获取变量生成并发配置 } from '../utils/apiConfig';
 import {
     规范化记忆系统,
     规范化记忆配置,
     构建即时记忆条目,
     构建短期记忆条目,
-    写入四段记忆,
-    记忆压缩任务结构
+    写入四段记忆
 } from './useGame/memory/memoryUtils';
-import { 构建上下文快照数据 } from './useGame/ui/contextSnapshot';
-import { 执行响应命令处理 } from './useGame/npc/responseCommandProcessor';
 import { 创建会话生命周期工作流 } from './useGame/sessionLifecycleWorkflow';
 import {
-    构建系统提示词 as 构建系统提示词工作流,
-    type 运行时提示词状态
+    构建系统提示词 as 构建系统提示词工作流
 } from './useGame/systemPromptBuilder';
 import { 构建见面场景提示词, 解析见面结果, 生成任务摘要 } from './useGame/bdsmMeetingWorkflow';
-import type { 关系阶段 } from '../models/campusNSFW/sm';
 import { useNSFW系统初始化 } from './useGame/nsfw/nsfwSystemInitialization';
 
 import {
@@ -83,18 +68,13 @@ import { 创建主角图片工作流 } from './useGame/image/playerImageWorkflow
 import { 创建运行时变量工作流 } from './useGame/runtimeVariableWorkflow';
 import { 创建变量校准协调器 as 创建变量生成协调器 } from './useGame/planning/variableCalibrationCoordinator';
 import { useWorldEvolutionControl } from './useGame/world/worldEvolutionControl';
-import { normalizeCanonicalGameTime, 环境时间转标准串, 提取环境月日 } from './useGame/time/timeUtils';
+import { normalizeCanonicalGameTime, 环境时间转标准串 } from './useGame/time/timeUtils';
 import { use时间初始化, 构建标签解析选项, 创建追加系统消息 } from './useGame/time/timeInitialization';
 import { 提取NPC生图基础数据, 提取NPC香闺秘档部位生图数据, 提取主角生图基础数据 } from './useGame/npcContext';
 import { 规范化游戏设置 } from '../utils/gameSettings';
 import { 规范化视觉设置 } from '../utils/visualSettings';
 import { 默认图片管理设置, 规范化图片管理设置 } from '../utils/imageManagerSettings';
 import { 规范化可选开局配置 } from '../utils/openingConfig';
-import type { DeviceGameContext } from '../models/mobileDevice'; // unused - managed by useDevice
-import { 构建文生图运行时额外提示词 } from '../prompts/runtime/nsfw';
-import { 构建真实世界模式提示词 } from '../prompts/runtime/realWorldMode';
-import { 核心_文章优化思维链 } from '../prompts/core/cotPolish';
-import { 核心_开局思维链 } from '../prompts/core/cotOpening';
 import {
     规范化环境信息,
     构建完整地点文本,
@@ -111,11 +91,6 @@ import { 设置键 } from '../utils/settingsSchema';
 import { useSettingsActions } from './useGame/useSettingsActions';
 import { useFeatureFlags } from './useGame/useFeatureFlags';
 import { useTravelAndTrade } from './useGame/useTravelAndTrade';
-import { useSceneImageArchive } from './useGame/useSceneImageArchive';
-import { useNPCWorkflow } from './useGame/useNPCWorkflow';
-import { useWorldAndPlanning } from './useGame/useWorldAndPlanning';
-import { useHistoryAndMemory } from './useGame/useHistoryAndMemory';
-import { useOpeningAndSession } from './useGame/useOpeningAndSession';
 import { useImagePresets } from './useGame/useImagePresets';
 import { useGameStore } from './useGame/subsystems/zustandStore';
 import { 提取原始报错详情, 格式化错误详情, 提取解析失败原始信息 } from './useGame/quality/errorFormatting';
@@ -124,67 +99,26 @@ import {
     计算回复耗时秒,
     估算消息Token,
     估算AI输出Token,
-    游戏时间转排序值,
-    提取文本中的游戏时间列表,
-    当前时间已达到,
     提取响应完整正文文本,
     收集最近完整正文回合,
     构建最近完整正文上下文
 } from './useGame/response/responseTextHelpers';
-import { 自动重试最大次数, 替换流式草稿为失败提示, 更新流式草稿为自动重试提示, 游戏设置启用自动重试, 提取自动重试原因, 是否可自动重试错误, 执行带自动重试的生成请求 } from './useGame/quality/autoRetry';
-import { 去重文本数组, 收集剧情规划时间触发原因, 收集女主规划时间触发原因, 收集剧情正文命中原因, 收集女主正文命中原因, 过滤规划补丁命令 } from './useGame/planning/planningReasonCollector';
+import { 替换流式草稿为失败提示, 更新流式草稿为自动重试提示, 游戏设置启用自动重试, 执行带自动重试的生成请求 } from './useGame/quality/autoRetry';
+import { 去重文本数组, 收集剧情规划时间触发原因, 收集女主规划时间触发原因, 收集剧情正文命中原因, 收集女主正文命中原因 } from './useGame/planning/planningReasonCollector';
 import { 创建回档快照系统, type 回合快照结构 } from './useGame/ui/rollbackSnapshot';
-import { 创建通知系统, type 右下角提示结构 } from './useGame/ui/notificationSystem';
-import { 创建记忆总结处理器, type NPC记忆总结任务结构, type 记忆总结阶段类型 } from './useGame/memory/memorySummaryHandlers';
+import { 创建通知系统 } from './useGame/ui/notificationSystem';
+import { 创建记忆总结处理器 } from './useGame/memory/memorySummaryHandlers';
 import { 创建变量生成进度系统, type 变量生成上下文缓存项 } from './useGame/planning/variableGenerationProgress';
 import { 创建变量生成队列调度器 } from './useGame/planning/variableGenerationQueue';
 import { useBackgroundImageMonitor } from './useGame/quality/backgroundImageMonitor';
-import type { 设备刷新任务 } from './useGame/device/deviceRefreshMonitor';
 import { useDevice } from './useGame/useDevice';
+import { 创建私聊发送工作流 } from './useGame/npc/privateChatCoordinator';
 import { 创建BDSM关系操作工作流 } from './useGame/bdsmRelationshipOperations';
 import { 创建主剧情发送工作流 } from './useGame/useSend';
 import { 创建图片生成协调器 } from './useGame/image/imageGenerationCoordinator';
-
-type 回忆检索进度 = {
-    phase: 'start' | 'stream' | 'done' | 'error';
-    text?: string;
-};
-
-type 正文润色进度 = {
-    phase: 'start' | 'done' | 'error' | 'skipped';
-    text?: string;
-    rawText?: string;
-    commandTexts?: string[];
-};
-
-type 变量生成进度 = {
-    phase: 'start' | 'done' | 'error' | 'skipped' | 'cancelled';
-    text?: string;
-    rawText?: string;
-    commandTexts?: string[];
-};
-
-type 独立阶段标识 = 'polish' | 'world' | 'planning' | 'variable';
-type 独立阶段失败决策 = 'retry' | 'skip';
-type 独立阶段失败决策参数 = {
-    stageId: 独立阶段标识;
-    stageLabel: string;
-    errorText: string;
-};
-
-type 规划分析进度 = {
-    phase: 'start' | 'done' | 'error' | 'skipped';
-    text?: string;
-    rawText?: string;
-    commandTexts?: string[];
-};
-
-type 世界演变进度 = {
-    phase: 'start' | 'done' | 'error' | 'skipped';
-    text?: string;
-    rawText?: string;
-    commandTexts?: string[];
-};
+import { 创建命令处理工作流 } from './useGame/core/commandProcessorCoordinator';
+import { 创建上下文快照工作流, type 上下文快照 } from './useGame/ui/contextSnapshotCoordinator';
+import { 构建useGame返回值 } from './useGame/core/useGameReturnMapper';
 
 const 加载图片AI服务 = () => import('../services/ai/image/runtime');
 const 加载NPC生图工作流 = () => import('./useGame/image/npcImageWorkflow');
@@ -192,49 +126,11 @@ const 加载NPC香闺秘档生图工作流 = () => import('./useGame/image/npcSe
 const 加载场景生图工作流 = () => import('./useGame/image/sceneImageWorkflow');
 
 
-type 最近开局配置结构 = {
-    worldConfig: WorldGenConfig;
-    charData: 角色数据结构;
-    openingConfig?: OpeningConfig;
-    openingStreaming: boolean;
-    openingExtraPrompt: string;
-};
-
-type 快速重开模式 = 'world_only' | 'opening_only' | 'all';
-
-type 开局独立阶段进度 = {
-    phase: 'start' | 'done' | 'error' | 'skipped' | 'cancelled';
-    text?: string;
-    rawText?: string;
-    commandTexts?: string[];
-};
-
-type 世界生成选项 = {
-    清空前端变量?: boolean;
-};
-
-type 上下文段 = {
-    id: string;
-    title: string;
-    category: string;
-    order: number;
-    content: string;
-    uploadTokens: number;
-};
-
-type 上下文快照 = {
-    sections: 上下文段[];
-    fullText: string;
-    uploadTokens: number;
-    runtimePromptStates: Record<string, 运行时提示词状态>;
-};
-
-
 export const useGame = () => {
     const gameState = useGameState();
     const {
         view, setView,
-        hasSave, setHasSave,
+        setHasSave,
         角色, 设置角色,
         环境, 设置环境,
         社交, 设置社交,
@@ -253,35 +149,19 @@ export const useGame = () => {
         历史记录, 设置历史记录,
         记忆系统, 设置记忆系统,
         loading, setLoading,
-        worldEvents, setWorldEvents,
-        showSettings, setShowSettings,
-        showInventory, setShowInventory,
-        showEquipment, setShowEquipment,
-        showBattle, setShowBattle,
-        showSocial, setShowSocial,
-        showTeam, setShowTeam,
-        showKungfu, setShowKungfu,
-        showWorld, setShowWorld,
-        showMap, setShowMap,
-        showSect, setShowSect,
-        showTask, setShowTask,
-        showAgreement, setShowAgreement,
-        showStory, setShowStory,
-        showHeroinePlan, setShowHeroinePlan,
-        showMemory, setShowMemory,
-        showSaveLoad, setShowSaveLoad,
-        activeTab, setActiveTab,
-        
+        setWorldEvents,
+        setShowSettings, setShowInventory, setShowEquipment, setShowBattle, setShowSocial, setShowTeam, setShowKungfu, setShowWorld, setShowMap, setShowSect, setShowTask, setShowAgreement, setShowStory, setShowHeroinePlan, setShowMemory, setShowSaveLoad,
+        setActiveTab, setCurrentTheme,
+
         apiConfig, setApiConfig,
         visualConfig, setVisualConfig,
         imageManagerConfig, setImageManagerConfig,
         gameConfig, setGameConfig,
         memoryConfig, setMemoryConfig,
-        performanceConfig, setPerformanceConfig,
+        performanceConfig,
         prompts, setPrompts,
         ensurePromptsLoaded,
         festivals, setFestivals,
-        currentTheme, setCurrentTheme,
         currentEra, setCurrentEra,
         scrollRef, abortControllerRef, variableGenerationAbortControllerRef,
 
@@ -375,7 +255,6 @@ export const useGame = () => {
     // Scene Config Slice
     const 场景图片档案 = store.场景图片档案;
     const set场景图片档案 = store.set场景图片档案;
-    const 时代信息 = store.时代信息;
     const set时代信息 = store.set时代信息;
 
     const 回合快照栈Ref = useRef<回合快照结构[]>([]);
@@ -400,11 +279,8 @@ export const useGame = () => {
     const 时代信息Ref = useRef<时代信息结构 | undefined>(undefined);
 
     const 后台手动生图监控Ref = useRef<Array<{ npcId: string; since: number; npcName: string; 构图: '头像' | '半身' | '立绘' }>>([]);
-    const 已提示后台生图任务Ref = useRef<Set<string>>(new Set());
     const 后台私密生图监控Ref = useRef<Array<{ npcId: string; since: number; npcName: string; 部位: 香闺秘档部位类型 }>>([]);
-    const 已提示后台私密生图任务Ref = useRef<Set<string>>(new Set());
     const 后台场景生图监控Ref = useRef<Array<{ since: number; 摘要: string }>>([]);
-    const 已提示后台场景生图任务Ref = useRef<Set<string>>(new Set());
     const performAutoSaveRef = useRef<((...args: any[]) => void) | null>(null);
     const 按NPC读取角色锚点Ref = useRef<((npcId: string) => any) | null>(null);
     const 提取场景角色锚点Ref = useRef<((ctx: unknown) => any) | null>(null);
@@ -509,7 +385,7 @@ export const useGame = () => {
         应用视觉设置到状态,
         应用场景图片档案到状态
     });
-    const { 同步重Roll计数, 清空重Roll快照, 推入重Roll快照, 弹出重Roll快照, 回档到快照, 重置自动存档状态, 删除最近自动存档并重置状态 } = 回档快照系统;
+    const { 清空重Roll快照, 推入重Roll快照, 弹出重Roll快照, 回档到快照, 重置自动存档状态, 删除最近自动存档并重置状态 } = 回档快照系统;
 
     const 变量生成队列调度器 = 创建变量生成队列调度器({
         执行变量模型校准工作流,
@@ -527,7 +403,7 @@ export const useGame = () => {
         深拷贝,
         队列调度器: 变量生成队列调度器
     });
-    const { 序列化变量校准命令, 清空变量生成上下文缓存, 记录变量生成上下文, 收集最近变量生成上下文, 等待世界演变空闲, handleCancelVariableGeneration, 获取变量生成状态, 获取任务详情, 监听任务完成 } = 变量生成进度系统;
+    const { 序列化变量校准命令, 清空变量生成上下文缓存, 记录变量生成上下文, 收集最近变量生成上下文, 等待世界演变空闲, handleCancelVariableGeneration } = 变量生成进度系统;
 
     const 记忆总结处理器 = 创建记忆总结处理器({
         待处理记忆总结任务,
@@ -556,7 +432,7 @@ export const useGame = () => {
         performAutoSave: (...args) => performAutoSaveRef.current?.(...args),
         规范化社交列表
     });
-    const { 构建记忆总结用户提示词, 清理记忆总结输出, handleStartMemorySummary, handleCancelMemorySummary, handleBackToMemorySummaryRemind, handleUpdateMemorySummaryDraft, handleStartManualMemorySummary, handleApplyMemorySummary, 构建NPC记忆总结任务, 构建NPC记忆总结用户提示词, 清空NPC记忆总结流程, 刷新NPC记忆总结队列, 应用并同步社交列表, 清空记忆总结流程, 刷新记忆总结任务, 应用并同步记忆系统, handleStartNpcMemorySummary, handleCancelNpcMemorySummary, handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft, handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary } = 记忆总结处理器;
+    const { handleStartMemorySummary, handleCancelMemorySummary, handleBackToMemorySummaryRemind, handleUpdateMemorySummaryDraft, handleStartManualMemorySummary, handleApplyMemorySummary, 刷新NPC记忆总结队列, 应用并同步记忆系统, handleStartNpcMemorySummary, handleCancelNpcMemorySummary, handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft, handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary } = 记忆总结处理器;
 
     // --- useFeatureFlags ---
     const featureFlags = useFeatureFlags({
@@ -607,7 +483,7 @@ export const useGame = () => {
         应用开场基态,
     } = featureFlags;
 
-    const 后台生图监控 = useBackgroundImageMonitor({
+    useBackgroundImageMonitor({
         推送右下角提示,
         NPC生图任务队列,
         场景生图任务队列
@@ -774,20 +650,10 @@ export const useGame = () => {
         performAutoSave: (...args) => performAutoSaveRef.current?.(...args)
     });
     const {
-        场景模式已开启,
-        创建场景生图任务,
-        追加场景生图任务,
-        更新场景生图任务,
         删除场景生图任务,
         清空场景生图任务队列,
         获取NPC唯一标识,
-        更新NPC最近生图结果,
-        写入NPC图片历史记录,
-        更新NPC香闺秘档部位结果,
-        获取生图阶段中文,
         创建NPC生图任务,
-        追加NPC生图任务,
-        更新NPC生图任务,
         删除NPC生图任务,
         清空NPC生图任务队列,
         删除NPC图片记录,
@@ -800,7 +666,6 @@ export const useGame = () => {
         清除NPC背景图片,
         保存NPC图片本地副本,
         读取文生图功能配置,
-        NPC符合自动生图条件,
         提取新增NPC列表,
         读取修炼体系开关,
         构建文生图额外要求,
@@ -865,113 +730,57 @@ export const useGame = () => {
         options: { ...options, eraId: options?.eraId ?? currentEra }
     });
 
-    const processResponseCommands = (
-        response: GameResponse,
-        baseState?: {
-            角色: typeof 角色;
-            环境: typeof 环境;
-            社交: typeof 社交;
-            世界: typeof 世界;
-            战斗: typeof 战斗;
-            玩家门派?: 详细门派结构;
-            任务列表?: any[];
-            约定列表?: any[];
-            剧情: typeof 剧情;
-            剧情规划: typeof 剧情规划;
-            女主剧情规划?: 女主剧情规划结构;
-            同人剧情规划?: 同人剧情规划结构;
-            同人女主剧情规划?: 同人女主剧情规划结构;
-        },
-        options?: {
-            applyState?: boolean;
-            rawContent?: string;
-        }
-    ) => 执行响应命令处理(
-        response,
-        {
-            角色,
-            环境,
-            社交,
-            世界,
-            战斗,
-            玩家门派,
-            任务列表,
-            约定列表,
-            剧情,
-            剧情规划,
-            女主剧情规划,
-            同人剧情规划,
-            同人女主剧情规划,
-            校园系统
-        },
-        {
-            规范化环境信息,
-            规范化社交列表: 规范化社交列表安全,
-            规范化世界状态,
-            规范化战斗状态,
-            规范化门派状态,
-            规范化剧情状态,
-            规范化剧情规划状态,
-            规范化女主剧情规划状态,
-            规范化同人剧情规划状态,
-            规范化同人女主剧情规划状态,
-            规范化角色物品容器映射,
-            规范化校园系统: (raw?: any) => {
-                const safe = 深拷贝(raw || {});
-                return {
-                    论坛帖子列表: Array.isArray(safe.论坛帖子列表) ? safe.论坛帖子列表 : [],
-                    表白墙帖子列表: Array.isArray(safe.表白墙帖子列表) ? safe.表白墙帖子列表 : [],
-                    BDSM帖子列表: Array.isArray(safe.BDSM帖子列表) ? safe.BDSM帖子列表 : [],
-                    私聊会话列表: Array.isArray(safe.私聊会话列表) ? safe.私聊会话列表 : [],
-                    课程表: (safe.课程表 && typeof safe.课程表 === 'object') ? safe.课程表 : {},
-                    校园卡: (safe.校园卡 && typeof safe.校园卡 === 'object') ? {
-                        余额: typeof safe.校园卡.余额 === 'number' ? safe.校园卡.余额 : 0,
-                        消费记录: Array.isArray(safe.校园卡.消费记录) ? safe.校园卡.消费记录 : [],
-                    } : { 余额: 0, 消费记录: [] },
-                    社团活动列表: Array.isArray(safe.社团活动列表) ? safe.社团活动列表 : [],
-                    欲望系统: safe.欲望系统 ?? undefined,
-                    见面预约列表: Array.isArray(safe.见面预约列表) ? safe.见面预约列表 : undefined,
-                };
-            },
-            战斗结束自动清空,
-            设置角色,
-            设置环境,
-            设置社交,
-            设置世界,
-            设置战斗,
-            设置玩家门派,
-            设置任务列表,
-            设置约定列表,
-            设置剧情,
-            设置剧情规划,
-            设置女主剧情规划,
-            设置同人剧情规划,
-            设置同人女主剧情规划,
-            设置校园系统: 设置校园系统,
-            设置写真系统: 设置写真系统,
-            设置都市网约车系统: 设置都市网约车系统,
-            命令后校准: (nextState) => {
-                if (!变量生成功能已启用(apiConfig)) {
-                    return nextState;
-                }
-                return 执行变量自动校准(nextState, {
-                    规范化环境信息,
-                    规范化社交列表: 规范化社交列表安全,
-                    规范化世界状态,
-                    规范化战斗状态,
-                    规范化门派状态,
-                    规范化剧情状态,
-                    规范化剧情规划状态,
-                    规范化女主剧情规划状态,
-                    规范化同人剧情规划状态,
-                    规范化同人女主剧情规划状态,
-                    规范化角色物品容器映射
-                });
-            }
-        },
-        baseState,
-        options
-    );
+    // ==================== 命令处理工作流 ====================
+    const { processResponseCommands } = 创建命令处理工作流({
+        角色,
+        环境,
+        社交,
+        世界,
+        战斗,
+        玩家门派,
+        任务列表,
+        约定列表,
+        剧情,
+        剧情规划,
+        女主剧情规划,
+        同人剧情规划,
+        同人女主剧情规划,
+        校园系统,
+        写真系统,
+        都市网约车系统,
+        规范化环境信息,
+        规范化社交列表: 规范化社交列表安全,
+        规范化世界状态,
+        规范化战斗状态,
+        规范化门派状态,
+        规范化剧情状态,
+        规范化剧情规划状态,
+        规范化女主剧情规划状态,
+        规范化同人剧情规划状态,
+        规范化同人女主剧情规划状态,
+        规范化角色物品容器映射,
+        战斗结束自动清空,
+        深拷贝,
+        设置角色,
+        设置环境,
+        设置社交,
+        设置世界,
+        设置战斗,
+        设置玩家门派,
+        设置任务列表,
+        设置约定列表,
+        设置剧情,
+        设置剧情规划,
+        设置女主剧情规划,
+        设置同人剧情规划,
+        设置同人女主剧情规划,
+        设置校园系统,
+        设置写真系统,
+        设置都市网约车系统,
+        执行变量自动校准,
+        变量生成功能已启用,
+        apiConfig
+    });
 
     const 执行世界演变更新 = async (params?: {
         来源?: 'manual' | 'auto_due' | 'story_dynamic' | 'story_dynamic_and_due';
@@ -1155,7 +964,6 @@ export const useGame = () => {
     });
 
     const {
-        后台执行变量校准: 后台执行变量生成,
         执行变量校准并合并响应: 执行变量生成并合并响应,
         执行重解析变量校准: 执行重解析变量生成
     } = 创建变量生成协调器({
@@ -1191,82 +999,44 @@ export const useGame = () => {
         }
     };
 
-    const buildContextSnapshot = async (): Promise<上下文快照> => {
-        const currentRefs = [
-            apiConfig,
-            gameConfig,
-            memoryConfig,
-            prompts,
-            内置提示词列表,
-            世界书列表,
-            记忆系统,
-            历史记录,
-            社交,
-            角色,
-            环境,
-            世界,
-            战斗,
-            玩家门派,
-            任务列表,
-            约定列表,
-            剧情,
-            剧情规划,
-            女主剧情规划,
-            同人剧情规划,
-            同人女主剧情规划,
-            开局配置
-        ];
-        const cached = 上下文快照缓存Ref.current;
-        if (
-            cached
-            && cached.refs.length === currentRefs.length
-            && cached.refs.every((item, index) => item === currentRefs[index])
-        ) {
-            return cached.value;
-        }
-
-        const nextSnapshot = await 构建上下文快照数据({
-            apiConfig,
-            gameConfig,
-            memoryConfig,
-            prompts,
-            内置提示词列表,
-            世界书列表,
-            记忆系统,
-            历史记录,
-            社交,
-            角色,
-            环境,
-            世界,
-            战斗,
-            玩家门派,
-            任务列表,
-            约定列表,
-            剧情,
-            剧情规划,
-            女主剧情规划,
-            同人剧情规划,
-            同人女主剧情规划,
-            开局配置,
-            校规系统,
-            催眠系统,
-            校园系统,
-            时代配置ID: currentEra,
-            规范化环境信息,
-            规范化剧情状态,
-            规范化剧情规划状态,
-            规范化女主剧情规划状态,
-            规范化同人剧情规划状态,
-            规范化同人女主剧情规划状态,
-            按回合窗口裁剪历史,
-            构建系统提示词
-        });
-        上下文快照缓存Ref.current = {
-            value: nextSnapshot,
-            refs: currentRefs
-        };
-        return nextSnapshot;
-    };
+    // --- 上下文快照 ---
+    const { buildContextSnapshot } = 创建上下文快照工作流({
+        apiConfig,
+        gameConfig,
+        memoryConfig,
+        prompts,
+        内置提示词列表,
+        世界书列表,
+        记忆系统,
+        历史记录,
+        社交,
+        角色,
+        环境,
+        世界,
+        战斗,
+        玩家门派,
+        任务列表,
+        约定列表,
+        剧情,
+        剧情规划,
+        女主剧情规划,
+        同人剧情规划,
+        同人女主剧情规划,
+        开局配置,
+        校规系统,
+        催眠系统,
+        校园系统,
+        currentEra,
+        上下文快照缓存Ref,
+        构建系统提示词,
+        规范化环境信息,
+        规范化剧情状态,
+        规范化剧情规划状态,
+        规范化女主剧情规划状态,
+        规范化同人剧情规划状态,
+        规范化同人女主剧情规划状态,
+        按回合窗口裁剪历史
+    });
 
     // --- Core Send Logic (提取到 useSend.ts) ---
     const { handleSend } = 创建主剧情发送工作流({
@@ -1352,58 +1122,12 @@ export const useGame = () => {
     });
 
     // --- 私聊发送工作流 ---
-    const handlePrivateChatSend = async (
-        npcId: string,
-        npcName: string,
-        content: string
-    ): Promise<{ npcReply: string }> => {
-        const 私聊Api = 获取主剧情接口配置(apiConfig);
-        if (!私聊Api || !私聊Api.apiKey) {
-            return { npcReply: '[无法连接AI，私聊功能不可用]' };
-        }
-
-        // 获取当前私聊会话历史
-        const 私聊列表 = 校园系统?.私聊会话列表 || [];
-        const 当前会话 = 私聊列表.find((s: any) => s.id === npcId);
-        const 会话历史 = (当前会话?.消息列表 || []).map((m: any) => ({
-            sender: m.发送者,
-            content: m.内容,
-            isMe: m.发送者 === (角色?.姓名 || '玩家')
-        }));
-
-        try {
-            const { 执行私聊发送工作流 } = await import('./useGame/privateChatWorkflow');
-            const result = await 执行私聊发送工作流({
-                npcId,
-                npcName,
-                玩家姓名: 角色?.姓名 || '玩家',
-                会话历史,
-                校园系统,
-                apiConfig: 私聊Api
-            }, content);
-
-            // 如果 AI 响应中包含欲望系统状态更新，应用它
-            if (result.状态更新?.更新档案) {
-                设置校园系统?.(prev => {
-                    const 欲望系统 = (prev?.欲望系统 || {}) as any;
-                    const 现有档案 = 欲望系统.NPC欲望档案 || {};
-                    const 更新后档案 = { ...现有档案 };
-                    for (const [id, 更新] of Object.entries(result.状态更新!.更新档案)) {
-                        更新后档案[id] = { ...(更新后档案[id] || {}), ...更新 };
-                    }
-                    return {
-                        ...prev,
-                        欲望系统: { ...欲望系统, NPC欲望档案: 更新后档案 }
-                    };
-                });
-            }
-
-            return { npcReply: result.npcReply };
-        } catch (err) {
-            console.warn('[私聊发送] 失败:', err);
-            return { npcReply: '[消息发送失败，请重试]' };
-        }
-    };
+    const { handlePrivateChatSend } = 创建私聊发送工作流({
+        apiConfig,
+        校园系统,
+        角色,
+        设置校园系统
+    });
 
     const imagePresets = useImagePresets({
         apiConfigRef,
@@ -1579,7 +1303,6 @@ export const useGame = () => {
 
     const {
         handleStartNewGameWizard,
-        generateOpeningStory,
         handleGenerateWorld,
         handleReturnToHome,
         handleQuickRestart
@@ -1816,196 +1539,178 @@ export const useGame = () => {
         构建文生图额外要求
     });
 
-    return {
-        state: gameState,
-        meta: {
-            canRerollLatest: 可重Roll计数 > 0,
-            canQuickRestart: Boolean(最近开局配置),
-            worldEvolutionEnabled: 已进入主剧情回合() && 接口配置是否可用(获取世界演变接口配置(apiConfig)),
-            worldEvolutionUpdating: 世界演变更新中,
-            worldEvolutionStatus: 世界演变状态文本,
-            worldEvolutionLastUpdatedAt: 世界演变最近更新时间,
-            worldEvolutionLastSummary: 世界演变最近摘要,
-            worldEvolutionLastRawText: 世界演变最近原始消息,
-            memorySummaryOpen: Boolean(待处理记忆总结任务) && 记忆总结阶段 !== 'idle',
-            memorySummaryStage: 记忆总结阶段,
-            memorySummaryTask: 待处理记忆总结任务,
-            memorySummaryDraft: 记忆总结草稿,
-            memorySummaryError: 记忆总结错误,
-            npcMemorySummaryOpen: !Boolean(待处理记忆总结任务) && Boolean(待处理NPC记忆总结队列[0]) && NPC记忆总结阶段 !== 'idle',
-            npcMemorySummaryStage: NPC记忆总结阶段,
-            npcMemorySummaryTask: 待处理NPC记忆总结队列[0] || null,
-            npcMemorySummaryDraft: NPC记忆总结草稿,
-            npcMemorySummaryError: NPC记忆总结错误,
-            npcMemorySummaryQueueLength: 待处理NPC记忆总结队列.length,
-            imageGenerationQueue: NPC生图任务队列,
-            sceneImageArchive: 场景图片档案,
-            sceneImageQueue: 场景生图任务队列,
-            variableGenerationRunning: 变量生成中,
-            openingWorldEvolutionProgress: 开局世界演变进度,
-            openingPlanningProgress: 开局规划进度,
-            openingVariableGenerationProgress: 开局变量生成进度,
-            builtinPromptEntries: 内置提示词列表,
-            worldbooks: 世界书列表,
-            worldbookPresetGroups: 世界书预设组列表,
-            notifications: 右下角提示列表,
-            chatScrollSuppressToken: 聊天区自动滚动抑制令牌,
-            chatForceScrollToken: 聊天区强制置底令牌,
-            eraInfo: 时代信息Ref.current,
-            // Mobile Device
-            deviceState: 设备状态,
-            deviceRefreshQueue: 设备刷新任务队列,
-        },
-        setters: {
-            setShowSettings, setShowInventory, setShowEquipment, setShowBattle, setShowSocial, setShowTeam, setShowKungfu, setShowWorld, setShowMap, setShowSect, setShowTask, setShowAgreement, setShowStory, setShowHeroinePlan, setShowMemory, setShowSaveLoad,
-            setActiveTab, setCurrentTheme, setCurrentEra,
-            setApiConfig, setVisualConfig, setImageManagerConfig, setPrompts,
-            set校规系统: 设置校规系统,
-            set催眠系统: 设置催眠系统,
-            set校园系统: 设置校园系统,
-            set约定列表: 设置约定列表,
-            set社交: 设置社交,
-            set设备刷新队列: set设备刷新任务队列,
-        },
-        actions: {
-            handleSend,
-            handlePrivateChatSend,
-            handleStop,
-            handleCancelVariableGeneration,
-            handleRegenerate,
-            handlePolishTurn,
-            handleRecoverFromParseErrorRaw,
-            saveSettings, saveVisualSettings, saveImageManagerSettings, saveGameSettings, saveMemorySettings,
-            saveBuiltinPromptEntries,
-            saveWorldbooks, saveWorldbookPresetGroups,
-            updatePrompts, updateFestivals,
-            handleSaveGame, handleLoadGame,
-            updateHistoryItem,
-            updateMemorySystem,
-            createNpcManually,
-            updateNpcManually,
-            deleteNpcManually,
-            uploadNpcImageToSlot,
-            updateRuntimeVariableSection,
-            applyRuntimeVariableCommand,
-            handleStartNewGameWizard,
-            handleGenerateWorld,
-            handleQuickRestart,
-            handleReturnToHome,
-            updateNpcMajorRole,
-            updateNpcPresence,
-            removeNpc,
-            removeTask,
-            removeAgreement,
-            generateNpcImageManually,
-            generateNpcSecretPartImage,
-            retryNpcImageGeneration,
-            updatePlayerAvatar: 更新玩家头像,
-            generatePlayerImageManually: 生成主角图片,
-            selectPlayerAvatarImage: 选择主角头像图片,
-            clearPlayerAvatarImage: 清除主角头像图片,
-            selectPlayerPortraitImage: 选择主角立绘图片,
-            clearPlayerPortraitImage: 清除主角立绘图片,
-            removePlayerImageRecord: 删除主角图片记录,
-            generateSceneImageManually: 生成场景壁纸,
-            selectNpcAvatarImage: 选择NPC头像图片,
-            selectNpcPortraitImage: 选择NPC立绘图片,
-            selectNpcBackgroundImage: 选择NPC背景图片,
-            clearNpcAvatarImage: 清除NPC头像图片,
-            clearNpcPortraitImage: 清除NPC立绘图片,
-            clearNpcBackgroundImage: 清除NPC背景图片,
-            removeNpcImageRecord: 删除NPC图片记录,
-            clearNpcImageHistory: 清空NPC图片历史,
-            removeNpcImageQueueTask: 删除NPC生图任务,
-            clearNpcImageQueue: 清空NPC生图任务队列,
-            saveNpcImageLocally: 保存NPC图片本地副本,
-            applySceneImageWallpaper: 应用场景图片为壁纸,
-            clearSceneWallpaper: 清除场景壁纸,
-            removeSceneImageRecord: 删除场景图片记录,
-            clearSceneImageHistory: 清空场景图片历史,
-            removeSceneImageQueueTask: 删除场景生图任务,
-            clearSceneImageQueue: 清空场景生图任务队列,
-            saveSceneImageLocally: 保存场景图片本地副本,
-            dismissNotification: 关闭右下角提示,
-            handleForceWorldEvolutionUpdate,
-            getContextSnapshot: buildContextSnapshot,
-            handleStartMemorySummary,
-            handleCancelMemorySummary,
-            handleBackToMemorySummaryRemind,
-            handleUpdateMemorySummaryDraft,
-            handleStartManualMemorySummary,
-            handleApplyMemorySummary,
-            handleStartNpcMemorySummary,
-            handleCancelNpcMemorySummary,
-            handleBackToNpcMemorySummaryRemind,
-            handleUpdateNpcMemorySummaryDraft,
-            handleQueueManualNpcMemorySummary,
-            handleApplyNpcMemorySummary,
-            saveArtistPreset,
-            deleteArtistPreset,
-            saveModelConverterPreset,
-            deleteModelConverterPreset,
-            setModelConverterPresetEnabled,
-            savePromptConverterPreset,
-            deletePromptConverterPreset,
-            saveCharacterAnchor: 保存角色锚点,
-            deleteCharacterAnchor: 删除角色锚点,
-            setCurrentCharacterAnchor: 设置当前角色锚点,
-            getCharacterAnchor: 读取角色锚点,
-            getCharacterAnchorByNpcId: 按NPC读取角色锚点,
-            getPlayerCharacterAnchor: 读取主角角色锚点,
-            extractCharacterAnchor: 提取角色锚点,
-            extractPlayerCharacterAnchor: 提取主角角色锚点,
-            importPresets,
-            exportPresets,
-            savePngStylePreset: 保存PNG画风预设,
-            deletePngStylePreset: 删除PNG画风预设,
-            setCurrentPngStylePreset: 设置当前PNG画风预设,
-            parsePngStylePreset,
-            exportPngStylePresets: 导出PNG画风预设,
-            importPngStylePresets: 导入PNG画风预设,
-            setPersistentWallpaper: 设置常驻壁纸,
-            clearPersistentWallpaper: 清除常驻壁纸,
-            pushNotification: 推送右下角提示,
-            handleEraChange: 处理时代变更,
-            // BDSM 关系管线
-            updateBDSMRelationshipState: 更新BDSM关系状态,
-            addBDSMTask: 添加BDSM任务,
-            updateBDSMTaskStatus: 更新BDSM任务状态,
-            updateContractStatus: 更新契约状态,
-            addBDSMMilestone: 添加BDSM里程碑,
-            setDailyInstructions: 设置日常指令,
-            buildMeetingPrompt: 构建见面场景提示词,
-            parseMeetingResult: 解析见面结果,
-            generateTaskSummary: 生成任务摘要,
-            reportTaskComplete: 请求报告任务完成,
-            stageAdvance: 请求阶段推进,
-            // BDSM AI 操作
-            requestBDSMTaskGeneration: 请求生成BDSM任务,
-            requestBDSMDailyInstructions: 请求生成BDSM日常指令,
-            requestBDSMTaskEvaluation: 请求评价BDSM任务,
-            requestBDSMContractGeneration: 请求生成BDSM契约,
-            requestBDSMStageAdvance: 请求判定BDSM阶段推进,
-            // 旅行系统
-            handleTravel,
-            handleExplore,
-            travelEvents: 旅行事件列表,
-            // 交易系统
-            handleBuyItem,
-            handleSellItem,
-            // 锻造系统
-            handleForgeItem,
-            getForgeRecipes,
-            checkForgeMaterials,
-            getForgeSuccessRate,
-            // Mobile Device
-            openDevice: 设备打开,
-            closeDevice: 设备关闭,
-            openDeviceApp: 设备打开应用,
-            returnDeviceHome: 设备返回主页,
-            setDeviceState: 设置设备状态,
-            // Performance
-            performanceConfig
-        }
-    };
+    return 构建useGame返回值({
+        gameState,
+        可重Roll计数,
+        世界演变更新中,
+        世界演变状态文本,
+        世界演变最近更新时间,
+        世界演变最近摘要,
+        世界演变最近原始消息,
+        待处理记忆总结任务,
+        记忆总结阶段,
+        记忆总结草稿,
+        记忆总结错误,
+        待处理NPC记忆总结队列,
+        NPC记忆总结阶段,
+        NPC记忆总结草稿,
+        NPC记忆总结错误,
+        NPC生图任务队列,
+        场景图片档案,
+        场景生图任务队列,
+        变量生成中,
+        开局世界演变进度,
+        开局规划进度,
+        开局变量生成进度,
+        内置提示词列表,
+        世界书列表,
+        世界书预设组列表,
+        右下角提示列表,
+        聊天区自动滚动抑制令牌,
+        聊天区强制置底令牌,
+        时代信息Ref,
+        设备状态,
+        设备刷新任务队列,
+        旅行事件列表,
+        最近开局配置,
+        已进入主剧情回合,
+        接口配置是否可用,
+        获取世界演变接口配置,
+        apiConfig,
+        setShowSettings, setShowInventory, setShowEquipment, setShowBattle, setShowSocial, setShowTeam, setShowKungfu, setShowWorld, setShowMap, setShowSect, setShowTask, setShowAgreement, setShowStory, setShowHeroinePlan, setShowMemory, setShowSaveLoad,
+        setActiveTab, setCurrentTheme, setCurrentEra,
+        setApiConfig, setVisualConfig, setImageManagerConfig, setPrompts,
+        设置校规系统, 设置催眠系统, 设置校园系统, 设置约定列表, 设置社交,
+        set设备刷新任务队列,
+        handleSend,
+        handlePrivateChatSend,
+        handleStop,
+        handleCancelVariableGeneration,
+        handleRegenerate,
+        handlePolishTurn,
+        handleRecoverFromParseErrorRaw,
+        saveSettings, saveVisualSettings, saveImageManagerSettings, saveGameSettings, saveMemorySettings,
+        saveBuiltinPromptEntries,
+        saveWorldbooks, saveWorldbookPresetGroups,
+        updatePrompts, updateFestivals,
+        handleSaveGame, handleLoadGame,
+        updateHistoryItem,
+        updateMemorySystem,
+        createNpcManually,
+        updateNpcManually,
+        deleteNpcManually,
+        uploadNpcImageToSlot,
+        updateRuntimeVariableSection,
+        applyRuntimeVariableCommand,
+        handleStartNewGameWizard,
+        handleGenerateWorld,
+        handleQuickRestart,
+        handleReturnToHome,
+        updateNpcMajorRole,
+        updateNpcPresence,
+        removeNpc,
+        removeTask,
+        removeAgreement,
+        generateNpcImageManually,
+        generateNpcSecretPartImage,
+        retryNpcImageGeneration,
+        更新玩家头像,
+        生成主角图片,
+        选择主角头像图片,
+        清除主角头像图片,
+        选择主角立绘图片,
+        清除主角立绘图片,
+        删除主角图片记录,
+        生成场景壁纸,
+        选择NPC头像图片,
+        选择NPC立绘图片,
+        选择NPC背景图片,
+        清除NPC头像图片,
+        清除NPC立绘图片,
+        清除NPC背景图片,
+        删除NPC图片记录,
+        清空NPC图片历史,
+        删除NPC生图任务,
+        清空NPC生图任务队列,
+        保存NPC图片本地副本,
+        应用场景图片为壁纸,
+        清除场景壁纸,
+        删除场景图片记录,
+        清空场景图片历史,
+        删除场景生图任务,
+        清空场景生图任务队列,
+        保存场景图片本地副本,
+        关闭右下角提示,
+        handleForceWorldEvolutionUpdate,
+        buildContextSnapshot,
+        handleStartMemorySummary,
+        handleCancelMemorySummary,
+        handleBackToMemorySummaryRemind,
+        handleUpdateMemorySummaryDraft,
+        handleStartManualMemorySummary,
+        handleApplyMemorySummary,
+        handleStartNpcMemorySummary,
+        handleCancelNpcMemorySummary,
+        handleBackToNpcMemorySummaryRemind,
+        handleUpdateNpcMemorySummaryDraft,
+        handleQueueManualNpcMemorySummary,
+        handleApplyNpcMemorySummary,
+        saveArtistPreset,
+        deleteArtistPreset,
+        saveModelConverterPreset,
+        deleteModelConverterPreset,
+        setModelConverterPresetEnabled,
+        savePromptConverterPreset,
+        deletePromptConverterPreset,
+        保存角色锚点,
+        删除角色锚点,
+        设置当前角色锚点,
+        读取角色锚点,
+        按NPC读取角色锚点,
+        读取主角角色锚点,
+        提取角色锚点,
+        提取主角角色锚点,
+        importPresets,
+        exportPresets,
+        保存PNG画风预设,
+        删除PNG画风预设,
+        设置当前PNG画风预设,
+        parsePngStylePreset,
+        导出PNG画风预设,
+        导入PNG画风预设,
+        设置常驻壁纸,
+        清除常驻壁纸,
+        推送右下角提示,
+        处理时代变更,
+        更新BDSM关系状态,
+        添加BDSM任务,
+        更新BDSM任务状态,
+        更新契约状态,
+        添加BDSM里程碑,
+        设置日常指令,
+        构建见面场景提示词,
+        解析见面结果,
+        生成任务摘要,
+        请求报告任务完成,
+        请求阶段推进,
+        请求生成BDSM任务,
+        请求生成BDSM日常指令,
+        请求评价BDSM任务,
+        请求生成BDSM契约,
+        请求判定BDSM阶段推进,
+        handleTravel,
+        handleExplore,
+        handleBuyItem,
+        handleSellItem,
+        handleForgeItem,
+        getForgeRecipes,
+        checkForgeMaterials,
+        getForgeSuccessRate,
+        设备打开,
+        设备关闭,
+        设备打开应用,
+        设备返回主页,
+        设置设备状态,
+        performanceConfig
+    });
 };

@@ -520,13 +520,16 @@ Phase 7: App.tsx 瘦身 ✅ 完成 (2115 → 289 行)
 
 **剩余步骤：**
 - [x] Step 4: 提取图片生成协调器 (-190行) — `hooks/useGame/image/imageGenerationCoordinator.ts`
-- [ ] Step 5: 提取工作流实例化分组 (~340行)
-- [ ] Step 6: 提取返回值组装 (~180行)
-- [ ] Step 7: 优化子 Hook 集成区块 (~160行)
-- [ ] Step 8: 提取核心工作流委托 (~150行)
-- [ ] Step 10: 优化状态解构 + Ref 区块 (~110行)
+- [x] Step 5: 提取命令处理工作流 (-56行) — `hooks/useGame/core/commandProcessorCoordinator.ts`
+- [x] Step 6: 提取返回值组装 (-84行) — `hooks/useGame/core/useGameReturnMapper.ts`
+- [x] Step 7 (原Step 6): 提取私聊发送协调器 (-50行) — `hooks/useGame/npc/privateChatCoordinator.ts`
+- [x] Step 8 (原Step 7): 提取上下文快照协调器 (-75行) — `hooks/useGame/ui/contextSnapshotCoordinator.ts`
+- [ ] Step 9: 提取工作流实例化分组 (~340行) — 依赖链复杂，收益/成本比低，暂缓
+- [ ] Step 10: 优化子 Hook 集成区块 (~160行) — 已较紧凑
 
-**useGame.ts 当前行数：** 2013 行（原始 ~2980 行，累计 -967 行）
+**useGame.ts 当前行数：** 1716 行（原始 ~2980 行，累计 -1264 行）
+
+**useGame.ts 当前行数：** 1833 行（原始 ~2980 行，累计 -1147 行）
 
 总工期: 已完成主体目标
 ```
