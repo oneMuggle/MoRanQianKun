@@ -63,6 +63,10 @@ export const 解析都市网约车系统状态更新 = (
     轨道进度?: number;
     暴露风险值?: number;
     紧张度?: number;
+    当前行程类型?: 行程NSFW类型;
+    当前地点?: 行程地点;
+    药物状态?: { 类型: string; 生效阶段: '未生效' | '初期' | '强烈' | '衰退' };
+    醉酒状态?: { 等级: '清醒' | '微醺' | '醉酒' | '烂醉'; 行为大胆度?: number; 记忆模糊度?: number; 判断力下降?: boolean };
   }>;
 } | null => {
   const match = rawText.match(/<都市网约车系统状态>([\s\S]*?)<\/都市网约车系统状态>/);
@@ -79,6 +83,10 @@ export const 解析都市网约车系统状态更新 = (
         轨道进度?: number;
         暴露风险值?: number;
         紧张度?: number;
+        当前行程类型?: 行程NSFW类型;
+        当前地点?: 行程地点;
+        药物状态?: { 类型: string; 生效阶段: '未生效' | '初期' | '强烈' | '衰退' };
+        醉酒状态?: { 等级: '清醒' | '微醺' | '醉酒' | '烂醉'; 行为大胆度?: number; 记忆模糊度?: number; 判断力下降?: boolean };
       }>;
     };
   } catch {
@@ -107,6 +115,10 @@ export const 应用都市网约车状态更新 = (
       轨道进度?: number;
       暴露风险值?: number;
       紧张度?: number;
+      当前行程类型?: 行程NSFW类型;
+      当前地点?: 行程地点;
+      药物状态?: { 类型: string; 生效阶段: '未生效' | '初期' | '强烈' | '衰退' };
+      醉酒状态?: { 等级: '清醒' | '微醺' | '醉酒' | '烂醉'; 行为大胆度?: number; 记忆模糊度?: number; 判断力下降?: boolean };
     }>;
   }
 ): { 行程系统?: Record<string, unknown> } | undefined => {
@@ -127,16 +139,22 @@ export const 应用都市网约车状态更新 = (
   }
 
   for (const [npcId, partialUpdate] of Object.entries(update.更新档案)) {
-    const existing = 行程系统.乘客欲望档案[npcId];
-    if (existing) {
-      // 合并更新：只更新提供的字段
-      for (const [key, value] of Object.entries(partialUpdate)) {
-        if (value !== undefined) {
-          (existing as Record<string, unknown>)[key] = value;
-        }
+    const existing = 行程系统.乘客欲望档案[npcId] || {} as Record<string, unknown>;
+    // 合并更新：只更新提供的字段
+    for (const [key, value] of Object.entries(partialUpdate)) {
+      if (key === '当前行程类型' && typeof value === 'string') {
+        行程系统.当前行程类型 = value;
+        continue;
       }
-      行程系统.乘客欲望档案[npcId] = existing;
+      if (key === '当前地点' && typeof value === 'string') {
+        行程系统.当前地点 = value;
+        continue;
+      }
+      if (value !== undefined) {
+        existing[key] = value;
+      }
     }
+    行程系统.乘客欲望档案[npcId] = existing;
   }
 
   return { ...current, 行程系统 };
