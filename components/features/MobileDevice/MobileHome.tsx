@@ -173,6 +173,34 @@ const MobileHome: React.FC<MobileHomeProps> = ({
     const [bdsmPanel, setBdsmPanel] = useState<'none' | '总览' | '任务' | '契约' | '安全设置'>('none');
     const [isLocked, setIsLocked] = useState(true);
 
+    // 提至 Hook 区顶部（早于 config 空检查），避免条件渲染破坏 Hook 顺序
+    const isLiMode = deviceState.mode === 'li';
+    const themeColor = isLiMode ? getLiModeThemeColor(config, '#6B2D8B') : undefined;
+    const isLockedState = isLocked;
+
+    const visibleApps = useMemo(() => {
+        if (!config) return [];
+        if (!installedApps) return config.apps;
+        const installedIds = new Set(installedApps.installedApps.map(i => i.appId));
+        return config.apps.filter(app => {
+            if (!installedIds.has(app)) return false;
+            const appDef = findAppById(app);
+            if (!appDef) return true;
+            return isAppVisible(appDef, nsfwEnabled, maxNsfwLevel);
+        });
+    }, [config, installedApps, nsfwEnabled, maxNsfwLevel]);
+
+    const dockApps = useMemo(() => {
+        if (!config) return [];
+        return getDockApps()
+            .map(app => app.id as MobileApp)
+            .filter(app => config.apps.includes(app));
+    }, [config]);
+
+    const wallpaperGradient = isLiMode
+        ? `linear-gradient(135deg, ${themeColor}20 0%, #0a0a0a 60%, #1a0a2e 100%)`
+        : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
+
     // 检测是否有 BDSM 关系（用于快捷入口，预留）
     // const 有BDSM关系 = useMemo(() => {
     //     const 欲望系统 = gameContext?.校园系统?.欲望系统;
@@ -197,9 +225,6 @@ const MobileHome: React.FC<MobileHomeProps> = ({
         );
     }
 
-    const isLiMode = deviceState.mode === 'li';
-    const themeColor = isLiMode ? getLiModeThemeColor(config, '#6B2D8B') : undefined;
-    // liModeName is used in the li-mode badge display (rendered inline in lock screen and status bar)
     void liModeName;
 
     const renderActiveApp = () => {
@@ -315,28 +340,6 @@ const MobileHome: React.FC<MobileHomeProps> = ({
             );
         }
     }
-
-    const isLockedState = isLocked;
-    const visibleApps = useMemo(() => {
-        if (!installedApps) return config.apps;
-        const installedIds = new Set(installedApps.installedApps.map(i => i.appId));
-        return config.apps.filter(app => {
-            if (!installedIds.has(app)) return false;
-            const appDef = findAppById(app);
-            if (!appDef) return true;
-            return isAppVisible(appDef, nsfwEnabled, maxNsfwLevel);
-        });
-    }, [config.apps, installedApps, nsfwEnabled, maxNsfwLevel]);
-
-    const dockApps = useMemo(() => {
-        return getDockApps()
-            .map(app => app.id as MobileApp)
-            .filter(app => config.apps.includes(app));
-    }, [config.apps]);
-
-    const wallpaperGradient = isLiMode
-        ? `linear-gradient(135deg, ${themeColor}20 0%, #0a0a0a 60%, #1a0a2e 100%)`
-        : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
 
     const handleUnlock = () => setIsLocked(false);
 
