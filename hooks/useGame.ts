@@ -114,6 +114,7 @@ import { 创建上下文快照工作流, type 上下文快照 } from './useGame/
 import { 构建useGame返回值 } from './useGame/core/useGameReturnMapper';
 import { createUtilityDomain } from './useGame/domains/utilityDomain';
 import { createMemoryRuntimeDomain } from './useGame/domains/memoryRuntimeDomain';
+import { createWorkflowDomain } from './useGame/domains/workflowDomain';
 
 const 加载图片AI服务 = () => import('../services/ai/image/runtime');
 const 加载NPC生图工作流 = () => import('./useGame/image/npcImageWorkflow');
@@ -321,61 +322,11 @@ export const useGame = () => {
         handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary,
     } = memoryRuntime;
 
-    // --- useFeatureFlags ---
-    const featureFlags = useFeatureFlags({
-        apiConfig,
-        gameConfig,
-        历史记录,
-        环境,
-        剧情,
-        社交,
-        战斗,
-        角色,
-        prompts,
-        设置角色,
-        设置环境,
-        设置游戏初始时间,
-        设置社交,
-        设置世界,
-        设置战斗,
-        设置玩家门派,
-        设置任务列表,
-        设置约定列表,
-        设置剧情,
-        设置剧情规划,
-        设置女主剧情规划,
-        设置同人剧情规划,
-        设置同人女主剧情规划,
-        应用并同步记忆系统,
-        设置历史记录,
-        设置校规系统,
-        设置催眠系统,
-        清空变量生成上下文缓存,
-        setWorldEvents,
-        规范化剧情状态,
-        规范化角色物品容器映射,
-        规范化环境信息,
-        深拷贝,
-    });
-    const {
-        世界演变功能已开启,
-        文章优化功能已开启,
-        已进入主剧情回合,
-        执行正文润色,
-        规范化剧情规划状态,
-        规范化女主剧情规划状态,
-        规范化同人剧情规划状态,
-        规范化同人女主剧情规划状态,
-        规范化社交列表安全,
-        应用开场基态,
-    } = featureFlags;
-
-    useEffect(() => {
-        刷新NPC记忆总结队列(Array.isArray(社交) ? 社交 : [], { 静默: NPC记忆总结阶段 === 'processing' || NPC记忆总结阶段 === 'review' });
-    }, [社交, memoryConfig]);
-
-    // 时间初始化（已提取到独立 hook）
-    use时间初始化({ 环境, 游戏初始时间, 记忆系统, festivals, 设置环境, 设置游戏初始时间 });
+    // 社交列表安全包装器（在 workflowDomain 之前定义，供 imageDomain 使用）
+    const 规范化社交列表安全 = (raw?: any[], options?: { 合并同名?: boolean }) => {
+        const list = Array.isArray(raw) ? raw : [];
+        return 规范化社交列表(list, options);
+    };
 
     // ==================== 图片生成域 ====================
     const imageDomain = createImageDomain({
@@ -472,251 +423,87 @@ export const useGame = () => {
         generatePlayerImageManually: 生成主角图片
     } = playerImage;
 
-    const {
-        loadBuiltinPromptEntries,
-        loadWorldbooks,
-        loadWorldbookPresetGroups,
-        saveSettings,
-        saveBuiltinPromptEntries,
-        saveWorldbooks,
-        saveWorldbookPresetGroups,
-        saveVisualSettings,
-        saveImageManagerSettings,
-        updateApiConfig,
-        saveArtistPreset,
-        deleteArtistPreset,
-        saveModelConverterPreset,
-        deleteModelConverterPreset,
-        setModelConverterPresetEnabled,
-        savePromptConverterPreset,
-        deletePromptConverterPreset,
-        exportPresets,
-        importPresets,
-        saveGameSettings,
-        saveMemorySettings,
-        updatePrompts,
-        updateFestivals
-    } = 创建设置持久化工作流({
-        获取接口配置: () => apiConfigRef.current,
-        同步接口配置: (config) => {
-            apiConfigRef.current = config;
-            setApiConfig(config);
-        },
-        设置内置提示词列表: set内置提示词列表,
-        设置世界书列表: set世界书列表,
-        设置世界书预设组列表: set世界书预设组列表,
-        应用视觉设置到状态,
-        应用图片管理设置到状态,
-        获取当前场景图片档案: () => 场景图片档案Ref.current || {},
-        同步场景图片档案: (archive) => {
-            场景图片档案Ref.current = archive;
-            set场景图片档案(archive);
-        },
-        获取场景图历史上限: () => 规范化图片管理设置(imageManagerConfigRef.current || imageManagerConfig || 默认图片管理设置).场景图历史上限,
-        设置游戏设置: setGameConfig,
-        设置记忆配置: setMemoryConfig,
-        设置提示词池: setPrompts,
-        设置节日列表: setFestivals
+    // ==================== 工作流协调域 ====================
+    const workflow = createWorkflowDomain({
+        apiConfig, gameConfig, 历史记录, 环境, 剧情, 社交, 战斗, 角色,
+        prompts, 设置角色, 设置环境, 设置游戏初始时间, 设置社交, 设置世界,
+        设置战斗, 设置玩家门派, 设置任务列表, 设置约定列表, 设置剧情,
+        设置剧情规划, 设置女主剧情规划, 设置同人剧情规划, 设置同人女主剧情规划,
+        应用并同步记忆系统, 设置历史记录, 设置校规系统, 设置催眠系统,
+        清空变量生成上下文缓存, setWorldEvents, 规范化剧情状态,
+        规范化角色物品容器映射, 规范化环境信息, 深拷贝, useFeatureFlags,
+        apiConfigRef, setApiConfig, set内置提示词列表, set世界书列表,
+        set世界书预设组列表, 应用视觉设置到状态, 应用图片管理设置到状态,
+        场景图片档案Ref, set场景图片档案, imageManagerConfigRef,
+        imageManagerConfig, 默认图片管理设置, 规范化图片管理设置,
+        setGameConfig, setMemoryConfig, setPrompts, setFestivals,
+        创建设置持久化工作流,
+        校园系统, 设置校园系统, 创建BDSM关系操作工作流,
+        记忆系统, memoryConfig, 内置提示词列表, 世界书列表,
+        角色姓名: 角色?.姓名, currentEra, 构建系统提示词工作流,
+        世界, 玩家门派, 任务列表, 约定列表, 剧情规划, 女主剧情规划,
+        同人剧情规划, 同人女主剧情规划, 校园系统ForCommand: 校园系统,
+        写真系统, 都市网约车系统, 规范化世界状态, 规范化战斗状态,
+        规范化门派状态, 设置写真系统, 设置都市网约车系统,
+        执行变量自动校准, 变量生成功能已启用, 创建命令处理工作流,
+        战斗结束自动清空,
+        loading, 变量生成中, 记忆总结阶段, visualConfig, visualConfigRef,
+        scrollRef, 回合快照栈Ref, 回档到快照, 弹出重Roll快照,
+        删除最近自动存档并重置状态, 环境时间转标准串, 规范化记忆配置,
+        规范化视觉设置, 规范化场景图片档案, normalizeCanonicalGameTime,
+        构建即时记忆条目, 构建短期记忆条目, 写入四段记忆,
+        估算AI输出Token, 提取解析失败原始信息, 提取原始报错详情,
+        构建标签解析选项, parseStoryRawText: textAIService.parseStoryRawText,
+        执行正文润色: undefined as any, 规范化游戏设置,
+        按世界演变分流净化响应, 应用并同步记忆系统FromRuntime: 应用并同步记忆系统,
+        performAutoSave: (...args: any[]) => performAutoSaveRef.current?.(...args),
+        记录变量生成上下文, set聊天区自动滚动抑制令牌,
+        获取NPC唯一标识, 合并NPC图片档案, 创建历史回合工作流,
+        开局配置, 世界演变进行中Ref, variableGenerationAbortControllerRef,
+        set变量生成中, 等待世界演变空闲, 执行变量模型校准工作流,
+        合并变量生成结果到响应, 获取变量计算接口配置, 接口配置是否可用,
+        序列化变量校准命令, 获取变量生成并发配置, 创建变量生成协调器,
+        view, 世界演变更新中, 世界演变状态文本, 世界演变最近更新时间,
+        世界演变最近现实更新时间戳Ref, 世界演变去重签名Ref,
+        set世界演变更新中, set世界演变状态文本,
+        执行世界演变更新: undefined as any, useWorldEvolutionControl,
+        环境时间转标准串ForRuntime: 环境时间转标准串,
+        创建运行时变量工作流, abortControllerRef, 规范化记忆系统,
     });
-
-    useEffect(() => {
-        void 加载场景图片档案();
-    }, []);
-
-    useEffect(() => {
-        void loadBuiltinPromptEntries();
-    }, []);
-
-    useEffect(() => {
-        void loadWorldbooks();
-    }, []);
-
-    useEffect(() => {
-        void loadWorldbookPresetGroups();
-    }, []);
-
-    // ==================== BDSM 关系管线操作 ====================
-    const bdsm = 创建BDSM关系操作工作流({ 校园系统, apiConfig, 设置校园系统 });
     const {
-        更新BDSM关系状态,
-        添加BDSM任务,
-        更新BDSM任务状态,
-        更新契约状态,
-        添加BDSM里程碑,
-        设置日常指令,
-        请求生成BDSM任务,
-        请求生成BDSM日常指令,
-        请求评价BDSM任务,
-        请求生成BDSM契约,
-        请求判定BDSM阶段推进,
-        构建BDSM状态更新回调,
-        构建BDSM见面预约更新回调,
-        请求报告任务完成,
-        请求阶段推进,
-    } = bdsm;
-
-
-    const 构建系统提示词 = (
-        promptPool: 提示词结构[],
-        memoryData: 记忆系统结构,
-        socialData: any[],
-        statePayload: any,
-        options?: {
-            禁用中期长期记忆?: boolean;
-            禁用短期记忆?: boolean;
-            禁用世界演变分流?: boolean;
-            禁用行动选项提示词?: boolean;
-            注入剧情推动协议?: boolean;
-            注入女主剧情规划协议?: boolean;
-            世界书作用域?: 世界书作用域[];
-            世界书附加文本?: string[];
-            openingConfig?: OpeningConfig;
-            eraId?: string | null;
-        },
-        deviceMessages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }>
-    ) => 构建系统提示词工作流({
-        promptPool,
-        memoryData,
-        socialData,
-        statePayload,
-        gameConfig,
-        memoryConfig,
-        fallbackPlayerName: 角色?.姓名,
-        builtinPromptEntries: 内置提示词列表,
-        worldbooks: 世界书列表,
-        worldEvolutionEnabled: 世界演变功能已开启(),
-        deviceMessages,
-        options: { ...options, eraId: options?.eraId ?? currentEra }
-    });
-
-    // useWorldEvolutionControl 移到 sendDomain 之后（依赖 执行世界演变更新）
-
-    // 命令处理工作流（必须在 创建历史回合工作流 之前创建，因为后者依赖 processResponseCommands）
-    const { processResponseCommands } = 创建命令处理工作流({
-        角色, 环境, 社交, 世界, 战斗, 玩家门派, 任务列表, 约定列表,
-        剧情, 剧情规划, 女主剧情规划, 同人剧情规划, 同人女主剧情规划,
-        校园系统, 写真系统, 都市网约车系统,
-        规范化环境信息,
-        规范化社交列表: 规范化社交列表安全,
-        规范化世界状态, 规范化战斗状态, 规范化门派状态,
-        规范化剧情状态, 规范化剧情规划状态, 规范化女主剧情规划状态,
+        worldEvolutionEnabled, 文章优化功能已开启, enteredMainStoryRound: 已进入主剧情回合,
+        执行正文润色, 规范化剧情规划状态, 规范化女主剧情规划状态,
         规范化同人剧情规划状态, 规范化同人女主剧情规划状态,
-        规范化角色物品容器映射,
-        战斗结束自动清空, 深拷贝,
-        设置角色, 设置环境, 设置社交, 设置世界, 设置战斗,
-        设置玩家门派, 设置任务列表, 设置约定列表,
-        设置剧情, 设置剧情规划, 设置女主剧情规划,
-        设置同人剧情规划, 设置同人女主剧情规划,
-        设置校园系统, 设置写真系统, 设置都市网约车系统,
-        执行变量自动校准, 变量生成功能已启用, apiConfig
-    });
+        应用开场基态,
+        loadBuiltinPromptEntries, loadWorldbooks, loadWorldbookPresetGroups,
+        saveSettings, saveBuiltinPromptEntries, saveWorldbooks,
+        saveWorldbookPresetGroups, saveVisualSettings, saveImageManagerSettings,
+        updateApiConfig, saveArtistPreset, deleteArtistPreset,
+        saveModelConverterPreset, deleteModelConverterPreset,
+        setModelConverterPresetEnabled, savePromptConverterPreset,
+        deletePromptConverterPreset, exportPresets, importPresets,
+        saveGameSettings, saveMemorySettings, updatePrompts, updateFestivals,
+        更新BDSM关系状态, 添加BDSM任务, 更新BDSM任务状态,
+        更新契约状态, 添加BDSM里程碑, 设置日常指令,
+        请求生成BDSM任务, 请求生成BDSM日常指令, 请求评价BDSM任务,
+        请求生成BDSM契约, 请求判定BDSM阶段推进,
+        构建BDSM状态更新回调, 构建BDSM见面预约更新回调,
+        请求报告任务完成, 请求阶段推进,
+        构建系统提示词,
+        processResponseCommands, 使用快照重建解析回合, updateHistoryItem,
+        handleRegenerate, handleRecoverFromParseErrorRaw, handlePolishTurn,
+        执行变量生成并合并响应, 执行重解析变量生成,
+        handleStop, handleForceWorldEvolutionUpdate, updateMemorySystem,
+        updateRuntimeVariableSection, applyRuntimeVariableCommand,
+        removeTask, removeAgreement,
+    } = workflow;
 
-    let 执行重解析变量生成委托 = async (params: {
-        snapshot: any;
-        playerInput: string;
-        parsedResponse: GameResponse;
-    }): Promise<GameResponse> => params.parsedResponse;
+    useEffect(() => {
+        刷新NPC记忆总结队列(Array.isArray(社交) ? 社交 : [], { 静默: NPC记忆总结阶段 === 'processing' || NPC记忆总结阶段 === 'review' });
+    }, [社交, memoryConfig]);
 
-    const {
-        使用快照重建解析回合,
-        updateHistoryItem,
-        handleRegenerate,
-        handleRecoverFromParseErrorRaw,
-        handlePolishTurn
-    } = 创建历史回合工作流({
-        历史记录,
-        记忆系统,
-        memoryConfig,
-        gameConfig,
-        prompts,
-        内置提示词列表,
-        世界书列表,
-        loading,
-        变量生成中: 变量生成中,
-        记忆总结阶段,
-        社交,
-        visualConfig,
-        visualConfigRef,
-        场景图片档案Ref,
-        scrollRef,
-        获取最新快照: () => 回合快照栈Ref.current[回合快照栈Ref.current.length - 1] || null,
-        回档到快照,
-        弹出重Roll快照,
-        删除最近自动存档并重置状态,
-        深拷贝,
-        环境时间转标准串,
-        获取开局配置: () => 开局配置,
-        规范化记忆配置,
-        规范化记忆系统,
-        规范化社交列表: 规范化社交列表安全,
-        规范化视觉设置,
-        规范化场景图片档案,
-        normalizeCanonicalGameTime,
-        构建即时记忆条目,
-        构建短期记忆条目,
-        写入四段记忆,
-        估算AI输出Token,
-        提取解析失败原始信息,
-        提取原始报错详情,
-        构建标签解析选项,
-        parseStoryRawText: textAIService.parseStoryRawText,
-        执行正文润色,
-        规范化游戏设置,
-        processResponseCommands,
-        按世界演变分流净化响应,
-        世界演变功能已开启,
-        执行重解析变量生成: (params) => 执行重解析变量生成委托(params),
-        应用并同步记忆系统,
-        performAutoSave: (...args) => performAutoSave(...args),
-        设置剧情,
-        设置历史记录,
-        设置玩家门派,
-        设置任务列表,
-        设置约定列表,
-        设置社交,
-        记录变量生成上下文,
-        set聊天区自动滚动抑制令牌,
-        获取NPC唯一标识,
-        合并NPC图片档案
-    });
-
-    // ==================== 变量校准协调器 ====================
-    // 注意：此协调器依赖 featureFlags.世界演变功能已开启，必须在 featureFlags 之后创建
-    const {
-        执行变量校准并合并响应: 执行变量生成并合并响应,
-        执行重解析变量校准: 执行重解析变量生成
-    } = 创建变量生成协调器({
-        apiConfig,
-        gameConfig,
-        prompts,
-        开局配置,
-        内置提示词列表,
-        世界书列表,
-        世界演变进行中Ref,
-        variableGenerationAbortControllerRef,
-        set变量生成中: set变量生成中,
-        深拷贝,
-        世界演变功能已开启,
-        等待世界演变空闲,
-        收集最近变量生成上下文,
-        执行变量模型校准工作流,
-        合并变量生成结果到响应,
-        变量生成功能已启用,
-        获取变量计算接口配置,
-        接口配置是否可用,
-        序列化变量生成命令: 序列化变量校准命令,
-        使用快照重建解析回合
-    }, 获取变量生成并发配置(gameConfig));
-    执行重解析变量生成委托 = 执行重解析变量生成;
-
-    const handleStop = () => {
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-        }
-        if (variableGenerationAbortControllerRef.current) {
-            variableGenerationAbortControllerRef.current.abort();
-        }
-    };
+    // 时间初始化（已提取到独立 hook）
+    use时间初始化({ 环境, 游戏初始时间, 记忆系统, festivals, 设置环境, 设置游戏初始时间 });
 
     // ==================== 核心发送域 ====================
     const sendDomain = createSendDomain({
@@ -767,31 +554,6 @@ export const useGame = () => {
     });
 
     const { 执行世界演变更新, 后台执行统一规划分析, buildContextSnapshot, handleSend, handlePrivateChatSend } = sendDomain;
-
-    // useWorldEvolutionControl 依赖 执行世界演变更新，必须在 sendDomain 之后
-    const { handleForceWorldEvolutionUpdate } = useWorldEvolutionControl({
-        view,
-        loading,
-        apiConfig,
-        环境,
-        世界,
-        世界演变更新中,
-        变量生成中: 变量生成中,
-        世界演变状态文本,
-        世界演变最近更新时间,
-        世界演变最近现实更新时间戳Ref,
-        世界演变去重签名Ref,
-        世界演变功能已开启,
-        已进入主剧情回合,
-        set世界演变状态文本,
-        规范化世界状态,
-        执行世界演变更新
-    });
-
-    const updateMemorySystem = (nextMemory: 记忆系统结构) => {
-        const normalized = 规范化记忆系统(nextMemory);
-        应用并同步记忆系统(normalized);
-    };
 
     // ==================== 会话生命周期域 ====================
     const sessionDomain = createSessionDomain({
@@ -965,61 +727,6 @@ export const useGame = () => {
 
     const { handleSaveGame, performAutoSave, handleLoadGame } = sessionDomain;
     const { handleStartNewGameWizard, handleGenerateWorld, handleReturnToHome, handleQuickRestart } = sessionDomain;
-
-    const {
-        updateRuntimeVariableSection,
-        applyRuntimeVariableCommand,
-        removeTask,
-        removeAgreement
-    } = 创建运行时变量工作流({
-        获取历史记录: () => 历史记录,
-        深拷贝,
-        获取当前状态: () => ({
-            角色,
-            环境,
-            社交,
-            世界,
-            战斗,
-            剧情,
-            剧情规划,
-            女主剧情规划,
-            同人剧情规划,
-            同人女主剧情规划,
-            玩家门派,
-            任务列表,
-            约定列表,
-            记忆系统
-        }),
-        规范化角色物品容器映射,
-        规范化环境信息,
-        规范化社交列表: 规范化社交列表安全,
-        规范化世界状态,
-        规范化战斗状态,
-        规范化剧情状态,
-        规范化剧情规划状态,
-        规范化女主剧情规划状态,
-        规范化同人剧情规划状态,
-        规范化同人女主剧情规划状态,
-        规范化门派状态,
-        规范化记忆系统,
-        环境时间转标准串,
-        获取开局配置: () => 开局配置,
-        设置角色,
-        设置环境,
-        设置社交,
-        设置世界,
-        设置战斗,
-        设置剧情,
-        设置剧情规划,
-        设置女主剧情规划,
-        设置同人剧情规划,
-        设置同人女主剧情规划,
-        设置玩家门派,
-        设置任务列表,
-        设置约定列表,
-        应用并同步记忆系统,
-        performAutoSave
-    });
 
 
     return 构建useGame返回值({

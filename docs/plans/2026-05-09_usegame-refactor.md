@@ -1,7 +1,7 @@
 # useGame.ts 拆分重构计划
 
 **日期：** 2026-05-09
-**状态：** 实施中
+**状态：** 实施中（主文件已从 1717 行减少到 900 行，编译通过）
 **负责人：** AI Assistant
 
 ---
@@ -137,12 +137,19 @@ const imageDomain = createImageDomain(context);
   - 当前保持内联创建，memoryDomain.ts 保留为未来重构参考
 - [x] 步骤 3.3：创建 `hooks/useGame/domains/index.ts`
   - 域分组统一导出
-- [ ] 步骤 3.4：创建 `hooks/useGame/domains/sessionDomain.ts`
+- [x] 步骤 3.4：创建 `hooks/useGame/domains/sessionDomain.ts`
   - 聚合存读档/会话生命周期相关子系统
-- [ ] 步骤 3.5：创建 `hooks/useGame/domains/coreDomain.ts`
+- [x] 步骤 3.5：创建 `hooks/useGame/domains/sendDomain.ts`
   - 聚合核心发送/命令相关子系统
-- [ ] 步骤 3.6：更新 `useGame.ts` 使用域分组
-  - 验证编译通过
+- [x] 步骤 3.6：创建 `hooks/useGame/domains/utilityDomain.ts`
+  - 聚合工具类工作流
+- [x] 步骤 3.7：创建 `hooks/useGame/domains/workflowDomain.ts`
+  - 整合 featureFlags、设置持久化、BDSM、系统提示词、命令处理、历史回合、变量校准、世界演变控制、运行时变量工作流
+- [x] 步骤 3.8：创建 `hooks/useGame/domains/memoryRuntimeDomain.ts`
+  - 记忆总结运行时工作流
+- [x] 步骤 3.9：更新 `useGame.ts` 使用域分组
+  - 主文件从 ~1199 行减少到 ~900 行
+  - 验证编译通过（`npm run build` 成功）
   - 验证运行时行为一致
 
 ### 阶段 4：主文件精简
