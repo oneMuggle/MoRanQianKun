@@ -112,6 +112,8 @@ import { 创建图片生成协调器 } from './useGame/image/imageGenerationCoor
 import { 创建命令处理工作流 } from './useGame/core/commandProcessorCoordinator';
 import { 创建上下文快照工作流, type 上下文快照 } from './useGame/ui/contextSnapshotCoordinator';
 import { 构建useGame返回值 } from './useGame/core/useGameReturnMapper';
+import { createUtilityDomain } from './useGame/domains/utilityDomain';
+import { createMemoryRuntimeDomain } from './useGame/domains/memoryRuntimeDomain';
 
 const 加载图片AI服务 = () => import('../services/ai/image/runtime');
 const 加载NPC生图工作流 = () => import('./useGame/image/npcImageWorkflow');
@@ -229,88 +231,40 @@ export const useGame = () => {
     // 世界演变时间管理（封装游戏内时间 + 现实时间戳）
     const { 世界演变时间管理 } = stateAccess;
 
-    // set世界演变最近更新时间 封装（原内联函数，保持向后兼容）
-    const set世界演变最近更新时间 = (value: string | null) => {
-        set世界演变最近更新时间State(value);
-        世界演变最近现实更新时间戳Ref.current = Date.now();
-    };
-
-    // --- useSettingsActions ---
-    const settingsActions = useSettingsActions({
-        visualConfigRef,
-        setVisualConfig,
-        场景图片档案Ref,
-        set场景图片档案,
-        时代信息Ref,
-        set时代信息,
-        imageManagerConfigRef,
-        setImageManagerConfig,
-        setCurrentEra,
-        setCurrentTheme,
+    // ==================== 工具域 ====================
+    const utilityDomain = createUtilityDomain({
+        visualConfigRef, setVisualConfig,
+        场景图片档案Ref, set场景图片档案,
+        时代信息Ref, set时代信息,
+        imageManagerConfigRef, setImageManagerConfig,
+        setCurrentEra, setCurrentTheme,
         set右下角提示列表,
+        useSettingsActions,
+        创建通知系统,
+        gameConfig, currentEra, 角色, 社交, 世界, 剧情,
+        历史记录, 校规系统, 催眠系统, 校园系统,
+        设置校园系统, apiConfig, useDevice,
+        环境, 设置角色, 设置环境, useTravelAndTrade,
+        NPC生图任务队列, 场景生图任务队列,
+        useBackgroundImageMonitor,
+        都市网约车系统, 写真系统,
+        设置都市网约车系统, 设置写真系统,
+        useNSFW系统初始化,
+        创建追加系统消息, 设置历史记录,
+        set世界演变最近更新时间State,
+        世界演变最近现实更新时间戳Ref,
     });
-    const { 深拷贝, 应用视觉设置到状态, 应用场景图片档案到状态, 应用时代信息到状态, 处理时代变更, 应用图片管理设置到状态, 关闭右下角提示 } = settingsActions;
-
-    useEffect(() => {
-        apiConfigRef.current = apiConfig;
-    }, [apiConfig]);
-
-    useEffect(() => {
-        visualConfigRef.current = visualConfig;
-    }, [visualConfig]);
-
-    useEffect(() => {
-        imageManagerConfigRef.current = 规范化图片管理设置(imageManagerConfig);
-    }, [imageManagerConfig]);
-
-    // --- 子系统初始化 ---
-    const 通知系统 = 创建通知系统(set右下角提示列表);
-    const 推送右下角提示 = 通知系统.推送右下角提示;
-
-    // --- useDevice ---
-    const device = useDevice({
-        gameConfig,
-        currentEra,
-        角色,
-        社交,
-        世界,
-        剧情,
-        历史记录,
-        校规系统,
-        催眠系统,
-        校园系统,
-        设置校园系统,
-        apiConfig,
+    const {
+        深拷贝, 应用视觉设置到状态, 应用场景图片档案到状态,
+        应用时代信息到状态, 处理时代变更, 应用图片管理设置到状态,
+        关闭右下角提示,
         推送右下角提示,
-    });
-    const {
-        设备关闭,
-        设备返回主页,
-        设备打开应用,
-        设备打开,
-        派生设备模式,
-    } = device;
-
-    // --- useTravelAndTrade ---
-    const travelAndTrade = useTravelAndTrade({
-        角色,
-        环境,
-        设置角色,
-        设置环境,
-        gameConfig,
-        currentEra,
-    });
-    const {
-        handleTravel,
-        handleExplore,
-        handleBuyItem,
-        handleSellItem,
-        handleForgeItem,
-        getForgeRecipes,
-        checkForgeMaterials,
-        getForgeSuccessRate,
-    } = travelAndTrade;
-    // 旅行事件列表 now managed by Zustand store (already destructured from stateAccess above)
+        设备关闭, 设备返回主页, 设备打开应用, 设备打开, 派生设备模式,
+        handleTravel, handleExplore, handleBuyItem, handleSellItem,
+        handleForgeItem, getForgeRecipes, checkForgeMaterials, getForgeSuccessRate,
+        追加系统消息,
+        set世界演变最近更新时间,
+    } = utilityDomain;
 
     const 回档快照系统 = 创建回档快照系统({
         回合快照栈Ref,
@@ -335,54 +289,37 @@ export const useGame = () => {
     });
     const { 清空重Roll快照, 推入重Roll快照, 弹出重Roll快照, 回档到快照, 重置自动存档状态, 删除最近自动存档并重置状态 } = 回档快照系统;
 
-    // ==================== 记忆与变量：早期子系统 ====================
-    // 这些不依赖 featureFlags 的输出，可以提前创建
-    const 变量生成队列调度器 = 创建变量生成队列调度器({
-        执行变量模型校准工作流,
-        apiConfig,
-        gameConfig
+    // ==================== 记忆与变量运行时域 ====================
+    const memoryRuntime = createMemoryRuntimeDomain({
+        执行变量模型校准工作流, apiConfig, gameConfig,
+        创建变量生成队列调度器,
+        最近变量生成上下文Ref, 变量生成中, set变量生成中,
+        开局变量生成进度, set开局变量生成进度,
+        世界演变进行中Ref, variableGenerationAbortControllerRef,
+        深拷贝, 创建变量生成进度系统,
+        待处理记忆总结任务, set待处理记忆总结任务,
+        记忆总结阶段, set记忆总结阶段,
+        记忆总结草稿, set记忆总结草稿,
+        记忆总结错误, set记忆总结错误,
+        待处理NPC记忆总结队列, set待处理NPC记忆总结队列,
+        NPC记忆总结阶段, setNPC记忆总结阶段,
+        NPC记忆总结草稿, setNPC记忆总结草稿,
+        NPC记忆总结错误, setNPC记忆总结错误,
+        社交, 设置社交, 记忆系统, 设置记忆系统,
+        memoryConfig, 历史记录, performAutoSaveRef,
+        创建记忆总结处理器, 规范化社交列表,
     });
-    const 变量生成进度系统 = 创建变量生成进度系统({
-        最近变量生成上下文Ref,
-        变量生成中,
-        set变量生成中,
-        开局变量生成进度,
-        set开局变量生成进度,
-        世界演变进行中Ref,
-        variableGenerationAbortControllerRef,
-        深拷贝,
-        队列调度器: 变量生成队列调度器
-    });
-    const { 序列化变量校准命令, 清空变量生成上下文缓存, 记录变量生成上下文, 收集最近变量生成上下文, 等待世界演变空闲, handleCancelVariableGeneration } = 变量生成进度系统;
-
-    const 记忆总结处理器 = 创建记忆总结处理器({
-        待处理记忆总结任务,
-        set待处理记忆总结任务,
-        记忆总结阶段,
-        set记忆总结阶段,
-        记忆总结草稿,
-        set记忆总结草稿,
-        记忆总结错误,
-        set记忆总结错误,
-        待处理NPC记忆总结队列,
-        set待处理NPC记忆总结队列,
-        NPC记忆总结阶段,
-        setNPC记忆总结阶段,
-        NPC记忆总结草稿,
-        setNPC记忆总结草稿,
-        NPC记忆总结错误,
-        setNPC记忆总结错误,
-        社交,
-        设置社交,
-        记忆系统,
-        设置记忆系统,
-        memoryConfig,
-        apiConfig,
-        历史记录,
-        performAutoSave: (...args: any[]) => performAutoSaveRef.current?.(...args),
-        规范化社交列表
-    });
-    const { handleStartMemorySummary, handleCancelMemorySummary, handleBackToMemorySummaryRemind, handleUpdateMemorySummaryDraft, handleStartManualMemorySummary, handleApplyMemorySummary, 刷新NPC记忆总结队列, 应用并同步记忆系统, handleStartNpcMemorySummary, handleCancelNpcMemorySummary, handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft, handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary } = 记忆总结处理器;
+    const {
+        序列化变量校准命令, 清空变量生成上下文缓存, 记录变量生成上下文,
+        收集最近变量生成上下文, 等待世界演变空闲, handleCancelVariableGeneration,
+        handleStartMemorySummary, handleCancelMemorySummary,
+        handleBackToMemorySummaryRemind, handleUpdateMemorySummaryDraft,
+        handleStartManualMemorySummary, handleApplyMemorySummary,
+        刷新NPC记忆总结队列, 应用并同步记忆系统,
+        handleStartNpcMemorySummary, handleCancelNpcMemorySummary,
+        handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft,
+        handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary,
+    } = memoryRuntime;
 
     // --- useFeatureFlags ---
     const featureFlags = useFeatureFlags({
@@ -433,20 +370,12 @@ export const useGame = () => {
         应用开场基态,
     } = featureFlags;
 
-    useBackgroundImageMonitor({
-        推送右下角提示,
-        NPC生图任务队列,
-        场景生图任务队列
-    });
-
     useEffect(() => {
         刷新NPC记忆总结队列(Array.isArray(社交) ? 社交 : [], { 静默: NPC记忆总结阶段 === 'processing' || NPC记忆总结阶段 === 'review' });
     }, [社交, memoryConfig]);
 
     // 时间初始化（已提取到独立 hook）
     use时间初始化({ 环境, 游戏初始时间, 记忆系统, festivals, 设置环境, 设置游戏初始时间 });
-
-    const 追加系统消息 = 创建追加系统消息(设置历史记录);
 
     // ==================== 图片生成域 ====================
     const imageDomain = createImageDomain({
@@ -593,19 +522,6 @@ export const useGame = () => {
     useEffect(() => {
         void 加载场景图片档案();
     }, []);
-
-    // NSFW 系统初始化（已提取到独立 hook）
-    useNSFW系统初始化({
-        gameConfig,
-        校园系统,
-        都市网约车系统,
-        写真系统,
-        角色,
-        社交,
-        设置校园系统,
-        设置都市网约车系统,
-        设置写真系统,
-    });
 
     useEffect(() => {
         void loadBuiltinPromptEntries();
