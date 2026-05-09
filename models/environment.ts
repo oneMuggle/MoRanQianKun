@@ -27,6 +27,7 @@ export interface 环境变量结构 {
 
 export interface 环境信息结构 {
     时间: string; // YYYY:MM:DD:HH:MM，环境时间唯一真值
+    年号: string; // 显示用年号，如"天授"、"公元"、"新历"
     大地点: string;
     中地点: string;
     小地点: string;

@@ -40,7 +40,7 @@ type 世界生成工作流依赖 = {
         promptSnapshot: 提示词结构[],
         useStreaming: boolean,
         apiForOpening: 当前可用接口结构,
-        options?: { 命令基态?: any; 开局额外要求?: string; 开局配置?: OpeningConfig; eraId?: string | null }
+        options?: { 命令基态?: any; 开局额外要求?: string; 开局配置?: OpeningConfig; eraId?: string | null; 年号?: string }
     ) => Promise<void>;
     追加系统消息: (message: string) => void;
     替换流式草稿为失败提示: (history: 聊天记录结构[], errorMessage: string) => 聊天记录结构[];
@@ -394,6 +394,10 @@ export const 执行世界生成工作流 = async (
 
         const worldPromptContent = generatedWorldPrompt?.trim() || worldPromptSeed;
 
+        // 从世界母本中提取起始年号
+        const 年号匹配 = worldPromptContent.match(/起始年号[：:]\s*(.+)/);
+        const 提取年号 = 年号匹配 ? 年号匹配[1].trim() : '';
+
         let finalPrompts = 写入或插入提示词(
             updatedPrompts,
             'core_world',
@@ -437,7 +441,8 @@ export const 执行世界生成工作流 = async (
                 命令基态: deps.创建开场命令基态(),
                 开局额外要求: normalizedOpeningExtraPrompt,
                 开局配置: openingConfig,
-                eraId: worldConfig.时代配置ID || null
+                eraId: worldConfig.时代配置ID || null,
+                年号: 提取年号 || undefined
             }
         );
         deps.setLoading(false);

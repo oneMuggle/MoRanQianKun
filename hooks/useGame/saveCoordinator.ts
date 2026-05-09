@@ -23,6 +23,7 @@ import type {
     时代信息结构
 } from '../../types';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级, 校园系统数据 } from '../../models/campusPhone';
+import { 获取时代背景 } from '../../models/system';
 import { 核心_世界观 } from '../../prompts/core/world';
 import { 核心_境界体系 } from '../../prompts/core/realm';
 import { 设置键 } from '../../utils/settingsSchema';
@@ -361,7 +362,17 @@ export const 执行读取存档 = async (
 
     const saveGameConfig = save.游戏设置 ? deps.规范化游戏设置(save.游戏设置) : undefined;
     deps.设置角色(deps.规范化角色物品容器映射(save.角色数据));
-    deps.设置环境(deps.规范化环境信息(save.环境信息 || deps.创建开场空白环境()));
+    const 加载环境 = deps.规范化环境信息(save.环境信息 || deps.创建开场空白环境());
+    // 旧存档兼容：年号字段缺失时按时代背景回退默认值
+    if (!加载环境.年号) {
+        const saveEraId = (save as any).时代配置ID || (save.世界 as any)?.时代配置ID;
+        const eraBg = saveEraId ? 获取时代背景(saveEraId) : null;
+        if (eraBg === '古代' || eraBg === '近代') 加载环境.年号 = '天授';
+        else if (eraBg === '现代') 加载环境.年号 = '公元';
+        else if (eraBg === '近未来' || eraBg === '未来') 加载环境.年号 = '新历';
+        else if (eraBg === '自定义') 加载环境.年号 = '纪年';
+    }
+    deps.设置环境(加载环境);
     deps.设置社交(deps.规范化社交列表(save.社交 || []));
     deps.设置世界(deps.规范化世界状态(save.世界 || deps.创建开场空白世界()));
     deps.设置战斗(deps.规范化战斗状态(save.战斗 || deps.创建开场空白战斗()));

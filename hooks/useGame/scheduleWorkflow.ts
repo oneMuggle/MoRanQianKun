@@ -149,6 +149,27 @@ export function 格式化短时间(时间串: string): string {
     return `${结构化.月}月${结构化.日}日 ${时段}（${时辰}）`;
 }
 
+function mapMinuteToKe(minute: number): string {
+    if (minute === 30) return '正刻';
+    if (minute < 15) return '初刻';
+    if (minute < 30) return '一刻';
+    if (minute < 45) return '二刻';
+    return '三刻';
+}
+
+/** 根据时代背景格式化时间：古代/近代用传统时辰，现代/未来用24小时制 */
+export function 格式化时间按时代(时间串: string, 时代背景: string): string {
+    const 结构化 = 标准时间串转结构化(时间串);
+    if (!结构化) return 时间串;
+
+    if (时代背景 === '古代' || 时代背景 === '近代') {
+        const 时辰 = 小时转时辰(结构化.时);
+        return `${时辰} · ${mapMinuteToKe(结构化.分)}`;
+    }
+    // 现代/近未来/未来/自定义
+    return `${String(结构化.时).padStart(2, '0')}:${String(结构化.分).padStart(2, '0')}`;
+}
+
 // ---- 内部工具 ----
 
 function 时间转分钟(时间串: string): number | null {

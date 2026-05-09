@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { 环境信息结构, 节日结构, 视觉设置结构 } from '../../types';
 import { 构建区域文字样式 } from '../../utils/visualSettings';
 import { normalizeCanonicalGameTime } from '../../hooks/useGame/time/timeUtils';
+import { 格式化时间按时代 } from '../../hooks/useGame/scheduleWorkflow';
+import { 获取时代背景 } from '../../models/system';
 import { useUIText } from '../../hooks/useUIText';
 
 interface Props {
@@ -142,29 +144,6 @@ const parseEnvTime = (env?: 环境信息结构): { year: number; month: number; 
     return { year, month, day, hour, minute };
 };
 
-const mapHourToWuxia = (hour: number): string => {
-    if (hour >= 23 || hour < 1) return '子时';
-    if (hour < 3) return '丑时';
-    if (hour < 5) return '寅时';
-    if (hour < 7) return '卯时';
-    if (hour < 9) return '辰时';
-    if (hour < 11) return '巳时';
-    if (hour < 13) return '午时';
-    if (hour < 15) return '未时';
-    if (hour < 17) return '申时';
-    if (hour < 19) return '酉时';
-    if (hour < 21) return '戌时';
-    return '亥时';
-};
-
-const mapMinuteToKe = (minute: number): string => {
-    if (minute === 30) return '正刻';
-    if (minute < 15) return '初刻';
-    if (minute < 30) return '一刻';
-    if (minute < 45) return '二刻';
-    return '三刻';
-};
-
 const parseCanonicalGameTime = (raw?: string): { year: number; month: number; day: number; hour: number; minute: number } | null => {
     if (typeof raw !== 'string') return null;
     const match = raw.trim().match(/^(\d{1,6}):(\d{2}):(\d{2}):(\d{2}):(\d{2})$/);
@@ -191,6 +170,7 @@ const TopBar: React.FC<Props> = ({ 环境, 游戏初始时间, timeFormat, festi
     const [liIntensityOpen, setLiIntensityOpen] = useState(false);
 
     const parsedTime = parseEnvTime(环境);
+    const eraBackground = eraId ? (获取时代背景(eraId) || '古代') : '古代';
     const derivedDayCount = useMemo(() => {
         const current = toGameMinuteValue(parsedTime);
         const initial = toGameMinuteValue(parseCanonicalGameTime(游戏初始时间));
@@ -202,19 +182,14 @@ const TopBar: React.FC<Props> = ({ 环境, 游戏初始时间, timeFormat, festi
     const day = parsedTime?.day ?? null;
     const topBarStyle = 构建区域文字样式(visualConfig, '顶部栏');
 
-    const numericTime = parsedTime
-        ? `${parsedTime.hour.toString().padStart(2, '0')}:${parsedTime.minute.toString().padStart(2, '0')}`
+    const displayTime = parsedTime
+        ? 格式化时间按时代(环境.时间, eraBackground)
         : '未知时间';
-    const traditionalTime = parsedTime
-        ? `${mapHourToWuxia(parsedTime.hour)} · ${mapMinuteToKe(parsedTime.minute)}`
-        : '未知时刻';
-
-    const displayTime = timeFormat === '数字' ? numericTime : traditionalTime;
     const fullDateStr = parsedTime
-        ? `${parsedTime.year}年${parsedTime.month.toString().padStart(2, '0')}月${parsedTime.day.toString().padStart(2, '0')}日 ${displayTime}`
+        ? `${环境.年号 || ''}${parsedTime.year}年${parsedTime.month.toString().padStart(2, '0')}月${parsedTime.day.toString().padStart(2, '0')}日 ${displayTime}`
         : displayTime;
     const mobileDateStr = parsedTime
-        ? `${parsedTime.year}年${parsedTime.month.toString().padStart(2, '0')}月${parsedTime.day.toString().padStart(2, '0')}日`
+        ? `${环境.年号 || ''}${parsedTime.year}年${parsedTime.month.toString().padStart(2, '0')}月${parsedTime.day.toString().padStart(2, '0')}日`
         : '未知日期';
     const mobileClockStr = displayTime;
 

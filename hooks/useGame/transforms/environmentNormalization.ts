@@ -79,7 +79,8 @@ export function 规范化环境信息(rawEnv?: any): 环境信息结构 {
     .map((item: any) => 标准化环境变量条目(item))
     .filter((item): item is { 名称: string; 描述: string; 效果: string } => Boolean(item))
     .slice(-2);
-  return { 时间, 大地点, 中地点, 小地点, 具体地点, 节日, 天气, 环境变量 };
+  const 年号 = typeof source?.年号 === 'string' ? source.年号.trim() : '';
+  return { 时间, 年号, 大地点, 中地点, 小地点, 具体地点, 节日, 天气, 环境变量 };
 }
 
 export function 构建完整地点文本(env: any): string {

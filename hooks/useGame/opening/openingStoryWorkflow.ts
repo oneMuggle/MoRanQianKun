@@ -314,6 +314,7 @@ export const 执行开场剧情生成工作流 = async (
         开局额外要求?: string;
         开局配置?: OpeningConfig;
         eraId?: string | null;
+        年号?: string; // 从世界母本提取的起始年号
     } | undefined,
     deps: 开场剧情生成依赖
 ): Promise<void> => {
@@ -328,6 +329,10 @@ export const 执行开场剧情生成工作流 = async (
     let openingStreamHeartbeat: ReturnType<typeof setInterval> | null = null;
     let openingDeltaReceived = false;
     const openingEnv = deps.规范化环境信息(contextData?.环境 || deps.环境);
+    // 应用从世界母本提取的起始年号作为默认值（LLM可通过变量规划覆盖）
+    if (options?.年号 && !openingEnv.年号) {
+        openingEnv.年号 = options.年号;
+    }
     let streamMarker = 0;
     const openingRequestStartedAt = Date.now();
     let openingInputTokens = 0;
