@@ -29,7 +29,33 @@ export type MobileApp =
     | 'confession'            // 表白墙（校园特有）
     | 'rules'                 // 校规编辑器（校园特有）
     | 'hypnosis'              // 催眠App（校园特有）
-    | 'bdsn';                 // BDSM论坛（校园特有）
+    | 'bdsn'                  // BDSM论坛（校园特有）
+    // 现代纪元新增
+    | 'phone'                 // 电话
+    | 'sms'                   // 短信
+    | 'camera'                // 相机
+    | 'settings'              // 设置
+    | 'weather'               // 天气
+    | 'calendar'              // 日历
+    | 'clock'                 // 时钟
+    | 'files'                 // 文件
+    | 'ride_hailing'          // 司机端
+    | 'delivery'              // 配送端
+    | 'appointment'           // 预约管理
+    | 'ledger'                // 记账本
+    | 'work_schedule'         // 工作台
+    | 'property'              // 房源管理
+    | 'shopping'              // 购物
+    | 'social_media'          // 社交媒体
+    | 'app_store'             // 应用市场
+    | 'music'                 // 音乐
+    | 'video'                 // 视频
+    | 'fitness'               // 运动健康
+    | 'map_app'               // 地图导航（新版）
+    | 'dating'                // 约会交友（NSFW）
+    | 'adult_forum'           // 成人论坛（NSFW）
+    | 'nsfw_gallery'          // 私密空间（NSFW）
+    | 'live_stream';          // 直播（NSFW）
 
 // 设备运行模式
 export type DeviceMode = 'normal' | 'li';
@@ -110,7 +136,11 @@ export interface AppDefinition {
 // 消息结构
 export interface DeviceMessage {
     id: string;
-    type: 'map' | 'chat' | 'forum' | 'news' | 'schedule' | 'campus_card' | 'club' | 'confession' | 'rules' | 'hypnosis';
+    type: 'map' | 'chat' | 'forum' | 'news' | 'schedule' | 'campus_card' | 'club' | 'confession' | 'rules' | 'hypnosis'
+        | 'phone' | 'sms' | 'camera' | 'settings' | 'weather' | 'calendar' | 'clock' | 'files'
+        | 'ride_hailing' | 'delivery' | 'appointment' | 'ledger' | 'work_schedule' | 'property'
+        | 'shopping' | 'social_media' | 'music' | 'video' | 'fitness' | 'map_app'
+        | 'dating' | 'adult_forum' | 'nsfw_gallery' | 'live_stream';
     title: string;
     content: string;
     sender?: string;

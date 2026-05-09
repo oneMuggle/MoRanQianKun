@@ -45,6 +45,12 @@ export function useDevice(deps: UseDeviceDeps) {
     const set设备状态 = useGameStore(s => s.set设备状态);
     const 设备刷新任务队列 = useGameStore(s => s.设备刷新任务队列);
     const set设备刷新任务队列 = useGameStore(s => s.set设备刷新任务队列);
+    const 设备已安装App = useGameStore(s => s.设备已安装App);
+    const 安装App = useGameStore(s => s.安装App);
+    const 卸载App = useGameStore(s => s.卸载App);
+    const 更新App角标 = useGameStore(s => s.更新App角标);
+    const 记录App打开 = useGameStore(s => s.记录App打开);
+    const 初始化App安装 = useGameStore(s => s.初始化App安装);
 
     /** 根据 gameConfig 推导设备模式 */
     const 派生设备模式 = useCallback((): 'normal' | 'li' => {
@@ -113,6 +119,12 @@ export function useDevice(deps: UseDeviceDeps) {
         设置设备状态: 设置设备状态委托,
         设备刷新任务队列,
         set设备刷新任务队列,
+        设备已安装App,
+        安装App,
+        卸载App,
+        更新App角标,
+        记录App打开,
+        初始化App安装,
         设备关闭,
         设备返回主页,
         设备打开应用,

@@ -3,6 +3,10 @@ import { getDeviceConfig, getAppName, getLiModeThemeColor } from '../../../model
 import { DeviceState, MobileApp, DeviceConfig, DeviceGameContext } from '../../../models/mobileDevice';
 import { resolveEraNode } from '../../../models/eraTheme';
 import type { 当前可用接口结构 } from '../../../utils/apiConfig';
+import { getDockApps, findAppById } from '../../../models/appRegistry';
+import type { AppInstallState } from '../../../models/installedApps';
+import type { NsfwLevel } from '../../../models/appRegistry';
+import { isAppVisible } from '../../../models/nsfwApps';
 
 type ApiConfigLike = 当前可用接口结构 | Record<string, unknown>;
 import MapApp from './apps/MapApp';
@@ -21,6 +25,26 @@ import BDSMRelationshipDashboard from './apps/BDSMRelationshipDashboard';
 import BDSMTaskPanel from './apps/BDSMTaskPanel';
 import BDSMContractPanel from './apps/BDSMContractPanel';
 import BDSMSafetySettings from './apps/BDSMSafetySettings';
+import PhoneStatusBar from './PhoneStatusBar';
+import LockScreen from './LockScreen';
+import PhoneApp from './apps/PhoneApp';
+import SmsApp from './apps/SmsApp';
+import CameraApp from './apps/CameraApp';
+import SettingsApp from './apps/SettingsApp';
+import WeatherApp from './apps/WeatherApp';
+import RideHailingApp from './apps/RideHailingApp';
+import DeliveryApp from './apps/DeliveryApp';
+import AppointmentApp from './apps/AppointmentApp';
+import LedgerApp from './apps/LedgerApp';
+import WorkScheduleApp from './apps/WorkScheduleApp';
+import PropertyApp from './apps/PropertyApp';
+import ShoppingApp from './apps/ShoppingApp';
+import SocialMediaApp from './apps/SocialMediaApp';
+import AppStoreApp from './apps/AppStoreApp';
+import DatingApp from './apps/DatingApp';
+import AdultForumApp from './apps/AdultForumApp';
+import NsfwGalleryApp from './apps/NsfwGalleryApp';
+import LiveStreamApp from './apps/LiveStreamApp';
 
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../types';
 import type { NPC结构 } from '../../../models/social';
@@ -44,6 +68,8 @@ interface AppProps {
     onConfirmNegotiation?: (npcId: string, npcName: string, 协商结果: { 见面回合偏移: number; 见面地点: string; 安全词: string; 玩家底线: string[] }) => void;
     onBDSM保存安全设置?: (npcId: string, 安全词: string, 底线: string[]) => void;
     apiConfig?: ApiConfigLike;
+    onInstallApp?: (appId: string) => void;
+    onUninstallApp?: (appId: string) => void;
 }
 
 interface MobileHomeProps {
@@ -67,6 +93,11 @@ interface MobileHomeProps {
     onConfirmNegotiation?: (npcId: string, npcName: string, 协商结果: { 见面回合偏移: number; 见面地点: string; 安全词: string; 玩家底线: string[] }) => void;
     onBDSM保存安全设置?: (npcId: string, 安全词: string, 底线: string[]) => void;
     apiConfig?: ApiConfigLike;
+    installedApps?: AppInstallState;
+    nsfwEnabled?: boolean;
+    maxNsfwLevel?: NsfwLevel;
+    onInstallApp?: (appId: string) => void;
+    onUninstallApp?: (appId: string) => void;
 }
 
 const appIcons: Record<MobileApp, string> = {
@@ -84,6 +115,32 @@ const appIcons: Record<MobileApp, string> = {
     rules: '📜',
     hypnosis: '🌀',
     bdsn: '🌙',
+    // 现代纪元
+    phone: '📞',
+    sms: '💬',
+    camera: '📷',
+    settings: '⚙️',
+    weather: '🌤️',
+    calendar: '📅',
+    clock: '⏰',
+    files: '📁',
+    ride_hailing: '🚗',
+    delivery: '🛵',
+    appointment: '📋',
+    ledger: '📒',
+    work_schedule: '💼',
+    property: '🏠',
+    shopping: '🛒',
+    social_media: '📱',
+    music: '🎵',
+    video: '🎬',
+    fitness: '🏃',
+    map_app: '🗺️',
+    dating: '❤️',
+    adult_forum: '🌙',
+    nsfw_gallery: '🔒',
+    live_stream: '📺',
+    app_store: '🏪',
 };
 
 const MobileHome: React.FC<MobileHomeProps> = ({
@@ -91,7 +148,7 @@ const MobileHome: React.FC<MobileHomeProps> = ({
     deviceState,
     onAppClick,
     onReturnHome,
-    onClose,
+    onClose: _onClose,
     gameContext,
     onRulesChange,
     onHypnosisChange,
@@ -105,17 +162,23 @@ const MobileHome: React.FC<MobileHomeProps> = ({
     onConfirmNegotiation,
     onBDSM保存安全设置,
     apiConfig,
+    installedApps,
+    nsfwEnabled = false,
+    maxNsfwLevel = 0,
+    onInstallApp,
+    onUninstallApp,
 }) => {
     const [config, setConfig] = useState<DeviceConfig | null>(null);
     const [liModeName, setLiModeName] = useState<string | undefined>();
     const [bdsmPanel, setBdsmPanel] = useState<'none' | '总览' | '任务' | '契约' | '安全设置'>('none');
+    const [isLocked, setIsLocked] = useState(true);
 
-    // 检测是否有 BDSM 关系
-    const 有BDSM关系 = useMemo(() => {
-        const 欲望系统 = gameContext?.校园系统?.欲望系统;
-        if (!欲望系统?.NPC欲望档案) return false;
-        return Object.values(欲望系统.NPC欲望档案).some((a: any) => a?.BDSM关系 && a.BDSM关系.阶段 !== '初识');
-    }, [gameContext?.校园系统?.欲望系统]);
+    // 检测是否有 BDSM 关系（用于快捷入口，预留）
+    // const 有BDSM关系 = useMemo(() => {
+    //     const 欲望系统 = gameContext?.校园系统?.欲望系统;
+    //     if (!欲望系统?.NPC欲望档案) return false;
+    //     return Object.values(欲望系统.NPC欲望档案).some((a: any) => a?.BDSM关系 && a.BDSM关系.阶段 !== '初识');
+    // }, [gameContext?.校园系统?.欲望系统]);
 
     useEffect(() => {
         const resolved = resolveEraNode(eraId);
@@ -136,7 +199,8 @@ const MobileHome: React.FC<MobileHomeProps> = ({
 
     const isLiMode = deviceState.mode === 'li';
     const themeColor = isLiMode ? getLiModeThemeColor(config, '#6B2D8B') : undefined;
-    const liModeEnabled = !!liModeName;
+    // liModeName is used in the li-mode badge display (rendered inline in lock screen and status bar)
+    void liModeName;
 
     const renderActiveApp = () => {
         const appProps: AppProps = {
@@ -171,6 +235,24 @@ const MobileHome: React.FC<MobileHomeProps> = ({
             case 'rules': return <CampusRulesApp {...appProps} />;
             case 'hypnosis': return <CampusHypnosisApp {...appProps} />;
             case 'bdsn': return <CampusForumApp {...appProps} />;
+            case 'phone': return <PhoneApp {...appProps} />;
+            case 'sms': return <SmsApp {...appProps} />;
+            case 'camera': return <CameraApp {...appProps} />;
+            case 'settings': return <SettingsApp {...appProps} />;
+            case 'weather': return <WeatherApp {...appProps} />;
+            case 'ride_hailing': return <RideHailingApp {...appProps} />;
+            case 'delivery': return <DeliveryApp {...appProps} />;
+            case 'appointment': return <AppointmentApp {...appProps} />;
+            case 'ledger': return <LedgerApp {...appProps} />;
+            case 'work_schedule': return <WorkScheduleApp {...appProps} />;
+            case 'property': return <PropertyApp {...appProps} />;
+            case 'shopping': return <ShoppingApp {...appProps} />;
+            case 'social_media': return <SocialMediaApp {...appProps} />;
+            case 'app_store': return <AppStoreApp {...appProps} installedApps={installedApps} nsfwEnabled={nsfwEnabled} onInstall={onInstallApp} onUninstall={onUninstallApp} />;
+            case 'dating': return <DatingApp {...appProps} />;
+            case 'adult_forum': return <AdultForumApp {...appProps} />;
+            case 'nsfw_gallery': return <NsfwGalleryApp {...appProps} />;
+            case 'live_stream': return <LiveStreamApp {...appProps} />;
             default: return null;
         }
     };
@@ -234,113 +316,130 @@ const MobileHome: React.FC<MobileHomeProps> = ({
         }
     }
 
+    const isLockedState = isLocked;
+    const visibleApps = useMemo(() => {
+        if (!installedApps) return config.apps;
+        const installedIds = new Set(installedApps.installedApps.map(i => i.appId));
+        return config.apps.filter(app => {
+            if (!installedIds.has(app)) return false;
+            const appDef = findAppById(app);
+            if (!appDef) return true;
+            return isAppVisible(appDef, nsfwEnabled, maxNsfwLevel);
+        });
+    }, [config.apps, installedApps, nsfwEnabled, maxNsfwLevel]);
+
+    const dockApps = useMemo(() => {
+        return getDockApps()
+            .map(app => app.id as MobileApp)
+            .filter(app => config.apps.includes(app));
+    }, [config.apps]);
+
+    const wallpaperGradient = isLiMode
+        ? `linear-gradient(135deg, ${themeColor}20 0%, #0a0a0a 60%, #1a0a2e 100%)`
+        : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
+
+    const handleUnlock = () => setIsLocked(false);
+
+    if (isLockedState) {
+        return (
+            <LockScreen
+                onUnlock={handleUnlock}
+                deviceMode={deviceState.mode}
+                themeColor={themeColor}
+                notifications={deviceState.notifications.slice(0, 3)}
+            />
+        );
+    }
+
     return (
         <div
-            className="flex flex-col h-full transition-colors duration-300"
+            className="flex flex-col h-full"
             data-device-mode={deviceState.mode}
-            style={
-                isLiMode
-                    ? {
-                          ['--li-theme-color' as string]: themeColor,
-                      }
-                    : undefined
-            }
+            style={{ background: wallpaperGradient }}
         >
-            {/* 顶部状态栏 */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
-                <div className="flex items-center gap-3">
-                    <h2
-                        className="text-lg font-bold"
-                        style={isLiMode ? { color: themeColor } : {}}
-                    >
-                        {config.deviceName}
-                    </h2>
-                    {liModeEnabled && liModeName && (
-                        <span
-                            className="text-xs px-2 py-0.5 rounded-full"
-                            style={{
-                                backgroundColor: `${themeColor}33`,
-                                color: themeColor,
-                                border: `1px solid ${themeColor}66`,
-                            }}
-                        >
-                            {liModeName}
-                        </span>
-                    )}
+            {/* 状态栏 */}
+            <PhoneStatusBar
+                _eraId={eraId}
+                deviceMode={deviceState.mode}
+                themeColor={themeColor}
+            />
+
+            {/* 应用网格 */}
+            <div className="flex-1 overflow-y-auto px-3 pt-4 pb-2">
+                <div className="grid grid-cols-4 gap-y-5 gap-x-3">
+                    {visibleApps.map((app) => {
+                        const appDef = findAppById(app);
+                        const appName = appDef
+                            ? getAppName(config, app, deviceState.mode)
+                            : getAppName(config, app, deviceState.mode);
+                        const icon = appDef?.icon ?? appIcons[app] ?? '📱';
+                        const appColor = appDef?.color;
+
+                        return (
+                            <button
+                                key={app}
+                                onClick={() => onAppClick(app)}
+                                className="flex flex-col items-center gap-1 group"
+                            >
+                                <div
+                                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-transform group-hover:scale-105 group-active:scale-95"
+                                    style={{
+                                        background: appColor
+                                            ? `linear-gradient(135deg, ${appColor}30, ${appColor}60)`
+                                            : 'rgba(255,255,255,0.08)',
+                                        boxShadow: appColor ? `0 2px 8px ${appColor}30` : undefined,
+                                    }}
+                                >
+                                    {icon}
+                                </div>
+                                <span className="text-[10px] text-gray-300 text-center leading-tight line-clamp-2">
+                                    {appName}
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
-                <button
-                    onClick={onClose}
-                    className="text-gray-400 hover:text-white transition-colors"
-                    aria-label="关闭设备"
-                >
-                    ✕
-                </button>
             </div>
 
-            {/* Active App or Home Grid */}
-            {deviceState.activeApp ? renderActiveApp() : (
-                <>
-                    {/* 应用网格 */}
-                    <div className="flex-1 overflow-y-auto p-4">
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                            {config.apps.map((app) => {
-                                const appName = getAppName(config, app, deviceState.mode);
-                                const icon = appIcons[app];
-                                return (
-                                    <button
-                                        key={app}
-                                        onClick={() => onAppClick(app)}
-                                        className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-white/10 transition-all duration-200 group"
-                                    >
-                                        <span
-                                            className="text-3xl transition-transform group-hover:scale-110"
-                                            style={
-                                                isLiMode
-                                                    ? {
-                                                          filter: `drop-shadow(0 0 4px ${themeColor})`,
-                                                      }
-                                                    : undefined
-                                            }
-                                        >
-                                            {icon}
-                                        </span>
-                                        <span
-                                            className="text-xs text-center transition-colors"
-                                            style={isLiMode ? { color: themeColor } : {}}
-                                        >
-                                            {appName}
-                                        </span>
-                                    </button>
-                                );
-                            })}
-                        </div>
+            {/* Dock 栏 */}
+            {dockApps.length > 0 && (
+                <div className="px-3 pb-1">
+                    <div
+                        className="rounded-2xl px-3 py-2 grid grid-cols-4 gap-3"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)' }}
+                    >
+                        {dockApps.map((app) => {
+                            const appDef = findAppById(app);
+                            const icon = appDef?.icon ?? appIcons[app] ?? '📱';
+                            return (
+                                <button
+                                    key={app}
+                                    onClick={() => onAppClick(app)}
+                                    className="flex items-center justify-center h-12 rounded-xl text-xl transition-transform hover:scale-105 active:scale-95"
+                                    style={{
+                                        background: appDef?.color
+                                            ? `linear-gradient(135deg, ${appDef.color}40, ${appDef.color}70)`
+                                            : 'rgba(255,255,255,0.06)',
+                                    }}
+                                >
+                                    {icon}
+                                </button>
+                            );
+                        })}
                     </div>
+                </div>
+            )}
 
-                    {/* BDSM 关系快捷入口 */}
-                    {有BDSM关系 && (
-                        <div className="px-4 pb-2">
-                            <button
-                                onClick={() => setBdsmPanel('总览')}
-                                className="w-full px-3 py-2 rounded-lg bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-700/30 flex items-center gap-3 hover:from-purple-800/40 hover:to-pink-800/40 transition-all"
-                            >
-                                <span className="text-lg">🔗</span>
-                                <div className="flex-1 text-left">
-                                    <span className="text-xs text-purple-300 font-medium">BDSM 关系</span>
-                                    <p className="text-[10px] text-gray-500">查看任务、契约与关系状态</p>
-                                </div>
-                                <span className="text-[10px] text-gray-500">&rarr;</span>
-                            </button>
-                        </div>
-                    )}
+            {/* Home Indicator */}
+            <div className="flex justify-center pb-2">
+                <div className="w-32 h-1 bg-white/20 rounded-full" />
+            </div>
 
-                    {/* 底部状态栏 */}
-                    <div className="px-4 py-2 border-t border-gray-700/50 text-xs text-gray-500">
-                        <div className="flex justify-between">
-                            <span>通讯范围: {config.capabilities.通讯范围}</span>
-                            <span>能源: {config.capabilities.能源类型}</span>
-                        </div>
-                    </div>
-                </>
+            {/* Active App overlay */}
+            {deviceState.activeApp && (
+                <div className="absolute inset-0 z-10 bg-black/90">
+                    {renderActiveApp()}
+                </div>
             )}
         </div>
     );

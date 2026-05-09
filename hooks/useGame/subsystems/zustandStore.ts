@@ -7,6 +7,8 @@ import { create } from 'zustand';
 import type { 右下角提示结构 } from '../ui/notificationSystem';
 import type { 旅行事件 } from '../travel/travelWorkflow';
 import type { DeviceState } from '../../../models/mobileDevice';
+import type { AppInstallState } from '../../../models/installedApps';
+import { createInitialInstallState, installApp, uninstallApp, updateBadge, recordAppOpened } from '../../../models/installedApps';
 import type { 设备刷新任务 } from '../device/deviceRefreshMonitor';
 import type { NPC生图任务记录, 场景生图任务记录, 世界书结构, 世界书预设组结构, 内置提示词条目结构, 场景图片档案, 时代信息结构 } from '../../../types';
 import type { 记忆压缩任务结构 } from '../memory/memoryUtils';
@@ -137,11 +139,18 @@ const createTravelSlice: ZustandSlice<TravelSlice> = (set) => ({
 interface DeviceSliceState {
     设备状态: DeviceState;
     设备刷新任务队列: 设备刷新任务[];
+    设备已安装App: AppInstallState;
 }
 
 interface DeviceSliceActions {
     set设备状态: (updater: DeviceState | ((prev: DeviceState) => DeviceState)) => void;
     set设备刷新任务队列: (updater: 设备刷新任务[] | ((prev: 设备刷新任务[]) => 设备刷新任务[])) => void;
+    set设备已安装App: (updater: AppInstallState | ((prev: AppInstallState) => AppInstallState)) => void;
+    安装App: (appId: string) => void;
+    卸载App: (appId: string) => void;
+    更新App角标: (appId: string, count: number) => void;
+    记录App打开: (appId: string) => void;
+    初始化App安装: (backgroundName?: string) => void;
 }
 
 interface DeviceSlice extends DeviceSliceState, DeviceSliceActions {}
@@ -161,14 +170,33 @@ const 创建初始设备状态 = (): DeviceState => ({
     notifications: [],
 });
 
-const createDeviceSlice: ZustandSlice<DeviceSlice> = (set) => ({
+const createDeviceSlice: ZustandSlice<DeviceSlice> = (set, _get) => ({
     设备状态: 创建初始设备状态(),
     设备刷新任务队列: [],
+    设备已安装App: { installedApps: [] },
     set设备状态: (updater) => set((state) => ({
         设备状态: typeof updater === 'function' ? (updater as (prev: DeviceState) => DeviceState)(state.设备状态) : updater
     })),
     set设备刷新任务队列: (updater) => set((state) => ({
         设备刷新任务队列: typeof updater === 'function' ? (updater as (prev: 设备刷新任务[]) => 设备刷新任务[])(state.设备刷新任务队列) : updater
+    })),
+    set设备已安装App: (updater) => set((state) => ({
+        设备已安装App: typeof updater === 'function' ? (updater as (prev: AppInstallState) => AppInstallState)(state.设备已安装App) : updater
+    })),
+    安装App: (appId) => set((state) => ({
+        设备已安装App: installApp(state.设备已安装App, appId)
+    })),
+    卸载App: (appId) => set((state) => ({
+        设备已安装App: uninstallApp(state.设备已安装App, appId)
+    })),
+    更新App角标: (appId, count) => set((state) => ({
+        设备已安装App: updateBadge(state.设备已安装App, appId, count)
+    })),
+    记录App打开: (appId) => set((state) => ({
+        设备已安装App: recordAppOpened(state.设备已安装App, appId)
+    })),
+    初始化App安装: (backgroundName) => set(() => ({
+        设备已安装App: createInitialInstallState(backgroundName)
     })),
 });
 

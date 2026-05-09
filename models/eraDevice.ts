@@ -193,9 +193,18 @@ export const eraDeviceConfigs: Record<string, DeviceConfig> = {
         deviceName: '智能手机',
         deviceForm: 'smartphone',
         eraId: 'contemporary_urban',
-        apps: ['map', 'contacts', 'chat', 'forum', 'news', 'album', 'tools'],
+        apps: [
+            // 通用
+            'phone', 'sms', 'camera', 'settings', 'weather', 'calendar', 'clock', 'files',
+            // 原有
+            'map', 'contacts', 'chat', 'forum', 'news', 'album', 'tools',
+        ],
         uiStyle: 'modern',
-        normalAppNames: { map: '地图', contacts: '通讯录', chat: '群聊', forum: '论坛', news: '资讯', album: '相册', tools: '工具' },
+        normalAppNames: {
+            map: '地图', contacts: '通讯录', chat: '群聊', forum: '论坛', news: '资讯', album: '相册', tools: '工具',
+            phone: '电话', sms: '短信', camera: '相机', settings: '设置', weather: '天气',
+            calendar: '日历', clock: '时钟', files: '文件',
+        },
         capabilities: {
             hasGPS: true,
             hasVocalInput: true,
@@ -208,12 +217,10 @@ export const eraDeviceConfigs: Record<string, DeviceConfig> = {
         },
         liModeOverrides: {
             appNames: {
-                map: '夜行地图',
-                contacts: '关系网',
-                chat: '私密聊天',
-                forum: '都市秘闻',
-                news: '深夜推送',
-                album: '私密相册',
+                map: '夜行地图', contacts: '关系网', chat: '私密聊天', forum: '都市秘闻',
+                news: '深夜推送', album: '私密相册', tools: '暗面工具',
+                phone: '密线', sms: '密信', camera: '暗摄', settings: '暗面设置',
+                weather: '夜象', calendar: '密约', clock: '暗钟', files: '暗柜',
             },
             themeColor: '#6B2D8B',
         },
@@ -1266,6 +1273,15 @@ export function getAppName(
         rules: '校规编辑器',
         hypnosis: '催眠App',
         bdsn: '深夜板块',
+        // 现代纪元
+        phone: '电话', sms: '短信', camera: '相机', settings: '设置',
+        weather: '天气', calendar: '日历', clock: '时钟', files: '文件',
+        ride_hailing: '司机端', delivery: '配送端', appointment: '预约管理',
+        ledger: '记账本', work_schedule: '工作台', property: '房源管理',
+        shopping: '购物', social_media: '社交媒体', app_store: '应用市场', music: '音乐',
+        video: '视频', fitness: '运动健康', map_app: '地图导航',
+        dating: '心动配对', adult_forum: '深夜论坛', nsfw_gallery: '私密空间',
+        live_stream: '直播',
     };
     return defaultNames[app];
 }
@@ -1291,4 +1307,30 @@ export const DEFAULT_APP_NAMES: Record<MobileApp, { normal: string; li: string }
     rules: { normal: '学生手册', li: '暗影校规' },
     hypnosis: { normal: '心理辅导', li: '深度催眠' },
     bdsn: { normal: '深夜板块', li: '禁忌论坛' },
+    // 现代纪元
+    phone: { normal: '电话', li: '密线' },
+    sms: { normal: '短信', li: '密信' },
+    camera: { normal: '相机', li: '暗摄' },
+    settings: { normal: '设置', li: '暗面设置' },
+    weather: { normal: '天气', li: '夜象' },
+    calendar: { normal: '日历', li: '密约' },
+    clock: { normal: '时钟', li: '暗钟' },
+    files: { normal: '文件', li: '暗柜' },
+    ride_hailing: { normal: '司机端', li: '夜行接单' },
+    delivery: { normal: '配送端', li: '暗路配送' },
+    appointment: { normal: '预约管理', li: '暗约' },
+    ledger: { normal: '记账本', li: '暗账' },
+    work_schedule: { normal: '工作台', li: '暗面工作' },
+    property: { normal: '房源管理', li: '暗房' },
+    shopping: { normal: '购物', li: '暗市' },
+    social_media: { normal: '社交媒体', li: '暗面社交' },
+    app_store: { normal: '应用市场', li: '暗面市场' },
+    music: { normal: '音乐', li: '夜曲' },
+    video: { normal: '视频', li: '暗屏' },
+    fitness: { normal: '运动健康', li: '暗面健康' },
+    map_app: { normal: '地图导航', li: '暗面地图' },
+    dating: { normal: '心动配对', li: '暗缘' },
+    adult_forum: { normal: '深夜论坛', li: '禁忌版块' },
+    nsfw_gallery: { normal: '私密空间', li: '暗室' },
+    live_stream: { normal: '直播', li: '暗播' },
 };
