@@ -326,7 +326,7 @@ const 主剧情剥离提示词ID = new Set([
 ]);
 
 export const 构建系统提示词 = ({
-    promptPool,
+    promptPool = [],
     memoryData,
     socialData,
     statePayload,
@@ -339,6 +339,15 @@ export const 构建系统提示词 = ({
     deviceMessages,
     options
 }: 系统提示词构建参数): 系统提示词构建结果 => {
+    const safeMemoryData: 记忆系统结构 = memoryData && typeof memoryData === 'object'
+        ? {
+            长期记忆: Array.isArray(memoryData.长期记忆) ? memoryData.长期记忆 : [],
+            中期记忆: Array.isArray(memoryData.中期记忆) ? memoryData.中期记忆 : [],
+            短期记忆: Array.isArray(memoryData.短期记忆) ? memoryData.短期记忆 : [],
+            即时记忆: Array.isArray(memoryData.即时记忆) ? memoryData.即时记忆 : [],
+            回忆档案: Array.isArray(memoryData.回忆档案) ? memoryData.回忆档案 : [],
+        }
+        : { 长期记忆: [], 中期记忆: [], 短期记忆: [], 即时记忆: [], 回忆档案: [] };
     const 构建环境状态文本 = (payload: any) => {
         const source = payload || {};
         const env = 规范化环境信息(source?.环境);
@@ -1669,10 +1678,10 @@ export const 构建系统提示词 = ({
 
     const longMemory = options?.禁用中期长期记忆
         ? ''
-        : `【长期记忆】\n${memoryData.长期记忆.join('\n') || '暂无'}`;
+        : `【长期记忆】\n${safeMemoryData.长期记忆.join('\n') || '暂无'}`;
     const midMemory = options?.禁用中期长期记忆
         ? ''
-        : `【中期记忆】\n${memoryData.中期记忆.join('\n') || '暂无'}`;
+        : `【中期记忆】\n${safeMemoryData.中期记忆.join('\n') || '暂无'}`;
     const contextMemory = options?.禁用中期长期记忆 ? '' : `${longMemory}\n${midMemory}`;
     const contextNPCData = npcContext.在场数据块;
     const nsfwCardBlock = normalizedGameConfig.启用NSFW模式
@@ -1697,7 +1706,7 @@ export const 构建系统提示词 = ({
     const shortMemoryInjectLimit = Math.max(1, Number(normalizedMemoryConfig.短期记忆阈值) || 30);
     const shortMemoryEntries = options?.禁用短期记忆
         ? []
-        : memoryData.短期记忆
+        : safeMemoryData.短期记忆
             .slice(-shortMemoryInjectLimit)
             .map((item) => 格式化短期记忆展示文本(item))
             .filter(Boolean);

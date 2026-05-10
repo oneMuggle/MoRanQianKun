@@ -94,7 +94,7 @@ const NoControl关联整行规则 = [
 ];
 
 const 获取提示词源 = (promptPool: 提示词结构[], id: string, fallback: 提示词结构): 提示词结构 => {
-    return promptPool.find((item) => item.id === id) || fallback;
+    return (Array.isArray(promptPool) ? promptPool : []).find((item) => item.id === id) || fallback;
 };
 
 const 替换或注入提示词 = (
@@ -492,7 +492,7 @@ const 应用酒馆消息后处理 = (
 };
 
 export const 构建运行时提示词池 = (
-    promptPool: 提示词结构[],
+    promptPool: 提示词结构[] = [],
     config: 游戏设置结构,
     options?: {
         启用世界演变分流?: boolean;

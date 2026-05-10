@@ -71,7 +71,7 @@ import { 规范化视觉设置 } from '../utils/visualSettings';
 import { 默认图片管理设置, 规范化图片管理设置 } from '../utils/imageManagerSettings';
 import { 规范化可选开局配置 } from '../utils/openingConfig';
 import { 规范化环境信息, 构建完整地点文本, 规范化角色物品容器映射, 规范化社交列表 } from './useGame/stateTransforms';
-import { createGameStateAccess, createRefRegistry } from './useGame/state';
+import { createGameStateAccess, createRefRegistry, useSyncRef } from './useGame/state';
 import { createImageDomain } from './useGame/domains/imageDomain';
 import { createSessionDomain } from './useGame/domains/sessionDomain';
 import { createSendDomain } from './useGame/domains/sendDomain';
@@ -228,6 +228,10 @@ export const useGame = () => {
         performAutoSaveRef,
         按NPC读取角色锚点Ref, 提取场景角色锚点Ref, 获取当前PNG画风预设摘要Ref,
     } = refs;
+
+    // Ref 同步（确保持久化工作流读取到最新值）
+    useSyncRef(apiConfigRef, apiConfig);
+    useSyncRef(visualConfigRef, visualConfig);
 
     // 世界演变时间管理（封装游戏内时间 + 现实时间戳）
     const { 世界演变时间管理 } = stateAccess;
