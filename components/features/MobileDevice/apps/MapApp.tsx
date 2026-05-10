@@ -14,21 +14,21 @@ interface LocationItem {
     id: string;
     name: string;
     type: string;
-    icon: string;
+    icon: React.ReactNode;
     description: string;
     distance?: string;
 }
 
-const typeIconMap: Record<string, string> = {
-    '城池': '🏯',
-    '门派': '🏛️',
-    '山': '⛰️',
-    '客栈': '🍶',
-    '村': '🏘️',
-    '寺': '🛕',
-    '观': '🏚️',
-    '湖': '🌊',
-    '关': '🚪',
+const typeIconMap: Record<string, { label: string; icon: React.ReactNode }> = {
+    '城池': { label: '城池', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2 22V6a2 2 0 012-2h4l2 2h8l2-2h4v18H2zm4-8h4v4H6v-4zm8-4h4v4h-4V10z" /></svg> },
+    '门派': { label: '门派', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7v15h20V7L12 2zm0 3l7 3.5V20H5V8.5L12 5z" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 22v-6h6v6" /></svg> },
+    '山': { label: '名山', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8 21l4-10 4 10M3 21l3-7 2 3m6-3l3-7 2 7" /></svg> },
+    '客栈': { label: '客栈', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 21v-5a1 1 0 00-1-1h-5a1 1 0 00-1 1v5H5v-4a1 1 0 00-.5-.87L3 18V4l9-2 9 2v14l-1.5-2.13A1 1 0 0019 14v3h-4z" /></svg> },
+    '村': { label: '村镇', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4" /></svg> },
+    '寺': { label: '寺庙', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2v4m0 0a8 8 0 008 8H4a8 8 0 008-8z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6 21h12M8 17h8" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v11" /></svg> },
+    '观': { label: '道观', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2v6m-2 0h4M4 21l8-13 8 13H4z" /></svg> },
+    '湖': { label: '水域', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 17c2-2 4-2 6 0s4 2 6 0 4-2 6 0" /></svg> },
+    '关': { label: '关隘', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 21V7l8-4 8 4v14M8 21v-6h8v6" /></svg> },
 };
 
 function inferLocationType(归属: { 大地点: string; 中地点: string; 小地点: string }): string {
@@ -43,11 +43,11 @@ function inferLocationType(归属: { 大地点: string; 中地点: string; 小�
     return '地点';
 }
 
-function pickIcon(type: string): string {
-    for (const [key, icon] of Object.entries(typeIconMap)) {
-        if (type.includes(key)) return icon;
+function pickIcon(type: string): React.ReactNode {
+    for (const [, value] of Object.entries(typeIconMap)) {
+        if (type.includes(value.label)) return value.icon;
     }
-    return '📍';
+    return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" /></svg>;
 }
 
 const MapApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext }) => {
@@ -76,7 +76,7 @@ const MapApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext })
                     id: `npc-${npc.姓名}-${npc.当前位置}`,
                     name: `${npc.姓名}`,
                     type: `活跃NPC · ${npc.当前状态}`,
-                    icon: '🧑',
+                    icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
                     description: `${npc.当前行动}\n所在位置：${npc.当前位置}`,
                 });
             }
@@ -84,7 +84,6 @@ const MapApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext })
         return result;
     }, [gameContext?.世界]);
 
-    // Simple ASCII-style directional map display
     const directionMap = `
         北
         ↑
@@ -130,7 +129,7 @@ const MapApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext })
                             {locations.map((loc) => (
                                 <li key={loc.id} className="rounded-lg border border-gray-700/30 bg-gray-800/40 p-3 hover:border-wuxia-gold/30 transition-colors cursor-pointer">
                                     <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-wuxia-gold/10 border border-wuxia-gold/20 flex items-center justify-center text-base flex-shrink-0">
+                                        <div className="w-8 h-8 rounded-full bg-wuxia-gold/10 border border-wuxia-gold/20 flex items-center justify-center text-wuxia-gold flex-shrink-0">
                                             {loc.icon}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -148,7 +147,7 @@ const MapApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext })
                         </ul>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-8 text-center">
-                            <span className="text-4xl text-gray-600 mb-3">🗺️</span>
+                            <svg className="w-10 h-10 text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
                             <p className="text-sm text-gray-400">暂无地图数据</p>
                         </div>
                     )}

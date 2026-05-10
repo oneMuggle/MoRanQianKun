@@ -2,10 +2,9 @@ import { useCallback } from 'react';
 import { 评估旅行可行性, 执行旅行, 执行探索 } from './travel/travelWorkflow';
 import { 执行购买, 执行出售, 计算购买价格, 计算出售价格, 出售结果 } from './travel/tradeWorkflow';
 import { 执行锻造, 计算锻造成功率, 检查锻造材料, 锻造配方库, 获取可锻造配方, 材料检查结果 } from './forgeWorkflow';
-import type { 旅行事件 } from './travel/travelWorkflow';
 import type { 地图结构, 建筑结构 } from '../../models/world';
 import type { 游戏物品 } from '../../models/item';
-import type { 角色数据结构, 环境信息结构, 游戏设置结构 } from '../../types';
+import type { 角色数据结构, 环境信息结构, 游戏设置结构, 聊天记录结构 } from '../../types';
 import type { NPC结构 } from '../../models/social';
 import { useGameStore } from './subsystems/zustandStore';
 
@@ -16,10 +15,11 @@ interface TravelAndTradeDeps {
     设置环境: React.Dispatch<React.SetStateAction<环境信息结构 | null>>;
     gameConfig: 游戏设置结构 | null;
     currentEra: number;
+    设置历史记录: (updater: (prev: 聊天记录结构[]) => 聊天记录结构[]) => void;
 }
 
 export function useTravelAndTrade(deps: TravelAndTradeDeps) {
-    const { 角色, 环境, 设置角色, 设置环境, gameConfig, currentEra } = deps;
+    const { 角色, 环境, 设置角色, 设置环境, gameConfig, currentEra, 设置历史记录 } = deps;
 
     // 旅行系统 — Zustand managed
     const 旅行事件列表 = useGameStore(s => s.旅行事件列表);
@@ -32,12 +32,25 @@ export function useTravelAndTrade(deps: TravelAndTradeDeps) {
             return;
         }
 
+        // 清除旧旅行事件
+        设置旅行事件列表([]);
+
         const 结果 = 执行旅行(角色, 环境, 目标地图, 目标建筑);
         if (结果.成功) {
             设置环境(结果.新环境);
             设置旅行事件列表(结果.事件);
+            // 旅行事件注入主叙事流
+            const 事件描述 = 结果.事件.map(e => e.描述).join('\n');
+            if (事件描述) {
+                const 系统消息: 聊天记录结构 = {
+                    role: 'system',
+                    content: `[旅行] 从${环境?.具体地点 || '原处'}前往「${目标地图.名称}」。\n${事件描述}`,
+                    timestamp: Date.now()
+                };
+                设置历史记录((prev: 聊天记录结构[]) => [...prev, 系统消息]);
+            }
         }
-    }, [角色, 环境, 设置环境]);
+    }, [角色, 环境, 设置环境, 设置旅行事件列表, 设置历史记录]);
 
     const handleExplore = useCallback((目标建筑: 建筑结构) => {
         const 结果 = 执行探索(环境, 目标建筑);

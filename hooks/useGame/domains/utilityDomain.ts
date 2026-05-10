@@ -134,6 +134,7 @@ export function createUtilityDomain(input: UtilityDomainInput) {
         设置环境,
         gameConfig,
         currentEra,
+        设置历史记录,
     });
     const {
         handleTravel,

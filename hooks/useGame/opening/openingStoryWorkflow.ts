@@ -1272,11 +1272,40 @@ export const 执行开场剧情生成工作流 = async (
         const openingStateAfterCommands = deps.processResponseCommands(responseForExecution, commandBaseState, { rawContent: deps.获取原始AI消息(aiResult.rawText) });
         const openingNewNpcList = deps.提取新增NPC列表(commandBaseState.社交, openingStateAfterCommands.社交);
         const hasOpeningCommands = Array.isArray(responseForExecution?.tavern_commands) && responseForExecution.tavern_commands.length > 0;
+        // 开局地图保底数据：若 AI 未生成地图，根据环境信息自动生成
+        const 世界数据 = deps.规范化世界状态(openingStateAfterCommands.世界);
+        if (世界数据.地图.length === 0) {
+            const 保底地图 = {
+                名称: openingStateAfterCommands.环境.大地点 || '未知地域',
+                坐标: '00:00',
+                描述: `${openingStateAfterCommands.环境.大地点 || '此地'}${openingStateAfterCommands.环境.中地点 ? '的' + openingStateAfterCommands.环境.中地点 : ''}一带，初来乍到，尚需探索。`,
+                归属: {
+                    大地点: openingStateAfterCommands.环境.大地点 || '',
+                    中地点: openingStateAfterCommands.环境.中地点 || '',
+                    小地点: openingStateAfterCommands.环境.小地点 || ''
+                },
+                内部建筑: openingStateAfterCommands.环境.具体地点 ? [openingStateAfterCommands.环境.具体地点] : []
+            };
+            const 保底建筑 = openingStateAfterCommands.环境.具体地点
+                ? [{
+                    名称: openingStateAfterCommands.环境.具体地点,
+                    描述: `${openingStateAfterCommands.环境.具体地点}，当前所在之处。`,
+                    归属: {
+                        大地点: openingStateAfterCommands.环境.大地点 || '',
+                        中地点: openingStateAfterCommands.环境.中地点 || '',
+                        小地点: openingStateAfterCommands.环境.小地点 || ''
+                    }
+                }]
+                : [];
+            世界数据.地图 = [保底地图];
+            世界数据.建筑 = 保底建筑;
+        }
+
         if (!hasOpeningCommands) {
             deps.设置角色(deps.规范化角色物品容器映射(openingStateAfterCommands.角色));
             deps.设置环境(deps.规范化环境信息(openingStateAfterCommands.环境));
             deps.设置社交(deps.规范化社交列表(openingStateAfterCommands.社交));
-            deps.设置世界(deps.规范化世界状态(openingStateAfterCommands.世界));
+            deps.设置世界(世界数据);
             deps.设置战斗(deps.规范化战斗状态(openingStateAfterCommands.战斗));
             deps.设置剧情(deps.规范化剧情状态(openingStateAfterCommands.剧情, openingStateAfterCommands.环境));
             deps.设置剧情规划(deps.规范化剧情规划状态(openingStateAfterCommands.剧情规划));
@@ -1284,6 +1313,8 @@ export const 执行开场剧情生成工作流 = async (
             deps.设置同人剧情规划(deps.规范化同人剧情规划状态(openingStateAfterCommands.同人剧情规划));
             deps.设置同人女主剧情规划(deps.规范化同人女主剧情规划状态(openingStateAfterCommands.同人女主剧情规划));
         }
+        // 无论是否有命令，都确保世界数据（含保底地图）被正确写入
+        deps.设置世界(世界数据);
         const opening命令后门派 = deps.规范化门派状态(openingStateAfterCommands.玩家门派);
         const opening命令后任务 = Array.isArray(openingStateAfterCommands.任务列表)
             ? openingStateAfterCommands.任务列表

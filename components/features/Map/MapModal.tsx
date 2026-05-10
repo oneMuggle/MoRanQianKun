@@ -26,23 +26,36 @@ const MapModal: React.FC<Props> = ({ world, env, character, onTravel, onExplore,
         小: 归一化文本(env?.小地点 || '')
     };
 
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const 过滤后的地图列表 = useMemo(() => {
+        if (!searchQuery.trim()) return maps;
+        const q = 归一化文本(searchQuery);
+        return maps.filter((m: 地图结构) =>
+            归一化文本(m?.名称).includes(q)
+            || 归一化文本(m?.归属?.大地点).includes(q)
+            || 归一化文本(m?.归属?.中地点).includes(q)
+            || 归一化文本(m?.归属?.小地点).includes(q)
+        );
+    }, [maps, searchQuery]);
+
     const 默认地图索引 = useMemo(() => {
-        const bySmallName = maps.findIndex((m: any) => 归一化文本(m?.名称) === 当前层级.小);
+        const bySmallName = 过滤后的地图列表.findIndex((m: 地图结构) => 归一化文本(m?.名称) === 当前层级.小);
         if (bySmallName >= 0) return bySmallName;
 
-        const byBelong = maps.findIndex((m: any) => (
+        const byBelong = 过滤后的地图列表.findIndex((m: 地图结构) => (
             归一化文本(m?.归属?.大地点) === 当前层级.大 &&
             归一化文本(m?.归属?.中地点) === 当前层级.中 &&
             归一化文本(m?.归属?.小地点) === 当前层级.小
         ));
         if (byBelong >= 0) return byBelong;
 
-        const byCurrentPlace = maps.findIndex((m: any) => {
+        const byCurrentPlace = 过滤后的地图列表.findIndex((m: 地图结构) => {
             const key = 归一化文本(m?.名称);
             return !!key && !!当前地点归一 && (当前地点归一.includes(key) || key.includes(当前地点归一));
         });
         return byCurrentPlace >= 0 ? byCurrentPlace : 0;
-    }, [maps, 当前地点归一, 当前层级.大, 当前层级.中, 当前层级.小]);
+    }, [过滤后的地图列表, 当前地点归一, 当前层级.大, 当前层级.中, 当前层级.小]);
 
     const [selectedMapIndex, setSelectedMapIndex] = useState(默认地图索引);
     useEffect(() => {
@@ -52,12 +65,12 @@ const MapModal: React.FC<Props> = ({ world, env, character, onTravel, onExplore,
     const 当前地图 = selectedMapIndex >= 0 ? maps[selectedMapIndex] || null : null;
     const 当前地图内部建筑名 = useMemo(() => {
         if (!当前地图 || !Array.isArray(当前地图.内部建筑)) return [];
-        return 当前地图.内部建筑.filter((name: any) => typeof name === 'string' && name.trim().length > 0);
+        return 当前地图.内部建筑.filter((name: string) => typeof name === 'string' && name.trim().length > 0);
     }, [当前地图]);
 
     const 当前地图建筑列表 = useMemo(() => {
         if (当前地图内部建筑名.length === 0) return [];
-        return buildings.filter((building: any) => {
+        return buildings.filter((building: 建筑结构) => {
             const name = 归一化文本(building?.名称);
             return 当前地图内部建筑名.some((raw: string) => 归一化文本(raw) === name);
         });
@@ -65,7 +78,7 @@ const MapModal: React.FC<Props> = ({ world, env, character, onTravel, onExplore,
 
     const 命中建筑列表 = useMemo(() => {
         if (!当前地点归一) return [];
-        return buildings.filter((building: any) => {
+        return buildings.filter((building: 建筑结构) => {
             const 名称归一 = 归一化文本(building?.名称);
             if (!名称归一) return false;
             return 当前地点归一 === 名称归一
@@ -132,12 +145,27 @@ const MapModal: React.FC<Props> = ({ world, env, character, onTravel, onExplore,
                             <div className="text-sm font-bold tracking-widest text-wuxia-gold/90 font-serif flex items-center gap-2">
                                 <span className="text-wuxia-gold/50">◧</span> 九州纪略
                             </div>
-                            <span className="text-[10px] text-gray-500 font-mono tracking-widest border border-gray-800 bg-black/50 px-2 py-0.5 rounded">{maps.length} 境</span>
+                            <span className="text-[10px] text-gray-500 font-mono tracking-widest border border-gray-800 bg-black/50 px-2 py-0.5 rounded">{过滤后的地图列表.length} 境</span>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-3 relative z-10">
-                            {maps.length === 0 ? (
-                                <div className="text-xs text-gray-600 text-center py-16 font-serif italic border border-dashed border-gray-800 rounded-lg">未见四海绘印</div>
-                            ) : maps.map((item: any, idx: number) => {
+                            {/* 搜索框 */}
+                            <div className="mb-3">
+                                <div className="relative">
+                                    <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => { setSearchQuery(e.target.value); setSelectedMapIndex(0); }}
+                                        placeholder="搜索地名或归属..."
+                                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-black/50 border border-gray-800 rounded-lg text-gray-300 placeholder-gray-600 focus:outline-none focus:border-wuxia-gold/40"
+                                    />
+                                </div>
+                            </div>
+                            {过滤后的地图列表.length === 0 ? (
+                                <div className="text-xs text-gray-600 text-center py-16 font-serif italic border border-dashed border-gray-800 rounded-lg">
+                                    {maps.length === 0 ? '未见四海绘印' : '未匹配任何地点'}
+                                </div>
+                            ) : 过滤后的地图列表.map((item: 地图结构, idx: number) => {
                                 const active = idx === selectedMapIndex;
                                 const 内部建筑数 = Array.isArray(item?.内部建筑) ? item.内部建筑.length : 0;
                                 return (
@@ -258,7 +286,7 @@ const MapModal: React.FC<Props> = ({ world, env, character, onTravel, onExplore,
                                         <div className="text-gray-300">
                                             {当前地图建筑列表.length > 0 ? (
                                                 <div className="flex flex-wrap gap-2">
-                                                    {当前地图建筑列表.map((b: any, i) => (
+                                                    {当前地图建筑列表.map((b: 建筑结构, i) => (
                                                         <span key={`matched-${b?.名称}-${i}`} className="px-2 py-1 text-xs bg-wuxia-gold/10 border border-wuxia-gold/30 rounded text-wuxia-gold/90 font-bold tracking-widest shadow-inner">
                                                             {b?.名称 || '未名'}
                                                         </span>
@@ -339,7 +367,7 @@ const MapModal: React.FC<Props> = ({ world, env, character, onTravel, onExplore,
                                         <div className="flex-1 h-px bg-gradient-to-l from-transparent to-wuxia-gold/20"></div>
                                     </div>
                                     
-                                    {命中建筑列表.map((building: any, idx: number) => (
+                                    {命中建筑列表.map((building: 建筑结构, idx: number) => (
                                         <div key={`hit-building-${building?.名称 || idx}`} className="p-4 rounded-xl border border-wuxia-gold/30 bg-gradient-to-br from-wuxia-gold/5 relative overflow-hidden group hover:border-wuxia-gold/60 transition-colors shadow-sm">
                                             <div className="absolute -right-4 -top-4 text-6xl text-wuxia-gold opacity-[0.03] group-hover:scale-110 transition-transform font-serif pointer-events-none">建</div>
 

@@ -26,23 +26,36 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
         小: 归一化文本(env?.小地点 || '')
     };
 
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const 过滤后的地图列表 = useMemo(() => {
+        if (!searchQuery.trim()) return maps;
+        const q = 归一化文本(searchQuery);
+        return maps.filter((m: 地图结构) =>
+            归一化文本(m?.名称).includes(q)
+            || 归一化文本(m?.归属?.大地点).includes(q)
+            || 归一化文本(m?.归属?.中地点).includes(q)
+            || 归一化文本(m?.归属?.小地点).includes(q)
+        );
+    }, [maps, searchQuery]);
+
     const 默认地图索引 = useMemo(() => {
-        const bySmallName = maps.findIndex((m: any) => 归一化文本(m?.名称) === 当前层级.小);
+        const bySmallName = 过滤后的地图列表.findIndex((m: 地图结构) => 归一化文本(m?.名称) === 当前层级.小);
         if (bySmallName >= 0) return bySmallName;
 
-        const byBelong = maps.findIndex((m: any) => (
+        const byBelong = 过滤后的地图列表.findIndex((m: 地图结构) => (
             归一化文本(m?.归属?.大地点) === 当前层级.大
             && 归一化文本(m?.归属?.中地点) === 当前层级.中
             && 归一化文本(m?.归属?.小地点) === 当前层级.小
         ));
         if (byBelong >= 0) return byBelong;
 
-        const byCurrentPlace = maps.findIndex((m: any) => {
+        const byCurrentPlace = 过滤后的地图列表.findIndex((m: 地图结构) => {
             const key = 归一化文本(m?.名称);
             return !!key && !!当前地点归一 && (当前地点归一.includes(key) || key.includes(当前地点归一));
         });
         return byCurrentPlace >= 0 ? byCurrentPlace : 0;
-    }, [maps, 当前地点归一, 当前层级.大, 当前层级.中, 当前层级.小]);
+    }, [过滤后的地图列表, 当前地点归一, 当前层级.大, 当前层级.中, 当前层级.小]);
 
     const [selectedMapIndex, setSelectedMapIndex] = useState(默认地图索引);
     const [activeTab, setActiveTab] = useState<'atlas' | 'buildings'>('atlas');
@@ -51,15 +64,15 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
         setSelectedMapIndex(默认地图索引);
     }, [默认地图索引]);
 
-    const 当前地图 = selectedMapIndex >= 0 ? maps[selectedMapIndex] || null : null;
+    const 当前地图 = selectedMapIndex >= 0 ? 过滤后的地图列表[selectedMapIndex] || null : null;
     const 当前地图内部建筑名 = useMemo(() => {
         if (!当前地图 || !Array.isArray(当前地图.内部建筑)) return [];
-        return 当前地图.内部建筑.filter((name: any) => typeof name === 'string' && name.trim().length > 0);
+        return 当前地图.内部建筑.filter((name: string) => typeof name === 'string' && name.trim().length > 0);
     }, [当前地图]);
 
     const 当前地图建筑列表 = useMemo(() => {
         if (当前地图内部建筑名.length === 0) return [];
-        return buildings.filter((building: any) => {
+        return buildings.filter((building: 建筑结构) => {
             const name = 归一化文本(building?.名称);
             return 当前地图内部建筑名.some((raw: string) => 归一化文本(raw) === name);
         });
@@ -67,7 +80,7 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
 
     const 命中建筑列表 = useMemo(() => {
         if (!当前地点归一) return [];
-        return buildings.filter((building: any) => {
+        return buildings.filter((building: 建筑结构) => {
             const 名称归一 = 归一化文本(building?.名称);
             if (!名称归一) return false;
             return 当前地点归一 === 名称归一
@@ -98,7 +111,18 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
                     </button>
                 </div>
 
-                <div className="shrink-0 border-b border-gray-800/60 bg-black/30 px-3 py-2">
+                <div className="shrink-0 border-b border-gray-800/60 bg-black/30 px-3 py-2 space-y-2">
+                    {/* 搜索框 */}
+                    <div className="relative">
+                        <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setSelectedMapIndex(0); }}
+                            placeholder="搜索地名或归属..."
+                            className="w-full pl-8 pr-3 py-1.5 text-xs bg-black/40 border border-gray-800 rounded-lg text-gray-300 placeholder-gray-600 focus:outline-none focus:border-wuxia-gold/40"
+                        />
+                    </div>
                     <div className="flex gap-2 overflow-x-auto no-scrollbar">
                         <button
                             onClick={() => setActiveTab('atlas')}
@@ -106,7 +130,7 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
                                 activeTab === 'atlas' ? 'border-wuxia-gold/60 bg-wuxia-gold/10 text-wuxia-gold' : 'border-gray-800 text-gray-500'
                             }`}
                         >
-                            地图图鉴 <span className="ml-1 font-mono">{maps.length}</span>
+                            地图图鉴 <span className="ml-1 font-mono">{过滤后的地图列表.length}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('buildings')}
@@ -224,7 +248,7 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
                                         <div className="text-[10px] text-gray-500 tracking-[0.25em] mb-2">已建档匹配建筑</div>
                                         {当前地图建筑列表.length > 0 ? (
                                             <div className="space-y-2">
-                                                {当前地图建筑列表.map((building: any, idx: number) => (
+                                                {当前地图建筑列表.map((building: 建筑结构, idx: number) => (
                                                     <div key={`${building?.名称 || idx}`} className="rounded-lg border border-gray-800 bg-black/20 px-3 py-2">
                                                         <div className="text-[11px] text-gray-200">{building?.名称 || `建筑 ${idx + 1}`}</div>
                                                         <div className="text-[10px] text-gray-500 mt-1">{building?.描述 || '暂无描述'}</div>
@@ -245,7 +269,7 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
                             <div className="bg-black/40 border border-gray-800 rounded-xl p-3 space-y-2">
                                 <div className="text-[10px] text-gray-500 tracking-[0.3em] px-1">地图列表</div>
                                 {maps.length > 0 ? (
-                                    maps.map((item: any, idx: number) => {
+                                    maps.map((item: 地图结构, idx: number) => {
                                         const selected = idx === selectedMapIndex;
                                         return (
                                             <button
@@ -282,7 +306,7 @@ const MobileMapModal: React.FC<Props> = ({ world, env, character, onTravel, onEx
                         <div className="bg-black/40 border border-gray-800 rounded-xl p-3 space-y-3">
                             <div className="text-[10px] text-gray-500 tracking-[0.3em] px-1">当前地点命中建筑</div>
                             {命中建筑列表.length > 0 ? (
-                                命中建筑列表.map((building: any, idx: number) => (
+                                命中建筑列表.map((building: 建筑结构, idx: number) => (
                                     <div key={`${building?.名称 || idx}`} className="rounded-xl border border-wuxia-gold/20 bg-wuxia-gold/5 p-4">
                                         <div className="flex items-center justify-between gap-2">
                                             <div className="text-sm text-wuxia-gold font-serif font-bold">{building?.名称 || `建筑 ${idx + 1}`}</div>
