@@ -83,6 +83,7 @@ type 主剧情上下文片段 = {
     字数要求提示词: string;
     免责声明输出提示词: string;
     输出协议提示词: string;
+    行动选项运行时指令: string;
 };
 
 export type 主剧情系统上下文 = {

@@ -97,6 +97,7 @@ export type 系统提示词上下文片段 = {
     任务状态: string;
     约定状态: string;
     NSFW角色卡片: string;
+    行动选项运行时指令: string;
 };
 
 export type 系统提示词构建结果 = {
@@ -1418,12 +1419,13 @@ export const 构建系统提示词 = ({
             && !selectedCotPromptIds.includes(p.id)
             && p.类型 !== '难度设定')
         .map(p => ({ id: p.id, content: 应用境界区块替换(应用写作设置(p.id, 渲染提示词文本(读取主剧情内置槽位覆盖(p.id, p.内容)))) }));
+    const actionOptionsEnabled = normalizedGameConfig.启用行动选项 || normalizedGameConfig.启用行动选项增强;
     const actionOptionsPromptContent = options?.禁用行动选项提示词
         ? ''
         : 按当前设置过滤提示词(渲染提示词文本(
-            获取行动选项提示词(effectivePromptPool, normalizedGameConfig.启用行动选项)
+            获取行动选项提示词(effectivePromptPool, actionOptionsEnabled)
         ));
-    const actionOptionsRuntimeDirectives = normalizedGameConfig.启用行动选项
+    const actionOptionsRuntimeDirectives = actionOptionsEnabled
         ? 构建行动选项运行时指令(normalizedGameConfig)
         : '';
     const activePerspectivePromptId = selectedPerspectivePrompt?.id || fallbackPerspectivePrompt?.id || '';
@@ -1766,7 +1768,8 @@ export const 构建系统提示词 = ({
             门派状态: contextSectState,
             任务状态: contextTaskState,
             约定状态: contextAgreementState,
-            NSFW角色卡片: nsfwCardBlock
+            NSFW角色卡片: nsfwCardBlock,
+            行动选项运行时指令: actionOptionsRuntimeDirectives
         }
     };
 };

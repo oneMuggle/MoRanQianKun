@@ -178,9 +178,11 @@ export function createWorkflowDomain(input: WorkflowDomainInput) {
     // --- 系统提示词构建 ---
     const 构建系统提示词 = (
         promptPool: any[], memoryData: any, socialData: any[],
-        statePayload: any, options?: any, deviceMessages?: any[]
+        statePayload: any, options?: any, deviceMessages?: any[],
+        overrideGameConfig?: any
     ) => 构建系统提示词工作流({
-        promptPool, memoryData, socialData, statePayload, gameConfig,
+        promptPool, memoryData, socialData, statePayload,
+        gameConfig: overrideGameConfig ?? gameConfig,
         memoryConfig, fallbackPlayerName: 角色姓名,
         builtinPromptEntries: 内置提示词列表, worldbooks: 世界书列表,
         worldEvolutionEnabled: worldEvolutionEnabled(), deviceMessages,

@@ -162,7 +162,7 @@ type 主剧情发送依赖 = {
     应用并同步记忆系统: (memory: 记忆系统结构, options?: { 静默总结提示?: boolean }) => void;
     onBDSM状态更新?: BDSM状态更新回调;
     onBDSM见面预约更新?: (更新: { npcId: string; 新状态: string }) => void;
-    构建系统提示词: (promptPool: any[], memoryData: 记忆系统结构, socialData: any[], statePayload: any, options?: any, deviceMessages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }>) => 主剧情系统上下文 & {
+    构建系统提示词: (promptPool: any[], memoryData: 记忆系统结构, socialData: any[], statePayload: any, options?: any, deviceMessages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }>, overrideGameConfig?: any) => 主剧情系统上下文 & {
         runtimePromptStates: Record<string, any>;
     };
     processResponseCommands: (
@@ -468,7 +468,8 @@ export const 执行主剧情发送工作流 = async (
                     timestamp: m.timestamp,
                     read: m.read,
                 }))
-                : undefined
+                : undefined,
+            currentState.gameConfig
         );
 
         // ─── 流式标记 ──────────────────────────────────────────────────
@@ -616,6 +617,7 @@ export const 执行主剧情发送工作流 = async (
                     { section: '长期记忆', content: contextPieces.长期记忆 || '', charCount: (contextPieces.长期记忆 || '').length },
                     { section: '中期记忆', content: contextPieces.中期记忆 || '', charCount: (contextPieces.中期记忆 || '').length },
                     { section: '剧情安排', content: contextPieces.剧情安排 || '', charCount: (contextPieces.剧情安排 || '').length },
+                    { section: '行动选项增强', content: contextPieces.行动选项运行时指令 || '', charCount: (contextPieces.行动选项运行时指令 || '').length },
                 ].filter(p => p.content);
                 const fullSystemPrompt = systemPromptPieces.map(p => p.content).join('\n\n');
                 const promptStates: Array<{ promptId: string; status: 'enabled' | 'disabled' | 'injected' }> = Object.entries(builtContext.runtimePromptStates || {}).map(([id, state]: [string, any]) => ({
