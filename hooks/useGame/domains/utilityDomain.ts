@@ -118,6 +118,7 @@ export function createUtilityDomain(input: UtilityDomainInput) {
         推送右下角提示,
     });
     const {
+        设备状态,
         设备关闭,
         设备返回主页,
         设备打开应用,
@@ -179,6 +180,7 @@ export function createUtilityDomain(input: UtilityDomainInput) {
         应用时代信息到状态, 处理时代变更, 应用图片管理设置到状态,
         关闭右下角提示,
         推送右下角提示,
+        设备状态,
         设备关闭, 设备返回主页, 设备打开应用, 设备打开, 派生设备模式,
         handleTravel, handleExplore, handleBuyItem, handleSellItem,
         handleForgeItem, getForgeRecipes, checkForgeMaterials, getForgeSuccessRate,

@@ -48,6 +48,7 @@ const App: React.FC = () => {
         apiConfig: state.apiConfig,
         启用修炼体系: state.gameConfig?.启用修炼体系 !== false,
         activeMobileWindow,
+        requestConfirm,
     });
 
     const appEffects = useAppEffects({

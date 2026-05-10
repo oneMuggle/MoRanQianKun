@@ -11,7 +11,6 @@
 
 import * as React from 'react';
 import { useModalOpeners, type ModalOpeners } from '../../hooks/useModalOpeners';
-import { useConfirmSystem } from '../../hooks/useConfirmSystem';
 
 // ============================================================================
 // 类型
@@ -60,14 +59,11 @@ interface UseAppModalStateDeps {
     apiConfig: any;
     启用修炼体系: boolean;
     activeMobileWindow: string | null;
+    requestConfirm: (options: any) => Promise<boolean>;
 }
 
 interface UseAppModalStateReturn extends AppModalState {
-    confirmState: any;
     requestConfirm: (options: any) => Promise<boolean>;
-    resolveConfirm: (value: boolean) => void;
-    ConfirmModal: React.ComponentType<any>;
-    confirmResolverRef: React.MutableRefObject<((value: boolean) => void) | null>;
     modalOpeners: ModalOpeners;
 }
 
@@ -81,6 +77,7 @@ export function useAppModalState({
     apiConfig,
     启用修炼体系,
     activeMobileWindow,
+    requestConfirm,
 }: UseAppModalStateDeps): UseAppModalStateReturn {
     // --- 弹窗状态 ---
     const [showCharacter, setShowCharacter] = React.useState(false);
@@ -100,10 +97,6 @@ export function useAppModalState({
     const [sceneQuickGenHint, setSceneQuickGenHint] = React.useState(false);
     const [sceneQuickGenToastVisible, setSceneQuickGenToastVisible] = React.useState(false);
     const [contextSnapshot, setContextSnapshot] = React.useState<Awaited<ReturnType<any>> | undefined>(undefined);
-
-    // --- 确认系统 ---
-    const confirmResolverRef = React.useRef<((value: boolean) => void) | null>(null);
-    const { confirmState, requestConfirm, resolveConfirm, ConfirmModal } = useConfirmSystem();
 
     // --- 弹窗开启器 ---
     const modalStates = {
@@ -148,8 +141,7 @@ export function useAppModalState({
         sceneQuickGenHint, setSceneQuickGenHint,
         sceneQuickGenToastVisible, setSceneQuickGenToastVisible,
         contextSnapshot, setContextSnapshot,
-        confirmState, requestConfirm, resolveConfirm, ConfirmModal,
-        confirmResolverRef,
+        requestConfirm,
         modalOpeners,
     };
 }
