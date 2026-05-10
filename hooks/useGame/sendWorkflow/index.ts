@@ -143,6 +143,8 @@ type 主剧情发送当前状态 = {
     校规系统?: { 校规列表: any[]; 影响日志: any[] };
     催眠系统?: { 催眠记录列表: any[]; app等级: any; 累计使用次数: number };
     校园系统?: { 欲望系统?: { NPC欲望档案?: Record<string, any>; 后果列表?: any[]; 里程碑列表?: any[]; SM场景池?: any[]; 桌游状态?: any; 校园祭状态?: any } };
+    都市网约车系统?: Record<string, unknown>;
+    写真系统?: any;
     时代配置ID?: string;
 };
 
@@ -162,6 +164,8 @@ type 主剧情发送依赖 = {
     应用并同步记忆系统: (memory: 记忆系统结构, options?: { 静默总结提示?: boolean }) => void;
     onBDSM状态更新?: BDSM状态更新回调;
     onBDSM见面预约更新?: (更新: { npcId: string; 新状态: string }) => void;
+    设置写真系统?: (value: any) => void;
+    设置校园系统?: (value: any) => void;
     构建系统提示词: (promptPool: any[], memoryData: 记忆系统结构, socialData: any[], statePayload: any, options?: any, deviceMessages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }>, overrideGameConfig?: any) => 主剧情系统上下文 & {
         runtimePromptStates: Record<string, any>;
     };
@@ -526,19 +530,13 @@ export const 执行主剧情发送工作流 = async (
               时代配置ID: currentState.时代配置ID,
               社交列表: currentState.社交,
             }),
-            写真NSFW参数: (0, () => {
-              try {
-                const { 构建写真NSFW参数 } = require('../photographyNSFWIntegration');
-                return 构建写真NSFW参数({
-                  写真系统: (currentState as any).写真系统,
-                  gameConfig: currentState.gameConfig,
-                  角色: { 出身背景: currentState.角色?.出身背景 },
-                  时代配置ID: currentState.时代配置ID,
-                });
-              } catch {
-                return undefined;
-              }
-            })(),
+            写真NSFW参数: 构建写真NSFW参数({
+              写真系统: (currentState as any).写真系统,
+              gameConfig: currentState.gameConfig,
+              角色: { 出身背景: currentState.角色?.出身背景, 姓名: currentState.角色?.姓名 },
+              时代配置ID: currentState.时代配置ID,
+              社交列表: currentState.社交,
+            }) as any,
         });
         const inputTokens = deps.估算消息Token(orderedMessages, activeApi?.model);
 
@@ -618,6 +616,7 @@ export const 执行主剧情发送工作流 = async (
                     { section: '中期记忆', content: contextPieces.中期记忆 || '', charCount: (contextPieces.中期记忆 || '').length },
                     { section: '剧情安排', content: contextPieces.剧情安排 || '', charCount: (contextPieces.剧情安排 || '').length },
                     { section: '行动选项增强', content: contextPieces.行动选项运行时指令 || '', charCount: (contextPieces.行动选项运行时指令 || '').length },
+                    { section: '额外要求提示词', content: extraPromptForService || '', charCount: (extraPromptForService || '').length },
                 ].filter(p => p.content);
                 const fullSystemPrompt = systemPromptPieces.map(p => p.content).join('\n\n');
                 const promptStates: Array<{ promptId: string; status: 'enabled' | 'disabled' | 'injected' }> = Object.entries(builtContext.runtimePromptStates || {}).map(([id, state]: [string, any]) => ({
@@ -753,6 +752,7 @@ export const 执行主剧情发送工作流 = async (
             fandomHeroinePlan: processingResult.finalState.同人女主剧情规划,
             memory: processingResult.nextMemory,
             都市网约车系统: (currentState as any).都市网约车系统,
+            写真系统: (currentState as any).写真系统,
             force: true
         });
 
@@ -938,6 +938,24 @@ export const 执行主剧情发送工作流 = async (
                     });
                 }
             }
+        }
+
+        // ─── 写真系统状态写回 ──────────────────────────────────────────
+        const 更新后写真系统 = (currentState as any).写真系统;
+        const 写真setter = deps.设置写真系统;
+        console.log('[写真系统诊断] 回合末尾写回:', {
+          写真系统存在: !!更新后写真系统,
+          setter可用: !!写真setter,
+          模特档案: 更新后写真系统?.模特档案 ? Object.keys(更新后写真系统.模特档案) : null,
+          进行中的项目: (更新后写真系统?.进行中的拍摄项目 || []).length,
+        });
+        if (更新后写真系统 && 写真setter) {
+          const 模特档案JSON = JSON.stringify(更新后写真系统.模特档案, null, 2) || 'undefined';
+          console.log('[写真系统诊断] 即将调用 setter, 模特档案数据:', 模特档案JSON.substring(0, 300));
+          写真setter(更新后写真系统);
+          console.log('[写真系统诊断] setter 调用完成');
+        } else if (!写真setter) {
+          console.error('[写真系统诊断] setter 不可用！');
         }
 
         return { attachedRecallPreview };

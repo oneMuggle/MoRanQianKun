@@ -181,6 +181,7 @@ export const 构建主剧情请求参数 = (
                 实际尺度: string;
                 拍摄阶段: string;
                 泄露风险值: number;
+                [key: string]: unknown;
             };
             模特数量?: number;
             摄影师数量?: number;
@@ -188,6 +189,12 @@ export const 构建主剧情请求参数 = (
             内容强度?: '微暗' | '暧昧' | '露骨';
             主要玩法层?: '经营管理' | '人际关系' | '灰色地带';
             启用道德选择?: boolean;
+            启用尺度递进?: boolean;
+            启用越界识别?: boolean;
+            启用安全词系统?: boolean;
+            启用照片交付?: boolean;
+            启用泄露事件?: boolean;
+            泄露事件频率?: '低' | '中' | '高';
         };
     }
 ): 主剧情请求构建结果 => {
@@ -224,9 +231,9 @@ export const 构建主剧情请求参数 = (
         )
         : '';
     const normalizedRuntimeExtraPrompt = !tavernPresetModeEnabled
-        ? 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 时代配置ID: params.时代配置ID, 校园NSFW参数: params.校园NSFW参数, 都市网约车NSFW参数: params.都市网约车NSFW参数 })
+        ? 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 时代配置ID: params.时代配置ID, 校园NSFW参数: params.校园NSFW参数, 都市网约车NSFW参数: params.都市网约车NSFW参数, 写真NSFW参数: params.写真NSFW参数 })
         : '';
-    const tavernRuntimeExtraPrompt = 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 时代配置ID: params.时代配置ID, 校园NSFW参数: params.校园NSFW参数, 都市网约车NSFW参数: params.都市网约车NSFW参数 });
+    const tavernRuntimeExtraPrompt = 构建运行时额外提示词(runtimeGameConfig.额外提示词 || '', { ...runtimeGameConfig, 时代配置ID: params.时代配置ID, 校园NSFW参数: params.校园NSFW参数, 都市网约车NSFW参数: params.都市网约车NSFW参数, 写真NSFW参数: params.写真NSFW参数 });
     const recallScriptAppend = params.recallTag ? `\n\n【剧情回忆】\n${params.recallTag}` : '';
     const scriptSectionText = `【即时剧情回顾】\n${formatHistoryToScript(params.updatedContextHistory) || '暂无'}${recallScriptAppend}`;
     const latestUserInputAsModel = [

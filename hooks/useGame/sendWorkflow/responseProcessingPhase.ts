@@ -166,6 +166,7 @@ export type 响应处理阶段输入 = {
         同人女主剧情规划?: any;
         开局配置?: any;
         都市网约车系统?: Record<string, unknown>;
+        写真系统?: any;
     };
     requestMeta: {
         sendInput: string;
@@ -274,6 +275,28 @@ export const 执行响应处理阶段 = async (
             nsfwUpdate
         );
         rawAiText = 移除都市网约车系统状态标签(rawAiText);
+    }
+
+    // ─── 写真 NSFW 状态解析与应用 ──────────────────────────────────────
+    const { 解析写真系统状态更新, 移除写真系统状态标签, 应用写真系统状态更新 } =
+        await import('../photographyNSFWIntegration');
+    const 写真更新 = 解析写真系统状态更新(rawAiText);
+    console.log('[写真系统诊断] 解析LLM响应:', {
+        有更新: !!写真更新,
+        模特档案更新: 写真更新?.更新模特档案 ? Object.keys(写真更新.更新模特档案) : null,
+        项目更新: 写真更新?.更新拍摄项目?.map((p: any) => ({ id: p.id || p.项目ID, 阶段: p.拍摄阶段 })),
+    });
+    if (写真更新) {
+        currentState.写真系统 = 应用写真系统状态更新(
+            currentState.写真系统,
+            写真更新
+        );
+        rawAiText = 移除写真系统状态标签(rawAiText);
+        console.log('[写真系统诊断] 应用后的写真系统:', {
+            模特档案: Object.keys(currentState.写真系统?.模特档案 || {}),
+            进行中的项目: currentState.写真系统?.进行中的拍摄项目?.length,
+            项目详情: currentState.写真系统?.进行中的拍摄项目?.map((p: any) => ({ id: p.id || p.项目ID, 阶段: p.拍摄阶段 })),
+        });
     }
 
     // ─── 都市网约车 NSFW 引擎层激活 ──────────────────────────────────

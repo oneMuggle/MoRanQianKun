@@ -30,7 +30,35 @@ export const 解析写真系统状态更新 = (
 
   try {
     const parsed = JSON.parse(match[1]);
-    return parsed as {
+
+    // 兼容两种字段名：LLM可能输出"更新拍摄项目"（数组）或"更新项目状态"（对象/平铺对象）
+    const raw项目更新 = (parsed as any).更新拍摄项目 || (parsed as any).更新项目状态;
+    let 标准化项目更新: Partial<拍摄项目状态>[] | undefined;
+    if (raw项目更新) {
+      if (Array.isArray(raw项目更新)) {
+        标准化项目更新 = raw项目更新;
+      } else if (typeof raw项目更新 === 'object') {
+        // 判断是平铺对象（含"项目ID"字段）还是嵌套对象（{"ID":{数据}}）
+        if (raw项目更新.项目ID || raw项目更新.id) {
+          // 平铺对象：直接作为单个项目更新
+          标准化项目更新 = [raw项目更新];
+        } else {
+          // 嵌套对象：{"项目ID": {数据}}
+          标准化项目更新 = Object.entries(raw项目更新).map(([id, data]: [string, any]) => ({
+            id,
+            项目ID: id,
+            ...data,
+          }));
+        }
+      }
+    }
+
+    return {
+      更新模特档案: parsed.更新模特档案,
+      更新摄影师档案: parsed.更新摄影师档案,
+      更新拍摄项目: 标准化项目更新,
+      新泄露事件: parsed.新泄露事件,
+    } as {
       更新模特档案?: Record<string, Partial<模特核心状态>>;
       更新摄影师档案?: Record<string, any>;
       更新拍摄项目?: Partial<拍摄项目状态>[];
@@ -49,6 +77,165 @@ export const 移除写真系统状态标签 = (rawText: string): string => {
 };
 
 /**
+ * 处理 AI 响应中的写真系统状态更新
+ * 1. 解析 <写真系统状态> 标签
+ * 2. 调用回调应用状态变更
+ * 3. 返回清理后的纯文本（不含状态标签）
+ */
+export const 处理写真系统状态更新 = (
+  rawAiText: string,
+  callback: (result: NonNullable<ReturnType<typeof 解析写真系统状态更新>>) => void
+): string => {
+  const 解析结果 = 解析写真系统状态更新(rawAiText);
+  if (解析结果) {
+    callback(解析结果);
+  }
+  return 移除写真系统状态标签(rawAiText);
+};
+
+/**
+ * 应用写真系统状态更新到游戏状态
+ * 支持懒初始化：如果写真系统尚未创建但有状态更新，会自动创建初始系统
+ */
+export const 应用写真系统状态更新 = (
+  current写真系统: any,
+  更新: NonNullable<ReturnType<typeof 解析写真系统状态更新>>
+): any => {
+  // 懒初始化：如果写真系统不存在但有更新，创建初始系统
+  const 基础系统 = current写真系统 || {
+    模特档案: {},
+    摄影师档案: {},
+    进行中的拍摄项目: [],
+    历史拍摄记录: [],
+    泄露事件列表: [],
+  };
+
+  const 新系统 = { ...基础系统 };
+
+  // 应用模特档案更新（不存在的自动创建）
+  if (更新.更新模特档案) {
+    const 新模特档案 = { ...(新系统.模特档案 || {}) };
+    for (const [id, 档案] of Object.entries(更新.更新模特档案)) {
+      if (新模特档案[id]) {
+        新模特档案[id] = { ...新模特档案[id], ...档案 };
+      } else {
+        // 新模特：创建完整最小档案，补充 Dashboard 所需的所有字段
+        const 基础模特 = {
+          id,
+          姓名: id,
+          类型: '素人模特' as const,
+          职业状态: '新人' as const,
+          保护意识: '适度保护' as const,
+          信任度: 50,
+          安全感: 60,
+          自我认同: 50,
+          羞耻度: 50,
+          拍摄总次数: 0,
+          正规拍摄次数: 0,
+          擦边拍摄次数: 0,
+          越界拍摄次数: 0,
+          当前底线: 'G级' as const,
+          底线历史: [],
+          被偷拍次数: 0,
+          被泄露次数: 0,
+          投诉次数: 0,
+          累计收入: 0,
+          单次报价: 0,
+          拍摄经历: [] as any[],
+        };
+        新模特档案[id] = { ...基础模特, ...档案 };
+      }
+    }
+    新系统.模特档案 = 新模特档案;
+  }
+
+  // 应用摄影师档案更新（不存在的自动创建）
+  if (更新.更新摄影师档案) {
+    const 新摄影师档案 = { ...(新系统.摄影师档案 || {}) };
+    for (const [id, 档案] of Object.entries(更新.更新摄影师档案)) {
+      if (新摄影师档案[id]) {
+        新摄影师档案[id] = { ...新摄影师档案[id], ...档案 };
+      } else {
+        // 新摄影师：创建完整最小档案
+        const 基础摄影师 = {
+          id,
+          姓名: id,
+          类型: '独立摄影师' as const,
+          动机: '纯艺术' as const,
+          信誉: '普通摄影师' as const,
+          技术水平: 50,
+          沟通能力: 50,
+          越界倾向: 30,
+          偷拍倾向: 10,
+          传播倾向: 10,
+          口碑评分: 50,
+          投诉累计: 0,
+          拍摄总次数: 0,
+          回头客数量: 0,
+          作品发布数量: 0,
+          擅长写真类型: [] as any[],
+          擅长拍摄风格: [] as any[],
+        };
+        新摄影师档案[id] = { ...基础摄影师, ...档案 };
+      }
+    }
+    新系统.摄影师档案 = 新摄影师档案;
+  }
+
+  // 应用拍摄项目状态更新（不存在的自动创建）
+  if (更新.更新拍摄项目) {
+    const 当前项目 = 新系统.进行中的拍摄项目 || [];
+    const 新项目列表 = [...当前项目];
+
+    for (const raw更新 of 更新.更新拍摄项目 as any[]) {
+      const 项目ID = raw更新.id || raw更新.项目ID;
+      const 已有索引 = 新项目列表.findIndex((p: any) => p.id === 项目ID || p.项目ID === 项目ID);
+
+      if (已有索引 >= 0) {
+        新项目列表[已有索引] = { ...新项目列表[已有索引], ...raw更新 };
+      } else {
+        // 新项目：创建完整最小项目
+        const 基础项目 = {
+          id: 项目ID,
+          项目ID,
+          模特Id: Object.keys(更新.更新模特档案 || {})[0] || 'unknown',
+          摄影师Id: 'unknown',
+          约定写真类型: '商业写真' as const,
+          约定场所: '影棚' as const,
+          约定风格: '清新自然' as const,
+          约定尺度: 'G级' as const,
+          约定服装: '日常便装' as const,
+          约定交付时间: 0,
+          实际场所: '影棚' as const,
+          实际尺度: 'G级' as const,
+          实际服装: '日常便装' as const,
+          当前回合: 1,
+          最大回合: 10,
+          拍摄阶段: '未开始' as const,
+          尺度变更历史: [],
+          越界行为记录: [],
+          泄露风险评分: 0,
+          交付状态: '待交付' as const,
+          交付方式: null,
+          后期处理方式: '纯自然' as const,
+          违规记录: [],
+        };
+        新项目列表.push({ ...基础项目, ...raw更新 });
+      }
+    }
+
+    新系统.进行中的拍摄项目 = 新项目列表;
+  }
+
+  // 应用新泄露事件
+  if (更新.新泄露事件) {
+    新系统.泄露事件列表 = [...(新系统.泄露事件列表 || []), ...更新.新泄露事件];
+  }
+
+  return 新系统;
+};
+
+/**
  * 构建写真约拍 NSFW 运行时参数（供主剧情请求使用）
  */
 export const 构建写真NSFW参数 = (state: {
@@ -60,8 +247,10 @@ export const 构建写真NSFW参数 = (state: {
     出身背景?: {
       名称?: string;
     };
+    姓名?: string;
   };
   时代配置ID?: string;
+  社交列表?: Array<{ id: string; 姓名: string; [key: string]: any }>;
 }): {
   活跃拍摄项目?: 拍摄项目状态;
   模特数量?: number;
@@ -69,7 +258,15 @@ export const 构建写真NSFW参数 = (state: {
   泄露事件数量?: number;
   内容强度?: '微暗' | '暧昧' | '露骨';
   主要玩法层?: '经营管理' | '人际关系' | '灰色地带';
+  NPC姓名映射?: Record<string, string>;
+  摄影师姓名映射?: Record<string, string>;
   启用道德选择?: boolean;
+  启用尺度递进?: boolean;
+  启用越界识别?: boolean;
+  启用安全词系统?: boolean;
+  启用照片交付?: boolean;
+  启用泄露事件?: boolean;
+  泄露事件频率?: '低' | '中' | '高';
 } | undefined => {
   // 检查时代配置 - 必须是 contemporary_ 开头的现代纪元
   const 时代ID = state.时代配置ID || '';
@@ -83,30 +280,50 @@ export const 构建写真NSFW参数 = (state: {
     return undefined;
   }
 
-  // 检查写真系统是否存在
+  // 写真系统可能为空（新游戏尚未创建约拍项目），但仍需返回基本设置参数
+  // 让 LLM 知道写真系统已激活，可以在剧情中触发约拍场景
   const 写真系统 = state.写真系统;
-  if (!写真系统) {
-    return undefined;
-  }
 
   // 获取活跃拍摄项目
-  const 进行中项目 = 写真系统.进行中的拍摄项目;
-  const 活跃项目 = 进行中项目 && 进行中项目.length > 0 
-    ? 进行中项目[进行中项目.length - 1] 
+  const 进行中项目 = 写真系统?.进行中的拍摄项目;
+  const 活跃项目 = 进行中项目 && 进行中项目.length > 0
+    ? 进行中项目[进行中项目.length - 1]
     : undefined;
 
-  // 统计数量
-  const 模特数量 = 写真系统.模特档案 ? Object.keys(写真系统.模特档案).length : 0;
-  const 摄影师数量 = 写真系统.摄影师档案 ? Object.keys(写真系统.摄影师档案).length : 0;
-  const 泄露事件数量 = 写真系统.泄露事件列表?.length || 0;
+  // 统计数量（系统为空时均为 0）
+  const 模特数量 = 写真系统?.模特档案 ? Object.keys(写真系统.模特档案).length : 0;
+  const 摄影师数量 = 写真系统?.摄影师档案 ? Object.keys(写真系统.摄影师档案).length : 0;
+  const 泄露事件数量 = 写真系统?.泄露事件列表?.length || 0;
+
+  // 构建 NPC ID -> 姓名的映射，供 LLM 在输出状态时使用真实姓名
+  const NPC姓名映射: Record<string, string> = {};
+  if (state.社交列表) {
+    state.社交列表.forEach(npc => {
+      NPC姓名映射[npc.id] = npc.姓名 || npc.id;
+    });
+  }
+
+  // 玩家角色如果是摄影师背景，用角色名作为摄影师姓名
+  const 摄影师姓名映射: Record<string, string> = {};
+  if (state.角色?.姓名) {
+    摄影师姓名映射['player'] = state.角色.姓名;
+  }
 
   return {
     活跃拍摄项目: 活跃项目,
     模特数量,
     摄影师数量,
     泄露事件数量,
+    NPC姓名映射,
+    摄影师姓名映射,
     内容强度: nsfw设置.NSFW内容强度,
     主要玩法层: nsfw设置.主要玩法层,
     启用道德选择: nsfw设置.启用道德选择,
+    启用尺度递进: nsfw设置.启用尺度递进,
+    启用越界识别: nsfw设置.启用越界识别,
+    启用安全词系统: nsfw设置.启用安全词系统,
+    启用照片交付: nsfw设置.启用照片交付,
+    启用泄露事件: nsfw设置.启用泄露事件,
+    泄露事件频率: nsfw设置.泄露事件频率,
   };
 };

@@ -353,6 +353,15 @@ interface Props {
 export const PhotographyDashboard: React.FC<Props> = ({
   模特档案, 摄影师档案, 进行中的拍摄项目, 历史拍摄记录, 泄露事件列表, onClose
 }) => {
+  // 诊断日志：确认 props 是否正确传递
+  console.log('[写真Dashboard诊断] Props:', {
+    模特档案Keys: Object.keys(模特档案),
+    摄影师档案Keys: Object.keys(摄影师档案),
+    进行中的拍摄项目数: 进行中的拍摄项目.length,
+    历史拍摄记录数: 历史拍摄记录.length,
+    泄露事件列表数: 泄露事件列表.length,
+  });
+
   const 活跃泄露 = useMemo(() => 泄露事件列表.filter(e => e.状态 === '活跃' || e.状态 === '已发酵'), [泄露事件列表]);
 
   const 模特姓名映射 = useMemo(() => {

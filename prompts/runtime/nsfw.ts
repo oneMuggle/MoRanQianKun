@@ -2,6 +2,7 @@ import { NSFW场景类型 } from '../../models/system';
 import { MODERN_ERA_IDS } from '../../models/eraTheme/assembly';
 import { 构建校园NSFW完整叙事约束 } from './campusNSFW';
 import { 构建都市网约车完整叙事约束 } from './urbanDriverNSFW';
+import { 构建写真NSFW完整叙事约束 } from './photographyNSFW';
 import { 
   构建夜场NSFW叙事约束,
   构建夜场NSFW完整叙事约束,
@@ -223,6 +224,37 @@ const 构建运行时NSFW提示词 = (
           内容强度?: '微暗' | '暧昧' | '露骨';
           后果?: { 类型: 网约车后果类型; 严重程度: '轻微' | '中等' | '严重' | '毁灭'; NPC信息?: string };
         };
+        /** 写真约拍 NSFW 子系统参数 */
+        写真NSFW参数?: {
+          活跃拍摄项目?: {
+            id: string;
+            模特ID: string;
+            摄影师ID: string;
+            约定尺度: string;
+            实际尺度: string;
+            拍摄阶段: string;
+            泄露风险值: number;
+            约定写真类型?: string;
+            约定场所?: string;
+            约定风格?: string;
+            约定服装?: string;
+            模特姓名?: string;
+            摄影师姓名?: string;
+          };
+          模特数量?: number;
+          摄影师数量?: number;
+          泄露事件数量?: number;
+          内容强度?: '微暗' | '暧昧' | '露骨';
+          主要玩法层?: '经营管理' | '人际关系' | '灰色地带';
+          启用道德选择?: boolean;
+          启用尺度递进?: boolean;
+          启用越界识别?: boolean;
+          启用安全词系统?: boolean;
+          启用照片交付?: boolean;
+          启用泄露事件?: boolean;
+          泄露事件频率?: '低' | '中' | '高';
+          活跃泄露事件摘要?: string;
+        };
     }
 ): string => {
     const custom = typeof customPrompt === 'string' ? customPrompt.trim() : '';
@@ -253,6 +285,36 @@ const 构建运行时NSFW提示词 = (
       const driverConstraint = 构建都市网约车完整叙事约束(options.都市网约车NSFW参数);
       if (driverConstraint) {
         组件.push(driverConstraint);
+      }
+    }
+
+    // 写真约拍 NSFW 约束（仅现代时代）
+    if (options?.写真NSFW参数 && options?.时代配置ID && MODERN_ERA_IDS.includes(options.时代配置ID as typeof MODERN_ERA_IDS[number])) {
+      const photoParams = options.写真NSFW参数;
+      const photographyConstraint = 构建写真NSFW完整叙事约束({
+        写真类型: photoParams.活跃拍摄项目?.约定写真类型 as any,
+        拍摄场所: photoParams.活跃拍摄项目?.约定场所 as any,
+        拍摄风格: photoParams.活跃拍摄项目?.约定风格 as any,
+        当前尺度: photoParams.活跃拍摄项目?.实际尺度 as any,
+        服装: photoParams.活跃拍摄项目?.约定服装 as any,
+        拍摄阶段: photoParams.活跃拍摄项目?.拍摄阶段,
+        模特姓名: photoParams.活跃拍摄项目?.模特姓名,
+        摄影师姓名: photoParams.活跃拍摄项目?.摄影师姓名,
+        内容强度: photoParams.内容强度,
+        主要玩法层: photoParams.主要玩法层 as any,
+        启用尺度递进: photoParams.启用尺度递进,
+        启用越界识别: photoParams.启用越界识别,
+        启用安全词系统: photoParams.启用安全词系统,
+        启用照片交付: photoParams.启用照片交付,
+        启用泄露事件: photoParams.启用泄露事件,
+        泄露事件频率: photoParams.泄露事件频率,
+        启用道德选择: photoParams.启用道德选择,
+        活跃泄露事件摘要: photoParams.活跃泄露事件摘要,
+        NPC姓名映射: (photoParams as any).NPC姓名映射,
+        摄影师姓名映射: (photoParams as any).摄影师姓名映射,
+      });
+      if (photographyConstraint) {
+        组件.push(photographyConstraint);
       }
     }
 
@@ -297,6 +359,37 @@ export const 构建运行时额外提示词 = (
           行车记录仪状态?: '关闭' | '录制中' | '已泄露';
           内容强度?: '微暗' | '暧昧' | '露骨';
           后果?: { 类型: 网约车后果类型; 严重程度: '轻微' | '中等' | '严重' | '毁灭'; NPC信息?: string };
+        };
+        /** 写真约拍 NSFW 子系统参数 */
+        写真NSFW参数?: {
+          活跃拍摄项目?: {
+            id: string;
+            模特ID: string;
+            摄影师ID: string;
+            约定尺度: string;
+            实际尺度: string;
+            拍摄阶段: string;
+            泄露风险值: number;
+            约定写真类型?: string;
+            约定场所?: string;
+            约定风格?: string;
+            约定服装?: string;
+            模特姓名?: string;
+            摄影师姓名?: string;
+          };
+          模特数量?: number;
+          摄影师数量?: number;
+          泄露事件数量?: number;
+          内容强度?: '微暗' | '暧昧' | '露骨';
+          主要玩法层?: '经营管理' | '人际关系' | '灰色地带';
+          启用道德选择?: boolean;
+          启用尺度递进?: boolean;
+          启用越界识别?: boolean;
+          启用安全词系统?: boolean;
+          启用照片交付?: boolean;
+          启用泄露事件?: boolean;
+          泄露事件频率?: '低' | '中' | '高';
+          活跃泄露事件摘要?: string;
         };
     }
 ): string => {

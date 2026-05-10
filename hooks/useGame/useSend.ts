@@ -29,6 +29,8 @@ interface SendDeps {
     校规系统: any;
     催眠系统: any;
     校园系统: any;
+    写真系统: any;
+    都市网约车系统: any;
     currentEra: string | null;
     loading: boolean;
     gameConfig: any;
@@ -50,6 +52,8 @@ interface SendDeps {
     设置剧情: (value: any) => void;
     设置历史记录: (value: any[] | ((prev: any[]) => any[])) => void;
     应用并同步记忆系统: (memory: any, options?: { 静默总结提示?: boolean }) => void;
+    设置写真系统: (value: any) => void;
+    设置校园系统: (value: any) => void;
     构建系统提示词: (...args: any[]) => any;
     processResponseCommands: (...args: any[]) => any;
     performAutoSave: (...args: any[]) => void | Promise<void>;
@@ -136,6 +140,8 @@ export function 创建主剧情发送工作流(deps: SendDeps) {
                 校规系统: deps.校规系统,
                 催眠系统: deps.催眠系统,
                 校园系统: deps.校园系统,
+                都市网约车系统: deps.都市网约车系统,
+                写真系统: deps.写真系统,
                 时代配置ID: deps.currentEra,
                 loading: deps.loading,
                 gameConfig: deps.gameConfig,
@@ -160,6 +166,8 @@ export function 创建主剧情发送工作流(deps: SendDeps) {
                 设置剧情: deps.设置剧情,
                 设置历史记录: deps.设置历史记录,
                 应用并同步记忆系统: deps.应用并同步记忆系统,
+                设置写真系统: deps.设置写真系统,
+                设置校园系统: deps.设置校园系统,
                 构建系统提示词: deps.构建系统提示词,
                 processResponseCommands: deps.processResponseCommands,
                 performAutoSave: (...args) => Promise.resolve(deps.performAutoSave(...args)),
