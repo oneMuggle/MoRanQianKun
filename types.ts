@@ -145,3 +145,55 @@ export interface 气运结构 {
     能力类型?: '战斗' | '生存' | '社交' | '谋略' | '特殊' | '辅助';
     适用境界?: [number, number];
 }
+
+// ─── 调试模式类型 ───
+
+export interface DebugPromptState {
+    promptId: string;
+    status: 'enabled' | 'disabled' | 'injected';
+}
+
+export interface DebugPromptTrace {
+    promptStates: Array<{
+        promptId: string;
+        sentStatus: 'sent' | 'not_sent';
+        detectedInResponse: boolean;
+        matchKeywords: string[];
+    }>;
+    protocolTags: {
+        tag: string;
+        present: boolean;
+    }[];
+}
+
+export interface DebugResponseAnalysis {
+    rawLength: number;
+    logCount: number;
+    tagsPresent: string[];
+    tagsMissing: string[];
+    hasActionOptions: boolean;
+    hasCommands: boolean;
+    hasVariableCalibration: boolean;
+    hasDynamicWorld: boolean;
+}
+
+export interface DebugTurnLog {
+    turnIndex: number;
+    timestamp: number;
+    // 请求侧
+    systemPrompt: string;
+    systemPromptPieces: Array<{ section: string; content: string; charCount: number }>;
+    promptStates: DebugPromptState[];
+    userMessages: Array<{ role: string; content: string; charCount: number }>;
+    totalInputChars: number;
+    // 响应侧
+    rawResponse: string;
+    parsedResponse?: GameResponse;
+    // 分析
+    promptTrace?: DebugPromptTrace;
+    responseAnalysis?: DebugResponseAnalysis;
+    // 元信息
+    apiConfig?: { provider: string; model: string };
+    durationMs?: number;
+    error?: string;
+}

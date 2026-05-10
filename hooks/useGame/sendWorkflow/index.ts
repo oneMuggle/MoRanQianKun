@@ -597,6 +597,56 @@ export const 执行主剧情发送工作流 = async (
             }
         });
 
+        // ─── 调试模式捕获 ────────────────────────────────────────────────
+        try {
+            if (runtimeGameConfig.启用调试模式 === true) {
+                const { turnLogger } = await import('../../../services/debug/turnLogger');
+                const { tracePromptInjection, analyzeResponse } = await import('../../../services/debug/promptTracer');
+                const contextPieces = builtContext.contextPieces;
+                const systemPromptPieces = [
+                    { section: 'AI角色声明', content: contextPieces.AI角色声明 || '', charCount: (contextPieces.AI角色声明 || '').length },
+                    { section: '世界观提示', content: contextPieces.worldPrompt || '', charCount: (contextPieces.worldPrompt || '').length },
+                    { section: '地图建筑', content: contextPieces.地图建筑状态 || '', charCount: (contextPieces.地图建筑状态 || '').length },
+                    { section: '境界体系', content: contextPieces.境界体系提示词 || '', charCount: (contextPieces.境界体系提示词 || '').length },
+                    { section: '叙事/规则', content: contextPieces.otherPrompts || '', charCount: (contextPieces.otherPrompts || '').length },
+                    { section: '难度设置', content: contextPieces.难度设置提示词 || '', charCount: (contextPieces.难度设置提示词 || '').length },
+                    { section: '叙事人称', content: contextPieces.叙事人称提示词 || '', charCount: (contextPieces.叙事人称提示词 || '').length },
+                    { section: '字数要求', content: contextPieces.字数要求提示词 || '', charCount: (contextPieces.字数要求提示词 || '').length },
+                    { section: '输出协议', content: contextPieces.输出协议提示词 || '', charCount: (contextPieces.输出协议提示词 || '').length },
+                    { section: '长期记忆', content: contextPieces.长期记忆 || '', charCount: (contextPieces.长期记忆 || '').length },
+                    { section: '中期记忆', content: contextPieces.中期记忆 || '', charCount: (contextPieces.中期记忆 || '').length },
+                    { section: '剧情安排', content: contextPieces.剧情安排 || '', charCount: (contextPieces.剧情安排 || '').length },
+                ].filter(p => p.content);
+                const fullSystemPrompt = systemPromptPieces.map(p => p.content).join('\n\n');
+                const promptStates: Array<{ promptId: string; status: 'enabled' | 'disabled' | 'injected' }> = Object.entries(builtContext.runtimePromptStates || {}).map(([id, state]: [string, any]) => ({
+                    promptId: id,
+                    status: state.当前启用 ? 'enabled' : 'disabled',
+                }));
+                const userMessages = orderedMessages
+                    .filter((m: any) => m.role !== 'system')
+                    .map((m: any) => ({ role: m.role, content: m.content, charCount: (m.content || '').length }));
+                const totalInputChars = fullSystemPrompt.length + userMessages.reduce((s: number, m) => s + m.charCount, 0);
+                const promptTrace = tracePromptInjection(promptStates, aiResult.rawText || '');
+                const responseAnalysis = analyzeResponse(aiResult.rawText || '', aiResult.response);
+                const activeConfig = activeApi ? { provider: activeApi.供应商, model: activeApi.model } : undefined;
+                turnLogger.recordTurn({
+                    turnIndex: (currentState.历史记录 || []).filter(h => h.role === 'user').length,
+                    timestamp: Date.now(),
+                    systemPrompt: fullSystemPrompt,
+                    systemPromptPieces,
+                    promptStates,
+                    userMessages,
+                    totalInputChars,
+                    rawResponse: aiResult.rawText || '',
+                    parsedResponse: aiResult.response,
+                    promptTrace,
+                    responseAnalysis,
+                    apiConfig: activeConfig,
+                });
+            }
+        } catch (debugErr) {
+            // 调试失败不影响正常游戏流程
+        }
 
         const turnSnapshot: 回合快照结构 = {
             玩家输入: sendInput,

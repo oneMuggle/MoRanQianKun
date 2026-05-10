@@ -21,7 +21,8 @@ export const desktopTabs: SettingsTabItem[] = [
     { id: 'prompt', label: '提示词' },
     { id: 'theme', label: '界面风格' },
     { id: 'storage', label: '数据存储' },
-    { id: 'performance', label: '性能监控' }
+    { id: 'performance', label: '性能监控' },
+    { id: 'debug', label: '调试模式' }
 ];
 
 export const mobileTabs: SettingsTabItem[] = [
@@ -45,5 +46,6 @@ export const mobileTabs: SettingsTabItem[] = [
     { id: 'prompt', label: '提示词' },
     { id: 'theme', label: '风格' },
     { id: 'storage', label: '存储' },
-    { id: 'performance', label: '性能' }
+    { id: 'performance', label: '性能' },
+    { id: 'debug', label: '调试' }
 ];

@@ -21,6 +21,7 @@ interface Props {
     socialList?: NPC结构[];
     playerProfile?: { 姓名?: string; 头像图片URL?: string };
     turnAnchorRef?: React.Ref<HTMLDivElement>;
+    isDebugMode?: boolean;
 }
 
 const TurnItem: React.FC<Props> = ({
@@ -39,7 +40,8 @@ const TurnItem: React.FC<Props> = ({
     visualConfig,
     socialList,
     playerProfile,
-    turnAnchorRef
+    turnAnchorRef,
+    isDebugMode = false
 }) => {
     const formatRawJson = (raw?: string) => raw || '（该回合未记录原始文本）';
 
@@ -322,6 +324,16 @@ const TurnItem: React.FC<Props> = ({
 
                 {/* 右侧容器：移动端贴边悬挂在回合牌右侧，桌面端保持右半区收拢 */}
                 <div className="absolute top-0 left-[calc(100%+4px)] flex shrink-0 items-center gap-1 flex-nowrap sm:static sm:left-auto sm:flex-1 sm:min-w-0 sm:justify-start sm:gap-2 sm:pl-2">
+                    {isDebugMode && (
+                        <div className="p-1 sm:p-1.5 rounded-lg border border-amber-500/30 text-amber-400 shrink-0 flex items-center gap-0.5" title="调试模式已记录本回合">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 6 9.75 12l3 6" />
+                                <circle cx="18" cy="18" r="3" strokeWidth={1.5} />
+                                <path strokeLinecap="round" d="M18 16.5v3m-1.5-1.5h3" />
+                            </svg>
+                            <span className="text-[8px] font-mono leading-none ml-0.5">调试</span>
+                        </div>
+                    )}
                     {hasCalibrationRecord && (
                         <button
                             onClick={() => {

@@ -16,6 +16,7 @@ interface Props {
     renderCount?: number;
     suppressAutoScrollToken?: number;
     forceScrollToken?: number;
+    isDebugMode?: boolean;
 }
 
 type 流式草稿显示结构 = {
@@ -66,7 +67,7 @@ const 解析流式草稿显示 = (content: string): 流式草稿显示结构 => 
     };
 };
 
-const ChatList: React.FC<Props> = ({ history, loading, scrollRef, onUpdateHistory, onPolishTurn, visualConfig, socialList, playerProfile, renderCount = 10, suppressAutoScrollToken, forceScrollToken }) => {
+const ChatList: React.FC<Props> = ({ history, loading, scrollRef, onUpdateHistory, onPolishTurn, visualConfig, socialList, playerProfile, renderCount = 10, suppressAutoScrollToken, forceScrollToken, isDebugMode = false }) => {
     const normalizedRenderCount = Number.isFinite(renderCount) ? Math.max(1, Math.floor(renderCount)) : 10;
     const chatStyle = 构建区域文字样式(visualConfig, '聊天');
     const 底部判定阈值 = 120;
@@ -269,6 +270,7 @@ const ChatList: React.FC<Props> = ({ history, loading, scrollRef, onUpdateHistor
                                     visualConfig={visualConfig}
                                     socialList={socialList}
                                     playerProfile={playerProfile}
+                                    isDebugMode={isDebugMode}
                                 />
                             </div>
                         );

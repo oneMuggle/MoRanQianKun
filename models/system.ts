@@ -1666,6 +1666,8 @@ export interface 游戏设置结构 {
     变量生成最大重试次数?: number; // 变量生成失败重试次数，默认 2，范围 0-5
     额外提示词: string; // Custom prompt injected at the end
     启用动态难度?: boolean; // Toggle dynamic difficulty adjustment based on player performance
+    启用调试模式?: boolean; // Enable LLM debug mode: capture prompts, responses, and injection traces
+    调试日志保留条数?: number; // Max debug turn logs to keep in ring buffer (default 20)
 }
 
 export interface 记忆配置结构 {

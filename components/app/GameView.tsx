@@ -256,6 +256,7 @@ export function GameView({
                                 renderCount={(state.visualConfig as any)?.渲染层数}
                                 suppressAutoScrollToken={(meta as any).chatScrollSuppressToken}
                                 forceScrollToken={(meta as any).chatForceScrollToken}
+                                isDebugMode={(state.gameConfig as any)?.启用调试模式 === true}
                             />
                             <InputArea
                                 onSend={(actions as any).handleSend}

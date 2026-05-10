@@ -27,6 +27,7 @@ const CurrentNovelDecompositionInjectionSettings = React.lazy(() => import('./Cu
 const MusicSettings = React.lazy(() => import('./MusicSettings'));
 const NpcManager = React.lazy(() => import('./NpcManager'));
 const VariableManager = React.lazy(() => import('./VariableManager'));
+const DebugPanel = React.lazy(() => import('./DebugPanel'));
 
 type RuntimeStateSections = Record<'角色' | '环境' | '社交' | '世界' | '战斗' | '剧情' | '女主剧情规划' | '玩家门派' | '任务列表' | '约定列表' | '记忆系统', unknown>;
 
@@ -56,7 +57,7 @@ export type SettingsTabId =
     | 'independent_api_gpt' | 'novel_decomposition' | 'novel_decomposition_runtime'
     | 'prompt' | 'storage' | 'theme' | 'visual' | 'world'
     | 'game' | 'reality' | 'tavern_preset' | 'memory'
-    | 'history' | 'context' | 'music' | 'npc_management' | 'variable_manager' | 'performance';
+    | 'history' | 'context' | 'music' | 'npc_management' | 'variable_manager' | 'performance' | 'debug';
 
 export interface SettingsTabItem {
     id: SettingsTabId;
@@ -188,6 +189,16 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         if (activeTab === 'reality' && gameConfig && onSaveGame) return <RealitySettings settings={gameConfig} onSave={onSaveGame} />;
         if (activeTab === 'tavern_preset' && gameConfig && onSaveGame) return <TavernPresetSettings settings={gameConfig} onSave={onSaveGame} />;
         if (activeTab === 'memory' && memoryConfig && onSaveMemory) return <MemorySettings settings={memoryConfig} onSave={onSaveMemory} />;
+        if (activeTab === 'debug' && gameConfig && onSaveGame) return (
+            <React.Suspense fallback={<div className="p-4 text-gray-500">加载中...</div>}>
+                <DebugPanel
+                    isDebugMode={gameConfig.启用调试模式 === true}
+                    onToggleDebug={(enabled) => onSaveGame({ ...gameConfig, 启用调试模式: enabled })}
+                    maxLogs={gameConfig.调试日志保留条数 ?? 20}
+                    onMaxLogsChange={(n) => onSaveGame({ ...gameConfig, 调试日志保留条数: n })}
+                />
+            </React.Suspense>
+        );
         return null;
     };
 

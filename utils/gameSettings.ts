@@ -194,7 +194,9 @@ export const 默认游戏设置: 游戏设置结构 = {
     额外提示词: 默认额外系统提示词,
     校园NSFW设置: 默认校园NSFW设置,
     都市网约车NSFW设置: 默认都市网约车NSFW设置,
-    写真NSFW设置: 默认写真NSFW设置
+    写真NSFW设置: 默认写真NSFW设置,
+    启用调试模式: false,
+    调试日志保留条数: 20
 };
 
 export const 解析酒馆预设角色ID = (
@@ -318,6 +320,10 @@ export const 规范化游戏设置 = (
             : fallback.都市网约车NSFW设置,
         写真NSFW设置: (source.写真NSFW设置 && typeof source.写真NSFW设置 === 'object')
             ? 规范化写真NSFW设置(source.写真NSFW设置 as Partial<写真NSFW设置>)
-            : fallback.写真NSFW设置
+            : fallback.写真NSFW设置,
+        启用调试模式: 读取布尔(source.启用调试模式, fallback.启用调试模式 === true),
+        调试日志保留条数: typeof source.调试日志保留条数 === 'number' && Number.isFinite(source.调试日志保留条数)
+            ? Math.max(5, Math.min(100, Math.floor(source.调试日志保留条数)))
+            : fallback.调试日志保留条数 ?? 20
     };
 };

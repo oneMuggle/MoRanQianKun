@@ -34,6 +34,16 @@ export interface StoryStreamOptions {
     onDelta?: (delta: string, accumulated: string) => void;
 }
 
+export interface DebugCapturePayload {
+    systemPrompt: string;
+    userMessages: Array<{ role: string; content: string; charCount: number }>;
+    rawResponse: string;
+    apiConfig: { provider: string; model: string };
+    durationMs: number;
+    source: string;
+}
+export type DebugCaptureCallback = (payload: DebugCapturePayload) => void;
+
 export interface StoryRequestOptions {
     enableCotInjection?: boolean;
     cotPseudoHistoryPrompt?: string;
@@ -65,7 +75,8 @@ export const generateMemoryRecall = async (
     signal?: AbortSignal,
     streamOptions?: RecallStreamOptions,
     extraPrompt?: string,
-    cotPseudoHistoryPrompt?: string
+    cotPseudoHistoryPrompt?: string,
+    onDebugCapture?: DebugCaptureCallback
 ): Promise<string> => {
     const normalizedExtraPrompt = (extraPrompt || '').trim();
     const normalizedCotPseudoPrompt = (cotPseudoHistoryPrompt || '').trim();
@@ -80,11 +91,27 @@ export const generateMemoryRecall = async (
         messagesRaw.push({ role: 'assistant', content: normalizedCotPseudoPrompt });
     }
     const messages = 规范化文本补全消息链(messagesRaw, { 保留System: true, 合并同角色: false });
-    return 请求模型文本(apiConfig, messages, {
+    const startedAt = Date.now();
+    const result = await 请求模型文本(apiConfig, messages, {
         temperature: 0.2,
         signal,
         streamOptions
     });
+    if (onDebugCapture) {
+        const durationMs = Date.now() - startedAt;
+        const userMessages = messages
+            .filter(m => m.role !== 'system')
+            .map(m => ({ role: m.role, content: m.content, charCount: (m.content || '').length }));
+        onDebugCapture({
+            systemPrompt,
+            userMessages,
+            rawResponse: result,
+            apiConfig: { provider: apiConfig.供应商, model: apiConfig.model },
+            durationMs,
+            source: 'memory_recall'
+        });
+    }
+    return result;
 };
 
 // ==================== Body Polish ====================
@@ -132,7 +159,8 @@ export const generatePolishedBody = async (
     apiConfig: 当前可用接口结构,
     signal?: AbortSignal,
     extraPrompt?: string,
-    cotPseudoHistoryPrompt?: string
+    cotPseudoHistoryPrompt?: string,
+    onDebugCapture?: DebugCaptureCallback
 ): Promise<PolishedBodyResult> => {
     if (!apiConfig.apiKey) throw new Error('Missing API Key');
     const normalizedBody = (bodyText || '').trim();
@@ -163,11 +191,26 @@ export const generatePolishedBody = async (
     }
     const messages = 规范化文本补全消息链(messagesRaw, { 保留System: true, 合并同角色: false });
 
+    const startedAt = Date.now();
     const raw = await 请求模型文本(apiConfig, messages, {
         temperature: 0.6,
         signal,
         errorDetailLimit: Number.POSITIVE_INFINITY
     });
+    if (onDebugCapture) {
+        const durationMs = Date.now() - startedAt;
+        const userMessages = messages
+            .filter(m => m.role !== 'system')
+            .map(m => ({ role: m.role, content: m.content, charCount: (m.content || '').length }));
+        onDebugCapture({
+            systemPrompt,
+            userMessages,
+            rawResponse: raw,
+            apiConfig: { provider: apiConfig.供应商, model: apiConfig.model },
+            durationMs,
+            source: 'body_polish'
+        });
+    }
 
     return { bodyText: 清理润色正文输出(raw), rawText: raw };
 };
@@ -186,7 +229,8 @@ export const generateWorldData = async (
     streamOptions?: WorldStreamOptions,
     extraPrompt?: string,
     cotPseudoHistoryPrompt?: string,
-    config?: { 启用修炼体系?: boolean }
+    config?: { 启用修炼体系?: boolean },
+    onDebugCapture?: DebugCaptureCallback
 ): Promise<string> => {
     if (!apiConfig.apiKey) throw new Error('Missing API Key');
 
@@ -205,7 +249,22 @@ export const generateWorldData = async (
     }
     const messages = 规范化文本补全消息链(messagesRaw, { 保留System: true, 合并同角色: false });
 
+    const startedAt = Date.now();
     const rawText = await 请求模型文本(apiConfig, messages, { temperature: 0.8, streamOptions });
+    if (onDebugCapture) {
+        const durationMs = Date.now() - startedAt;
+        const userMessages = messages
+            .filter(m => m.role !== 'system')
+            .map(m => ({ role: m.role, content: m.content, charCount: (m.content || '').length }));
+        onDebugCapture({
+            systemPrompt: genSystemPrompt,
+            userMessages,
+            rawResponse: rawText,
+            apiConfig: { provider: apiConfig.供应商, model: apiConfig.model },
+            durationMs,
+            source: 'world_generation'
+        });
+    }
     return 解析世界观提示词内容(rawText);
 };
 
@@ -286,7 +345,8 @@ export const generateFandomRealmData = async (
     params: { openingConfig?: any },
     apiConfig: 当前可用接口结构,
     streamOptions?: WorldStreamOptions,
-    extraPrompt?: string
+    extraPrompt?: string,
+    onDebugCapture?: DebugCaptureCallback
 ): Promise<string> => {
     if (!apiConfig.apiKey) throw new Error('Missing API Key');
 
@@ -295,11 +355,26 @@ export const generateFandomRealmData = async (
     const normalizedExtraPrompt = (extraPrompt || '').trim();
 
     const 请求并解析 = async (messages: 通用消息[], currentStreamOptions?: WorldStreamOptions): Promise<string> => {
+        const startedAt = Date.now();
         const rawText = await 请求模型文本(
             apiConfig,
             规范化文本补全消息链(messages, { 保留System: true, 合并同角色: false }),
             { temperature: 0.5, streamOptions: currentStreamOptions }
         );
+        if (onDebugCapture) {
+            const durationMs = Date.now() - startedAt;
+            const userMessages = messages
+                .filter(m => m.role !== 'system')
+                .map(m => ({ role: m.role, content: m.content, charCount: (m.content || '').length }));
+            onDebugCapture({
+                systemPrompt,
+                userMessages,
+                rawResponse: rawText,
+                apiConfig: { provider: apiConfig.供应商, model: apiConfig.model },
+                durationMs,
+                source: 'fandom_realm_generation'
+            });
+        }
         return 解析境界体系提示词内容(rawText);
     };
 
