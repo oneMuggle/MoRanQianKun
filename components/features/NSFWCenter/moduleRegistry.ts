@@ -22,12 +22,16 @@ const settingsComponentMap: Record<string, React.LazyExoticComponent<React.FC<an
   campusNSFW: React.lazy(() => import('../Settings/CampusNSFWSettings')),
   photographyNSFW: React.lazy(() => import('../Settings/PhotographyNSFWSettings')),
   urbanDriverNSFW: React.lazy(() => import('../Settings/UrbanDriverNSFWSettings')),
+  bdsmNSFW: React.lazy(() => import('../Settings/BDSMNSFWSettings')),
+  boardGameNSFW: React.lazy(() => import('../Settings/BoardGameNSFWSettings')),
 };
 
 const dashboardLabelMap: Record<string, string> = {
   campusNSFW: '校园欲望仪表盘',
   photographyNSFW: '写真仪表盘',
   urbanDriverNSFW: '网约车仪表盘',
+  bdsmNSFW: 'BDSM 仪表盘',
+  boardGameNSFW: '桌游社交仪表盘',
 };
 
 export function 获取NSFW模块列表(): NsfwModuleUI[] {

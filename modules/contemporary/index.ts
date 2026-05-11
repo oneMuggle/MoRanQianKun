@@ -4,3 +4,5 @@
 import './campusNSFW/registration';
 import './urbanDriverNSFW/registration';
 import './photographyNSFW/registration';
+import './bdsmNSFW/registration';
+import './boardGameNSFW/registration';

@@ -6,6 +6,8 @@ import { 环境信息结构 } from './environment';
 import type { 校园NSFW设置 } from './campusNSFW';
 import type { 都市网约车NSFW设置 } from './urbanDriverNSFW';
 import type { 写真NSFW设置, 写真系统扩展 } from './photographyNSFW';
+import type { BDSM系统设置 } from './bdsmNSFW';
+import type { 桌游社交NSFW设置 } from './boardGameNSFW';
 import { 生图目标类型, 生图筛选性别类型, 生图筛选重要性类型, 场景图片档案 } from './imageGeneration';
 import { NPC结构 } from './social';
 import type { 关系网络数据 } from './relationship';
@@ -1636,6 +1638,8 @@ export interface 游戏设置结构 {
     校园NSFW设置?: 校园NSFW设置; // Campus NSFW subsystem toggles (contemporary_campus only)
     都市网约车NSFW设置?: 都市网约车NSFW设置; // Urban ride-hailing driver NSFW subsystem toggles (contemporary_urban only)
     写真NSFW设置?: 写真NSFW设置; // Photography NSFW subsystem toggles (contemporary_* only)
+    BDSM系统设置?: BDSM系统设置; // BDSM independent subsystem toggles (all eras)
+    桌游社交NSFW设置?: 桌游社交NSFW设置; // Board game social NSFW subsystem toggles (all eras)
     启用饱腹口渴系统: boolean; // Toggle hunger/thirst prompt injection and UI visibility
     启用修炼体系: boolean; // Toggle cultivation/realm/kungfu prompt injection and related UI visibility
     启用里武侠模式: boolean; // Toggle inner martial arts (里武侠) world: dual-cultivation personality, revealing clothing, 武根 system
