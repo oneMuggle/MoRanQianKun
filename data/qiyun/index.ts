@@ -17,6 +17,7 @@ export { 白嫖躺赢 } from './categories/white-free';
 export { 怠惰降维 } from './categories/lazy-dim';
 export { 精神暴击 } from './categories/mental-crit';
 export { 合欢秘辛 } from './categories/hehuan';
+export { 武侠气运 } from './categories/martial-arts';
 
 import type { 气运数据, 气运稀有度 } from './types';
 import type { 气运属性类型, 气运效果类型 } from '../../types';
@@ -31,6 +32,7 @@ import { 白嫖躺赢 } from './categories/white-free';
 import { 怠惰降维 } from './categories/lazy-dim';
 import { 精神暴击 } from './categories/mental-crit';
 import { 合欢秘辛 } from './categories/hehuan';
+import { 武侠气运 } from './categories/martial-arts';
 
 export type 气运能力类型 = '战斗' | '生存' | '社交' | '谋略' | '特殊' | '辅助';
 
@@ -47,6 +49,7 @@ export const 气运数据列表: 气运数据[] = [
     ...怠惰降维,
     ...精神暴击,
     ...合欢秘辛,
+    ...武侠气运,
 ];
 
 /** 向后兼容别名 */
@@ -65,6 +68,7 @@ export function getQiyunByCategory(类别: string): 气运数据[] {
         '怠惰降维': 怠惰降维,
         '精神暴击': 精神暴击,
         '合欢秘辛': 合欢秘辛,
+        '武侠气运': 武侠气运,
     };
     return map[类别] || [];
 }
