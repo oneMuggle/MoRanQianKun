@@ -175,7 +175,7 @@ const MobileHome: React.FC<MobileHomeProps> = ({
 
     // 提至 Hook 区顶部（早于 config 空检查），避免条件渲染破坏 Hook 顺序
     const isLiMode = deviceState.mode === 'li';
-    const themeColor = isLiMode ? getLiModeThemeColor(config, '#6B2D8B') : undefined;
+    const themeColor = isLiMode && config ? getLiModeThemeColor(config, '#6B2D8B') : undefined;
     const isLockedState = isLocked;
 
     const visibleApps = useMemo(() => {

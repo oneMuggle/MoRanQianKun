@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { NPC结构 } from '../../../models/social';
+import { NPC结构, 服饰部位分类, 道具部位分类 } from '../../../models/social';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';
 import type { 关系网络数据 } from '../../../models/relationship';
 import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/memory/npcMemorySummary';
 import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import { 获取图片展示地址 } from '../../../utils/imageAssets';
+import { 获取已装备部位, 获取已装备道具 } from '../../../utils/clothingHelpers';
 import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';
 import RelationshipGraph from '../Relationship/RelationshipGraph';
 
@@ -46,6 +47,7 @@ const MobileSocial: React.FC<Props> = ({
     const [香闺展示模式, set香闺展示模式] = useState<Record<string, 'text' | 'image'>>({});
     const [showFullBackground, setShowFullBackground] = useState<boolean>(false);
     const [imageViewer, setImageViewer] = useState<{ src: string; alt: string } | null>(null);
+    const [服饰面板展开, set服饰面板展开] = useState(false);
 
     const 获取欲望阶段颜色 = (npcId: string): { bg: string; text: string; label: string } => {
         const 档案 = 欲望系统?.NPC欲望档案?.[npcId];
@@ -115,6 +117,17 @@ const MobileSocial: React.FC<Props> = ({
         (npc as any).档案?.衣着风格,
         (npc as any).档案?.衣着要点
     );
+    const 读取服饰档案 = (npc: NPC结构) => (npc as any).服饰档案 || null;
+    const 读取道具档案 = (npc: NPC结构) => (npc as any).道具档案 || null;
+    const 服饰部位标签: Record<服饰部位分类, string> = {
+        '上衣': '上衣', '下着': '下着', '鞋子': '鞋子', '袜子': '袜子',
+        '内衣': '内衣', '内裤': '内裤', '配饰': '配饰', '头饰': '头饰',
+        '外套': '外套', '特殊': '特殊'
+    };
+    const 道具类别标签: Record<道具部位分类, string> = {
+        '束缚器具': '束缚', '刺激器具': '刺激', '穿戴器具': '穿戴',
+        '消耗品': '消耗', '遥控设备': '遥控', '特殊': '特殊'
+    };
     const 读取生日 = (npc: NPC结构): string => 取首个非空文本(
         (npc as any).生日,
         (npc as any).出生日期,
@@ -698,9 +711,62 @@ const MobileSocial: React.FC<Props> = ({
                                                         <span className="text-pink-400/70 shrink-0 mt-px">身材</span>
                                                         <span className="text-gray-300 leading-relaxed">{读取身材(currentNPC) || '暂无记录'}</span>
                                                     </div>
-                                                    <div className="flex items-start gap-1.5">
-                                                        <span className="text-pink-400/70 shrink-0 mt-px">衣着</span>
-                                                        <span className="text-gray-300 leading-relaxed">{读取衣着(currentNPC) || '暂无记录'}</span>
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="flex items-start gap-1.5">
+                                                            <span className="text-pink-400/70 shrink-0 mt-px">衣着</span>
+                                                            <span className="text-gray-300 leading-relaxed flex-1">{读取衣着(currentNPC) || '暂无记录'}</span>
+                                                            {(读取服饰档案(currentNPC) || 读取道具档案(currentNPC)) && (
+                                                                <button
+                                                                    onClick={() => set服饰面板展开(!服饰面板展开)}
+                                                                    className="text-xs text-pink-400/60 active:text-pink-400 transition-colors ml-1 shrink-0"
+                                                                >
+                                                                    {服饰面板展开 ? '收起' : '详情'}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                        {服饰面板展开 && (
+                                                            <div className="ml-6 mt-2 space-y-2 text-xs">
+                                                                {读取服饰档案(currentNPC) && (
+                                                                    <div className="bg-black/20 rounded-lg p-2.5 space-y-1.5">
+                                                                        <div className="text-pink-300/60 text-[10px] font-semibold">服饰</div>
+                                                                        {获取已装备部位(currentNPC).map(部位 => {
+                                                                            const 数据 = currentNPC.服饰档案?.[部位];
+                                                                            if (!数据) return null;
+                                                                            return (
+                                                                                <div key={部位} className="flex flex-col gap-0.5">
+                                                                                    <span className="text-pink-400/50 text-[10px]">{服饰部位标签[部位]}</span>
+                                                                                    <span className="text-gray-300">{数据.名称}</span>
+                                                                                    {数据.描述 && 数据.描述 !== 数据.名称 && (
+                                                                                        <span className="text-gray-500 text-[10px] leading-relaxed">{数据.描述}</span>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                                {读取道具档案(currentNPC) && (
+                                                                    <div className="bg-black/20 rounded-lg p-2.5 space-y-1.5">
+                                                                        <div className="text-pink-300/60 text-[10px] font-semibold">道具</div>
+                                                                        {获取已装备道具(currentNPC).map(类别 => {
+                                                                            const 数据 = currentNPC.道具档案?.[类别];
+                                                                            if (!数据) return null;
+                                                                            return (
+                                                                                <div key={类别} className="flex flex-col gap-0.5">
+                                                                                    <span className="text-pink-400/50 text-[10px]">{道具类别标签[类别]}</span>
+                                                                                    <span className="text-gray-300">{数据.名称}</span>
+                                                                                    {数据.描述 && 数据.描述 !== 数据.名称 && (
+                                                                                        <span className="text-gray-500 text-[10px] leading-relaxed">{数据.描述}</span>
+                                                                                    )}
+                                                                                    {数据.状态 && (
+                                                                                        <span className="text-yellow-500/70 text-[10px]">[{数据.状态}]</span>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

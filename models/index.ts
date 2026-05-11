@@ -7,7 +7,7 @@
 // 核心实体
 export type { 角色数据结构, 角色装备, 角色金钱, 玩家BUFF结构, 突破条件结构 } from './character';
 export type { 环境信息结构, 环境变量结构, 天气信息结构, 结构化时间信息结构, 环境节日信息结构 } from './environment';
-export type { NPC结构, NPC关系边, 服装状态结构 } from './social';
+export type { NPC结构, NPC关系边, 服装状态结构, NPC服饰档案, 服装部位, 服饰部位分类, 服装变更记录, NPC道具档案, 道具条目, 道具部位分类, 道具变更记录 } from './social';
 export type { 世界数据结构, 地图结构, 建筑结构, 活跃NPC结构, 游戏时间格式, 地点归属结构 } from './world';
 export type { 战斗状态结构, 战斗敌方信息 } from './battle';
 export type { 门派成员简报 as 门派状态结构 } from './sect';
