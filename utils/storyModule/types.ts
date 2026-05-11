@@ -28,8 +28,14 @@ export interface StoryModule<
   /** 模块显示名称，如 '校园NSFW' */
   name: string;
 
-  /** 所属时代 ID，如 'contemporary_urban' */
+  /** 所属时代 ID，如 'contemporary_urban'。也可设为父级如 'contemporary' 使其对所有子纪元可用 */
   eraId: string;
+
+  /**
+   * 可选：显式声明该模块适用的所有纪元 ID。
+   * 优先级高于 eraId 的层级匹配，用于精确控制模块在多个不连续纪元下共享。
+   */
+  parentEraIds?: string[];
 
   /** 语义化版本 */
   version: string;

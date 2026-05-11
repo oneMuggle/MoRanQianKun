@@ -1,6 +1,7 @@
 // 故事模块注册表 — 集中管理所有已注册模块
 
 import type { StoryModule } from './types';
+import { getEraPath } from '../../models/eraTheme/assembly';
 
 export class 故事模块注册表 {
   private static _模块映射 = new Map<string, StoryModule<any, any>>();
@@ -18,11 +19,29 @@ export class 故事模块注册表 {
     return this._模块映射.get(id);
   }
 
-  /** 获取指定时代的所有模块（按优先级降序排序） */
+  /** 检查模块是否匹配指定纪元（支持精确匹配 + 层级匹配 + parentEraIds 精确列表） */
+  private static 模块匹配纪元(m: StoryModule<any, any>, eraId: string): boolean {
+    // 1. 精确匹配
+    if (m.eraId === eraId) return true;
+
+    // 2. parentEraIds 显式列表匹配
+    if (m.parentEraIds && m.parentEraIds.includes(eraId)) return true;
+
+    // 3. 层级匹配：当前纪元的路径中包含模块的 eraId
+    const path = getEraPath(eraId);
+    return path.some(n => n.id === m.eraId);
+  }
+
+  /** 获取指定时代的所有模块（按优先级降序排序，精确匹配优先于层级匹配） */
   static 获取时代模块(eraId: string): StoryModule<any, any>[] {
     return Array.from(this._模块映射.values())
-      .filter(m => m.eraId === eraId)
-      .sort((a, b) => b.priority - a.priority);
+      .filter(m => this.模块匹配纪元(m, eraId))
+      .sort((a, b) => {
+        const aExact = a.eraId === eraId || (a.parentEraIds?.includes(eraId) ?? false);
+        const bExact = b.eraId === eraId || (b.parentEraIds?.includes(eraId) ?? false);
+        if (aExact !== bExact) return bExact ? 1 : -1;
+        return b.priority - a.priority;
+      });
   }
 
   /** 获取当前活跃模块（基于 gameConfig 的主开关） */

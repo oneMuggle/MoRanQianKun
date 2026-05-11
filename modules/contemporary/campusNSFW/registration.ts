@@ -7,6 +7,7 @@ import { 默认校园NSFW设置 } from '../../../models/campusNSFW';
 import { 规范化校园NSFW设置 } from '../../../models/campusNSFW/normalization';
 import { 构建校园NSFW完整叙事约束 } from '../../../prompts/runtime/campusNSFW';
 import type { 露出偏好等级, 权力倾向, SM场景类型, 校园祭阶段, 校园祭主题, 摊位类型, 后夜祭状态, 桌游类型, 密室主题 } from '../../../models/campusNSFW';
+import { MODERN_ERA_IDS } from '../../../models/eraTheme/assembly';
 
 interface 校园运行时参数 {
   欲望阶段: string;
@@ -97,7 +98,8 @@ function 提取校园参数(
 const 校园NSFW模块: StoryModule<校园NSFW设置, 校园运行时参数> = {
   id: 'campusNSFW',
   name: '校园NSFW',
-  eraId: 'contemporary_urban',
+  eraId: 'contemporary',
+  parentEraIds: [...MODERN_ERA_IDS],
   version: '2.0.0',
   priority: 100,
   category: 'nsfw',
