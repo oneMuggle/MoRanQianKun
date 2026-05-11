@@ -180,7 +180,9 @@ const 清洗导入存档 = (raw: any): Omit<存档结构, 'id'> | null => {
         当前角色锚点ID: typeof raw.当前角色锚点ID === 'string' ? raw.当前角色锚点ID : undefined,
         校园系统: raw.校园系统 && typeof raw.校园系统 === 'object' ? 深拷贝(raw.校园系统) : undefined,
         校规系统: raw.校规系统 && typeof raw.校规系统 === 'object' ? 深拷贝(raw.校规系统) : undefined,
-        催眠系统: raw.催眠系统 && typeof raw.催眠系统 === 'object' ? 深拷贝(raw.催眠系统) : undefined
+        催眠系统: raw.催眠系统 && typeof raw.催眠系统 === 'object' ? 深拷贝(raw.催眠系统) : undefined,
+        写真系统: raw.写真系统 && typeof raw.写真系统 === 'object' ? 深拷贝(raw.写真系统) : undefined,
+        都市网约车系统: raw.都市网约车系统 && typeof raw.都市网约车系统 === 'object' ? 深拷贝(raw.都市网约车系统) : undefined
     };
 
     return normalized;
