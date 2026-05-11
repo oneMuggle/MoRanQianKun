@@ -328,7 +328,8 @@ export const useGame = () => {
         // Campus Systems
         校规系统, 设置校规系统,
         催眠系统, 设置催眠系统,
-        校园系统, 设置校园系统
+        校园系统, 设置校园系统,
+        写真系统, 设置写真系统
     } = gameState;
 
     // Mobile Device
@@ -906,6 +907,17 @@ export const useGame = () => {
             }
         }));
     }, [社交, gameConfig?.校园NSFW设置?.启用校园NSFW深化系统, 校园系统?.欲望系统?.NPC欲望档案, 设置校园系统]);
+
+    // 写真 NSFW 系统初始化：当主开关打开且尚未初始化时，初始化空系统档案
+    useEffect(() => {
+        const nsfwEnabled = gameConfig?.写真NSFW设置?.启用写真NSFW系统;
+        const 写真系统已存在 = 写真系统 && Object.keys(写真系统).length > 0;
+        const 是现代纪元 = currentEra?.startsWith('contemporary_');
+
+        if (nsfwEnabled && !写真系统已存在 && 是现代纪元) {
+            设置写真系统({});
+        }
+    }, [gameConfig?.写真NSFW设置?.启用写真NSFW系统, 写真系统, currentEra, 设置写真系统]);
 
     useEffect(() => {
         void loadBuiltinPromptEntries();

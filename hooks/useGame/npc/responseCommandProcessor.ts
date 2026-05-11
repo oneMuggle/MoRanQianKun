@@ -13,6 +13,7 @@ import {
 } from '../../../types';
 import type { 校园系统数据 } from '../../../models/campusPhone';
 import type { 校园NSFW系统扩展 } from '../../../models/campusNSFW';
+import type { 写真系统扩展 } from '../../../models/photographyNSFW';
 import { applyStateCommand } from '../../../utils/stateHelpers';
 
 const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
@@ -32,6 +33,7 @@ export type 响应命令处理状态 = {
     同人剧情规划?: 同人剧情规划结构;
     同人女主剧情规划?: 同人女主剧情规划结构;
     校园系统: 校园系统数据;
+    写真系统?: 写真系统扩展;
 };
 
 type 响应命令处理依赖 = {
@@ -62,6 +64,7 @@ type 响应命令处理依赖 = {
     设置同人剧情规划?: (value: 同人剧情规划结构 | undefined) => void;
     设置同人女主剧情规划?: (value: 同人女主剧情规划结构 | undefined) => void;
     设置校园系统?: (value: 校园系统数据) => void;
+    设置写真系统?: (value: 写真系统扩展) => void;
     命令后校准?: (state: 响应命令处理状态) => { state: 响应命令处理状态; corrections?: string[] } | 响应命令处理状态;
 };
 
@@ -93,6 +96,7 @@ export const 执行响应命令处理 = (
     let fandomStoryPlanBuffer = deps.规范化同人剧情规划状态(baseState?.同人剧情规划 ?? currentState.同人剧情规划);
     let fandomHeroinePlanBuffer = deps.规范化同人女主剧情规划状态(baseState?.同人女主剧情规划 ?? currentState.同人女主剧情规划);
     let campusBuffer = deps.规范化校园系统(baseState?.校园系统 ?? currentState.校园系统);
+    let 写真系统Buffer = currentState.写真系统;
 
     if (Array.isArray(response.tavern_commands)) {
         response.tavern_commands.forEach(cmd => {

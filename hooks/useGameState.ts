@@ -34,6 +34,7 @@ import { 默认中期转长期提示词, 默认短期转中期提示词, 默认N
 import { 节日列表 } from '../data/world';
 import { 初始设备状态, type DeviceState, type MobileApp } from './useGame/device/mobileDeviceWorkflow';
 import type { 校园系统数据 } from '../models/campusPhone';
+import type { 写真系统扩展 } from '../models/photographyNSFW';
 import * as dbService from '../services/dbService';
 import { THEMES, 应用主题到根元素, 应用时代主题到根元素 } from '../styles/themes';
 import { 获取时代主题方案 } from '../models/system';
@@ -216,6 +217,9 @@ export const useGameState = () => {
         校园卡: { 余额: 0, 消费记录: [] },
         社团活动列表: [],
     });
+
+    // Photography NSFW System (写真约拍 NSFW 子系统)
+    const [写真系统, 设置写真系统] = useState<写真系统扩展>({});
 
     const [activeTab, setActiveTab] = useState<'api' | 'image_generation' | 'integrated_models' | 'independent_api_gpt' | 'novel_decomposition' | 'novel_decomposition_runtime' | 'prompt' | 'storage' | 'theme' | 'visual' | 'world' | 'game' | 'reality' | 'tavern_preset' | 'memory' | 'history' | 'context' | 'music' | 'npc_management' | 'variable_manager'>('api');
     
@@ -453,6 +457,7 @@ export const useGameState = () => {
         校规系统, 设置校规系统,
         催眠系统, 设置催眠系统,
         校园系统, 设置校园系统,
+        写真系统, 设置写真系统,
         
         // Configs
         apiConfig, setApiConfig,
