@@ -56,6 +56,7 @@ interface GameViewProps {
     openNovelDecompositionWorkbench: () => void;
     openSave: () => void;
     openLoad: () => void;
+    openRelationship: () => void;
     openNsfwCenter: () => void;
     closeMobileMusic: () => void;
     showMobileMusic: boolean;
@@ -108,6 +109,7 @@ export function GameView({
     openNovelDecompositionWorkbench,
     openSave,
     openLoad,
+    openRelationship,
     openNsfwCenter,
     closeMobileMusic,
     showMobileMusic,
@@ -295,6 +297,7 @@ export function GameView({
                             onOpenBattle={openBattle}
                             onOpenTeam={openTeam}
                             onOpenSocial={openSocial}
+                            onOpenRelationship={openRelationship}
                             onOpenKungfu={openKungfu}
                             onOpenWorld={openWorld}
                             onOpenMap={openMap}

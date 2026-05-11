@@ -111,6 +111,7 @@ export interface GameModal {
     showHeroinePlan: boolean;
     showMemory: boolean;
     showSaveLoad: { show: boolean; mode: 'save' | 'load' };
+    showRelationship: { show: boolean };
     activeTab: 'api' | 'image_generation' | 'integrated_models' | 'independent_api_gpt' | 'novel_decomposition' | 'novel_decomposition_runtime' | 'prompt' | 'storage' | 'theme' | 'visual' | 'world' | 'game' | 'reality' | 'tavern_preset' | 'memory' | 'history' | 'context' | 'music' | 'npc_management' | 'variable_manager';
     currentTheme: ThemePreset;
     currentEra: string;
@@ -282,6 +283,7 @@ export const GameModalProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         showHeroinePlan: state.showHeroinePlan,
         showMemory: state.showMemory,
         showSaveLoad: state.showSaveLoad,
+        showRelationship: state.showRelationship,
         activeTab: state.activeTab,
         currentTheme: state.currentTheme,
         currentEra: state.currentEra,
@@ -290,7 +292,7 @@ export const GameModalProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         state.showBattle, state.showSocial, state.showTeam, state.showKungfu,
         state.showWorld, state.showMap, state.showSect, state.showTask,
         state.showAgreement, state.showStory, state.showHeroinePlan,
-        state.showMemory, state.showSaveLoad, state.activeTab,
+        state.showMemory, state.showSaveLoad, state.showRelationship, state.activeTab,
         state.currentTheme, state.currentEra
     ]);
     

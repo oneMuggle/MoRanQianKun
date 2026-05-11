@@ -22,6 +22,7 @@ interface GameSetters {
     setShowHeroinePlan: React.Dispatch<React.SetStateAction<boolean>>;
     setShowMemory: React.Dispatch<React.SetStateAction<boolean>>;
     setShowSaveLoad: React.Dispatch<React.SetStateAction<{ show: boolean; mode: 'save' | 'load' }>>;
+    setShowRelationship: React.Dispatch<React.SetStateAction<{ show: boolean }>>;
     setShowSettings: React.Dispatch<React.SetStateAction<boolean>>;
     setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -85,6 +86,8 @@ export interface ModalOpeners {
     openMemory: () => void;
     openSave: () => void;
     openLoad: () => void;
+    openRelationship: () => void;
+    closeRelationship: () => void;
     closeSettings: () => void;
     closeNovelDecompositionWorkbench: () => void;
     closeNovelWritingWorkbench: () => void;
@@ -120,6 +123,7 @@ export function useModalOpeners(deps: UseModalOpenersDeps): ModalOpeners {
         states.setShowImageManager(false);
         states.setShowNovelDecompositionWorkbench(false);
         setters.setShowSaveLoad({ show: false, mode: 'save' });
+        setters.setShowRelationship({ show: false });
         setters.setShowSettings(false);
         states.setShowMobileMusic(false);
     }, [setters, states]);
@@ -145,6 +149,8 @@ export function useModalOpeners(deps: UseModalOpenersDeps): ModalOpeners {
     const openMemory = React.useCallback(() => setters.setShowMemory(true), [setters]);
     const openSave = React.useCallback(() => setters.setShowSaveLoad({ show: true, mode: 'save' }), [setters]);
     const openLoad = React.useCallback(() => setters.setShowSaveLoad({ show: true, mode: 'load' }), [setters]);
+    const openRelationship = React.useCallback(() => setters.setShowRelationship({ show: true }), [setters]);
+    const closeRelationship = React.useCallback(() => setters.setShowRelationship({ show: false }), [setters]);
     const closeSettings = React.useCallback(() => setters.setShowSettings(false), [setters]);
     const closeNovelDecompositionWorkbench = React.useCallback(() => states.setShowNovelDecompositionWorkbench(false), [states]);
     const closeNovelWritingWorkbench = React.useCallback(() => states.setShowNovelWritingWorkbench(false), [states]);
@@ -239,6 +245,9 @@ export function useModalOpeners(deps: UseModalOpenersDeps): ModalOpeners {
             case '社交':
                 setters.setShowSocial(true);
                 break;
+            case '关系':
+                setters.setShowRelationship({ show: true });
+                break;
             case '功法':
                 if (启用修炼体系) {
                     setters.setShowKungfu(true);
@@ -317,7 +326,7 @@ export function useModalOpeners(deps: UseModalOpenersDeps): ModalOpeners {
         openBattle, openTeam, openSocial, openKungfu,
         openWorld, openMap, openSect, openTask,
         openAgreement, openStory, openHeroinePlan, openMemory,
-        openSave, openLoad,
+        openSave, openLoad, openRelationship, closeRelationship,
         closeSettings, closeNovelDecompositionWorkbench, closeNovelWritingWorkbench,
         closeSaveLoad, closeMobileMusic,
         openWorldbookManager, openNovelDecompositionWorkbench,

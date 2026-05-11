@@ -13,6 +13,7 @@ interface Props {
     onOpenBattle: () => void;
     onOpenTeam: () => void;
     onOpenSocial: () => void;
+    onOpenRelationship?: () => void;
     onOpenKungfu: () => void;
     onOpenWorld: () => void;
     onOpenMap: () => void;
@@ -37,7 +38,7 @@ interface Props {
 
 const RightPanel: React.FC<Props> = ({
     onOpenSettings, onOpenInventory, onOpenEquipment, onOpenBattle, onOpenTeam,
-    onOpenSocial, onOpenKungfu, onOpenWorld, onOpenMap, onOpenSect,
+    onOpenSocial, onOpenRelationship, onOpenKungfu, onOpenWorld, onOpenMap, onOpenSect,
     onOpenTask, onOpenAgreement, onOpenStory, onOpenHeroinePlan, onOpenMemory, onOpenImageManager,
     onOpenNovelDecomposition, onOpenDevice, deviceUnreadCount = 0,
     worldEvolutionEnabled = false,
@@ -57,6 +58,7 @@ const RightPanel: React.FC<Props> = ({
         { label: '背包', action: onOpenInventory, color: 'primary' },
         { label: '队伍', action: onOpenTeam, color: 'primary' },
         { label: '社交', action: onOpenSocial, color: 'primary' },
+        ...(onOpenRelationship ? [{ label: '关系', action: onOpenRelationship, color: 'primary' }] : []),
         ...(enableKungfu ? [{ label: '功法', action: onOpenKungfu, color: 'primary' }] : []),
         {
             label: worldEvolutionUpdating ? '世界·更新中' : '世界',

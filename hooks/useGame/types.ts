@@ -66,6 +66,7 @@ export interface UseGameSetters {
     setShowHeroinePlan: (v: boolean) => void;
     setShowMemory: (v: boolean) => void;
     setShowSaveLoad: (v: boolean) => void;
+    setShowRelationship: (v: boolean) => void;
     setActiveTab: (v: string) => void;
     setCurrentTheme: (v: string) => void;
     setCurrentEra: (v: number) => void;

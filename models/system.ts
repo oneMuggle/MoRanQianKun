@@ -8,6 +8,7 @@ import type { 都市网约车NSFW设置 } from './urbanDriverNSFW';
 import type { 写真NSFW设置, 写真系统扩展 } from './photographyNSFW';
 import { 生图目标类型, 生图筛选性别类型, 生图筛选重要性类型, 场景图片档案 } from './imageGeneration';
 import { NPC结构 } from './social';
+import type { 关系网络数据 } from './relationship';
 import { 世界数据结构 } from './world';
 import { 详细门派结构 } from './sect';
 import { 任务结构, 约定结构 } from './task';
@@ -1764,6 +1765,7 @@ export interface 存档结构 {
     校园系统?: 校园系统数据;
     写真系统?: 写真系统扩展; // 写真约拍系统（现代纪元NSFW模块）
     都市网约车系统?: Record<string, unknown>; // 都市网约车NSFW系统
+    关系谱?: 关系网络数据; // 人物关系谱系统
 }
 
 export type PromptCategory = '核心设定' | '数值设定' | '难度设定' | '写作设定' | '自定义';

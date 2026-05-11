@@ -87,6 +87,7 @@ export interface GameStateAccess {
     setShowHeroinePlan: GameStateSlice['setShowHeroinePlan'];
     setShowMemory: GameStateSlice['setShowMemory'];
     setShowSaveLoad: GameStateSlice['setShowSaveLoad'];
+    setShowRelationship: GameStateSlice['setShowRelationship'];
     setActiveTab: GameStateSlice['setActiveTab'];
     setCurrentTheme: GameStateSlice['setCurrentTheme'];
 
@@ -303,6 +304,7 @@ export function createGameStateAccess(
         setShowHeroinePlan: gameState.setShowHeroinePlan,
         setShowMemory: gameState.setShowMemory,
         setShowSaveLoad: gameState.setShowSaveLoad,
+        setShowRelationship: gameState.setShowRelationship,
         setActiveTab: gameState.setActiveTab,
         setCurrentTheme: gameState.setCurrentTheme,
 

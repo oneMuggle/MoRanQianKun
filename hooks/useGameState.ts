@@ -189,6 +189,9 @@ export const useGameState = () => {
     // Save/Load Modal
     const [showSaveLoad, setShowSaveLoad] = useState<{ show: boolean, mode: 'save' | 'load' }>({ show: false, mode: 'save' });
 
+    // Relationship Modal
+    const [showRelationship, setShowRelationship] = useState<{ show: boolean }>({ show: false });
+
     // Mobile Device State
     const [设备状态, 设置设备状态] = useState<DeviceState>(初始设备状态);
     const 设备打开 = () => 设置设备状态((prev) => ({ ...prev, isOpen: true }));
@@ -449,6 +452,7 @@ export const useGameState = () => {
         showHeroinePlan, setShowHeroinePlan,
         showMemory, setShowMemory,
         showSaveLoad, setShowSaveLoad, // New
+        showRelationship, setShowRelationship,
         activeTab, setActiveTab,
 
         // Mobile Device
