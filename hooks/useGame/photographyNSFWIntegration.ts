@@ -13,6 +13,52 @@ import type {
   泄露事件状态,
 } from '../../models/photographyNSFW';
 
+// ==================== 解析校验常量 ====================
+
+/** 模特档案中已知的合法字段名 —— 用于拒绝将字段名误认为模特 ID */
+const VALID_MODEL_FIELDS = [
+  '姓名', '类型', '职业状态', '保护意识',
+  '信任度', '安全感', '自我认同', '羞耻度',
+  '拍摄总次数', '正规拍摄次数', '擦边拍摄次数', '越界拍摄次数',
+  '当前底线', '底线历史',
+  '被偷拍次数', '被泄露次数', '投诉次数',
+  '累计收入', '单次报价',
+  '拍摄经历',
+  'id', '项目ID',
+] as const;
+
+/** 摄影师档案中已知的合法字段名 */
+const VALID_PHOTOGRAPHER_FIELDS = [
+  '姓名', '类型', '动机', '信誉',
+  '技术水平', '沟通能力',
+  '越界倾向', '偷拍倾向', '传播倾向',
+  '口碑评分', '投诉累计',
+  '拍摄总次数', '回头客数量', '作品发布数量',
+  '擅长写真类型', '擅长拍摄风格',
+  'id', '项目ID',
+] as const;
+
+/**
+ * 校验一个对象是否是合法的模特档案更新值
+ * 必须至少包含一个已知字段，且不能是纯扁平值
+ */
+const isValidModelUpdate = (value: unknown): value is Record<string, unknown> => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const keys = Object.keys(value);
+  // 至少包含一个已知字段
+  return keys.some(k => VALID_MODEL_FIELDS.includes(k as typeof VALID_MODEL_FIELDS[number]));
+};
+
+/**
+ * 校验一个键是否是常见的字段名（而非合法的实体 ID）
+ * 如果 LLM 把 "姓名"、"安全感" 等作为 key，说明输出格式错误
+ */
+const isLikelyFieldName = (key: string): boolean => {
+  return VALID_MODEL_FIELDS.includes(key as typeof VALID_MODEL_FIELDS[number])
+    || VALID_PHOTOGRAPHER_FIELDS.includes(key as typeof VALID_PHOTOGRAPHER_FIELDS[number])
+    || ['模特id', '模特ID', 'ID', 'id', '项目ID', '摄影师Id', '模特Id'].includes(key);
+};
+
 /**
  * 解析写真系统状态更新标签
  * 格式: <写真系统状态>{"更新档案":{"NPC_ID":{...}}}</写真系统状态>
@@ -53,9 +99,21 @@ export const 解析写真系统状态更新 = (
       }
     }
 
+    // 过滤模特档案：拒绝 key 为字段名的无效 entry
+    const raw模特档案 = parsed.更新模特档案;
+    const 过滤后模特档案 = raw模特档案
+      ? Object.fromEntries(Object.entries(raw模特档案).filter(([k, v]) => !isLikelyFieldName(k) && isValidModelUpdate(v)))
+      : undefined;
+
+    // 过滤摄影师档案：拒绝 key 为字段名的无效 entry
+    const raw摄影师档案 = parsed.更新摄影师档案;
+    const 过滤后摄影师档案 = raw摄影师档案
+      ? Object.fromEntries(Object.entries(raw摄影师档案).filter(([k]) => !isLikelyFieldName(k)))
+      : undefined;
+
     return {
-      更新模特档案: parsed.更新模特档案,
-      更新摄影师档案: parsed.更新摄影师档案,
+      更新模特档案: 过滤后模特档案,
+      更新摄影师档案: 过滤后摄影师档案,
       更新拍摄项目: 标准化项目更新,
       新泄露事件: parsed.新泄露事件,
     } as {
@@ -116,6 +174,14 @@ export const 应用写真系统状态更新 = (
   if (更新.更新模特档案) {
     const 新模特档案 = { ...(新系统.模特档案 || {}) };
     for (const [id, 档案] of Object.entries(更新.更新模特档案)) {
+      // 校验：拒绝将字段名（如"姓名"、"安全感"）误认为模特 ID
+      if (isLikelyFieldName(id)) {
+        continue;
+      }
+      // 校验：值必须是合法的对象
+      if (!isValidModelUpdate(档案)) {
+        continue;
+      }
       if (新模特档案[id]) {
         新模特档案[id] = { ...新模特档案[id], ...档案 };
       } else {
@@ -153,6 +219,10 @@ export const 应用写真系统状态更新 = (
   if (更新.更新摄影师档案) {
     const 新摄影师档案 = { ...(新系统.摄影师档案 || {}) };
     for (const [id, 档案] of Object.entries(更新.更新摄影师档案)) {
+      // 校验：拒绝将字段名误认为摄影师 ID
+      if (isLikelyFieldName(id)) {
+        continue;
+      }
       if (新摄影师档案[id]) {
         新摄影师档案[id] = { ...新摄影师档案[id], ...档案 };
       } else {
@@ -195,11 +265,19 @@ export const 应用写真系统状态更新 = (
         新项目列表[已有索引] = { ...新项目列表[已有索引], ...raw更新 };
       } else {
         // 新项目：创建完整最小项目
+        // 推断模特 ID：优先从 raw更新 中取，其次从更新档案中推断
+        const 推断模特Id = raw更新.模特Id
+          || Object.keys(更新.更新模特档案 || {})[0]
+          || (raw更新.模特姓名 ? raw更新.模特姓名 : 'unknown');
+        // 推断摄影师 ID：优先使用 raw更新 中的，其次尝试 'player'
+        const 推断摄影师Id = raw更新.摄影师Id || raw更新.摄影师ID || 'player';
+
         const 基础项目 = {
           id: 项目ID,
           项目ID,
-          模特Id: Object.keys(更新.更新模特档案 || {})[0] || 'unknown',
-          摄影师Id: 'unknown',
+          项目名称: raw更新.项目名称 || `${raw更新.约定写真类型 || '写真'}拍摄项目`,
+          模特Id: 推断模特Id,
+          摄影师Id: 推断摄影师Id,
           约定写真类型: '商业写真' as const,
           约定场所: '影棚' as const,
           约定风格: '清新自然' as const,
@@ -212,6 +290,16 @@ export const 应用写真系统状态更新 = (
           当前回合: 1,
           最大回合: 10,
           拍摄阶段: '未开始' as const,
+          阶段明细: [
+            { 阶段名称: '未开始', 状态: '进行中' },
+            { 阶段名称: '化妆造型', 状态: '未开始' },
+            { 阶段名称: '第一组拍摄', 状态: '未开始' },
+            { 阶段名称: '换装', 状态: '未开始' },
+            { 阶段名称: '第二组拍摄', 状态: '未开始' },
+            { 阶段名称: '休息', 状态: '未开始' },
+            { 阶段名称: '收尾', 状态: '未开始' },
+            { 阶段名称: '已完成', 状态: '未开始' },
+          ],
           尺度变更历史: [],
           越界行为记录: [],
           泄露风险评分: 0,

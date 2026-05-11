@@ -82,6 +82,13 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
     return map;
   }, [摄影师档案]);
 
+  const 阶段状态映射: Record<string, { 颜色: string; 图标: string }> = {
+    '未开始': { 颜色: 'text-gray-600', 图标: '○' },
+    '进行中': { 颜色: 'text-wuxia-gold', 图标: '◉' },
+    '已完成': { 颜色: 'text-green-400', 图标: '✓' },
+    '已跳过': { 颜色: 'text-gray-500', 图标: '—' },
+  };
+
   const tabs: { id: TabId; label: string; count: number }[] = [
     { id: 'projects', label: '项目', count: 进行中的拍摄项目.length },
     { id: 'leaks', label: '泄露', count: 活跃泄露.length },
@@ -98,12 +105,13 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
         const 模特姓名 = 模特姓名映射[p.模特Id] || p.模特Id;
         const 摄影师姓名 = 摄影师姓名映射[p.摄影师Id] || p.摄影师Id;
         const 进度 = p.最大回合 > 0 ? Math.round((p.当前回合 / p.最大回合) * 100) : 0;
+        const 显示名称 = p.项目名称 || `${模特姓名} × ${摄影师姓名}`;
         return (
           <div key={p.id} className="bg-black/40 border border-white/10 rounded-xl overflow-hidden">
             <button type="button" onClick={() => toggleExpand(p.id)} className="w-full flex items-center justify-between p-3">
               <div className="text-left">
-                <div className="text-wuxia-gold font-bold text-sm">{模特姓名} × {摄影师姓名}</div>
-                <div className="text-[10px] text-gray-500">{p.拍摄阶段}</div>
+                <div className="text-wuxia-gold font-bold text-sm">{显示名称}</div>
+                <div className="text-[10px] text-gray-500">{p.约定写真类型} · {p.拍摄阶段}</div>
               </div>
               <div className="flex items-center gap-2">
                 <span className={`text-[11px] ${尺度颜色[p.实际尺度]}`}>{p.实际尺度}</span>
@@ -111,6 +119,10 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
             </button>
             {expandedId === p.id && (
               <div className="px-3 pb-3 space-y-2 border-t border-white/5 pt-2">
+                <div className="grid grid-cols-2 gap-1 text-[11px]">
+                  <div><span className="text-gray-500">模特：</span><span className="text-gray-300">{模特姓名}</span></div>
+                  <div><span className="text-gray-500">摄影师：</span><span className="text-gray-300">{摄影师姓名}</span></div>
+                </div>
                 <div className="flex items-center gap-2 text-[11px]">
                   <span className="text-gray-500 w-10">进度</span>
                   <div className="flex-1 h-1.5 bg-black/60 rounded-full overflow-hidden">
@@ -118,6 +130,22 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
                   </div>
                   <span className="text-gray-400 font-mono w-10 text-right">{进度}%</span>
                 </div>
+                {p.阶段明细 && p.阶段明细.length > 0 && (
+                  <div>
+                    <div className="text-[10px] text-gray-600 mb-1">阶段</div>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {p.阶段明细.map((stage, i) => {
+                        const status = 阶段状态映射[stage.状态] || 阶段状态映射['未开始'];
+                        const isCurrent = stage.状态 === '进行中';
+                        return (
+                          <div key={i} className={`px-1.5 py-0.5 rounded text-[10px] ${isCurrent ? 'bg-wuxia-gold/10 border border-wuxia-gold/30 text-wuxia-gold' : status.颜色}`}>
+                            {status.图标} {stage.阶段名称}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <div className="text-[11px] text-gray-500">
                   场所: <span className={场所风险颜色[p.实际场所]}>{p.实际场所}</span>
                 </div>
