@@ -88,6 +88,11 @@ export interface GameStateAccess {
     setShowMemory: GameStateSlice['setShowMemory'];
     setShowSaveLoad: GameStateSlice['setShowSaveLoad'];
     setShowRelationship: GameStateSlice['setShowRelationship'];
+
+    // 关系谱
+    关系谱: GameStateSlice['关系谱'];
+    设置关系谱: GameStateSlice['设置关系谱'];
+
     setActiveTab: GameStateSlice['setActiveTab'];
     setCurrentTheme: GameStateSlice['setCurrentTheme'];
 
@@ -305,6 +310,11 @@ export function createGameStateAccess(
         setShowMemory: gameState.setShowMemory,
         setShowSaveLoad: gameState.setShowSaveLoad,
         setShowRelationship: gameState.setShowRelationship,
+
+        // 关系谱
+        关系谱: gameState.关系谱,
+        设置关系谱: gameState.设置关系谱,
+
         setActiveTab: gameState.setActiveTab,
         setCurrentTheme: gameState.setCurrentTheme,
 

@@ -20,6 +20,7 @@ import type {
     时代信息结构
 } from '../../../types';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级, 校园系统数据 } from '../../../models/campusPhone';
+import type { 关系网络数据 } from '../../../models/relationship';
 import type { NPC结构 } from '../../../types';
 import { 从NPC创建欲望档案, 创建默认欲望档案 } from '../campusNSFWEngine';
 import { 执行手动存档, 执行自动存档, 执行读取存档 } from '../saveCoordinator';
@@ -60,11 +61,13 @@ type 存档编排工作流依赖 = {
     校园系统?: 校园系统数据;
     写真系统?: unknown;
     都市网约车系统?: unknown;
+    关系谱?: 关系网络数据;
     设置校规系统: (value: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     设置催眠系统: (value: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
     设置校园系统: (value: 校园系统数据) => void;
     设置写真系统?: (value: unknown) => void;
     设置都市网约车系统?: (value: unknown) => void;
+    设置关系谱?: (value: 关系网络数据 | undefined) => void;
     规范化环境信息: (envLike?: any) => 环境信息结构;
     构建完整地点文本: (envLike?: any) => string;
     规范化世界状态: (raw?: any) => 世界数据结构;
@@ -157,7 +160,8 @@ export const 创建存读档工作流 = (deps: 存档编排工作流依赖) => {
         催眠系统: deps.催眠系统,
         校园系统: deps.校园系统,
         写真系统: deps.写真系统,
-        都市网约车系统: deps.都市网约车系统
+        都市网约车系统: deps.都市网约车系统,
+        关系谱: deps.关系谱
     });
 
     const 构建协调依赖 = () => ({
@@ -203,6 +207,7 @@ export const 创建存读档工作流 = (deps: 存档编排工作流依赖) => {
         设置校园系统: deps.设置校园系统,
         设置写真系统: deps.设置写真系统,
         设置都市网约车系统: deps.设置都市网约车系统,
+        设置关系谱: deps.设置关系谱,
         setView: deps.setView,
         setShowSaveLoad: deps.setShowSaveLoad,
         设置最近开局配置: deps.设置最近开局配置,

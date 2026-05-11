@@ -64,6 +64,11 @@ interface ReturnMapperDeps {
     setShowHeroinePlan: (v: boolean) => void;
     setShowMemory: (v: boolean) => void;
     setShowSaveLoad: (v: any) => void;
+    setShowRelationship: (v: any) => void;
+
+    // 关系谱
+    设置关系谱: (v: any) => void;
+
     setActiveTab: (v: any) => void;
     setCurrentTheme: (v: any) => void;
     setCurrentEra: (v: any) => void;
@@ -275,6 +280,8 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             setShowHeroinePlan: deps.setShowHeroinePlan,
             setShowMemory: deps.setShowMemory,
             setShowSaveLoad: deps.setShowSaveLoad,
+            setShowRelationship: deps.setShowRelationship,
+            设置关系谱: deps.设置关系谱,
             setActiveTab: deps.setActiveTab,
             setCurrentTheme: deps.setCurrentTheme,
             setCurrentEra: deps.setCurrentEra,

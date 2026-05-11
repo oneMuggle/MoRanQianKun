@@ -34,6 +34,7 @@ import { 默认中期转长期提示词, 默认短期转中期提示词, 默认N
 import { 节日列表 } from '../data/world';
 import { 初始设备状态, type DeviceState, type MobileApp } from './useGame/device/mobileDeviceWorkflow';
 import type { 校园系统数据 } from '../models/campusPhone';
+import type { 关系网络数据 } from '../models/relationship';
 import * as dbService from '../services/dbService';
 import { THEMES, 应用主题到根元素, 应用时代主题到根元素 } from '../styles/themes';
 import { 获取时代主题方案 } from '../models/system';
@@ -191,6 +192,9 @@ export const useGameState = () => {
 
     // Relationship Modal
     const [showRelationship, setShowRelationship] = useState<{ show: boolean }>({ show: false });
+
+    // 人物关系谱（懒初始化：首次从社交数据构建）
+    const [关系谱, 设置关系谱] = useState<关系网络数据 | undefined>(undefined);
 
     // Mobile Device State
     const [设备状态, 设置设备状态] = useState<DeviceState>(初始设备状态);
@@ -453,6 +457,7 @@ export const useGameState = () => {
         showMemory, setShowMemory,
         showSaveLoad, setShowSaveLoad, // New
         showRelationship, setShowRelationship,
+        关系谱, 设置关系谱,
         activeTab, setActiveTab,
 
         // Mobile Device

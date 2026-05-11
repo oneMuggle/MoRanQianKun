@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { NPC结构 } from '../../../models/social';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';
+import type { 关系网络数据 } from '../../../models/relationship';
 import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/memory/npcMemorySummary';
 import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import { 获取图片展示地址 } from '../../../utils/imageAssets';
 import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';
+import RelationshipGraph from '../Relationship/RelationshipGraph';
 
 interface Props {
     socialList: NPC结构[];
@@ -21,6 +23,7 @@ interface Props {
         后果列表?: Array<{ 类型: string; 描述: string }>;
     };
     onOpenCampusDesire?: () => void;
+    关系谱?: 关系网络数据;
 }
 
 const SocialModal: React.FC<Props> = ({
@@ -33,10 +36,12 @@ const SocialModal: React.FC<Props> = ({
     onTogglePresence,
     onDeleteNpc,
     欲望系统,
-    onOpenCampusDesire
+    onOpenCampusDesire,
+    关系谱
 }) => {
     useImageAssetPrefetch(socialList);
     const 显示境界 = cultivationSystemEnabled !== false;
+    const [activeTab, setActiveTab] = useState<'social' | 'relationship'>('social');
     const [selectedId, setSelectedId] = useState<string | null>(
         socialList.length > 0 ? socialList[0].id : null
     );
@@ -264,7 +269,7 @@ const SocialModal: React.FC<Props> = ({
                 <div className="h-14 shrink-0 border-b border-white/10 bg-gradient-to-r from-black/80 to-black/40 flex items-center justify-between px-6 relative z-50">
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-wuxia-gold animate-pulse shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
-                        <h3 className="text-wuxia-gold font-serif font-bold text-xl tracking-[0.4em] drop-shadow-md">江湖谱<span className="text-[10px] text-wuxia-gold/50 ml-2 font-mono tracking-widest border border-wuxia-gold/20 px-2 py-0.5 rounded-full">SOCIAL LINK SYSTEM</span></h3>
+                        <h3 className="text-wuxia-gold font-serif font-bold text-xl tracking-[0.4em] drop-shadow-md">{activeTab === 'social' ? '江湖谱' : '关系网'}<span className="text-[10px] text-wuxia-gold/50 ml-2 font-mono tracking-widest border border-wuxia-gold/20 px-2 py-0.5 rounded-full">{activeTab === 'social' ? 'SOCIAL LINK SYSTEM' : 'RELATIONSHIP GRAPH'}</span></h3>
                     </div>
                     <button
                         onClick={onClose}
@@ -277,7 +282,39 @@ const SocialModal: React.FC<Props> = ({
                     </button>
                 </div>
 
+                {/* Tab Switcher */}
+                <div className="flex shrink-0 border-b border-white/10 bg-black/60">
+                    <button
+                        onClick={() => setActiveTab('social')}
+                        className={`flex-1 py-2.5 text-xs font-serif tracking-[0.2em] transition-all relative ${
+                            activeTab === 'social'
+                                ? 'text-wuxia-gold bg-wuxia-gold/5'
+                                : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                        }`}
+                    >
+                        江湖谱
+                        {activeTab === 'social' && (
+                            <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-wuxia-gold rounded-full mx-auto" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('relationship')}
+                        className={`flex-1 py-2.5 text-xs font-serif tracking-[0.2em] transition-all relative ${
+                            activeTab === 'relationship'
+                                ? 'text-wuxia-gold bg-wuxia-gold/5'
+                                : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                        }`}
+                    >
+                        关系网
+                        {activeTab === 'relationship' && (
+                            <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-wuxia-gold rounded-full mx-auto" />
+                        )}
+                    </button>
+                </div>
+
                 <div className="flex-1 flex overflow-hidden relative">
+                    {activeTab === 'social' && (
+                    <>
                     {/* Left: Party Selection */}
                     <div className="w-[300px] shrink-0 border-r border-white/5 bg-gradient-to-b from-black/80 to-black/90 overflow-y-auto custom-scrollbar p-3 space-y-2 relative z-10 z-[60]">
                         <div className="text-[10px] text-wuxia-gold/50 tracking-[0.3em] uppercase mb-4 px-2 flex items-center gap-2">
@@ -351,7 +388,7 @@ const SocialModal: React.FC<Props> = ({
                     </div>
 
                     {/* Right: JRPG Detail Screen */}
-                    <div className="flex-1 flex flex-col relative bg-black shrink-0 w-0 z-[50]">
+                    <div className="flex-1 flex flex-col relative bg-black shrink-0 w-0 z-[50] overflow-hidden">
                         {/* Global Background for Right Area */}
                         <div className="absolute inset-0 z-0">
                             {当前背景 ? (
@@ -405,7 +442,8 @@ const SocialModal: React.FC<Props> = ({
                         </div>
 
                         {currentNPC ? (
-                            <div className={`flex-1 min-h-0 overflow-y-auto custom-scrollbar relative z-10 flex flex-col transition-all duration-500 ${showFullBackground ? 'p-0 gap-0 opacity-0 pointer-events-none' : 'p-6 gap-6 opacity-100'}`}>
+                            <div className={`flex-1 min-h-0 overflow-y-auto custom-scrollbar relative z-10 transition-all duration-500 ${showFullBackground ? 'p-0 opacity-0 pointer-events-none' : 'p-6 opacity-100'}`}>
+                                <div className="space-y-6">
                                 {/* JRPG Style Header */}
                                 <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-r from-black/80 via-black/60 to-black/80 backdrop-blur-md p-6 flex items-start justify-between shadow-2xl group shrink-0">
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-wuxia-gold/5 rounded-full filter blur-3xl group-hover:bg-wuxia-gold/10 transition-colors"></div>
@@ -853,6 +891,7 @@ const SocialModal: React.FC<Props> = ({
                                         )}
                                     </div>
                                 </div>
+                                </div>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center h-full text-gray-500 font-serif w-full absolute inset-0 z-10 bg-black/80">
@@ -862,6 +901,29 @@ const SocialModal: React.FC<Props> = ({
                             </div>
                         )}
                     </div>
+                    </>
+                    )}
+                    {activeTab === 'relationship' && (
+                    <>
+                    {关系谱 ? (
+                    <div className="flex-1 p-4 overflow-hidden">
+                        <RelationshipGraph
+                            网络={关系谱}
+                            社交列表={socialList}
+                            选中边={undefined}
+                            on边Click={() => {}}
+                        />
+                    </div>
+                    ) : (
+                    <div className="flex-1 flex items-center justify-center text-gray-500 font-serif">
+                        <div className="text-center">
+                            <div className="text-xl tracking-[0.3em] text-wuxia-gold/80 mb-2">暂无关系数据</div>
+                            <div className="text-[10px] font-mono opacity-50">NO RELATIONSHIP DATA</div>
+                        </div>
+                    </div>
+                    )}
+                    </>
+                    )}
                 </div>
             </div>
 

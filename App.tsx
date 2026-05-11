@@ -98,7 +98,7 @@ const App: React.FC = () => {
         openBattle, openTeam, openSocial, openKungfu,
         openWorld, openMap, openSect, openTask,
         openAgreement, openStory, openHeroinePlan, openMemory,
-        openSave, openLoad, openRelationship, closeRelationship,
+        openSave, openLoad,
         closeSettings, closeNovelDecompositionWorkbench, closeNovelWritingWorkbench,
         closeSaveLoad, closeMobileMusic,
         openWorldbookManager, openNovelDecompositionWorkbench,
@@ -208,7 +208,6 @@ const App: React.FC = () => {
                         openNovelDecompositionWorkbench={openNovelDecompositionWorkbench}
                         openSave={openSave}
                         openLoad={openLoad}
-                        openRelationship={openRelationship}
                         openNsfwCenter={() => setShowNsfwCenter(true)}
                         closeMobileMusic={closeMobileMusic}
                         showMobileMusic={showMobileMusic}

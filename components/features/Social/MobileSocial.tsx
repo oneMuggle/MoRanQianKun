@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { NPC结构 } from '../../../models/social';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';
+import type { 关系网络数据 } from '../../../models/relationship';
 import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/memory/npcMemorySummary';
 import { useImageAssetPrefetch } from '../../../hooks/useImageAssetPrefetch';
 import { 获取图片展示地址 } from '../../../utils/imageAssets';
 import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';
+import RelationshipGraph from '../Relationship/RelationshipGraph';
 
 interface Props {
     socialList: NPC结构[];
@@ -20,6 +22,7 @@ interface Props {
         后果列表?: Array<{ 类型: string; 描述: string }>;
     };
     onOpenCampusDesire?: () => void;
+    关系谱?: 关系网络数据;
 }
 
 const MobileSocial: React.FC<Props> = ({
@@ -32,8 +35,10 @@ const MobileSocial: React.FC<Props> = ({
     onTogglePresence,
     onDeleteNpc,
     欲望系统,
-    onOpenCampusDesire
+    onOpenCampusDesire,
+    关系谱
 }) => {
+    const [activeTab, setActiveTab] = useState<'social' | 'relationship'>('social');
     const [selectedId, setSelectedId] = useState<string | null>(
         socialList.length > 0 ? socialList[0].id : null
     );
@@ -270,7 +275,7 @@ const MobileSocial: React.FC<Props> = ({
                 <div className="h-14 shrink-0 border-b border-white/10 bg-gradient-to-r from-black/80 to-black/40 flex items-center justify-between px-4 relative z-[100]">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-wuxia-gold animate-pulse shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
-                        <h3 className="text-wuxia-gold font-serif font-bold text-lg tracking-[0.2em] drop-shadow-md">江湖谱<span className="text-[8px] text-wuxia-gold/50 ml-1.5 font-mono tracking-widest border border-wuxia-gold/20 px-1 py-0.5 rounded-full">SOCIAL</span></h3>
+                        <h3 className="text-wuxia-gold font-serif font-bold text-lg tracking-[0.2em] drop-shadow-md">{activeTab === 'social' ? '江湖谱' : '关系网'}<span className="text-[8px] text-wuxia-gold/50 ml-1.5 font-mono tracking-widest border border-wuxia-gold/20 px-1 py-0.5 rounded-full">{activeTab === 'social' ? 'SOCIAL' : 'RELATIONSHIP'}</span></h3>
                     </div>
                     <button 
                         onClick={onClose}
@@ -283,7 +288,39 @@ const MobileSocial: React.FC<Props> = ({
                     </button>
                 </div>
 
+                {/* Tab Switcher */}
+                <div className="flex shrink-0 border-b border-white/10 bg-black/60">
+                    <button
+                        onClick={() => setActiveTab('social')}
+                        className={`flex-1 py-2 text-xs font-serif tracking-[0.2em] transition-all relative ${
+                            activeTab === 'social'
+                                ? 'text-wuxia-gold bg-wuxia-gold/5'
+                                : 'text-gray-500 active:text-gray-300 active:bg-white/5'
+                        }`}
+                    >
+                        江湖谱
+                        {activeTab === 'social' && (
+                            <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-wuxia-gold rounded-full mx-auto" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('relationship')}
+                        className={`flex-1 py-2 text-xs font-serif tracking-[0.2em] transition-all relative ${
+                            activeTab === 'relationship'
+                                ? 'text-wuxia-gold bg-wuxia-gold/5'
+                                : 'text-gray-500 active:text-gray-300 active:bg-white/5'
+                        }`}
+                    >
+                        关系网
+                        {activeTab === 'relationship' && (
+                            <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-wuxia-gold rounded-full mx-auto" />
+                        )}
+                    </button>
+                </div>
+
                 <div className="flex-1 flex flex-col overflow-hidden relative z-0">
+                    {activeTab === 'social' && (
+                    <>
                     {/* Top: Horizontal Party Selection */}
                     <div className="h-[100px] shrink-0 border-b border-white/5 bg-gradient-to-b from-black/80 to-black/90 relative z-[90] pt-1 pb-2 shadow-[0_10px_20px_rgba(0,0,0,0.8)]">
                         <div className="text-[9px] text-wuxia-gold/50 tracking-[0.2em] uppercase mb-1 px-3 flex items-center justify-between">
@@ -828,6 +865,29 @@ const MobileSocial: React.FC<Props> = ({
                         )}
                         </div>
                     </div>
+                    </>
+                    )}
+                    {activeTab === 'relationship' && (
+                    <>
+                    {关系谱 ? (
+                    <div className="flex-1 p-4 overflow-hidden">
+                        <RelationshipGraph
+                            网络={关系谱}
+                            社交列表={socialList}
+                            选中边={undefined}
+                            on边Click={() => {}}
+                        />
+                    </div>
+                    ) : (
+                    <div className="flex-1 flex items-center justify-center text-gray-500 font-serif">
+                        <div className="text-center">
+                            <div className="text-xl tracking-[0.3em] text-wuxia-gold/80 mb-2">暂无关系数据</div>
+                            <div className="text-[10px] font-mono opacity-50">NO RELATIONSHIP DATA</div>
+                        </div>
+                    </div>
+                    )}
+                    </>
+                    )}
                 </div>
             </div>
             {imageViewer && (

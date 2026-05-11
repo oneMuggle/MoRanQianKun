@@ -55,8 +55,6 @@ import {
     ImageManagerModal,
     MobileImageManagerModal,
     MobileDeviceModal,
-    RelationshipModal,
-    MobileRelationship,
 } from '../features/lazyComponents';
 
 // ============================================================================
@@ -523,6 +521,7 @@ export function ModalLayer({
                                     onDeleteNpc={(actions as any).removeNpc}
                                     欲望系统={(state as any).校园系统?.欲望系统}
                                     onOpenCampusDesire={() => (actions as any).openCampusDesire?.()}
+                                    关系谱={(state as any).关系谱}
                                 />
                             ) : (
                                 <SocialModal
@@ -536,27 +535,7 @@ export function ModalLayer({
                                     onDeleteNpc={(actions as any).removeNpc}
                                     欲望系统={(state as any).校园系统?.欲望系统}
                                     onOpenCampusDesire={() => (actions as any).openCampusDesire?.()}
-                                />
-                            )}
-                        </懒加载边界>
-                    )}
-
-                    {/* Relationship Modal */}
-                    {((state.showRelationship as any)?.show) && (
-                        <懒加载边界>
-                            {isMobile ? (
-                                <MobileRelationship
-                                    socialList={state.社交}
-                                    关系谱={(state as any).关系谱 || { 主角姓名: (state.角色 as any)?.姓名 || '少侠', 关系边列表: [], 最后更新时间: new Date().toISOString() }}
-                                    playerName={(state.角色 as any)?.姓名 || '少侠'}
-                                    onClose={() => (setters as any).setShowRelationship?.({ show: false })}
-                                />
-                            ) : (
-                                <RelationshipModal
-                                    socialList={state.社交}
-                                    关系谱={(state as any).关系谱 || { 主角姓名: (state.角色 as any)?.姓名 || '少侠', 关系边列表: [], 最后更新时间: new Date().toISOString() }}
-                                    playerName={(state.角色 as any)?.姓名 || '少侠'}
-                                    onClose={() => (setters as any).setShowRelationship?.({ show: false })}
+                                    关系谱={(state as any).关系谱}
                                 />
                             )}
                         </懒加载边界>

@@ -72,6 +72,7 @@ import { 默认图片管理设置, 规范化图片管理设置 } from '../utils/
 import { 规范化可选开局配置 } from '../utils/openingConfig';
 import { 规范化环境信息, 构建完整地点文本, 规范化角色物品容器映射, 规范化社交列表 } from './useGame/stateTransforms';
 import { createGameStateAccess, createRefRegistry, useSyncRef } from './useGame/state';
+import { 懒初始化关系网络 } from './useGame/relationshipNetworkWorkflow';
 import { createImageDomain } from './useGame/domains/imageDomain';
 import { createSessionDomain } from './useGame/domains/sessionDomain';
 import { createSendDomain } from './useGame/domains/sendDomain';
@@ -151,6 +152,7 @@ export const useGame = () => {
         loading, setLoading,
         setWorldEvents,
         setShowSettings, setShowInventory, setShowEquipment, setShowBattle, setShowSocial, setShowTeam, setShowKungfu, setShowWorld, setShowMap, setShowSect, setShowTask, setShowAgreement, setShowStory, setShowHeroinePlan, setShowMemory, setShowSaveLoad, setShowRelationship,
+        关系谱, 设置关系谱,
         setActiveTab, setCurrentTheme,
         apiConfig, setApiConfig,
         visualConfig, setVisualConfig,
@@ -507,6 +509,15 @@ export const useGame = () => {
         刷新NPC记忆总结队列(Array.isArray(社交) ? 社交 : [], { 静默: NPC记忆总结阶段 === 'processing' || NPC记忆总结阶段 === 'review' });
     }, [社交, memoryConfig]);
 
+    // 人物关系谱懒初始化：当社交数据变化时自动构建
+    useEffect(() => {
+        if (!Array.isArray(社交) || 社交.length === 0) return;
+        const 主角姓名 = (角色 as any)?.姓名;
+        if (!主角姓名) return;
+        const 网络 = 懒初始化关系网络(社交, 主角姓名, 关系谱);
+        设置关系谱(网络);
+    }, [社交, 角色, 关系谱, 设置关系谱]);
+
     // 时间初始化（已提取到独立 hook）
     use时间初始化({ 环境, 游戏初始时间, 记忆系统, festivals, 设置环境, 设置游戏初始时间 });
 
@@ -650,6 +661,7 @@ export const useGame = () => {
         设置校园系统,
         设置写真系统,
         设置都市网约车系统,
+        设置关系谱,
         setView,
         setShowSaveLoad,
         设置最近开局配置,
@@ -773,6 +785,7 @@ export const useGame = () => {
         获取世界演变接口配置,
         apiConfig,
         setShowSettings, setShowInventory, setShowEquipment, setShowBattle, setShowSocial, setShowTeam, setShowKungfu, setShowWorld, setShowMap, setShowSect, setShowTask, setShowAgreement, setShowStory, setShowHeroinePlan, setShowMemory, setShowSaveLoad, setShowRelationship,
+        设置关系谱,
         setActiveTab, setCurrentTheme, setCurrentEra,
         setApiConfig, setVisualConfig, setImageManagerConfig, setPrompts,
         设置校规系统, 设置催眠系统, 设置校园系统, 设置约定列表, 设置社交,

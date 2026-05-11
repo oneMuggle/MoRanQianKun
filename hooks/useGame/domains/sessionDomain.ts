@@ -77,6 +77,7 @@ export interface SessionDomainInput {
     设置校园系统: any;
     设置写真系统: any;
     设置都市网约车系统: any;
+    设置关系谱?: any;
     setView: any;
     setShowSaveLoad: any;
     设置最近开局配置: any;
@@ -225,6 +226,7 @@ export function createSessionDomain(input: SessionDomainInput) {
         设置校园系统,
         设置写真系统,
         设置都市网约车系统,
+        设置关系谱,
         setView,
         setShowSaveLoad,
         设置最近开局配置,
@@ -368,6 +370,7 @@ export function createSessionDomain(input: SessionDomainInput) {
         设置校园系统,
         设置写真系统,
         设置都市网约车系统,
+        设置关系谱,
         setView,
         setShowSaveLoad,
         设置最近开局配置,

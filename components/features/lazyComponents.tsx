@@ -129,7 +129,3 @@ export const MobileNovelWritingWorkbenchModal = 创建可预加载懒组件(() =
 
 // Mobile Device
 export const MobileDeviceModal = 创建可预加载懒组件(() => import('./MobileDevice/MobileDeviceModal'));
-
-// Relationship
-export const RelationshipModal = 创建可预加载懒组件(() => import('./Relationship/RelationshipModal'));
-export const MobileRelationship = 创建可预加载懒组件(() => import('./Relationship/MobileRelationship'));

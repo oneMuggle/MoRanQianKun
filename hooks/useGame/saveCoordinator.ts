@@ -23,6 +23,7 @@ import type {
     时代信息结构
 } from '../../types';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级, 校园系统数据 } from '../../models/campusPhone';
+import type { 关系网络数据 } from '../../models/relationship';
 import { 获取时代背景 } from '../../models/system';
 import { 核心_世界观 } from '../../prompts/core/world';
 import { 核心_境界体系 } from '../../prompts/core/realm';
@@ -84,6 +85,7 @@ type 存档协调当前状态 = {
     校园系统?: 校园系统数据;
     写真系统?: unknown;
     都市网约车系统?: unknown;
+    关系谱?: 关系网络数据;
 };
 
 type 存档协调依赖 = {
@@ -129,6 +131,7 @@ type 存档协调依赖 = {
     设置校园系统: (value: 校园系统数据) => void;
     设置写真系统: (value: unknown) => void;
     设置都市网约车系统: (value: unknown) => void;
+    设置关系谱?: (value: 关系网络数据) => void;
     setView: (value: 'home' | 'game' | 'new_game') => void;
     setShowSaveLoad: (value: { show: boolean; mode: 'save' | 'load' }) => void;
     设置最近开局配置: (value: any) => void;
@@ -304,7 +307,8 @@ export const 创建存档数据 = (
         催眠系统: currentState.催眠系统 ? deps.深拷贝(currentState.催眠系统) : undefined,
         校园系统: currentState.校园系统 ? deps.深拷贝(currentState.校园系统) : undefined,
         写真系统: (currentState as any).写真系统 ? deps.深拷贝((currentState as any).写真系统) : undefined,
-        都市网约车系统: 都市网约车系统Source ? deps.深拷贝(都市网约车系统Source) : undefined
+        都市网约车系统: 都市网约车系统Source ? deps.深拷贝(都市网约车系统Source) : undefined,
+        关系谱: currentState.关系谱 ? deps.深拷贝(currentState.关系谱) : undefined
     };
 };
 
@@ -454,6 +458,9 @@ export const 执行读取存档 = async (
     }
     if (save.都市网约车系统 && typeof save.都市网约车系统 === 'object') {
         deps.设置都市网约车系统(deps.深拷贝(save.都市网约车系统));
+    }
+    if (save.关系谱 && typeof save.关系谱 === 'object') {
+        deps.设置关系谱?.(deps.深拷贝(save.关系谱));
     }
 
     deps.setHasSave(true);
