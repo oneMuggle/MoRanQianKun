@@ -1995,3 +1995,30 @@ All 6 occupation → talent/qiyun mappings found.
 ---
 
 *Verified by cron subagent — 2026-05-07*
+
+---
+
+## 2026-05-11 Night Execution
+
+### Completed Tasks
+
+#### Phase 2 Integration (写真NSFW Steps 5-10)
+- `components/features/Settings/PhotographyNSFWSettings.tsx` — Settings UI polishing
+- `hooks/useGame.ts` — 写真系统 initialization useEffect (+14 lines)
+- `hooks/useGame/npc/responseCommandProcessor.ts` — 写真系统 state type + buffer (+4 lines)
+- `hooks/useGameState.ts` — 写真系统 state hook (+5 lines)
+- `docs/plans/nightly-2026-05-11.md` — nightly execution plan
+
+**Build**: ✅ Passes (10.57s)
+**Commit**: c48f238
+
+### Blocked
+- GitHub push blocked — origin/main diverged, fetch times out (network degraded)
+- SendWorkflow (Step 9) pending — integration call not yet added to sendWorkflow/index.ts
+
+### Next Steps
+1. Push to GitHub (requires fetch + rebase once network recovers)
+2. Complete Step 9 (sendWorkflow integration — +15 lines)
+3. Complete Phase 3 (Steps 11-14: AI workflows, prompt templates, shooting workflow)
+
+*Recorded by cron — 2026-05-11*
