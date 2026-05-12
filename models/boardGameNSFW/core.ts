@@ -123,3 +123,47 @@ export interface 桌游状态 {
   }[];
   桌游偏好: Record<string, number>;
 }
+
+// === 多人局管理 ===
+
+export type NSFW编排模式 = '轮流' | '随机' | '阵营';
+
+export type 多人局事件类型 = '指令执行' | '阵营对抗' | '私下结盟' | '公开曝光' | '集体NSFW';
+
+export interface 多人局配置 {
+  最小人数: number;
+  最大人数: number;
+  启用阵营: boolean;
+  启用淘汰机制: boolean;
+  NSFW编排模式: NSFW编排模式;
+}
+
+export interface 多人局参与者 {
+  id: string;
+  姓名: string;
+  欲望阶段: string;
+  出局: boolean;
+}
+
+export interface 多人局事件 {
+  id: string;
+  事件类型: 多人局事件类型;
+  发起者: string;
+  目标: string[];
+  事件描述: string;
+  紧张度: number;
+  当前回合: number;
+  已执行: boolean;
+  阵营?: string;
+}
+
+export interface 多人局状态 {
+  配置: 多人局配置;
+  参与NPC: 多人局参与者[];
+  当前回合: number;
+  总回合数: number;
+  待处理事件: 多人局事件[];
+  已执行事件: 多人局事件[];
+  阵营分配: Record<string, string>;
+  NSFW已触发: boolean;
+}

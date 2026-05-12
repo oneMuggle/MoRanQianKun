@@ -20,3 +20,22 @@ export {
 } from './eventSystem';
 
 export type { 桌游NSFW事件 } from './eventSystem';
+
+// === 多人局管理 ===
+
+export {
+  选择参与NPC,
+  判定多人局触发,
+  编排多人局NSFW事件,
+  推进多人局回合,
+  分配阵营,
+  初始化多人局,
+  type 候选NPC,
+} from './multiplayer';
+
+export type {
+  多人局配置,
+  多人局参与者,
+  多人局事件,
+  多人局状态,
+} from '../../../models/boardGameNSFW/core';
