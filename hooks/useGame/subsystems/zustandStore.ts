@@ -17,6 +17,7 @@ import type { WorldGenConfig } from '../../../models/system';
 import type { 角色数据结构 } from '../../../models/character';
 import type { OpeningConfig } from '../../../models/system';
 import type { 桌游类型 } from '../../../models/boardGameNSFW/core';
+import type { EngineType, PauseReason, ActionLogEntry, ScheduledEvent } from '../engine/types';
 
 // Type helpers for slices (defined locally to avoid circular deps with useGame.ts)
 type 最近开局配置结构 = {
@@ -553,9 +554,123 @@ const createBoardGameSlice: ZustandSlice<BoardGameSlice> = (set) => ({
   clearPendingEvents: () => set({ pendingEvents: [] }),
 });
 
+// ==================== Engine Slice (Zustand) ====================
+
+interface EngineSliceState {
+  engineStatus: Record<EngineType, 'idle' | 'running' | 'paused' | 'error'>;
+  enginePausedReason: Record<EngineType, PauseReason | null>;
+  engineActiveFlags: Record<EngineType, boolean>;
+}
+
+interface EngineSliceActions {
+  setEngineStatus: (type: EngineType, status: EngineSliceState['engineStatus'][EngineType]) => void;
+  setEnginePausedReason: (type: EngineType, reason: PauseReason | null) => void;
+  setEngineActive: (type: EngineType, active: boolean) => void;
+  pauseEngine: (type: EngineType, reason: PauseReason) => void;
+  resumeEngine: (type: EngineType) => void;
+}
+
+interface EngineSlice extends EngineSliceState, EngineSliceActions {}
+
+const DEFAULT_ENGINE_STATUS: Record<EngineType, 'idle' | 'running' | 'paused' | 'error'> = {
+  boardGame: 'idle',
+  urbanDriver: 'idle',
+  phoneSim: 'idle',
+  campusNSFW: 'idle',
+  bdsm: 'idle',
+  global: 'idle',
+};
+
+const createEngineSlice: ZustandSlice<EngineSlice> = (set) => ({
+  engineStatus: { ...DEFAULT_ENGINE_STATUS },
+  enginePausedReason: { boardGame: null, urbanDriver: null, phoneSim: null, campusNSFW: null, bdsm: null, global: null },
+  engineActiveFlags: { boardGame: false, urbanDriver: false, phoneSim: false, campusNSFW: false, bdsm: false, global: false },
+  setEngineStatus: (type, status) => set((state) => ({
+    engineStatus: { ...state.engineStatus, [type]: status },
+  })),
+  setEnginePausedReason: (type, reason) => set((state) => ({
+    enginePausedReason: { ...state.enginePausedReason, [type]: reason },
+  })),
+  setEngineActive: (type, active) => set((state) => ({
+    engineActiveFlags: { ...state.engineActiveFlags, [type]: active },
+  })),
+  pauseEngine: (type, reason) => set((state) => ({
+    engineStatus: { ...state.engineStatus, [type]: 'paused' },
+    enginePausedReason: { ...state.enginePausedReason, [type]: reason },
+  })),
+  resumeEngine: (type) => set((state) => ({
+    engineStatus: { ...state.engineStatus, [type]: 'running' },
+    enginePausedReason: { ...state.enginePausedReason, [type]: null },
+  })),
+});
+
+// ==================== Turn Slice (Zustand) ====================
+
+interface TurnSliceState {
+  globalTurn: number;
+  currentPhase: 'idle' | 'player-action' | 'resolution' | 'narrative' | 'transition';
+  activeEngines: EngineType[];
+  lastTurnTimestamp: number | null;
+}
+
+interface TurnSliceActions {
+  advanceTurn: () => void;
+  setTurnPhase: (phase: TurnSliceState['currentPhase']) => void;
+  setActiveEngines: (engines: EngineType[]) => void;
+  toggleEngineActive: (type: EngineType, active: boolean) => void;
+  resetTurn: () => void;
+}
+
+interface TurnSlice extends TurnSliceState, TurnSliceActions {}
+
+const createTurnSlice: ZustandSlice<TurnSlice> = (set, get) => ({
+  globalTurn: 0,
+  currentPhase: 'idle',
+  activeEngines: [],
+  lastTurnTimestamp: null,
+  advanceTurn: () => set((state) => ({
+    globalTurn: state.globalTurn + 1,
+    lastTurnTimestamp: Date.now(),
+  })),
+  setTurnPhase: (phase) => set({ currentPhase: phase }),
+  setActiveEngines: (engines) => set({ activeEngines: engines }),
+  toggleEngineActive: (type, active) => set((state) => ({
+    activeEngines: active
+      ? [...new Set([...state.activeEngines, type])]
+      : state.activeEngines.filter((e) => e !== type),
+  })),
+  resetTurn: () => set({ globalTurn: 0, currentPhase: 'idle', activeEngines: [], lastTurnTimestamp: null }),
+});
+
+// ==================== ActionLog Slice (Zustand) ====================
+
+interface ActionLogSliceState {
+  logs: ActionLogEntry[];
+  logTurn: number;
+}
+
+interface ActionLogSliceActions {
+  addLog: (entry: ActionLogEntry) => void;
+  clearLogs: () => void;
+  incrementLogTurn: () => void;
+}
+
+interface ActionLogSlice extends ActionLogSliceState, ActionLogSliceActions {}
+
+const createActionLogSlice: ZustandSlice<ActionLogSlice> = (set) => ({
+  logs: [],
+  logTurn: 0,
+  addLog: (entry) => set((state) => ({
+    logs: [...state.logs, entry].slice(-500),
+    logTurn: state.logTurn + 1,
+  })),
+  clearLogs: () => set({ logs: [], logTurn: 0 }),
+  incrementLogTurn: () => set((state) => ({ logTurn: state.logTurn + 1 })),
+});
+
 // ==================== Store ====================
 
-export interface GameStore extends UISlice, TravelSlice, DeviceSlice, ImageSlice, SettingsSlice, WorldSlice, MemorySlice, VariableSlice, OpeningSlice, SceneConfigSlice, BoardGameSlice {}
+export interface GameStore extends UISlice, TravelSlice, DeviceSlice, ImageSlice, SettingsSlice, WorldSlice, MemorySlice, VariableSlice, OpeningSlice, SceneConfigSlice, BoardGameSlice, EngineSlice, TurnSlice, ActionLogSlice {}
 
 export const useGameStore = create<GameStore>()((...a) => ({
     ...createUISlice(...a),
@@ -569,5 +684,8 @@ export const useGameStore = create<GameStore>()((...a) => ({
     ...createOpeningSlice(...a),
     ...createSceneConfigSlice(...a),
     ...createBoardGameSlice(...a),
+    ...createEngineSlice(...a),
+    ...createTurnSlice(...a),
+    ...createActionLogSlice(...a),
 }));
 

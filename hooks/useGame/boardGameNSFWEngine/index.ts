@@ -38,6 +38,10 @@ export {
   type 候选NPC,
 } from './multiplayer';
 
+// === SLG Engine 实现 ===
+
+export { BoardGameEngine } from './boardGameEngine';
+
 export type {
   多人局配置,
   多人局参与者,

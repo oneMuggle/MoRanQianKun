@@ -7,6 +7,7 @@
 
 import type { useGameState } from '../../useGameState';
 import type { GameStore, BoardGamePlayerAction, BoardGamePendingEvent, BoardGameSettlementResult } from '../subsystems/zustandStore';
+import type { EngineType, PauseReason, ActionLogEntry } from '../engine/types';
 
 // ============================================================
 // 类型定义
@@ -243,6 +244,32 @@ export interface GameStateAccess {
     setLastSettlement: GameStoreSlice['setLastSettlement'];
     clearActionHistory: GameStoreSlice['clearActionHistory'];
     clearPendingEvents: GameStoreSlice['clearPendingEvents'];
+
+    // Engine Slice
+    engineStatus: GameStoreSlice['engineStatus'];
+    setEngineStatus: GameStoreSlice['setEngineStatus'];
+    enginePausedReason: GameStoreSlice['enginePausedReason'];
+    setEnginePausedReason: GameStoreSlice['setEnginePausedReason'];
+    engineActiveFlags: GameStoreSlice['engineActiveFlags'];
+    setEngineActive: GameStoreSlice['setEngineActive'];
+    pauseEngine: GameStoreSlice['pauseEngine'];
+    resumeEngine: GameStoreSlice['resumeEngine'];
+
+    // Turn Slice
+    globalTurn: GameStoreSlice['globalTurn'];
+    advanceTurn: GameStoreSlice['advanceTurn'];
+    currentPhase: GameStoreSlice['currentPhase'];
+    setTurnPhase: GameStoreSlice['setTurnPhase'];
+    activeEngines: GameStoreSlice['activeEngines'];
+    setActiveEngines: GameStoreSlice['setActiveEngines'];
+    toggleEngineActive: GameStoreSlice['toggleEngineActive'];
+    resetTurn: GameStoreSlice['resetTurn'];
+
+    // ActionLog Slice
+    actionLogs: GameStoreSlice['logs'];
+    addLog: GameStoreSlice['addLog'];
+    clearLogs: GameStoreSlice['clearLogs'];
+    logTurn: GameStoreSlice['logTurn'];
 
     // --- 派生状态 ---
     /** 世界演变时间管理（游戏内时间 + 现实时间戳） */
@@ -490,6 +517,32 @@ export function createGameStateAccess(
         setLastSettlement: store.setLastSettlement,
         clearActionHistory: store.clearActionHistory,
         clearPendingEvents: store.clearPendingEvents,
+
+        // Engine Slice
+        engineStatus: store.engineStatus,
+        setEngineStatus: store.setEngineStatus,
+        enginePausedReason: store.enginePausedReason,
+        setEnginePausedReason: store.setEnginePausedReason,
+        engineActiveFlags: store.engineActiveFlags,
+        setEngineActive: store.setEngineActive,
+        pauseEngine: store.pauseEngine,
+        resumeEngine: store.resumeEngine,
+
+        // Turn Slice
+        globalTurn: store.globalTurn,
+        advanceTurn: store.advanceTurn,
+        currentPhase: store.currentPhase,
+        setTurnPhase: store.setTurnPhase,
+        activeEngines: store.activeEngines,
+        setActiveEngines: store.setActiveEngines,
+        toggleEngineActive: store.toggleEngineActive,
+        resetTurn: store.resetTurn,
+
+        // ActionLog Slice
+        actionLogs: store.logs,
+        addLog: store.addLog,
+        clearLogs: store.clearLogs,
+        logTurn: store.logTurn,
 
         // --- 派生状态 ---
         世界演变时间管理,
