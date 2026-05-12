@@ -19,7 +19,7 @@ import type {
 } from '../../models/campusNSFW';
 import type { NSFW编排模式 } from '../../models/boardGameNSFW/core';
 import { 构建BDSM论坛叙事约束 } from './bdsmForum';
-import { 构建调教任务系统叙事约束 } from './bdsmTasks';
+import { 构建调教任务系统叙事约束 } from './bdsmNSFW';
 import type { 校园亲密互动类型 } from '../../models/intimacy';
 import type { BDSM调教任务 } from './bdsmTasks';
 

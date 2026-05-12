@@ -78,3 +78,13 @@ export const 默认BDSM系统设置: BDSM系统设置 = {
 };
 
 export { 规范化BDSM系统设置 } from './normalization';
+
+// === 多角色关系网 ===
+
+export type {
+  BDSM关系边类型,
+  BDSM关系边,
+  关系网络数据,
+} from './network';
+
+export { 创建空关系网络 } from './network';

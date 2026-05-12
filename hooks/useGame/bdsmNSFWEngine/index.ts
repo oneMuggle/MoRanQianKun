@@ -16,3 +16,16 @@ export {
   获取BDSM场景For时代,
   获取BDSM场景修正值,
 } from './eraAdapter';
+
+// === 多角色关系网 ===
+
+export {
+  检测关系冲突,
+  查找关系链,
+  添加关系边,
+  更新关系强度,
+  构建多角色摘要,
+  构建多角色BDSM叙事约束,
+} from './network';
+
+export type { 冲突记录 } from './network';

@@ -5,6 +5,7 @@ import { 故事模块注册表 } from '../../../utils/storyModule/registry';
 import type { BDSM系统设置 } from '../../../models/bdsmNSFW';
 import { 默认BDSM系统设置, 规范化BDSM系统设置 } from '../../../models/bdsmNSFW';
 import { 构建BDSM完整叙事约束 } from '../../../prompts/runtime/bdsmNSFW';
+import { 构建多角色BDSM叙事约束 } from '../../../hooks/useGame/bdsmNSFWEngine/network';
 
 // ==================== 运行时参数 ====================
 
@@ -114,7 +115,11 @@ function 提取BDSM参数(
 // ==================== 提示词构建 ====================
 
 function 构建BDSM叙事约束(params: BDSM运行时参数): string {
-  return 构建BDSM完整叙事约束({
+  // 从 gameState 中提取关系网络（如果启用了多角色关系）
+  // 注意：这里暂时无法直接访问 gameState 中的网络数据，需要运行时注入
+  // 因此当标志为 true 时，我们在基础约束上追加多角色叙事指导
+
+  const 基础约束 = 构建BDSM完整叙事约束({
     权力倾向: params.权力倾向 as any,
     服从度: params.服从度,
     已解锁SM场景: params.已解锁SM场景 as any[],
@@ -122,6 +127,22 @@ function 构建BDSM叙事约束(params: BDSM运行时参数): string {
     日常指令: params.日常指令列表,
     契约状态: undefined,
   });
+
+  if (!params.启用BDSM多角色关系) {
+    return 基础约束;
+  }
+
+  // 多角色模式：追加多角色叙事约束
+  const 多角色约束 = 构建多角色BDSM叙事约束({
+    活跃关系数: 1, // 至少有一个活跃关系（当前 NPC）
+    有冲突: false, // 冲突检测由运行时动态计算
+    最长链长度: 1,
+    网络摘要: '', // 网络摘要由运行时注入
+  });
+
+  return 多角色约束
+    ? `${基础约束}\n\n${多角色约束}`
+    : 基础约束;
 }
 
 // ==================== 模块注册 ====================
