@@ -1,682 +1,895 @@
 /**
  * rpgBattleEngine.ts
  *
- * RPG 回合制战斗引擎 — 继承 BaseEngine，实现 SLGEngine 接口
- *
- * 核心能力:
- * - 确定性伤害计算（不依赖 AI）
- * - 先攻排序的行动顺序
- * - 技能施展与冷却管理
- * - Buff 结算
- * - 身体部位 HP 系统
- * - 通过 EventBus 发布战斗事件
+ * RPG 战斗引擎 — 管理回合制战斗全流程
+ * 整合 damageCalculator、initiativeCalculator、skillResolver、buffManager、battleStateMachine
  */
 
-import { BaseEngine } from '../engine/baseEngine';
+import { BaseEngine } from './baseEngine';
 import type {
-  GameEvent,
   GameStateSnapshot,
   NarrativeConstraint,
   TurnResult,
   PlayerAction,
   ActionResult,
-  StateChange,
   EngineType,
-} from '../engine/types';
-import { GlobalEventBus } from '../events/globalEventBus';
+} from './types';
+import type { 角色数据结构 } from '../../../models/character';
+import type { 功法结构 } from '../../../models/kungfu';
+import type { 游戏物品 } from '../../../models/item';
+import type { 战斗敌方信息 } from '../../../models/battle';
 import {
-  BattleStateMachine,
   calculateCombatStats,
   calculateDamage,
   calculateSkillDamage,
   getBodyPartMultiplier,
+  type CombatStats,
+} from '../rpg/battle/damageCalculator';
+import {
   calculateInitiative,
+  type InitiativeActor,
+} from '../rpg/battle/initiativeCalculator';
+import {
   resolveSkill,
+  consumeResource,
   tickCooldowns,
   setCooldown,
+} from '../rpg/battle/skillResolver';
+import {
   BuffManager,
-  type CombatStats,
-  type DamageResult,
-  type InitiativeActor,
-  type BuffResolveResult,
-} from '../rpg/battle';
-import type { 角色数据结构 } from '../../../models/character';
-import type { 游戏物品 } from '../../../models/item';
-import type { 功法结构 } from '../../../models/kungfu';
-import type { 战斗敌方信息 } from '../../../models/battle';
+} from '../rpg/battle/buffManager';
+import {
+  BattleStateMachine,
+  type BattlePhase,
+} from '../rpg/battle/battleStateMachine';
 
-/** 战斗参与者 */
+// ==================== 类型定义 ====================
+
+/** 统一战斗角色 — 玩家用 character，敌人用 enemy */
 export interface BattleActor {
-  /** 唯一标识 */
   id: string;
-  /** 名字 */
   name: string;
-  /** 阵营 */
   side: 'player' | 'enemy';
-  /** 角色数据（玩家）或敌方信息（敌人） */
+  /** 玩家角色数据（仅 player 侧） */
   character?: 角色数据结构;
+  /** 敌人数据（仅 enemy 侧） */
   enemy?: 战斗敌方信息;
-  /** 装备（仅玩家） */
+  /** 装备（仅 player 侧） */
   equipment?: Record<string, 游戏物品 | undefined>;
-  /** 已学功法（仅玩家） */
+  /** 功法列表 */
   kungfuList?: 功法结构[];
 }
 
-/** 战斗配置 */
-export interface BattleConfig {
-  /** 随机数种子（可选，用于确定性回放） */
-  seed?: number;
-  /** 最大回合数（超时判负） */
-  maxRounds?: number;
-}
-
-/** 战斗引擎状态 */
-export interface RpgBattleState {
-  /** 战斗是否进行中 */
-  isActive: boolean;
-  /** 当前回合数 */
+export interface BattleLogEntry {
   round: number;
-  /** 所有行动者（按先攻排序） */
-  actors: BattleActor[];
-  /** 当前行动者索引 */
-  currentActorIndex: number;
-  /** 玩家战斗属性 */
-  playerStats?: CombatStats;
-  /** 敌方战斗属性映射 */
-  enemyStats: Map<string, CombatStats>;
-  /** 技能冷却（actor ID -> skill ID -> remaining turns） */
-  cooldowns: Map<string, Map<string, number>>;
+  actorId: string;
+  action: string;
+  targetId?: string;
+  damage?: number;
+  isCrit?: boolean;
+  isDodge?: boolean;
+  detail?: string;
 }
 
-let _simpleRngState = 0;
-
-/** 简单确定性 RNG（基于种子） */
-function seededRng(seed: number): () => number {
-  _simpleRngState = seed;
-  return () => {
-    _simpleRngState = (_simpleRngState * 16807 + 0) % 2147483647;
-    return _simpleRngState / 2147483647;
-  };
+export interface BattleSnapshot {
+  phase: BattlePhase;
+  round: number;
+  actors: Array<{
+    id: string;
+    name: string;
+    side: 'player' | 'enemy';
+    currentHP: number;
+    maxHP: number;
+    isAlive: boolean;
+  }>;
+  currentActorId: string | null;
+  cooldowns: Record<string, Record<string, number>>;
+  buffs: Record<string, string[]>;
+  log: BattleLogEntry[];
 }
+
+export interface BattleOutcome {
+  winner: 'player' | 'enemy' | 'draw';
+  rounds: number;
+  log: BattleLogEntry[];
+}
+
+// ==================== RpgBattleEngine ====================
 
 export class RpgBattleEngine extends BaseEngine {
+  private _turnNumber = 0;
   private _stateMachine: BattleStateMachine;
   private _buffManager: BuffManager;
-  private _battleState: RpgBattleState;
+  private _actors: BattleActor[] = [];
+  private _orderedActors: InitiativeActor[] = [];
+  private _cooldowns: Map<string, Map<string, number>> = new Map();
+  private _hp: Map<string, number> = new Map();
+  private _maxHp: Map<string, number> = new Map();
+  private _combatStats: Map<string, CombatStats> = new Map();
+  private _log: BattleLogEntry[] = [];
+  private _outcome: BattleOutcome | null = null;
   private _rng: () => number;
-  private _eventBus: GlobalEventBus;
 
-  constructor() {
+  constructor(rng?: () => number) {
     super('rpgBattle' as EngineType);
     this._stateMachine = new BattleStateMachine();
     this._buffManager = new BuffManager();
-    this._rng = Math.random;
-    this._eventBus = GlobalEventBus.getInstance();
-    this._battleState = this._initialBattleState();
+    this._rng = rng ?? Math.random;
   }
 
-  // ==================== 战斗初始化 ====================
+  // ==================== 公开属性 ====================
+
+  get phase(): BattlePhase {
+    return this._stateMachine.phase;
+  }
+
+  get isActive(): boolean {
+    return this._stateMachine.phase !== 'idle' && this._stateMachine.phase !== 'end';
+  }
+
+  get round(): number {
+    return this._stateMachine.round;
+  }
+
+  // ==================== 战斗生命周期 ====================
 
   /**
-   * 初始化战斗 — 设置参与者、计算先攻
+   * 初始化战斗
    */
-  initBattle(actors: BattleActor[], config?: BattleConfig): void {
-    // 设置 RNG
-    if (config?.seed != null) {
-      this._rng = seededRng(config.seed);
-    }
+  initBattle(actors: BattleActor[]): void {
+    if (actors.length < 2) return;
 
-    this._battleState = {
-      isActive: true,
-      round: 0,
-      actors,
-      currentActorIndex: 0,
-      playerStats: undefined,
-      enemyStats: new Map(),
-      cooldowns: new Map(),
-    };
+    this._actors = actors;
+    this._log = [];
+    this._outcome = null;
 
-    // 计算战斗属性
-    for (const actor of actors) {
+    for (const actor of this._actors) {
+      let stats: CombatStats;
+      let maxHP: number;
+      let currentHP: number;
+
       if (actor.side === 'player' && actor.character) {
-        this._battleState.playerStats = calculateCombatStats(
-          actor.character,
-          actor.equipment ?? {},
-        );
+        stats = calculateCombatStats(actor.character, actor.equipment ?? {});
+        maxHP = stats.最大血量;
+        const totalBodyHP = this._getTotalBodyHP(actor.character);
+        const hpRatio = totalBodyHP > 0 ? totalBodyHP / maxHP : 1;
+        currentHP = Math.round(maxHP * Math.min(hpRatio, 1));
       } else if (actor.side === 'enemy' && actor.enemy) {
-        const stats = this._enemyToCombatStats(actor.enemy);
-        this._battleState.enemyStats.set(actor.id, stats);
+        maxHP = actor.enemy.最大血量;
+        currentHP = actor.enemy.当前血量;
+        stats = {
+          攻击力: actor.enemy.战斗力,
+          防御力: actor.enemy.防御力,
+          速度: 10,
+          暴击率: 0.05,
+          闪避率: 0.03,
+          最大血量: maxHP,
+        };
+      } else {
+        maxHP = 100;
+        currentHP = 100;
+        stats = {
+          攻击力: 10,
+          防御力: 5,
+          速度: 10,
+          暴击率: 0.05,
+          闪避率: 0.03,
+          最大血量: maxHP,
+        };
       }
-      this._battleState.cooldowns.set(actor.id, new Map());
+
+      this._combatStats.set(actor.id, stats);
+      this._maxHp.set(actor.id, maxHP);
+      this._hp.set(actor.id, currentHP);
+      this._cooldowns.set(actor.id, new Map());
     }
 
-    // 计算先攻并排序
-    const initiativeActors: InitiativeActor[] = actors.map((actor) => ({
+    // 先攻判定
+    const initiativeActors: InitiativeActor[] = this._actors.map((actor) => ({
       id: actor.id,
       side: actor.side,
-      stats: this._getActorCombatStats(actor),
+      stats: this._combatStats.get(actor.id)!,
     }));
-    const ordered = calculateInitiative(initiativeActors, this._rng);
-    this._battleState.actors = actors
-      .slice()
-      .sort((a, b) => {
-        const orderA = ordered.findIndex((o) => o.id === a.id);
-        const orderB = ordered.findIndex((o) => o.id === b.id);
-        return orderA - orderB;
-      });
+    this._orderedActors = calculateInitiative(initiativeActors, this._rng);
 
-    // 启动状态机
+    // 状态机推进到 turn_start
     this._stateMachine.start();
     this._stateMachine.onInitiativeResolved();
 
-    // 发布战斗开始事件
-    this._publishEvent('BATTLE_START', {
-      round: this._battleState.round,
-      actorCount: actors.length,
-      actors: actors.map((a) => ({ id: a.id, name: a.name, side: a.side })),
+    this._turnNumber = 1;
+
+    this._publishBattleEvent('BATTLE_START', {
+      actorCount: this._actors.length,
+      order: this._orderedActors.map((a) => a.id),
     });
   }
 
-  // ==================== SLGEngine 接口实现 ====================
+  /**
+   * 获取当前行动者
+   */
+  getCurrentActor(): BattleActor | null {
+    const index = this._stateMachine.currentActorIndex;
+    if (index < 0 || index >= this._orderedActors.length) return null;
+    const actorId = this._orderedActors[index].id;
+    return this._actors.find((a) => a.id === actorId) ?? null;
+  }
 
   /**
-   * 推进战斗回合
+   * 获取玩家战斗属性
    */
-  advanceTurn(): TurnResult {
-    const stateChanges: StateChange[] = [];
-    const eventsTriggered: GameEvent[] = [];
+  getPlayerStats(): CombatStats | null {
+    const player = this._actors.find((a) => a.side === 'player');
+    if (!player) return null;
+    return this._combatStats.get(player.id) ?? null;
+  }
 
-    if (!this._battleState.isActive || this._stateMachine.phase === 'end') {
-      return { turnNumber: this._stateMachine.round, phase: 'idle', eventsTriggered: [], stateChanges: [] };
+  /**
+   * 获取角色当前HP
+   */
+  getActorHP(actorId: string): { current: number; max: number } | null {
+    const max = this._maxHp.get(actorId);
+    if (max === undefined) return null;
+    return { current: this._hp.get(actorId) ?? 0, max };
+  }
+
+  /**
+   * 获取战斗日志
+   */
+  getBattleLog(): ReadonlyArray<BattleLogEntry> {
+    return [...this._log];
+  }
+
+  /**
+   * 获取战斗结果
+   */
+  getOutcome(): BattleOutcome | null {
+    return this._outcome;
+  }
+
+  /**
+   * 获取战斗快照
+   */
+  getBattleSnapshot(): BattleSnapshot | null {
+    if (!this.isActive) return null;
+
+    return {
+      phase: this._stateMachine.phase,
+      round: this._stateMachine.round,
+      actors: this._actors.map((a) => ({
+        id: a.id,
+        name: a.name,
+        side: a.side,
+        currentHP: this._hp.get(a.id) ?? 0,
+        maxHP: this._maxHp.get(a.id) ?? 0,
+        isAlive: (this._hp.get(a.id) ?? 0) > 0,
+      })),
+      currentActorId:
+        this._orderedActors[this._stateMachine.currentActorIndex]?.id ?? null,
+      cooldowns: Object.fromEntries(
+        Array.from(this._cooldowns.entries()).map(([k, v]) => [k, Object.fromEntries(v)]),
+      ),
+      buffs: Object.fromEntries(
+        this._actors.map((a) => [
+          a.id,
+          this._buffManager.getBuffs(a.id).map((b) => b.name),
+        ]),
+      ),
+      log: this._log,
+    };
+  }
+
+  // ==================== SLGEngine 接口 ====================
+
+  advanceTurn(): TurnResult {
+    this._turnNumber++;
+
+    // 更新所有冷却
+    for (const [actorId, cooldowns] of this._cooldowns) {
+      this._cooldowns.set(actorId, tickCooldowns(cooldowns));
     }
 
-    const previousPhase = this._stateMachine.phase;
+    if (this.isActive) {
+      const totalActors = this._orderedActors.length;
+      if (totalActors > 0) {
+        const currentPhase = this._stateMachine.phase;
 
-    // 状态机推进
-    switch (previousPhase) {
-      case 'turn_start':
-        this._stateMachine.onTurnStart();
-        break;
-
-      case 'action_select': {
-        const currentActor = this._battleState.actors[this._stateMachine.currentActorIndex];
-        // 检查眩晕状态
-        if (currentActor) {
-          const modifiers = this._buffManager.getModifiers(currentActor.id);
-          if (modifiers.isStunned) {
-            // 被眩晕，跳过行动
-            this._stateMachine.onActionSelected('skip', currentActor.id);
-          } else if (currentActor.side === 'enemy') {
-            this._autoSelectEnemyAction(currentActor);
+        if (currentPhase === 'turn_start') {
+          // turn_start → action_select → (auto action if needed) → ... → turn_end → check_win
+          this._advanceFullActorTurn(totalActors);
+        } else if (currentPhase === 'action_select') {
+          // 玩家还没行动，自动跳过
+          const currentActor = this.getCurrentActor();
+          if (currentActor && currentActor.side === 'enemy') {
+            this._enemyAutoAction(currentActor);
+          }
+          // 推进完整个行动周期
+          this._advanceFullActionCycle();
+        } else if (currentPhase === 'turn_end') {
+          this._stateMachine.onWinCheck(totalActors);
+        } else if (currentPhase === 'check_win') {
+          const nextPhase = this._stateMachine.onWinCheck(totalActors);
+          if (nextPhase === 'turn_start') {
+            this._stateMachine.onTurnStart();
           }
         }
-        break;
       }
+    }
 
-      case 'action_execute':
-        this._executeCurrentAction();
-        this._stateMachine.onActionExecuted();
-        break;
+    return {
+      turnNumber: this._turnNumber,
+      phase: this.isActive ? 'player-action' : 'narrative',
+      eventsTriggered: this._pendingEvents.map((e) => ({ ...e })),
+      stateChanges: [
+        {
+          key: 'battle_phase',
+          before: this._stateMachine.phase,
+          after: this._stateMachine.phase,
+        },
+      ],
+    };
+  }
 
-      case 'damage':
+  /**
+   * 完整推进一个行动者的回合：从 turn_start 到 check_win
+   */
+  private _advanceFullActorTurn(totalActors: number): void {
+    this._stateMachine.onTurnStart();
+
+    // 如果是敌人行动，自动执行
+    const currentActor = this.getCurrentActor();
+    if (currentActor && currentActor.side === 'enemy') {
+      this._enemyAutoAction(currentActor);
+    }
+
+    // 如果还在 action_select（没人行动或玩家没行动），自动跳过
+    if (this._stateMachine.phase === 'action_select') {
+      this._advanceFullActionCycle();
+    }
+    // 如果已经通过行动推进到了后续阶段，只需要做收尾
+    else if (this._stateMachine.phase !== 'check_win' && this._stateMachine.phase !== 'end') {
+      if (this._stateMachine.phase === 'action_execute') {
         this._stateMachine.onDamageCalculated();
-        break;
-
-      case 'buff_resolve': {
-        const currentActor = this._battleState.actors[this._stateMachine.currentActorIndex];
-        if (currentActor) {
-          const buffResult = this._buffManager.resolve(currentActor.id);
-          this._applyBuffResult(currentActor.id, buffResult);
-        }
-        // Tick 所有角色的冷却
-        for (const [actorId, actorCooldowns] of this._battleState.cooldowns) {
-          this._battleState.cooldowns.set(actorId, tickCooldowns(actorCooldowns));
-        }
+      }
+      if (this._stateMachine.phase === 'damage') {
         this._stateMachine.onBuffResolved();
-        break;
       }
-
-      case 'turn_end':
+      if (this._stateMachine.phase === 'buff_resolve') {
         this._stateMachine.onTurnEnd();
-        break;
+      }
+      if (this._stateMachine.phase === 'turn_end') {
+        this._stateMachine.onWinCheck(totalActors);
+      }
+    }
 
-      case 'check_win': {
-        const winResult = this._checkWinCondition();
-        if (winResult) {
-          this._stateMachine.end(winResult);
-          this._publishEvent('BATTLE_END', {
-            winner: winResult,
-            round: this._stateMachine.round,
-          });
-          this._battleState.isActive = false;
-        } else {
-          this._stateMachine.onWinCheck(this._battleState.actors.length);
-        }
-        break;
+    // 最终都要检查胜负（如果前面没检查过的话）
+    if (this._stateMachine.phase === 'turn_end') {
+      this._stateMachine.onWinCheck(totalActors);
+    }
+  }
+
+  /**
+   * 从 action_select 推进到 turn_end
+   */
+  private _advanceFullActionCycle(): void {
+    if (this._stateMachine.phase === 'action_select') {
+      this._stateMachine.onActionSelected('idle', '');
+    }
+    if (this._stateMachine.phase === 'action_execute') {
+      this._stateMachine.onActionExecuted();
+    }
+    if (this._stateMachine.phase === 'damage') {
+      this._stateMachine.onDamageCalculated();
+    }
+    if (this._stateMachine.phase === 'buff_resolve') {
+      this._stateMachine.onBuffResolved();
+    }
+    if (this._stateMachine.phase === 'turn_end') {
+      this._stateMachine.onTurnEnd();
+    }
+  }
+
+  executePlayerAction(action: PlayerAction): ActionResult {
+    const { type, payload } = action;
+
+    if (type === 'attack' || type === 'normal_attack') {
+      const currentActor = this.getCurrentActor();
+      if (!currentActor) {
+        return {
+          success: false,
+          stateUpdates: {},
+          narrativeConstraint: '<战斗>无当前行动者</战斗>',
+          keyStep: false,
+          sideEffects: [],
+        };
       }
 
-      default:
-        this._stateMachine.onTurnStart();
-        break;
+      if (currentActor.side !== 'player') {
+        return {
+          success: false,
+          stateUpdates: {},
+          narrativeConstraint: '<战斗>不是玩家的回合</战斗>',
+          keyStep: false,
+          sideEffects: [],
+        };
+      }
+
+      const targetId = payload.targetId as string;
+      const bodyPart = payload.bodyPart as string | undefined;
+      return this._doAttack(currentActor.id, targetId, bodyPart);
     }
 
-    // 收集状态变更
-    stateChanges.push({
-      key: 'battle.phase',
-      before: previousPhase,
-      after: this._stateMachine.phase,
-    });
+    if (type === 'skill_attack') {
+      const currentActor = this.getCurrentActor();
+      if (!currentActor) {
+        return {
+          success: false,
+          stateUpdates: {},
+          narrativeConstraint: '<战斗>无当前行动者</战斗>',
+          keyStep: false,
+          sideEffects: [],
+        };
+      }
+
+      const targetId = payload.targetId as string;
+      const kungfuId = payload.kungfuId as string;
+      const bodyPart = payload.bodyPart as string | undefined;
+      return this._doSkillAttack(currentActor.id, targetId, kungfuId, bodyPart);
+    }
+
+    if (type === 'defend') {
+      const currentActor = this.getCurrentActor();
+      if (!currentActor) {
+        return {
+          success: false,
+          stateUpdates: {},
+          narrativeConstraint: '<战斗>无当前行动者</战斗>',
+          keyStep: false,
+          sideEffects: [],
+        };
+      }
+      return this._doDefend(currentActor.id);
+    }
 
     return {
-      turnNumber: this._stateMachine.round,
-      phase: this._mapBattlePhaseToTurnPhase(),
-      eventsTriggered,
-      stateChanges,
+      success: false,
+      stateUpdates: {},
+      narrativeConstraint: '<战斗>未知操作类型</战斗>',
+      keyStep: false,
+      sideEffects: [],
     };
   }
 
-  /**
-   * 执行玩家行动
-   */
-  executePlayerAction(action: PlayerAction): ActionResult {
-    if (this._stateMachine.phase !== 'action_select') {
-      return {
-        success: false,
-        stateUpdates: {},
-        narrativeConstraint: '<战斗>当前阶段不允许行动</战斗>',
-        keyStep: false,
-        sideEffects: [],
-      };
-    }
-
-    const currentActor = this._battleState.actors[this._stateMachine.currentActorIndex];
-    if (currentActor?.side !== 'player') {
-      return {
-        success: false,
-        stateUpdates: {},
-        narrativeConstraint: '<战斗>不是玩家的回合</战斗>',
-        keyStep: false,
-        sideEffects: [],
-      };
-    }
-
-    const actionType = action.type;
-    const targetId = action.payload.targetId as string;
-
-    // 检查眩晕状态
-    const playerModifiers = this._buffManager.getModifiers(currentActor.id);
-    if (playerModifiers.isStunned) {
-      return {
-        success: false,
-        stateUpdates: {},
-        narrativeConstraint: '<战斗>角色被眩晕，无法行动</战斗>',
-        keyStep: false,
-        sideEffects: [],
-      };
-    }
-
-    this._stateMachine.onActionSelected(actionType, targetId);
-
-    return {
-      success: true,
-      stateUpdates: { action: actionType, target: targetId },
-      narrativeConstraint: `<战斗行动>类型: ${actionType}, 目标: ${targetId}</战斗行动>`,
-      keyStep: true,
-      sideEffects: [{ type: 'action_selected', payload: { actionType, targetId } }],
-    };
-  }
-
-  /**
-   * 检查行动是否合法
-   */
   canExecuteAction(action: PlayerAction): boolean {
-    if (this._stateMachine.phase !== 'action_select') return false;
-
-    const currentActor = this._battleState.actors[this._stateMachine.currentActorIndex];
-    if (currentActor?.side !== 'player') return false;
-
-    // 检查是否被眩晕
-    const modifiers = this._buffManager.getModifiers(currentActor.id);
-    if (modifiers.isStunned) return false;
-
-    // 检查技能是否被沉默
-    if (action.type === 'skill' && modifiers.isSilenced) return false;
-
-    // 检查目标是否有效
-    const targetId = action.payload.targetId as string;
-    if (!targetId) return false;
-
-    return this._battleState.actors.some((a) => a.id === targetId && a.side !== currentActor.side);
+    return ['attack', 'normal_attack', 'skill_attack', 'defend'].includes(action.type);
   }
 
-  /**
-   * 获取战斗状态快照
-   */
   getSnapshot(): GameStateSnapshot {
     return {
-      turnNumber: this._stateMachine.round,
+      turnNumber: this._turnNumber,
       timestamp: Date.now(),
       engineStates: {
         rpgBattle: {
+          battleActive: this.isActive,
           phase: this._stateMachine.phase,
           round: this._stateMachine.round,
-          currentActorIndex: this._stateMachine.currentActorIndex,
-          isActive: this._battleState.isActive,
-          actors: this._battleState.actors.map((a) => ({
+          actors: this._actors.map((a) => ({
             id: a.id,
             name: a.name,
             side: a.side,
+            currentHP: this._hp.get(a.id) ?? 0,
+            maxHP: this._maxHp.get(a.id) ?? 0,
+            isAlive: (this._hp.get(a.id) ?? 0) > 0,
           })),
+          currentActorId:
+            this._orderedActors[this._stateMachine.currentActorIndex]?.id ?? null,
+          logLength: this._log.length,
         },
       },
     };
   }
 
-  /**
-   * 获取叙事约束
-   */
   getNarrativeConstraints(): NarrativeConstraint {
-    const currentActor = this._battleState.actors[this._stateMachine.currentActorIndex];
+    const alivePlayers = this._actors.filter(
+      (a) => a.side === 'player' && (this._hp.get(a.id) ?? 0) > 0,
+    ).length;
+    const aliveEnemies = this._actors.filter(
+      (a) => a.side === 'enemy' && (this._hp.get(a.id) ?? 0) > 0,
+    ).length;
+
     return {
-      scene: `战斗第${this._stateMachine.round}回合`,
+      scene: this.isActive ? '战斗中' : '战斗外',
       turn: this._stateMachine.round,
-      tension: this._calculateTension(),
-      playerAction: currentActor?.side === 'player' ? `选择行动: ${this._stateMachine.phase}` : '敌人行动中',
-      keyStep: this._stateMachine.phase === 'action_select',
+      tension: this.isActive ? Math.min(alivePlayers + aliveEnemies, 10) : 0,
+      playerAction: `存活: 玩家方${alivePlayers}人, 敌方${aliveEnemies}人`,
+      keyStep: false,
       nsfwTriggered: false,
-      participants: this._battleState.actors.map((a) => ({
-        id: a.id,
-        name: a.name,
-        status: a.side === 'player' ? '战斗中' : '敌方',
-      })),
-      nextEvent: this._stateMachine.phase,
+      participants: [],
+      nextEvent: this.isActive ? 'battle_action' : 'idle',
     };
   }
 
-  // ==================== 公共 API ====================
-
-  /** 获取当前战斗阶段 */
-  get phase() {
-    return this._stateMachine.phase;
-  }
-
-  /** 获取当前回合数 */
-  get round() {
-    return this._stateMachine.round;
-  }
-
-  /** 获取战斗是否进行中 */
-  get isActive() {
-    return this._battleState.isActive;
-  }
-
-  /** 获取所有 Buff */
-  getBuffs(actorId: string) {
-    return this._buffManager.getBuffs(actorId);
-  }
-
-  /** 添加 Buff */
-  addBuff(actorId: string, buff: Parameters<BuffManager['addBuff']>[1]) {
-    this._buffManager.addBuff(actorId, buff);
-    this._publishEvent('BATTLE_BUFF_APPLY', {
-      actorId,
-      buffName: buff.name,
-      remainingTurns: buff.remainingTurns,
-    });
-  }
-
-  /** 获取当前行动者 */
-  getCurrentActor(): BattleActor | undefined {
-    return this._battleState.actors[this._stateMachine.currentActorIndex];
-  }
-
-  /** 获取玩家战斗属性 */
-  getPlayerStats(): CombatStats | undefined {
-    return this._battleState.playerStats;
-  }
-
-  /** 获取敌方战斗属性 */
-  getEnemyStats(actorId: string): CombatStats | undefined {
-    return this._battleState.enemyStats.get(actorId);
-  }
-
-  /** 重置战斗引擎 */
   reset(): void {
-    super.pause('phase-change');
-    this._stateMachine.reset();
+    this._actors = [];
+    this._orderedActors = [];
+    this._hp.clear();
+    this._maxHp.clear();
+    this._combatStats.clear();
+    this._cooldowns.clear();
     this._buffManager.clear();
-    this._battleState = this._initialBattleState();
+    this._log = [];
+    this._outcome = null;
+    this._stateMachine.reset();
+    this._turnNumber = 0;
+    super.pause('phase-change');
     super.resume();
   }
 
   // ==================== 内部方法 ====================
 
-  private _executeCurrentAction(): void {
-    const currentActor = this._battleState.actors[this._stateMachine.currentActorIndex];
-    const action = this._stateMachine.state.selectedAction;
-    const targetId = this._stateMachine.state.actionTarget;
-
-    if (!currentActor || !action || !targetId) return;
-
-    const targetActor = this._battleState.actors.find((a) => a.id === targetId);
-    if (!targetActor) return;
-
-    const attackerStats = this._getActorCombatStats(currentActor);
-    const defenderStats = this._getActorCombatStats(targetActor);
-
-    let damageResult: DamageResult;
-
-    if (action === 'attack' || action === 'normal_attack') {
-      damageResult = calculateDamage(attackerStats, defenderStats, this._rng);
-    } else if (action === 'skill') {
-      damageResult = this._tryExecuteSkill(currentActor, attackerStats, defenderStats);
-    } else {
-      damageResult = calculateDamage(attackerStats, defenderStats, this._rng);
+  private _doAttack(attackerId: string, defenderId: string, bodyPart?: string): ActionResult {
+    const attackerStats = this._combatStats.get(attackerId);
+    const defenderStats = this._combatStats.get(defenderId);
+    if (!attackerStats || !defenderStats) {
+      return {
+        success: false,
+        stateUpdates: {},
+        narrativeConstraint: '<战斗>角色不在战斗中</战斗>',
+        keyStep: false,
+        sideEffects: [],
+      };
     }
 
-    // 应用身体部位伤害修正
-    const bodyPart = (action as unknown as { bodyPart?: string }).bodyPart ?? '胸部';
-    const multiplier = getBodyPartMultiplier(bodyPart);
-    const finalDamage = Math.round(damageResult.damage * multiplier);
+    this._stateMachine.onActionSelected('normal_attack', defenderId);
+    this._stateMachine.onActionExecuted();
 
-    // 发布伤害事件
-    this._publishEvent('BATTLE_DAMAGE', {
-      attackerId: currentActor.id,
-      targetId: targetActor.id,
-      damage: finalDamage,
-      isCrit: damageResult.isCrit,
-      isDodge: damageResult.isDodge,
-      damageType: damageResult.damageType,
-      bodyPart,
-      multiplier,
+    let result = calculateDamage(attackerStats, defenderStats, this._rng);
+
+    if (bodyPart) {
+      const multiplier = getBodyPartMultiplier(bodyPart);
+      result = { ...result, damage: Math.round(result.damage * multiplier) };
+    }
+
+    // Buff 结算
+    const attackerBuffResolve = this._buffManager.resolve(attackerId);
+    const defenderBuffResolve = this._buffManager.resolve(defenderId);
+
+    if (defenderBuffResolve.damageOverTime > 0) {
+      result.damage += defenderBuffResolve.damageOverTime;
+    }
+
+    const attackerHp = this._hp.get(attackerId) ?? 0;
+    this._hp.set(
+      attackerId,
+      Math.min(attackerHp + attackerBuffResolve.hpRegen, this._maxHp.get(attackerId) ?? 0),
+    );
+
+    const currentDefenderHp = this._hp.get(defenderId) ?? 0;
+    const newDefenderHp = Math.max(0, currentDefenderHp - result.damage);
+    this._hp.set(defenderId, newDefenderHp);
+
+    this._stateMachine.onDamageCalculated();
+    this._stateMachine.onBuffResolved();
+    this._stateMachine.onTurnEnd();
+
+    this._log.push({
+      round: this._stateMachine.round,
+      actorId: attackerId,
+      action: 'normal_attack',
+      targetId: defenderId,
+      damage: result.damage,
+      isCrit: result.isCrit,
+      isDodge: result.isDodge,
     });
+
+    this._publishBattleEvent('BATTLE_DAMAGE', {
+      attackerId, defenderId, damage: result.damage,
+      isCrit: result.isCrit, isDodge: result.isDodge,
+    });
+
+    this._checkWinCondition();
+
+    return {
+      success: true,
+      stateUpdates: { action: 'attack', attackerId, defenderId, damage: result.damage },
+      narrativeConstraint: result.isDodge
+        ? `<战斗>${defenderId} 闪避了攻击！</战斗>`
+        : `<战斗>${attackerId} 对 ${defenderId} 造成 ${result.damage} 点伤害${result.isCrit ? '（暴击！）' : ''}</战斗>`,
+      keyStep: result.isCrit || result.damage > 50,
+      sideEffects: [
+        { type: 'battle_damage', payload: { attackerId, defenderId, damage: result.damage } },
+      ],
+    };
   }
 
-  private _tryExecuteSkill(
-    actor: BattleActor,
-    attackerStats: CombatStats,
-    defenderStats: CombatStats,
-  ): DamageResult {
-    // 尝试使用最后选择的技能
-    const skillId = this._stateMachine.state.selectedAction;
-    const kungfu = actor.kungfuList?.find((k) => k.ID === skillId);
-
-    if (!kungfu || !actor.character) {
-      return calculateDamage(attackerStats, defenderStats, this._rng);
+  private _doSkillAttack(
+    attackerId: string,
+    defenderId: string,
+    kungfuId: string,
+    bodyPart?: string,
+  ): ActionResult {
+    const attacker = this._actors.find((a) => a.id === attackerId);
+    const defenderStats = this._combatStats.get(defenderId);
+    if (!attacker || !defenderStats) {
+      return {
+        success: false,
+        stateUpdates: {},
+        narrativeConstraint: '<战斗>角色不在战斗中</战斗>',
+        keyStep: false,
+        sideEffects: [],
+      };
     }
 
-    const cooldowns = this._battleState.cooldowns.get(actor.id) ?? new Map();
-    const resolveResult = resolveSkill(
-      kungfu,
-      cooldowns,
-      () =>
+    const kungfu = (attacker.kungfuList ?? []).find((k) => k.ID === kungfuId);
+    if (!kungfu) {
+      return {
+        success: false,
+        stateUpdates: {},
+        narrativeConstraint: '<战斗>未习得该功法</战斗>',
+        keyStep: false,
+        sideEffects: [],
+      };
+    }
+
+    const buffModifiers = this._buffManager.getModifiers(attackerId);
+    if (buffModifiers.isSilenced) {
+      return {
+        success: false,
+        stateUpdates: {},
+        narrativeConstraint: '<战斗>角色被沉默，无法使用技能</战斗>',
+        keyStep: false,
+        sideEffects: [],
+      };
+    }
+
+    const actorCooldowns = this._cooldowns.get(attackerId) ?? new Map();
+    const attackerStats = this._combatStats.get(attackerId)!;
+
+    // 敌人没有完整的角色数据结构，用简化处理
+    let damageResult: { damage: number; isCrit: boolean; isDodge: boolean; damageType: 'physical' | 'skill' | 'true' | 'mixed' };
+
+    if (attacker.character) {
+      const skillResult = resolveSkill(kungfu, actorCooldowns, () =>
         calculateSkillDamage(
-          actor.character!,
+          attacker.character!,
           attackerStats,
           defenderStats,
           kungfu,
           this._rng,
         ),
-    );
+      );
 
-    if (resolveResult.success && resolveResult.damage) {
-      // 设置冷却（解析字符串如 "3回合" → 3）
-      if (kungfu.冷却时间) {
-        const cooldownTurns = this._parseCooldown(kungfu.冷却时间);
-        if (cooldownTurns > 0) {
-          this._battleState.cooldowns.set(
-            actor.id,
-            setCooldown(cooldowns, kungfu.ID, cooldownTurns),
-          );
-        }
+      if (!skillResult.success) {
+        return {
+          success: false,
+          stateUpdates: {},
+          narrativeConstraint: `<战斗>技能施展失败: ${skillResult.reason}</战斗>`,
+          keyStep: false,
+          sideEffects: [],
+        };
       }
 
-      // 发布技能使用事件
-      if (resolveResult.cost && resolveResult.cost > 0) {
-        this._publishEvent('BATTLE_SKILL_USE', {
-          actorId: actor.id,
-          skillName: kungfu.名称,
-          cost: resolveResult.cost,
-          costType: kungfu.消耗类型,
-        });
+      if (skillResult.cost && skillResult.cost > 0 && attacker.character) {
+        const consumed = consumeResource(attacker.character, kungfu.消耗类型, skillResult.cost);
+        attacker.character = consumed as 角色数据结构;
       }
 
-      return resolveResult.damage;
-    }
-
-    // 技能施展失败，回退为普通攻击
-    return calculateDamage(attackerStats, defenderStats, this._rng);
-  }
-
-  private _autoSelectEnemyAction(_enemy: BattleActor): void {
-    // 简单 AI：随机选择一个玩家目标并执行普通攻击
-    const playerTargets = this._battleState.actors.filter((a) => a.side === 'player');
-    if (playerTargets.length === 0) return;
-
-    const target = playerTargets[Math.floor(this._rng() * playerTargets.length)];
-    this._stateMachine.onActionSelected('attack', target.id);
-  }
-
-  private _checkWinCondition(): 'player' | 'enemy' | 'draw' | null {
-    const playerAlive = this._battleState.actors.some(
-      (a) => a.side === 'player' && this._isActorAlive(a),
-    );
-    const enemyAlive = this._battleState.actors.some(
-      (a) => a.side === 'enemy' && this._isActorAlive(a),
-    );
-
-    if (!playerAlive && !enemyAlive) return 'draw';
-    if (!enemyAlive) return 'player';
-    if (!playerAlive) return 'enemy';
-
-    // 超时检查
-    if (this._stateMachine.round >= 50) {
-      return 'draw';
-    }
-
-    return null;
-  }
-
-  private _isActorAlive(actor: BattleActor): boolean {
-    if (actor.side === 'player' && actor.character) {
-      const totalHp =
-        (actor.character.头部当前血量 ?? 0) +
-        (actor.character.胸部当前血量 ?? 0) +
-        (actor.character.腹部当前血量 ?? 0) +
-        (actor.character.左手当前血量 ?? 0) +
-        (actor.character.右手当前血量 ?? 0) +
-        (actor.character.左腿当前血量 ?? 0) +
-        (actor.character.右腿当前血量 ?? 0);
-      return totalHp > 0;
-    }
-    if (actor.side === 'enemy' && actor.enemy) {
-      return (actor.enemy.当前血量 ?? 0) > 0;
-    }
-    return false;
-  }
-
-  private _getActorCombatStats(actor: BattleActor): CombatStats {
-    if (actor.side === 'player' && this._battleState.playerStats) {
-      return this._battleState.playerStats;
-    }
-    const enemyStats = this._battleState.enemyStats.get(actor.id);
-    if (enemyStats) return enemyStats;
-
-    return {
-      攻击力: 10,
-      防御力: 5,
-      速度: 10,
-      暴击率: 0.05,
-      闪避率: 0.03,
-      最大血量: 100,
-    };
-  }
-
-  private _enemyToCombatStats(enemy: 战斗敌方信息): CombatStats {
-    return {
-      攻击力: enemy.战斗力 ?? 10,
-      防御力: enemy.防御力 ?? 5,
-      速度: 10,
-      暴击率: 0.05,
-      闪避率: 0.03,
-      最大血量: enemy.最大血量 ?? 100,
-    };
-  }
-
-  private _applyBuffResult(actorId: string, result: BuffResolveResult): void {
-    if (result.damageOverTime > 0) {
-      this._publishEvent('BATTLE_DAMAGE', {
-        attackerId: 'buff',
-        targetId: actorId,
-        damage: result.damageOverTime,
+      const cooldownTurns = this._parseCooldown(kungfu.冷却时间);
+      this._cooldowns.set(attackerId, setCooldown(actorCooldowns, kungfuId, cooldownTurns));
+      damageResult = skillResult.damage!;
+    } else {
+      // 敌人用简化伤害
+      damageResult = {
+        damage: Math.max(1, attackerStats.攻击力 - defenderStats.防御力 * 0.3),
         isCrit: false,
         isDodge: false,
-        damageType: 'skill',
-        bodyPart: '胸部',
-        multiplier: 1.0,
-      });
+        damageType: 'skill' as const,
+      };
     }
-    if (result.hpRegen > 0) {
-      this._publishEvent('BATTLE_BUFF_APPLY', {
-        actorId,
-        effect: 'hp_regen',
-        value: result.hpRegen,
-      });
+
+    this._stateMachine.onActionSelected('skill_attack', defenderId);
+    this._stateMachine.onActionExecuted();
+
+    if (bodyPart) {
+      const multiplier = getBodyPartMultiplier(bodyPart);
+      damageResult = { ...damageResult, damage: Math.round(damageResult.damage * multiplier) };
+    }
+
+    const defenderBuffResolve = this._buffManager.resolve(defenderId);
+    const attackerBuffResolve = this._buffManager.resolve(attackerId);
+
+    if (defenderBuffResolve.damageOverTime > 0) {
+      damageResult.damage += defenderBuffResolve.damageOverTime;
+    }
+
+    const attackerHp = this._hp.get(attackerId) ?? 0;
+    this._hp.set(
+      attackerId,
+      Math.min(attackerHp + attackerBuffResolve.hpRegen, this._maxHp.get(attackerId) ?? 0),
+    );
+
+    const currentDefenderHp = this._hp.get(defenderId) ?? 0;
+    const newDefenderHp = Math.max(0, currentDefenderHp - damageResult.damage);
+    this._hp.set(defenderId, newDefenderHp);
+
+    this._stateMachine.onDamageCalculated();
+    this._stateMachine.onBuffResolved();
+    this._stateMachine.onTurnEnd();
+
+    if (attacker.character && kungfu.附带效果?.length) {
+      this._applySkillBuff(attackerId, defenderId, kungfu);
+    }
+
+    this._log.push({
+      round: this._stateMachine.round,
+      actorId: attackerId,
+      action: `skill:${kungfu.名称}`,
+      targetId: defenderId,
+      damage: damageResult.damage,
+      isCrit: damageResult.isCrit,
+      isDodge: damageResult.isDodge,
+    });
+
+    this._publishBattleEvent('BATTLE_SKILL_USE', {
+      attackerId, defenderId, skillName: kungfu.名称, damage: damageResult.damage,
+    });
+
+    this._checkWinCondition();
+
+    return {
+      success: true,
+      stateUpdates: {
+        action: 'skill_attack', attackerId, defenderId,
+        skillName: kungfu.名称, damage: damageResult.damage,
+      },
+      narrativeConstraint: damageResult.isDodge
+        ? `<战斗>${defenderId} 闪避了 ${kungfu.名称}！</战斗>`
+        : `<战斗>${attackerId} 施展 ${kungfu.名称}，对 ${defenderId} 造成 ${damageResult.damage} 点伤害${damageResult.isCrit ? '（暴击！）' : ''}</战斗>`,
+      keyStep: damageResult.isCrit || damageResult.damage > 80,
+      sideEffects: [
+        { type: 'battle_skill_use', payload: { attackerId, defenderId, skillName: kungfu.名称, damage: damageResult.damage } },
+      ],
+    };
+  }
+
+  private _doDefend(actorId: string): ActionResult {
+    this._buffManager.addBuff(actorId, {
+      name: '防御姿态',
+      remainingTurns: 1,
+      maxTurns: 1,
+      buffType: 'buff',
+      effectType: 'defense_modify',
+      value: 10,
+      isPercentage: false,
+    });
+
+    this._stateMachine.onActionSelected('defend', actorId);
+    this._stateMachine.onActionExecuted();
+    this._stateMachine.onDamageCalculated();
+    this._stateMachine.onBuffResolved();
+    this._stateMachine.onTurnEnd();
+
+    this._log.push({
+      round: this._stateMachine.round,
+      actorId,
+      action: 'defend',
+      detail: '进入防御姿态，防御力+10',
+    });
+
+    this._publishBattleEvent('BATTLE_BUFF_APPLY', { actorId, buffName: '防御姿态' });
+    this._checkWinCondition();
+
+    return {
+      success: true,
+      stateUpdates: { action: 'defend', actorId },
+      narrativeConstraint: `<战斗>${actorId} 进入防御姿态</战斗>`,
+      keyStep: false,
+      sideEffects: [{ type: 'battle_defend', payload: { actorId } }],
+    };
+  }
+
+  private _enemyAutoAction(enemy: BattleActor): void {
+    const players = this._actors.filter(
+      (a) => a.side === 'player' && (this._hp.get(a.id) ?? 0) > 0,
+    );
+    if (players.length === 0) return;
+
+    const target = players[Math.floor(this._rng() * players.length)];
+    const attackerStats = this._combatStats.get(enemy.id);
+    const defenderStats = this._combatStats.get(target.id);
+    if (!attackerStats || !defenderStats) return;
+
+    // 尝试使用技能
+    const kungfuList = enemy.kungfuList ?? [];
+    if (kungfuList.length > 0) {
+      const kungfu = kungfuList[Math.floor(this._rng() * kungfuList.length)];
+      const result = this._doSkillAttack(enemy.id, target.id, kungfu.ID);
+      if (result.success) return;
+    }
+
+    // 默认普通攻击
+    this._doAttack(enemy.id, target.id);
+  }
+
+  private _checkWinCondition(): void {
+    const playerAlive = this._actors.some(
+      (a) => a.side === 'player' && (this._hp.get(a.id) ?? 0) > 0,
+    );
+    const enemyAlive = this._actors.some(
+      (a) => a.side === 'enemy' && (this._hp.get(a.id) ?? 0) > 0,
+    );
+
+    if (!playerAlive && !enemyAlive) {
+      this._outcome = { winner: 'draw', rounds: this._stateMachine.round, log: [...this._log] };
+      this._stateMachine.end('draw');
+    } else if (!enemyAlive) {
+      this._outcome = { winner: 'player', rounds: this._stateMachine.round, log: [...this._log] };
+      this._stateMachine.end('player');
+    } else if (!playerAlive) {
+      this._outcome = { winner: 'enemy', rounds: this._stateMachine.round, log: [...this._log] };
+      this._stateMachine.end('enemy');
+    }
+    // If both sides are alive, don't call onWinCheck here — advanceTurn will handle phase progression
+  }
+
+  private _applySkillBuff(
+    _attackerId: string,
+    defenderId: string,
+    kungfu: 功法结构,
+  ): void {
+    for (const effect of kungfu.附带效果 ?? []) {
+      const effectName = effect.名称;
+      const duration = this._parseDuration(effect.持续时间);
+
+      if (effectName === '眩晕') {
+        this._buffManager.addBuff(defenderId, {
+          name: `${kungfu.名称}-眩晕`,
+          remainingTurns: duration,
+          maxTurns: duration,
+          buffType: 'control',
+          effectType: 'stun',
+          value: 0,
+          isPercentage: false,
+          sourceSkillId: kungfu.ID,
+        });
+      } else if (effectName === '沉默') {
+        this._buffManager.addBuff(defenderId, {
+          name: `${kungfu.名称}-沉默`,
+          remainingTurns: duration,
+          maxTurns: duration,
+          buffType: 'control',
+          effectType: 'silence',
+          value: 0,
+          isPercentage: false,
+          sourceSkillId: kungfu.ID,
+        });
+      }
     }
   }
 
-  private _calculateTension(): number {
-    const playerCount = this._battleState.actors.filter(
-      (a) => a.side === 'player' && this._isActorAlive(a),
-    ).length;
-    const enemyCount = this._battleState.actors.filter(
-      (a) => a.side === 'enemy' && this._isActorAlive(a),
-    ).length;
-    const total = this._battleState.actors.length;
-    if (total === 0) return 0;
-    return Math.min(10, Math.round(((total - playerCount - enemyCount) / total) * 10));
+  private _getTotalBodyHP(character: 角色数据结构): number {
+    return (
+      (character.头部当前血量 ?? 0) +
+      (character.胸部当前血量 ?? 0) +
+      (character.腹部当前血量 ?? 0) +
+      (character.左手当前血量 ?? 0) +
+      (character.右手当前血量 ?? 0) +
+      (character.左腿当前血量 ?? 0) +
+      (character.右腿当前血量 ?? 0)
+    );
   }
 
-  private _mapBattlePhaseToTurnPhase(): TurnResult['phase'] {
-    switch (this._stateMachine.phase) {
-      case 'action_select':
-        return 'player-action';
-      case 'action_execute':
-      case 'damage':
-      case 'buff_resolve':
-        return 'resolution';
-      case 'turn_end':
-      case 'check_win':
-        return 'transition';
-      case 'end':
-        return 'idle';
-      default:
-        return 'narrative';
-    }
+  private _parseDuration(durationStr: string): number {
+    const match = durationStr.match(/(\d+)/);
+    return match ? parseInt(match[1], 10) : 1;
   }
 
-  private _publishEvent(type: string, payload: Record<string, unknown>): void {
-    const event: GameEvent = {
+  private _parseCooldown(cooldownStr: string): number {
+    const match = cooldownStr.match(/(\d+)/);
+    return match ? parseInt(match[1], 10) : 0;
+  }
+
+  private _publishBattleEvent(type: string, payload: Record<string, unknown>): void {
+    this.enqueueEvent({
       id: `battle-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       engineType: this._engineType,
       type,
@@ -684,35 +897,11 @@ export class RpgBattleEngine extends BaseEngine {
       status: 'pending',
       payload,
       createdAt: Date.now(),
-    };
-    this._eventBus.publish(event);
-    this.enqueueEvent(event);
-  }
-
-  private _initialBattleState(): RpgBattleState {
-    return {
-      isActive: false,
-      round: 0,
-      actors: [],
-      currentActorIndex: 0,
-      playerStats: undefined,
-      enemyStats: new Map(),
-      cooldowns: new Map(),
-    };
-  }
-
-  /**
-   * 解析冷却时间字符串（如 "3回合" → 3）
-   */
-  private _parseCooldown(cooldownStr: string): number {
-    const match = cooldownStr.match(/(\d+)/);
-    return match ? parseInt(match[1], 10) : 0;
+    });
   }
 }
 
-/**
- * 工厂函数
- */
-export function createRpgBattleEngine(): RpgBattleEngine {
-  return new RpgBattleEngine();
+/** 工厂函数 */
+export function createRpgBattleEngine(rng?: () => number): RpgBattleEngine {
+  return new RpgBattleEngine(rng);
 }
