@@ -364,19 +364,25 @@ export const 创建记忆总结处理器 = (deps: {
             清空NPC记忆总结流程({ 保留队列: true });
             return;
         }
-        const candidate = currentTask.触发方式 === 'manual'
-            ? 构建手动NPC记忆总结候选(targetNpc.记忆, deps.memoryConfig)
-            : 构建自动NPC记忆总结候选(targetNpc.记忆, deps.memoryConfig);
-        if (!candidate) {
-            刷新NPC记忆总结队列(Array.isArray(deps.社交) ? deps.社交 : [], { 静默: true });
-            deps.setNPC记忆总结阶段('idle');
-            deps.setNPC记忆总结草稿('');
-            deps.setNPC记忆总结错误('');
+        try {
+            const candidate = currentTask.触发方式 === 'manual'
+                ? 构建手动NPC记忆总结候选(targetNpc.记忆, deps.memoryConfig)
+                : 构建自动NPC记忆总结候选(targetNpc.记忆, deps.memoryConfig);
+            if (!candidate) {
+                刷新NPC记忆总结队列(Array.isArray(deps.社交) ? deps.社交 : [], { 静默: true });
+                deps.setNPC记忆总结阶段('idle');
+                deps.setNPC记忆总结草稿('');
+                deps.setNPC记忆总结错误('');
+                return;
+            }
+            const nextNpc = 应用NPC记忆总结(targetNpc, candidate, deps.NPC记忆总结草稿);
+            const nextSocial = (Array.isArray(deps.社交) ? deps.社交 : []).map((npc) => npc?.id === targetNpc.id ? nextNpc : npc);
+            应用并同步社交列表(nextSocial);
+        } catch (error: unknown) {
+            deps.setNPC记忆总结错误(`应用失败：${(error as any)?.message ?? '未知错误'}`);
+            deps.setNPC记忆总结阶段('review');
             return;
         }
-        const nextNpc = 应用NPC记忆总结(targetNpc, candidate, deps.NPC记忆总结草稿);
-        const nextSocial = (Array.isArray(deps.社交) ? deps.社交 : []).map((npc) => npc?.id === targetNpc.id ? nextNpc : npc);
-        应用并同步社交列表(nextSocial);
         deps.setNPC记忆总结阶段('idle');
         deps.setNPC记忆总结草稿('');
         deps.setNPC记忆总结错误('');
