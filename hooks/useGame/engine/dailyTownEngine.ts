@@ -455,6 +455,25 @@ export class DailyTownEngine extends BaseEngine {
     this._pendingEvents = [];
   }
 
+  // ==================== 序列化 ====================
+
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: this.getEngineType(),
+      turnNumber: this._turnNumber,
+      currentRegionId: this._currentRegionId,
+      apState: this._apManager.getState(),
+      timeState: this._timeManager.getState(),
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): DailyTownEngine {
+    const engine = new DailyTownEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    if (typeof state.currentRegionId === 'string') engine._currentRegionId = state.currentRegionId;
+    return engine;
+  }
+
   // ==================== 内部辅助 ====================
 
   private _makeFailResult(targetRegionId: string, reason: string): MoveResult {

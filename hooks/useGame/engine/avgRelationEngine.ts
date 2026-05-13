@@ -414,6 +414,24 @@ export class AvgRelationEngine extends BaseEngine {
     };
   }
 
+  // ==================== 序列化 ====================
+
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: this.getEngineType(),
+      turnNumber: this._turnNumber,
+      galgameState: this._galgameState,
+      relationCount: this._graph.getAllNpcIds().length,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): AvgRelationEngine {
+    const engine = new AvgRelationEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    if (state.galgameState) engine._galgameState = state.galgameState as any;
+    return engine;
+  }
+
   // ==================== 内部辅助 ====================
 
   private _failResult(reason: string): ActionResult {

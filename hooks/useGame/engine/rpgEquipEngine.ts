@@ -213,6 +213,21 @@ export class RpgEquipEngine extends BaseEngine {
     super.resume();
   }
 
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: this._engineType,
+      turnNumber: this._turnNumber,
+      equipment: this._equipment,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): RpgEquipEngine {
+    const engine = new RpgEquipEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    if (state.equipment) engine._equipment = state.equipment as any;
+    return engine;
+  }
+
   private _publishEquipEvent(type: string, payload: Record<string, unknown>): void {
     const event: GameEvent = {
       id: `equip-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,

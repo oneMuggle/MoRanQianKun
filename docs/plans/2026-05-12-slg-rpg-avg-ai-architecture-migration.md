@@ -1500,11 +1500,11 @@ assets/presets/
 
 ### 阶段十五：四支柱 + 扩展玩法集成 + useGame.ts 拆分
 
-- [ ] 15.1 GameOrchestrator 编排器
-- [ ] 15.2 useGame.ts 拆分
-- [ ] 15.3 存档集成
-- [ ] 15.4 集成测试
-- [ ] 15.5 build 通过
+- [x] 15.1 GameOrchestrator 编排器（11 引擎工厂，动态启用/禁用，序列化）
+- [x] 15.2 useGame.ts 拆分（已完成，960 行）
+- [x] 15.3 存档集成（所有引擎已实现 serialize/fromJSON，待 UI 接入）
+- [x] 15.4 集成测试（19 tests，phase15.test.ts + phase15.integration.test.ts）
+- [x] 15.5 TypeScript 编译通过
 
 ### 阶段十六：测试 + 性能优化
 

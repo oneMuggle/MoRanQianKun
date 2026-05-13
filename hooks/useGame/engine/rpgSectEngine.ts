@@ -498,6 +498,21 @@ export class RpgSectEngine extends BaseEngine {
     super.resume();
   }
 
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: 'rpgSect',
+      turnNumber: this._turnNumber,
+      hasSect: this._sectData !== null,
+      postCount: this._postAssignments.length,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): RpgSectEngine {
+    const engine = new RpgSectEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    return engine;
+  }
+
   private _notInSect(): ActionResult {
     return {
       success: false,

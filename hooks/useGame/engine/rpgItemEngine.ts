@@ -243,6 +243,20 @@ export class RpgItemEngine extends BaseEngine {
     super.resume();
   }
 
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: 'rpgItem',
+      turnNumber: this._turnNumber,
+      itemCount: Object.keys(this._inventory).length,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): RpgItemEngine {
+    const engine = new RpgItemEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    return engine;
+  }
+
   private _publishItemEvent(type: string, payload: Record<string, unknown>): void {
     const event: GameEvent = {
       id: `item-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,

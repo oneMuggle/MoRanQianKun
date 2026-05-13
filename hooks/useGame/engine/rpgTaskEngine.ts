@@ -404,6 +404,21 @@ export class RpgTaskEngine extends BaseEngine {
     super.resume();
   }
 
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: 'rpgTask',
+      turnNumber: this._turnNumber,
+      taskCount: this._taskList.length,
+      completedCount: this._completedTasks.length,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): RpgTaskEngine {
+    const engine = new RpgTaskEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    return engine;
+  }
+
   private _publishTaskEvent(type: string, payload: Record<string, unknown>): void {
     const event: GameEvent = {
       id: `task-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,

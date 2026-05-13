@@ -379,6 +379,26 @@ export class AvgDialogueEngine extends BaseEngine {
     this._gameContext = { stats: {}, intimacy: {}, tasks: {}, items: [], flags: {} };
   }
 
+  // ==================== 序列化 ====================
+
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: this.getEngineType(),
+      turnNumber: this._turnNumber,
+      currentTreeId: this._currentTreeId,
+      dialogueState: this._dialogueState,
+      treeCount: this._trees.size,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): AvgDialogueEngine {
+    const engine = new AvgDialogueEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    if (typeof state.currentTreeId === 'string') engine._currentTreeId = state.currentTreeId;
+    if (state.dialogueState) engine._dialogueState = state.dialogueState as DialogueState;
+    return engine;
+  }
+
   // ==================== 内部辅助 ====================
 
   private _failResult(reason: string): ActionResult {

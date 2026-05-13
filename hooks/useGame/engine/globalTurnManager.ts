@@ -227,6 +227,10 @@ export class GlobalTurnManager {
     return this._turnHistory.slice(-limit);
   }
 
+  getCurrentTurn(): number {
+    return this._currentTurn;
+  }
+
   /**
    * 获取管理器快照。
    */

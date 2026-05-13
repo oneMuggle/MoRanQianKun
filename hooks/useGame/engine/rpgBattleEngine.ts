@@ -524,6 +524,25 @@ export class RpgBattleEngine extends BaseEngine {
     super.resume();
   }
 
+  // ==================== 序列化 ====================
+
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: this.getEngineType(),
+      turnNumber: this._turnNumber,
+      battleActive: this.isActive,
+      phase: this._stateMachine.phase,
+      round: this._stateMachine.round,
+      actorCount: this._actors.length,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): RpgBattleEngine {
+    const engine = new RpgBattleEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    return engine;
+  }
+
   // ==================== 内部方法 ====================
 
   private _doAttack(attackerId: string, defenderId: string, bodyPart?: string): ActionResult {

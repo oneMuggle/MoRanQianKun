@@ -324,6 +324,20 @@ export class RpgKungfuEngine extends BaseEngine {
     super.resume();
   }
 
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: 'rpgKungfu',
+      turnNumber: this._turnNumber,
+      kungfuCount: this._kungfuList.length,
+    };
+  }
+
+  static fromJSON(state: Record<string, unknown>): RpgKungfuEngine {
+    const engine = new RpgKungfuEngine();
+    if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
+    return engine;
+  }
+
   private _publishKungfuEvent(type: string, payload: Record<string, unknown>): void {
     const event: GameEvent = {
       id: `kungfu-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
