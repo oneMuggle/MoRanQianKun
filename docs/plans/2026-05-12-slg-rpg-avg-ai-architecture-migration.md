@@ -29,6 +29,9 @@
 | Zustand Store（14 slices） | `hooks/useGame/subsystems/zustandStore.ts` | 完成 |
 | 叙事桥接层 `useBoardGameBridge` | `hooks/useBoardGameBridge.ts` | 完成 |
 | 单元测试 | 5 个测试文件，158 tests 通过 | 完成 |
+| AVG 对话树引擎（Phase 11） | `hooks/useGame/engine/avgDialogueEngine.ts` + `models/avg/dialogueTree.ts` | 完成 |
+| AVG 关系图谱引擎（Phase 12） | `hooks/useGame/engine/avgRelationEngine.ts` + `models/avg/relationGraph.ts` + `models/avg/galgame.ts` | 完成 |
+| AVG 分支叙事引擎（Phase 13） | `hooks/useGame/engine/avgBranchEngine.ts` + `models/avg/branchNarrative.ts` | 完成 |
 
 ### 1.2 当前架构局限
 
@@ -1480,20 +1483,20 @@ assets/presets/
 
 ### 阶段十三：AVG 分支叙事追踪引擎
 
-- [ ] 13.1 AVG 分支引擎
-- [ ] 13.2 分支追踪 + 后果解析
-- [ ] 13.3 单元测试
-- [ ] 13.4 build 通过
+- [x] 13.1 AVG 分支引擎
+- [x] 13.2 分支追踪 + 后果解析
+- [x] 13.3 单元测试（70 tests）
+- [x] 13.4 TypeScript 编译通过
 
 ### 阶段十四：地图探索引擎
 
-- [ ] 14.1 ExplorationEngine 主类
-- [ ] 14.2 地图节点图 + 战争迷雾
-- [ ] 14.3 遇敌概率 + 宝藏发现
-- [ ] 14.4 事件触发点
+- [x] 14.1 ExplorationEngine 主类
+- [x] 14.2 地图节点图 + 战争迷雾
+- [x] 14.3 遇敌概率 + 宝藏发现
+- [x] 14.4 事件触发点
 - [ ] 14.5 地图探索 UI（桌面 + 移动）
-- [ ] 14.6 单元测试
-- [ ] 14.7 build 通过
+- [x] 14.6 单元测试（36 tests）
+- [x] 14.7 TypeScript 编译通过
 
 ### 阶段十五：四支柱 + 扩展玩法集成 + useGame.ts 拆分
 

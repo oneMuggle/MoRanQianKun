@@ -27,3 +27,6 @@ export { AvgDialogueEngine, createAvgDialogueEngine } from './avgDialogueEngine'
 export type { AvgDialogueState } from './avgDialogueEngine';
 export { AvgRelationEngine, createAvgRelationEngine } from './avgRelationEngine';
 export type { AvgRelationState } from './avgRelationEngine';
+export { AvgBranchEngine, createAvgBranchEngine } from './avgBranchEngine';
+export { ExplorationEngine, createExplorationEngine } from './explorationEngine';
+export type { ExplorationEngineConfig, ExplorationState } from './explorationEngine';
