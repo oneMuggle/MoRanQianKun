@@ -182,3 +182,17 @@
 .animate-sweep {
   animation: sweep 3s infinite;
 }
+
+/* Galgame Character Breathe Animation */
+@keyframes breathe {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.01);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}

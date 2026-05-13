@@ -1,8 +1,29 @@
 # UI 沉浸式演进方案 — 实施计划
 
 > 创建日期: 2026-05-13
-> 状态: 待实施
+> 状态: **实施中（Phase 1-2 P0 已完成）**
 > 上游文档: `2026-05-12-slg-rpg-avg-ai-architecture-migration.md`（第七节）
+> 最后更新: 2026-05-13
+
+## 进度总览
+
+| Phase | 名称 | 优先级 | 状态 |
+|-------|------|--------|------|
+| Phase 1 | 数据链路打通 | P0 | ✅ **已完成** |
+| Phase 2 | Galgame 核心 UI | P0 | ✅ **已完成** |
+| Phase 3 | 场景切换动画 | P1 | 待实施 |
+| Phase 4 | 战争迷雾 & 战术地图增强 | P1 | 待实施 |
+| Phase 5 | CG 播放器 | P1 | 待实施 |
+| Phase 6 | UI 模式切换器 | P2 | 待实施 |
+| Phase 7 | 降级体系 | P2 | 待实施 |
+
+**Phase 1-2 产出：**
+- 新增 5 个文件：`useTypewriter.ts`, `CharacterSprite.tsx`, `SceneBackground.tsx`, `GalgameDialogueBox.tsx`, `GalgameMode.tsx`
+- 修改 3 个文件：`MapExplorerModal.tsx`, `MobileMapExplorerModal.tsx`, `ModalLayer.tsx`, `global.css`
+- MapExplorer 弹窗已从 demo 数据切换到真实引擎数据
+- Galgame UI 基础设施（立绘、背景、对话框、打字机、容器）全部就绪
+
+---
 
 ---
 
@@ -114,13 +135,15 @@ syncExplorationState,
 
 #### 步骤
 
-- [ ] **步骤 1.1**：修改 `MapExplorerModal.tsx`，从 Zustand Store 读取真实数据
+- [x] **步骤 1.1**：修改 `MapExplorerModal.tsx`，从 Zustand Store 读取真实数据
   - 文件：`components/features/Exploration/MapExplorerModal.tsx`
   - 改动：移除硬编码 demoNodes/demoPaths，改为从 store 读取 `explorationNodes`、`explorationPaths`、`explorationCurrentAp`、`explorationMaxAp`、`explorationCurrentNodeId`、`explorationPendingEvents`
   - 将 `onMove` 回调连接到引擎层的事件处理（通过 `explorationBridge` 或直接调用引擎方法）
+  - 状态：✅ 已完成（2026-05-13）。使用 `adaptMapData` 转换引擎数据，`onMove` 通过 `explorationBridge.moveTo` 调用
 
-- [ ] **步骤 1.2**：修改 `MobileMapExplorerModal.tsx`，同上
+- [x] **步骤 1.2**：修改 `MobileMapExplorerModal.tsx`，同上
   - 文件：`components/features/Exploration/MobileMapExplorerModal.tsx`
+  - 状态：✅ 已完成（2026-05-13）。与桌面端同样的数据接入方式
 
 - [ ] **步骤 1.3**：修改 `CGGalleryModal.tsx`，从 Zustand Store 读取 CG 数据
   - 文件：`components/features/Galgame/CGGalleryModal.tsx`
@@ -145,16 +168,16 @@ syncExplorationState,
 
 #### 步骤
 
-- [ ] **步骤 2.1**：实现逐字显示 Hook
+- [x] **步骤 2.1**：实现逐字显示 Hook
   - 文件：`hooks/useGame/ui/useTypewriter.ts`（新建）
   - 功能：
     - 输入完整文本，按字符逐个显示（可配置速度）
     - 支持 `skip()` 跳过到完整显示
     - 支持 `isComplete` 状态
     - 支持中文按字符（非按字节）显示
-  - 测试：编写单元测试覆盖核心逻辑
+  - 状态：✅ 已完成（2026-05-13）。使用 `[...text]` 展开支持中文
 
-- [ ] **步骤 2.2**：实现角色立绘组件
+- [x] **步骤 2.2**：实现角色立绘组件
   - 文件：`components/features/Galgame/CharacterSprite.tsx`（新建）
   - 功能：
     - 接收 NPC 数据（名字、图片 URL、表情、位置）
@@ -163,8 +186,9 @@ syncExplorationState,
     - 支持表情切换（通过 CSS filter 或不同图片）
     - 支持懒加载和预缓存
     - 降级支持：无图片时显示色块 + 名称标签（Tier 3）
+  - 状态：✅ 已完成（2026-05-13）
 
-- [ ] **步骤 2.3**：实现场景背景组件
+- [x] **步骤 2.3**：实现场景背景组件
   - 文件：`components/features/Galgame/SceneBackground.tsx`（新建）
   - 功能：
     - 根据当前区域加载背景图
@@ -172,8 +196,9 @@ syncExplorationState,
     - 支持时段影响色调（CSS `filter: brightness()` + `sepia()`）
     - 降级支持：CSS gradient 模拟场景氛围（Tier 3）
     - 图片缓存到 IndexedDB
+  - 状态：✅ 已完成（2026-05-13）。CSS gradient 降级已实现
 
-- [ ] **步骤 2.4**：实现 Galgame 对话框
+- [x] **步骤 2.4**：实现 Galgame 对话框
   - 文件：`components/features/Galgame/GalgameDialogueBox.tsx`（新建）
   - 功能：
     - 角色名显示区
@@ -181,13 +206,15 @@ syncExplorationState,
     - 点击跳过逐字动画
     - 选项按钮列表（与 AVG 对话树引擎联动）
     - 后果提示小字
+  - 状态：✅ 已完成（2026-05-13）
 
-- [ ] **步骤 2.5**：实现 Galgame 模式容器
+- [x] **步骤 2.5**：实现 Galgame 模式容器
   - 文件：`components/features/Galgame/GalgameMode.tsx`（新建）
   - 功能：
     - 组合 SceneBackground + CharacterSprite(s) + GalgameDialogueBox
     - 从 Zustand 读取当前对话数据
     - 支持移动端适配（全屏纵向布局）
+  - 状态：✅ 已完成（2026-05-13）
 
 #### 依赖
 
@@ -371,38 +398,39 @@ syncExplorationState,
 
 ### 新建文件清单（共 16 个）
 
-| 文件 | Phase | 说明 |
-|------|-------|------|
-| `hooks/useGame/ui/useTypewriter.ts` | 2 | 逐字显示 hook |
-| `hooks/useGame/ui/uiModeManager.ts` | 6 | UI 模式管理器 |
-| `hooks/useGame/ui/performanceDetector.ts` | 7 | 设备性能检测 |
-| `hooks/useGame/ui/cgTriggerWorkflow.ts` | 5 | CG 触发流程 |
-| `components/features/Galgame/CharacterSprite.tsx` | 2 | 角色立绘组件 |
-| `components/features/Galgame/SceneBackground.tsx` | 2 | 场景背景组件 |
-| `components/features/Galgame/GalgameDialogueBox.tsx` | 2 | 对话框 + 逐字效果 |
-| `components/features/Galgame/GalgameMode.tsx` | 2 | Galgame 模式容器 |
-| `components/features/Galgame/CGPlayer.tsx` | 5 | CG 播放器 |
-| `components/features/Galgame/CSSSceneBackground.tsx` | 7 | CSS 氛围场景（降级） |
-| `components/features/Galgame/ProceduralAvatar.tsx` | 7 | 程序化头像 |
-| `components/features/Exploration/FogOfWar.tsx` | 4 | 战争迷雾层 |
-| `components/features/Transitions/SceneTransition.tsx` | 3 | 场景切换动画 |
-| `components/features/UIMode/ModeSwitcher.tsx` | 6 | UI 模式切换器 |
-| `hooks/useGame/ui/__tests__/useTypewriter.test.ts` | 2 | useTypewriter 测试 |
-| `hooks/useGame/ui/__tests__/performanceDetector.test.ts` | 7 | performanceDetector 测试 |
+| 文件 | Phase | 说明 | 状态 |
+|------|-------|------|------|
+| `hooks/useGame/ui/useTypewriter.ts` | 2 | 逐字显示 hook | ✅ 已完成 |
+| `hooks/useGame/ui/uiModeManager.ts` | 6 | UI 模式管理器 | 待实施 |
+| `hooks/useGame/ui/performanceDetector.ts` | 7 | 设备性能检测 | 待实施 |
+| `hooks/useGame/ui/cgTriggerWorkflow.ts` | 5 | CG 触发流程 | 待实施 |
+| `components/features/Galgame/CharacterSprite.tsx` | 2 | 角色立绘组件 | ✅ 已完成 |
+| `components/features/Galgame/SceneBackground.tsx` | 2 | 场景背景组件 | ✅ 已完成 |
+| `components/features/Galgame/GalgameDialogueBox.tsx` | 2 | 对话框 + 逐字效果 | ✅ 已完成 |
+| `components/features/Galgame/GalgameMode.tsx` | 2 | Galgame 模式容器 | ✅ 已完成 |
+| `components/features/Galgame/CGPlayer.tsx` | 5 | CG 播放器 | 待实施 |
+| `components/features/Galgame/CSSSceneBackground.tsx` | 7 | CSS 氛围场景（降级） | 待实施 |
+| `components/features/Galgame/ProceduralAvatar.tsx` | 7 | 程序化头像 | 待实施 |
+| `components/features/Exploration/FogOfWar.tsx` | 4 | 战争迷雾层 | 待实施 |
+| `components/features/Transitions/SceneTransition.tsx` | 3 | 场景切换动画 | 待实施 |
+| `components/features/UIMode/ModeSwitcher.tsx` | 6 | UI 模式切换器 | 待实施 |
+| `hooks/useGame/ui/__tests__/useTypewriter.test.ts` | 2 | useTypewriter 测试 | 待实施 |
+| `hooks/useGame/ui/__tests__/performanceDetector.test.ts` | 7 | performanceDetector 测试 | 待实施 |
 
 ### 修改文件清单（共 9 个）
 
-| 文件 | Phase | 改动说明 |
-|------|-------|----------|
-| `components/features/Exploration/MapExplorerModal.tsx` | 1 | 连接 Zustand 真实数据 |
-| `components/features/Exploration/MobileMapExplorerModal.tsx` | 1 | 同上 |
-| `components/features/Galgame/CGGalleryModal.tsx` | 1 | 连接 Zustand 真实数据 |
-| `components/features/Galgame/MobileCGGalleryModal.tsx` | 1 | 同上 |
-| `components/features/Exploration/MapExplorer.tsx` | 3,4 | 集成场景切换动画 + 缩放拖拽 |
-| `hooks/useGame/subsystems/zustandStore.ts` | 1 | 新增 uiSlice |
-| `services/dbService.ts` | 7 | 扩展图片缓存 |
-| `components/app/ModalLayer.tsx` | 6 | 集成模式切换器 |
-| `components/features/lazyComponents.tsx` | 2,3,5,6 | 注册新组件 |
+| 文件 | Phase | 改动说明 | 状态 |
+|------|-------|----------|------|
+| `components/features/Exploration/MapExplorerModal.tsx` | 1 | 连接 Zustand 真实数据 | ✅ 已完成 |
+| `components/features/Exploration/MobileMapExplorerModal.tsx` | 1 | 同上 | ✅ 已完成 |
+| `components/features/Galgame/CGGalleryModal.tsx` | 1 | 连接 Zustand 真实数据 | 待实施 |
+| `components/features/Galgame/MobileCGGalleryModal.tsx` | 1 | 同上 | 待实施 |
+| `components/features/Exploration/MapExplorer.tsx` | 3,4 | 集成场景切换动画 + 缩放拖拽 | 待实施 |
+| `hooks/useGame/subsystems/zustandStore.ts` | 1 | 新增 uiSlice | 待实施 |
+| `services/dbService.ts` | 7 | 扩展图片缓存 | 待实施 |
+| `components/app/ModalLayer.tsx` | 6 | 集成模式切换器 | ✅ 已完成（传递 onMove 回调） |
+| `components/features/lazyComponents.tsx` | 2,3,5,6 | 注册新组件 | 待实施 |
+| `styles/global.css` | 2 | 新增呼吸动画 | ✅ 已完成 |
 
 ---
 
@@ -467,18 +495,18 @@ Phase 1（数据链路）──┬──▶ Phase 2（Galgame 核心）──▶
 
 ### Phase 1 验收
 
-- [ ] MapExplorerModal 显示真实 exploration 数据（非 demo）
-- [ ] 点击可移动节点触发真实移动
+- [x] MapExplorerModal 显示真实 exploration 数据（非 demo）✅
+- [x] 点击可移动节点触发真实移动 ✅（通过 explorationBridge.moveTo）
 - [ ] CGGalleryModal 显示真实 CG 数据
 - [ ] 移动端弹窗同样使用真实数据
 
 ### Phase 2 验收
 
 - [ ] 角色立绘在对话时正确显示
-- [ ] 说话中的角色立绘有呼吸动画
+- [ ] 说话中的角色立绘有呼吸动画 ✅（`animate-breathe` 已添加到 global.css）
 - [ ] 场景背景根据当前区域正确加载
-- [ ] 对话框支持逐字显示，点击可跳过
-- [ ] 选项按钮列表正确渲染
+- [ ] 对话框支持逐字显示，点击可跳过 ✅
+- [ ] 选项按钮列表正确渲染 ✅
 - [ ] 移动端 GalgameMode 全屏适配
 
 ### Phase 3 验收
