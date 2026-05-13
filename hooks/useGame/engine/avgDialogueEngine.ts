@@ -19,6 +19,8 @@ import type {
   DialogueNode,
   DialogueState,
   DialogueHistoryEntry,
+  DialogueChoice,
+  DialogueAction,
 } from '../../../models/avg/dialogueTree';
 import { NodeResolver, createNodeResolver } from '../avg/dialogue/nodeResolver';
 import type { GameContext } from '../avg/dialogue/conditionEvaluator';
@@ -253,8 +255,11 @@ export class AvgDialogueEngine extends BaseEngine {
     };
   }
 
-  // ==================== 动态节点 ====================
+  // ==================== 动态节点（AI 生成支持） ====================
 
+  /**
+   * 在指定节点后插入新节点（支持链式插入）
+   */
   insertNode(treeId: string, node: DialogueNode, afterNodeId?: string): boolean {
     const tree = this._trees.get(treeId);
     if (!tree) return false;
@@ -266,10 +271,136 @@ export class AvgDialogueEngine extends BaseEngine {
 
     if (afterNodeId) {
       const target = updatedNodes.find((n) => n.id === afterNodeId);
-      if (target && !target.nextNodeId) {
+      if (target) {
+        node.nextNodeId = target.nextNodeId;
         target.nextNodeId = node.id;
       }
     }
+
+    this._trees.set(treeId, { ...tree, nodes: updatedNodes });
+    return true;
+  }
+
+  /**
+   * 批量插入 AI 生成的节点链
+   * 节点按数组顺序自动连接（nodes[0]→nodes[1]→...），首节点连接到 afterNodeId
+   */
+  insertNodes(treeId: string, nodes: DialogueNode[], afterNodeId?: string): boolean {
+    if (nodes.length === 0) return false;
+
+    const tree = this._trees.get(treeId);
+    if (!tree) return false;
+
+    const existingIds = new Set(tree.nodes.map((n) => n.id));
+    const newIds = nodes.map((n) => n.id);
+    if (newIds.some((id) => existingIds.has(id))) return false;
+
+    // 自动链接节点链
+    for (let i = 0; i < nodes.length - 1; i++) {
+      if (!nodes[i].nextNodeId) {
+        nodes[i].nextNodeId = nodes[i + 1].id;
+      }
+    }
+
+    // 连接到目标节点
+    if (afterNodeId) {
+      const target = tree.nodes.find((n) => n.id === afterNodeId);
+      if (target) {
+        nodes[nodes.length - 1].nextNodeId = target.nextNodeId;
+        target.nextNodeId = nodes[0].id;
+      }
+    }
+
+    this._trees.set(treeId, {
+      ...tree,
+      nodes: [...tree.nodes, ...nodes.map((n) => ({ ...n }))],
+    });
+    return true;
+  }
+
+  /**
+   * 创建 AI 生成的对话节点（从 AI 返回的结构化数据）
+   */
+  static createAiNode(params: {
+    id: string;
+    speaker?: string;
+    text: string;
+    type?: 'text' | 'choice' | 'action';
+    choices?: { id: string; text: string; targetNodeId: string; consequenceHint?: string; actions?: DialogueAction[] }[];
+    tags?: string[];
+    actions?: DialogueAction[];
+  }): DialogueNode {
+    return {
+      id: params.id,
+      type: params.type ?? 'text',
+      speaker: params.speaker,
+      text: params.text,
+      choices: params.choices?.map((c) => ({
+        id: c.id,
+        text: c.text,
+        targetNodeId: c.targetNodeId,
+        consequenceHint: c.consequenceHint,
+        actions: c.actions ?? [],
+      })),
+      tags: params.tags,
+      actions: params.actions ?? [],
+    };
+  }
+
+  /**
+   * 向已有 choice 节点动态添加选项分支（用于 AI 运行时生成新选项）
+   */
+  addChoice(treeId: string, nodeId: string, choice: {
+    id: string;
+    text: string;
+    targetNodeId: string;
+    consequenceHint?: string;
+    actions?: DialogueAction[];
+  }): boolean {
+    const tree = this._trees.get(treeId);
+    if (!tree) return false;
+
+    const node = tree.nodes.find((n) => n.id === nodeId);
+    if (!node) return false;
+    if (node.type !== 'choice') return false;
+    if (node.choices?.some((c) => c.id === choice.id)) return false;
+
+    const newChoice: DialogueChoice = {
+      id: choice.id,
+      text: choice.text,
+      targetNodeId: choice.targetNodeId,
+      consequenceHint: choice.consequenceHint,
+      actions: choice.actions ?? [],
+    };
+
+    const updatedChoices = [...(node.choices ?? []), newChoice];
+    const updatedNode = { ...node, choices: updatedChoices };
+    const updatedNodes = tree.nodes.map((n) => (n.id === nodeId ? updatedNode : n));
+
+    this._trees.set(treeId, { ...tree, nodes: updatedNodes });
+    return true;
+  }
+
+  /**
+   * 删除指定节点（自动重连 nextNodeId）
+   */
+  removeNode(treeId: string, nodeId: string): boolean {
+    const tree = this._trees.get(treeId);
+    if (!tree) return false;
+    if (nodeId === tree.rootNodeId) return false;
+
+    const target = tree.nodes.find((n) => n.id === nodeId);
+    if (!target) return false;
+
+    // 重连所有指向被删除节点的 nextNodeId
+    const updatedNodes = tree.nodes
+      .filter((n) => n.id !== nodeId)
+      .map((n) => {
+        if (n.nextNodeId === nodeId) {
+          return { ...n, nextNodeId: target.nextNodeId };
+        }
+        return n;
+      });
 
     this._trees.set(treeId, { ...tree, nodes: updatedNodes });
     return true;

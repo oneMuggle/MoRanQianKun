@@ -492,5 +492,135 @@ describe('AvgDialogueEngine', () => {
       const result = engine.insertNode('missing', newNode);
       expect(result).toBe(false);
     });
+
+    it('insertNode properly relinks nextNodeId', () => {
+      engine.registerTree(makeTree('t1'));
+      const newNode: DialogueNode = { id: 'n5', type: 'text', text: 'Inserted', actions: [] };
+      engine.insertNode('t1', newNode, 'n1');
+      const tree = engine.getTree('t1')!;
+      const n1 = tree.nodes.find(n => n.id === 'n1')!;
+      expect(n1.nextNodeId).toBe('n5');
+    });
+
+    it('inserts a chain of AI-generated nodes', () => {
+      engine.registerTree(makeTree('t1'));
+      const aiNodes = [
+        AvgDialogueEngine.createAiNode({ id: 'ai-1', text: 'AI 生成节点 1', speaker: 'NPC' }),
+        AvgDialogueEngine.createAiNode({ id: 'ai-2', text: 'AI 生成节点 2', speaker: 'NPC' }),
+        AvgDialogueEngine.createAiNode({ id: 'ai-3', text: 'AI 生成节点 3', speaker: 'NPC' }),
+      ];
+      const result = engine.insertNodes('t1', aiNodes, 'n1');
+      expect(result).toBe(true);
+      const tree = engine.getTree('t1')!;
+      expect(tree.nodes.find(n => n.id === 'ai-1')).toBeDefined();
+      expect(tree.nodes.find(n => n.id === 'ai-2')).toBeDefined();
+      expect(tree.nodes.find(n => n.id === 'ai-3')).toBeDefined();
+      const n1 = tree.nodes.find(n => n.id === 'n1')!;
+      expect(n1.nextNodeId).toBe('ai-1');
+      const ai1 = tree.nodes.find(n => n.id === 'ai-1')!;
+      expect(ai1.nextNodeId).toBe('ai-2');
+      const ai2 = tree.nodes.find(n => n.id === 'ai-2')!;
+      expect(ai2.nextNodeId).toBe('ai-3');
+    });
+
+    it('rejects insertNodes with duplicate ids', () => {
+      engine.registerTree(makeTree('t1'));
+      const aiNodes = [
+        AvgDialogueEngine.createAiNode({ id: 'n1', text: 'Dup', speaker: 'NPC' }),
+      ];
+      const result = engine.insertNodes('t1', aiNodes);
+      expect(result).toBe(false);
+    });
+
+    it('creates AI node with choices', () => {
+      const node = AvgDialogueEngine.createAiNode({
+        id: 'ai-choice',
+        text: '请选择',
+        type: 'choice',
+        speaker: 'NPC',
+        choices: [
+          { id: 'c1', text: '选项A', targetNodeId: 'n1' },
+          { id: 'c2', text: '选项B', targetNodeId: 'n2' },
+        ],
+      });
+      expect(node.type).toBe('choice');
+      expect(node.choices).toHaveLength(2);
+      expect(node.choices![0].actions).toEqual([]);
+    });
+
+    it('adds a choice to an existing choice node', () => {
+      const choiceNode: DialogueNode = {
+        id: 'c-node',
+        type: 'choice',
+        text: '请选择',
+        actions: [],
+        choices: [
+          { id: 'c1', text: '选项A', targetNodeId: 'n1', actions: [] },
+        ],
+      };
+      const tree = makeTree('t1');
+      tree.nodes = [choiceNode];
+      tree.rootNodeId = 'c-node';
+      engine.registerTree(tree);
+      const result = engine.addChoice('t1', 'c-node', {
+        id: 'c2',
+        text: '选项B',
+        targetNodeId: 'n2',
+      });
+      expect(result).toBe(true);
+      const updated = engine.getTree('t1')!;
+      const updatedNode = updated.nodes.find(n => n.id === 'c-node')!;
+      expect(updatedNode.choices).toHaveLength(2);
+    });
+
+    it('rejects addChoice on non-choice node', () => {
+      engine.registerTree(makeTree('t1'));
+      const result = engine.addChoice('t1', 'n1', {
+        id: 'c-new', text: 'X', targetNodeId: 'n2',
+      });
+      expect(result).toBe(false);
+    });
+
+    it('rejects addChoice with duplicate choice id', () => {
+      const choiceNode: DialogueNode = {
+        id: 'c-node', type: 'choice', text: '请选择', actions: [],
+        choices: [{ id: 'c1', text: '选项A', targetNodeId: 'n1', actions: [] }],
+      };
+      const tree = makeTree('t1');
+      tree.nodes = [choiceNode];
+      tree.rootNodeId = 'c-node';
+      engine.registerTree(tree);
+      const result = engine.addChoice('t1', 'c-node', {
+        id: 'c1', text: '重复', targetNodeId: 'n2',
+      });
+      expect(result).toBe(false);
+    });
+
+    it('removes a node and reconnects nextNodeId', () => {
+      const nodes: DialogueNode[] = [
+        { id: 'n1', type: 'text', text: '1', actions: [], nextNodeId: 'n2' },
+        { id: 'n2', type: 'text', text: '2', actions: [], nextNodeId: 'n3' },
+        { id: 'n3', type: 'text', text: '3', actions: [] },
+      ];
+      const tree: DialogueTree = { id: 't1', name: 'T', description: 'D', rootNodeId: 'n1', nodes };
+      engine.registerTree(tree);
+      const result = engine.removeNode('t1', 'n2');
+      expect(result).toBe(true);
+      const updated = engine.getTree('t1')!;
+      expect(updated.nodes.find(n => n.id === 'n2')).toBeUndefined();
+      const n1 = updated.nodes.find(n => n.id === 'n1')!;
+      expect(n1.nextNodeId).toBe('n3');
+    });
+
+    it('rejects removing root node', () => {
+      engine.registerTree(makeTree('t1'));
+      const result = engine.removeNode('t1', 'n1');
+      expect(result).toBe(false);
+    });
+
+    it('rejects removing from missing tree', () => {
+      const result = engine.removeNode('missing', 'n1');
+      expect(result).toBe(false);
+    });
   });
 });

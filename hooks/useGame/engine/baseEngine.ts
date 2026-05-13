@@ -107,6 +107,26 @@ export abstract class BaseEngine implements SLGEngine {
     };
   }
 
+  // ==================== 序列化 ====================
+
+  serialize(): Record<string, unknown> {
+    return {
+      engineType: this._engineType,
+      paused: this._paused,
+      pauseReason: this._pauseReason,
+      pendingEvents: this._pendingEvents,
+      scheduledEvents: this._scheduledEvents,
+    };
+  }
+
+  protected fromJSON(json: Record<string, unknown>): void {
+    this._engineType = json.engineType as EngineType;
+    this._paused = !!json.paused;
+    this._pauseReason = (json.pauseReason as PauseReason) || null;
+    this._pendingEvents = (json.pendingEvents as GameEvent[]) || [];
+    this._scheduledEvents = (json.scheduledEvents as ScheduledEvent[]) || [];
+  }
+
   // ==================== 引擎信息 ====================
 
   getEngineType(): EngineType {
