@@ -33,6 +33,31 @@
 
 ---
 
+## 任务: Phase 1.4 — openingStoryWorkflow 拆分（部分）
+
+**Source**: `hooks/useGame/opening/openingStoryWorkflow.ts` (1466 lines)
+**Target**: `hooks/useGame/opening/openingStoryWorkflow/` (5 files planned)
+
+### 完成内容
+| 文件 | 状态 | 说明 |
+|------|------|------|
+| worldGenPhase.ts | ✅ 完成 | 世界生成阶段 (10191 bytes) |
+| variableInitPhase.ts | ✅ 完成 | 变量初始化阶段 (10008 bytes) |
+| types.ts | ✅ 完成 | 共享类型定义 (780 bytes) |
+| utils.ts | ✅ 完成 | 工具函数 (5814 bytes) |
+| index.ts | ✅ 完成 | 桶导出 (128 bytes) |
+| planningInitPhase.ts | 🔲 未完成 | 待提取 |
+| openingNarrative.ts | 🔲 未完成 | 待提取 |
+
+**Commit**: `ea4330f refactor(openingStoryWorkflow): partial split — worldGenPhase + variableInitPhase extracted`
+**Build**: ✅ Passes (10.21s)
+
+### 待完成
+- planningInitPhase.ts 和 openingNarrative.ts 仍在原始文件中
+- 原始文件未转为 re-export 模式
+
+---
+
 # 2026-05-07 动态难度调整 (Dynamic Difficulty Adjustment) — Verification
 
 **Date**: 2026-05-07
