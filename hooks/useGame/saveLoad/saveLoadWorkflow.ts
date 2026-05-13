@@ -62,6 +62,14 @@ type 存档编排工作流依赖 = {
     写真系统?: unknown;
     都市网约车系统?: unknown;
     关系谱?: 关系网络数据;
+    // 探索引擎状态（从 Zustand 读取）
+    explorationNodes?: Array<{ id: string; type: string; name: string; description: string; dangerLevel: string; fowState: string; eventTriggered: boolean }>;
+    explorationPaths?: Array<{ from: string; to: string; actionCost: number; description?: string }>;
+    explorationCurrentAp?: number;
+    explorationMaxAp?: number;
+    explorationCurrentNodeId?: string | null;
+    // 探索引擎状态恢复
+    同步探索状态到Zustand?: (nodes: Array<{ id: string; type: string; name: string; description: string; dangerLevel: string; fowState: string; eventTriggered: boolean }>, paths: Array<{ from: string; to: string; actionCost: number }>, currentNodeId: string | null, currentAp: number, maxAp: number) => void;
     设置校规系统: (value: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
     设置催眠系统: (value: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
     设置校园系统: (value: 校园系统数据) => void;
@@ -161,7 +169,13 @@ export const 创建存读档工作流 = (deps: 存档编排工作流依赖) => {
         校园系统: deps.校园系统,
         写真系统: deps.写真系统,
         都市网约车系统: deps.都市网约车系统,
-        关系谱: deps.关系谱
+        关系谱: deps.关系谱,
+        // 探索引擎状态
+        explorationNodes: deps.explorationNodes,
+        explorationPaths: deps.explorationPaths,
+        explorationCurrentAp: deps.explorationCurrentAp,
+        explorationMaxAp: deps.explorationMaxAp,
+        explorationCurrentNodeId: deps.explorationCurrentNodeId,
     });
 
     const 构建协调依赖 = () => ({
@@ -312,6 +326,18 @@ export const 创建存读档工作流 = (deps: 存档编排工作流依赖) => {
         }
 
         deps.设置校园系统(当前校园系统 as 校园系统数据);
+
+        // 探索引擎状态恢复（旧存档可能没有这些字段）
+        if (save.explorationNodes && Array.isArray(save.explorationNodes) && save.explorationNodes.length > 0) {
+            deps.同步探索状态到Zustand?.(
+                save.explorationNodes,
+                save.explorationPaths || [],
+                save.explorationCurrentNodeId ?? null,
+                save.explorationCurrentAp ?? 10,
+                save.explorationMaxAp ?? 10,
+            );
+        }
+
         deps.读档后重置上下文();
         deps.读档后定位到最新回合();
     };

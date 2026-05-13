@@ -105,6 +105,13 @@ export interface SessionDomainInput {
     读档后重置上下文: any;
     读档后定位到最新回合: any;
     创建存读档工作流: any;
+    // 探索引擎状态
+    explorationNodes?: any;
+    explorationPaths?: any;
+    explorationCurrentAp?: number;
+    explorationMaxAp?: number;
+    explorationCurrentNodeId?: string | null;
+    同步探索状态到Zustand?: any;
     // 会话生命周期依赖
     apiConfig: any;
     view: any;
@@ -227,6 +234,12 @@ export function createSessionDomain(input: SessionDomainInput) {
         设置写真系统,
         设置都市网约车系统,
         设置关系谱,
+        explorationNodes,
+        explorationPaths,
+        explorationCurrentAp,
+        explorationMaxAp,
+        explorationCurrentNodeId,
+        同步探索状态到Zustand,
         setView,
         setShowSaveLoad,
         设置最近开局配置,
@@ -371,6 +384,12 @@ export function createSessionDomain(input: SessionDomainInput) {
         设置写真系统,
         设置都市网约车系统,
         设置关系谱,
+        explorationNodes,
+        explorationPaths,
+        explorationCurrentAp,
+        explorationMaxAp,
+        explorationCurrentNodeId,
+        同步探索状态到Zustand,
         setView,
         setShowSaveLoad,
         设置最近开局配置,

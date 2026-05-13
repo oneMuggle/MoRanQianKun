@@ -110,6 +110,8 @@ import { 创建私聊发送工作流 } from './useGame/npc/privateChatCoordinato
 import { 创建BDSM关系操作工作流 } from './useGame/bdsmRelationshipOperations';
 import { 创建主剧情发送工作流 } from './useGame/useSend';
 import { 创建图片生成协调器 } from './useGame/image/imageGenerationCoordinator';
+import { createExplorationEngine } from './useGame/engine/explorationEngine';
+import { worldToExploration } from './useGame/exploration/worldToExplorationAdapter';
 import { 创建命令处理工作流 } from './useGame/core/commandProcessorCoordinator';
 import { 创建上下文快照工作流, type 上下文快照 } from './useGame/ui/contextSnapshotCoordinator';
 import { 构建useGame返回值 } from './useGame/core/useGameReturnMapper';
@@ -602,6 +604,23 @@ export const useGame = () => {
     // ==================== 探索引擎桥接层 ====================
     const explorationBridge = useExplorationBridge();
 
+    // 探索引擎初始化：创建引擎实例 + 从世界数据生成地图
+    useEffect(() => {
+        // 引擎已存在则跳过
+        if (explorationBridge.engineRef.current) return;
+
+        // 创建引擎实例
+        const engine = createExplorationEngine();
+        explorationBridge.engineRef.current = engine;
+
+        // 从世界数据/环境数据生成地图
+        const { nodes, paths, startNodeId } = worldToExploration(世界, 环境);
+        if (nodes.length > 0) {
+            engine.initMap(nodes, paths, startNodeId || undefined);
+            explorationBridge.syncStateToZustand();
+        }
+    }, []);
+
     // 包装 handleSend：发送前暂停桌游/探索，回复后恢复
     const handleSendWithBoardGame: typeof handleSend = async (content, isStreaming, options) => {
         boardGameBridge.onChatMessageSent();
@@ -703,6 +722,27 @@ export const useGame = () => {
         设置写真系统,
         设置都市网约车系统,
         设置关系谱,
+        // 探索引擎状态
+        explorationNodes,
+        explorationPaths,
+        explorationCurrentAp,
+        explorationMaxAp,
+        explorationCurrentNodeId,
+        同步探索状态到Zustand: (
+            nodes: typeof explorationNodes,
+            paths: typeof explorationPaths,
+            currentNodeId: typeof explorationCurrentNodeId,
+            currentAp: number,
+            maxAp: number,
+        ) => {
+            syncExplorationState({
+                explorationNodes: nodes || [],
+                explorationPaths: paths || [],
+                explorationCurrentNodeId: currentNodeId ?? null,
+                explorationCurrentAp: currentAp,
+                explorationMaxAp: maxAp,
+            });
+        },
         setView,
         setShowSaveLoad,
         设置最近开局配置,

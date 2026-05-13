@@ -1770,6 +1770,12 @@ export interface 存档结构 {
     写真系统?: 写真系统扩展; // 写真约拍系统（现代纪元NSFW模块）
     都市网约车系统?: Record<string, unknown>; // 都市网约车NSFW系统
     关系谱?: 关系网络数据; // 人物关系谱系统
+    // 探索引擎状态
+    explorationNodes?: Array<{ id: string; type: string; name: string; description: string; dangerLevel: string; fowState: string; eventTriggered: boolean }>;
+    explorationPaths?: Array<{ from: string; to: string; actionCost: number; description?: string }>;
+    explorationCurrentAp?: number;
+    explorationMaxAp?: number;
+    explorationCurrentNodeId?: string | null;
 }
 
 export type PromptCategory = '核心设定' | '数值设定' | '难度设定' | '写作设定' | '自定义';

@@ -86,6 +86,12 @@ type 存档协调当前状态 = {
     写真系统?: unknown;
     都市网约车系统?: unknown;
     关系谱?: 关系网络数据;
+    // 探索引擎
+    explorationNodes?: Array<{ id: string; type: string; name: string; description: string; dangerLevel: string; fowState: string; eventTriggered: boolean }>;
+    explorationPaths?: Array<{ from: string; to: string; actionCost: number; description?: string }>;
+    explorationCurrentAp?: number;
+    explorationMaxAp?: number;
+    explorationCurrentNodeId?: string | null;
 };
 
 type 存档协调依赖 = {
@@ -308,7 +314,13 @@ export const 创建存档数据 = (
         校园系统: currentState.校园系统 ? deps.深拷贝(currentState.校园系统) : undefined,
         写真系统: (currentState as any).写真系统 ? deps.深拷贝((currentState as any).写真系统) : undefined,
         都市网约车系统: 都市网约车系统Source ? deps.深拷贝(都市网约车系统Source) : undefined,
-        关系谱: currentState.关系谱 ? deps.深拷贝(currentState.关系谱) : undefined
+        关系谱: currentState.关系谱 ? deps.深拷贝(currentState.关系谱) : undefined,
+        // 探索引擎状态
+        explorationNodes: currentState.explorationNodes ? deps.深拷贝(currentState.explorationNodes) : undefined,
+        explorationPaths: currentState.explorationPaths ? deps.深拷贝(currentState.explorationPaths) : undefined,
+        explorationCurrentAp: currentState.explorationCurrentAp,
+        explorationMaxAp: currentState.explorationMaxAp,
+        explorationCurrentNodeId: currentState.explorationCurrentNodeId,
     };
 };
 
@@ -461,6 +473,11 @@ export const 执行读取存档 = async (
     }
     if (save.关系谱 && typeof save.关系谱 === 'object') {
         deps.设置关系谱?.(deps.深拷贝(save.关系谱));
+    }
+    // 探索引擎状态恢复（旧存档可能没有这些字段）
+    if (save.explorationNodes && Array.isArray(save.explorationNodes)) {
+        // 探索状态需要通过 Zustand 恢复，由上层调用 handleLoadGame 处理
+        // 这里仅保存，加载由 saveLoadWorkflow 处理
     }
 
     deps.setHasSave(true);
