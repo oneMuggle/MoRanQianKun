@@ -68,7 +68,16 @@ export function ModalRenderer({
 
         // 检查弹窗是否打开：同时支持新系统（openModals Map）和旧系统（state.showXxx 布尔值）
         const isOpenViaMap = openModals.has(module.id);
-        const isOpenViaState = module.modal.stateKey ? !!state[module.modal.stateKey] : false;
+        let isOpenViaState = false;
+        if (module.modal.stateKey) {
+          const stateVal = state[module.modal.stateKey];
+          // 特殊处理 showSaveLoad 这种 { show: boolean, mode: string } 结构
+          if (module.id === 'saveLoad' && stateVal && typeof stateVal === 'object') {
+            isOpenViaState = (stateVal as { show?: boolean }).show === true;
+          } else {
+            isOpenViaState = !!stateVal;
+          }
+        }
         if (!isOpenViaMap && !isOpenViaState) return null;
 
         // 构造 modalManager API 传给 propsFactory

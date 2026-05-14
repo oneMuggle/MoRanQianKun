@@ -114,6 +114,7 @@ const SaveLoadModal: React.FC<Props> = ({ onClose, onLoadGame, onSaveGame, mode,
         if (!ok) return;
         try {
             await Promise.resolve(onLoadGame(save));
+            onClose();
         } catch (error: any) {
             console.error(error);
             alert(`读取失败：${error?.message || '未知错误'}`);

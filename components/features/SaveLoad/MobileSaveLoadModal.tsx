@@ -17,6 +17,24 @@ const MobileSaveLoadModal: React.FC<Props> = ({ onClose, onLoadGame, onSaveGame,
     const [loading, setLoading] = useState(true);
     const 文案 = useUIText();
 
+    const handleLoadClick = async (save: 存档结构) => {
+        const ok = requestConfirm
+            ? await requestConfirm({
+                title: '读取存档',
+                message: `读取存档？`,
+                confirmText: '读取'
+            })
+            : true;
+        if (!ok) return;
+        try {
+            await Promise.resolve(onLoadGame(save));
+            onClose();
+        } catch (error: any) {
+            console.error(error);
+            alert(`读取失败：${error?.message || '未知错误'}`);
+        }
+    };
+
     useEffect(() => {
         void loadSaves();
     }, []);
@@ -83,7 +101,7 @@ const MobileSaveLoadModal: React.FC<Props> = ({ onClose, onLoadGame, onSaveGame,
                                     </div>
                                     {mode === 'load' && (
                                         <button
-                                            onClick={() => onLoadGame(save)}
+                                            onClick={() => { void handleLoadClick(save); }}
                                             className="px-4 py-2 bg-wuxia-gold/20 text-wuxia-gold rounded-lg text-sm"
                                         >
                                             读取

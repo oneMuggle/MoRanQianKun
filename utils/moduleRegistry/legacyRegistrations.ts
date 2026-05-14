@@ -291,7 +291,6 @@ UIFeatureRegistry.register({
     mobileComponent: MobileSaveLoadModal,
     visibility: 'always',
     stateKey: 'showSaveLoad',
-    stateKey: 'showKungfu',
     propsFactory: ({ state, actions, modalManager, requestConfirm }) => {
       const payload = modalManager.openModals.get('saveLoad');
       const mode = (payload && typeof payload === 'object' && 'mode' in payload)
@@ -523,7 +522,6 @@ UIFeatureRegistry.register({
     mobileComponent: MobileMemory,
     visibility: 'always',
     stateKey: 'showMemory',
-    stateKey: 'showHeroinePlan',
     propsFactory: ({ state, setters, modalManager }) => ({
       history: state.历史记录,
       memorySystem: state.记忆系统,
@@ -1026,10 +1024,6 @@ UIFeatureRegistry.register({
     mobileComponent: MobileBoardGameDashboard,
     visibility: 'always',
     stateKey: 'showBoardGameDashboard',
-    stateKey: 'showNsfwCenter',
-    stateKey: 'showUrbanDriver',
-    stateKey: 'showPhotography',
-    stateKey: 'showCampusDesire',
     propsFactory: ({ state, setters, modalManager }) => {
       const 欲望系统 = ((state as any).校园系统?.欲望系统) || {};
       return {
