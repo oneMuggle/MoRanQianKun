@@ -3329,6 +3329,7 @@ const ImageManagerModal: React.FC<Props> = ({
 
     return (
         <div className="fixed inset-0 z-[230] bg-black/90 backdrop-blur-md flex items-center justify-center p-0 md:p-4 animate-fadeIn overflow-hidden">
+            <div className="w-full h-full flex flex-col overflow-hidden">
             <ImageManagerShell
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -3472,6 +3473,7 @@ const ImageManagerModal: React.FC<Props> = ({
                 />
             )}
         </ImageManagerShell>
+            </div>
 
         {imageViewer && (
             <ImageViewerOverlay
