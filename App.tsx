@@ -256,6 +256,7 @@ const App: React.FC = () => {
                     setShowWorldbookManager={setShowWorldbookManager}
                     setShowNovelDecompositionWorkbench={setShowNovelDecompositionWorkbench}
                     setShowNovelWritingWorkbench={setShowNovelWritingWorkbench}
+                    setShowCampusDesire={setShowCampusDesire}
                 />
 
                 {/* NSFW Modals */}

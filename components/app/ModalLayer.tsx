@@ -96,6 +96,7 @@ interface ModalLayerProps {
     setShowWorldbookManager: (v: React.SetStateAction<boolean>) => void;
     setShowNovelDecompositionWorkbench: (v: React.SetStateAction<boolean>) => void;
     setShowNovelWritingWorkbench: (v: React.SetStateAction<boolean>) => void;
+    setShowCampusDesire: (v: React.SetStateAction<boolean>) => void;
 }
 
 // ============================================================================
@@ -131,6 +132,7 @@ export function ModalLayer({
     setShowWorldbookManager,
     setShowNovelDecompositionWorkbench,
     setShowNovelWritingWorkbench,
+    setShowCampusDesire,
 }: ModalLayerProps) {
     return (
         <>
@@ -522,9 +524,9 @@ export function ModalLayer({
                                     nsfwEnabled={(state.gameConfig as any)?.启用NSFW模式 === true}
                                     onToggleMajorRole={(actions as any).updateNpcMajorRole}
                                     onTogglePresence={(actions as any).updateNpcPresence}
-                                    onDeleteNpc={(actions as any).removeNpc}
+                                    onDeleteNpc={(actions as any).移除NPC}
                                     欲望系统={(state as any).校园系统?.欲望系统}
-                                    onOpenCampusDesire={() => (actions as any).openCampusDesire?.()}
+                                    onOpenCampusDesire={() => setShowCampusDesire(true)}
                                     关系谱={(state as any).关系谱}
                                 />
                             ) : (
@@ -536,9 +538,9 @@ export function ModalLayer({
                                     nsfwEnabled={(state.gameConfig as any)?.启用NSFW模式 === true}
                                     onToggleMajorRole={(actions as any).updateNpcMajorRole}
                                     onTogglePresence={(actions as any).updateNpcPresence}
-                                    onDeleteNpc={(actions as any).removeNpc}
+                                    onDeleteNpc={(actions as any).移除NPC}
                                     欲望系统={(state as any).校园系统?.欲望系统}
-                                    onOpenCampusDesire={() => (actions as any).openCampusDesire?.()}
+                                    onOpenCampusDesire={() => setShowCampusDesire(true)}
                                     关系谱={(state as any).关系谱}
                                 />
                             )}

@@ -55,7 +55,7 @@ const BDSMSafetyModal: React.FC<Props> = ({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[210] flex items-center justify-center bg-black/60 backdrop-blur-sm"
             onKeyDown={handleKeyDown}
         >
             <div className="relative w-full max-w-lg max-h-[80vh] bg-gray-900 rounded-xl border border-gray-700/50 shadow-2xl flex flex-col overflow-hidden">

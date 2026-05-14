@@ -454,6 +454,18 @@ export const useGame = () => {
         uploadNpcImageToSlot, updateNpcMajorRole, updateNpcPresence, removeNpc
     } = manualNpc;
 
+    /** 删除 NPC 时同步清理校园系统欲望档案 */
+    const 移除NPC = (npcId: string) => {
+        removeNpc(npcId);
+        设置校园系统((prev: any) => {
+            if (!prev?.欲望系统?.NPC欲望档案?.[npcId]) return prev;
+            const nextDesire = { ...prev.欲望系统 };
+            const nextArchive = { ...nextDesire.NPC欲望档案 };
+            delete nextArchive[npcId];
+            return { ...prev, 欲望系统: { ...nextDesire, NPC欲望档案: nextArchive } };
+        });
+    };
+
     const {
         generateNpcImageManually, generateNpcSecretPartImage, retryNpcImageGeneration
     } = manualImageActions;
@@ -994,7 +1006,7 @@ export const useGame = () => {
         handleReturnToHome,
         updateNpcMajorRole,
         updateNpcPresence,
-        removeNpc,
+        移除NPC,
         removeTask,
         removeAgreement,
         generateNpcImageManually,

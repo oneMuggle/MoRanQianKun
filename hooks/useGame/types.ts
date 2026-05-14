@@ -137,7 +137,7 @@ export interface UseGameActions {
     uploadNpcImageToSlot: (npcId: string, slot: string, image: 图片资源) => void;
     updateNpcMajorRole: (npcId: string, role: string) => void;
     updateNpcPresence: (npcId: string, presence: unknown) => void;
-    removeNpc: (npcId: string) => void;
+    移除NPC: (npcId: string) => void;
 
     // Runtime variables
     updateRuntimeVariableSection: (section: unknown) => void;

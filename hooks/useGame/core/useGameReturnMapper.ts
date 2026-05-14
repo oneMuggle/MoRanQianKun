@@ -194,7 +194,7 @@ interface ReturnMapperDeps {
     handleReturnToHome: any;
     updateNpcMajorRole: any;
     updateNpcPresence: any;
-    removeNpc: any;
+    移除NPC: any;
     removeTask: any;
     removeAgreement: any;
     generateNpcImageManually: any;
@@ -420,7 +420,7 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             handleReturnToHome: deps.handleReturnToHome,
             updateNpcMajorRole: deps.updateNpcMajorRole,
             updateNpcPresence: deps.updateNpcPresence,
-            removeNpc: deps.removeNpc,
+            removeNpc: deps.移除NPC,
             removeTask: deps.removeTask,
             removeAgreement: deps.removeAgreement,
             generateNpcImageManually: deps.generateNpcImageManually,

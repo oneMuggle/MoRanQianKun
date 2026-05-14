@@ -241,6 +241,7 @@ export function NSFWModals({
             {!isMobile && showBDSMRelationship && (
                 <BDSMRelationshipModal
                     关系状态={欲望系统?.NPC欲望档案?.[showBDSMRelationship.npcId]?.BDSM关系}
+                    欲望档案={欲望系统?.NPC欲望档案?.[showBDSMRelationship.npcId]}
                     npcName={showBDSMRelationship.npcName}
                     日常指令={欲望系统?.NPC欲望档案?.[showBDSMRelationship.npcId]?.BDSM关系?.日常指令 ?? []}
                     onClose={() => setShowBDSMRelationship(null)}

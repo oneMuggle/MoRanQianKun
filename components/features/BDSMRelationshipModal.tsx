@@ -1,8 +1,10 @@
 import React, { useCallback } from 'react';
 import type { BDSM关系状态, BDSM日常指令 } from '../../models/campusNSFW/sm';
+import type { NPC欲望档案 } from '../../models/campusNSFW/core';
 
 interface Props {
     关系状态: BDSM关系状态;
+    欲望档案?: NPC欲望档案;
     npcName: string;
     日常指令: BDSM日常指令[];
     onClose: () => void;
@@ -39,6 +41,7 @@ const 阶段描述: Record<string, string> = {
 
 const BDSMRelationshipModal: React.FC<Props> = ({
     关系状态,
+    欲望档案,
     npcName,
     日常指令,
     onClose,
@@ -53,12 +56,15 @@ const BDSMRelationshipModal: React.FC<Props> = ({
         if (e.key === 'Escape') onClose();
     }, [onClose]);
 
-    const progressPercent = Math.min(100, Math.max(0, 关系状态.服从度));
-    const powerBalance = Math.min(100, Math.max(0, ((关系状态.权力天平 + 50) / 100) * 100));
+    // 优先读取欲望层数据，若无则回退到 BDSM 层
+    const 服从度 = 欲望档案?.服从度?.当前值 ?? 关系状态?.服从度 ?? 0;
+    const 权力天平 = 欲望档案?.权力天平?.当前值 ?? 关系状态?.权力天平 ?? 0;
+    const progressPercent = Math.min(100, Math.max(0, 服从度));
+    const powerBalance = Math.min(100, Math.max(0, ((权力天平 + 50) / 100) * 100));
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[210] flex items-center justify-center bg-black/60 backdrop-blur-sm"
             onKeyDown={handleKeyDown}
         >
             <div className="relative w-full max-w-2xl max-h-[80vh] bg-gray-900 rounded-xl border border-gray-700/50 shadow-2xl flex flex-col overflow-hidden">
@@ -70,7 +76,10 @@ const BDSMRelationshipModal: React.FC<Props> = ({
                         </div>
                         <div>
                             <h2 className="text-lg text-white font-semibold">{npcName} — BDSM 关系</h2>
-                            <p className="text-xs text-gray-400">关系阶段：{关系状态.阶段}</p>
+                            <p className="text-xs text-gray-400">
+                                欲望阶段：{欲望档案?.当前阶段 ?? '—'}
+                                {欲望档案 && 关系状态?.阶段 && ` | BDSM 阶段：${关系状态.阶段}`}
+                            </p>
                         </div>
                     </div>
                     <button
@@ -108,7 +117,7 @@ const BDSMRelationshipModal: React.FC<Props> = ({
                                 <div>
                                     <div className="flex items-center justify-between mb-1">
                                         <span className="text-sm text-gray-400">服从度</span>
-                                        <span className="text-sm text-white font-mono">{关系状态.服从度}/100</span>
+                                        <span className="text-sm text-white font-mono">{服从度}/100</span>
                                     </div>
                                     <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                                         <div
@@ -121,14 +130,14 @@ const BDSMRelationshipModal: React.FC<Props> = ({
                                     <div className="flex items-center justify-between mb-1">
                                         <span className="text-sm text-gray-400">权力天平</span>
                                         <span className="text-sm text-white font-mono">
-                                            {关系状态.权力天平 > 0 ? '支配' : 关系状态.权力天平 < 0 ? '服从' : '平衡'} {Math.abs(关系状态.权力天平)}/50
+                                            {权力天平 > 0 ? '支配' : 权力天平 < 0 ? '服从' : '平衡'} {Math.abs(权力天平)}/50
                                         </span>
                                     </div>
                                     <div className="h-3 bg-gray-700 rounded-full overflow-hidden relative">
                                         <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-500 z-10" />
                                         <div
                                             className={`h-full rounded-full transition-all duration-500 ${
-                                                关系状态.权力天平 >= 0
+                                                权力天平 >= 0
                                                     ? 'bg-gradient-to-r from-amber-500 to-orange-500'
                                                     : 'bg-gradient-to-r from-blue-500 to-cyan-500'
                                             }`}
