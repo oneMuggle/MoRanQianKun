@@ -1,6 +1,7 @@
 import { NSFW场景类型 } from '../../models/system';
 import { MODERN_ERA_IDS } from '../../models/eraTheme/assembly';
 import { 构建校园NSFW完整叙事约束 } from './campusNSFW';
+import { 构建Exposure完整叙事约束 } from './exposureNSFW';
 import { 构建都市网约车完整叙事约束 } from './urbanDriverNSFW';
 import { 构建写真NSFW完整叙事约束 } from './photographyNSFW';
 import { 
@@ -24,6 +25,7 @@ import type {
   桌游类型,
   密室主题,
 } from '../../models/campusNSFW';
+import type { 露出偏好等级 as Exposure露出等级 } from '../../models/exposureNSFW';
 import type {
   乘客欲望阶段,
   行程关系轨道,
@@ -211,6 +213,14 @@ const 构建运行时NSFW提示词 = (
           内容强度?: '微暗' | '暧昧' | '露骨';
           其他Npc欲望摘要?: string;
         };
+        /** 露出 NSFW 独立子系统参数 */
+        ExposureNSFW参数?: {
+          露出偏好等级?: Exposure露出等级;
+          紧张度?: number;
+          有旁观者?: boolean;
+          网络流言等级?: number;
+          有无证据?: boolean;
+        };
         /** 都市网约车 NSFW 子系统参数 */
         都市网约车NSFW参数?: {
           行程类型?: 行程NSFW类型;
@@ -277,6 +287,14 @@ const 构建运行时NSFW提示词 = (
       const campusConstraint = 构建校园NSFW叙事约束(options.校园NSFW参数);
       if (campusConstraint) {
         组件.push(campusConstraint);
+      }
+    }
+
+    // 露出 NSFW 约束（仅现代时代）
+    if (options?.ExposureNSFW参数 && options?.时代配置ID && MODERN_ERA_IDS.includes(options.时代配置ID as typeof MODERN_ERA_IDS[number])) {
+      const exposureConstraint = 构建Exposure完整叙事约束(options.ExposureNSFW参数);
+      if (exposureConstraint) {
+        组件.push(exposureConstraint);
       }
     }
 
@@ -347,6 +365,14 @@ export const 构建运行时额外提示词 = (
           密室主题?: 密室主题;
           内容强度?: '微暗' | '暧昧' | '露骨';
           其他Npc欲望摘要?: string;
+        };
+        /** 露出 NSFW 独立子系统参数 */
+        ExposureNSFW参数?: {
+          露出偏好等级?: Exposure露出等级;
+          紧张度?: number;
+          有旁观者?: boolean;
+          网络流言等级?: number;
+          有无证据?: boolean;
         };
         都市网约车NSFW参数?: {
           行程类型?: 行程NSFW类型;

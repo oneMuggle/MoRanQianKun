@@ -5,8 +5,9 @@
  */
 
 import type { 权力倾向, 契约记录, 契约类型, 契约状态, SM场景类型 } from '../../../models/bdsmNSFW';
-import type { 欲望阶段, 关系轨道, 露出偏好等级, 后果类型, 后果记录 } from '../../../models/campusNSFW';
-import { 权力倾向阈值 } from '../campusNSFW/constants';
+import type { 欲望阶段, 关系轨道, 后果类型, 后果记录 } from '../../../models/nsfwCore';
+import type { 露出偏好等级 } from '../../../models/exposureNSFW';
+import { 权力倾向阈值 } from '../../../models/nsfwCore/constants';
 
 export type { 权力倾向 };
 

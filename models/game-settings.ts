@@ -7,6 +7,8 @@ import { 环境信息结构 } from './environment';
 import type { 校园NSFW设置 } from './campusNSFW';
 import type { 都市网约车NSFW设置 } from './urbanDriverNSFW';
 import type { 写真NSFW设置, 写真系统扩展 } from './photographyNSFW';
+import type { BDSM系统设置 } from './bdsmNSFW';
+import type { ExposureNSFW设置 } from './exposureNSFW';
 import { 场景图片档案 } from './imageGeneration';
 import { NPC结构 } from './social';
 import type { 关系网络数据 } from './relationship';
@@ -268,6 +270,8 @@ export interface 游戏设置结构 {
     校园NSFW设置?: 校园NSFW设置;
     都市网约车NSFW设置?: 都市网约车NSFW设置;
     写真NSFW设置?: 写真NSFW设置; // 写真约拍NSFW子系统（仅现代纪元）
+    BDSMNSFW设置?: BDSM系统设置; // BDSM 独立 NSFW 子系统
+    ExposureNSFW设置?: ExposureNSFW设置; // 露出独立 NSFW 子系统
     启用饱腹口渴系统: boolean;
     启用修炼体系: boolean;
     启用里武侠模式: boolean;

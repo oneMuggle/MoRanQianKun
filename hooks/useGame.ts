@@ -652,6 +652,28 @@ export const useGame = () => {
     const explorationBridge = useExplorationBridge({
         apiConfig,
         onTravelNarrative: handleTravelNarrative,
+        onActionNarrative: useCallback((actionType: string, narrative: string, travelTimeMinutes: number) => {
+            // 推进游戏时间
+            const store = useGameStore.getState();
+            const currentTime = (store as any).环境?.时间;
+            if (currentTime && travelTimeMinutes > 0) {
+                const advanced = 推进游戏时间(currentTime, travelTimeMinutes);
+                设置环境({ ...环境, 时间: advanced });
+            }
+
+            // 追加叙事到历史记录
+            const userMsg = {
+                role: 'user' as const,
+                content: `[探索] ${actionType}`,
+                timestamp: Date.now(),
+            };
+            const assistantMsg = {
+                role: 'assistant' as const,
+                content: narrative,
+                timestamp: Date.now(),
+            };
+            设置历史记录([...历史记录, userMsg, assistantMsg]);
+        }, [环境, 历史记录, 设置环境, 设置历史记录]),
     });
 
     // 缓存世界/环境数据引用，供懒加载初始化使用

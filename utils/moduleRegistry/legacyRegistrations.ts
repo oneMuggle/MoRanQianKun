@@ -6,6 +6,8 @@
  */
 
 import { UIFeatureRegistry } from './registry';
+import { desktopTabs, mobileTabs } from '../../components/features/Settings/tabDefinitions';
+import { 获取时代主题方案, 全部时代配置 } from '../../models/system';
 import {
   CharacterModal,
   MobileCharacter,
@@ -589,8 +591,6 @@ UIFeatureRegistry.register({
     visibility: 'always',
     stateKey: 'showSettings',
     propsFactory: ({ state, meta, setters, actions, modalManager, isMobile, requestConfirm, extraProps }) => {
-      // 动态导入 tabDefinitions 避免循环依赖
-      const { desktopTabs, mobileTabs } = require('../../components/features/Settings/tabDefinitions');
       return {
         navMode: isMobile ? 'pills' : 'sidebar',
         tabs: isMobile ? mobileTabs : desktopTabs,
@@ -609,8 +609,8 @@ UIFeatureRegistry.register({
         currentTheme: state.currentTheme,
         currentEra: state.currentEra,
         eraInfo: (meta as any).eraInfo,
-        eraTheme: state.currentEra ? require('../../models/system').获取时代主题方案(state.currentEra as string) : undefined,
-        availableEras: require('../../models/system').全部时代配置,
+        eraTheme: state.currentEra ? 获取时代主题方案(state.currentEra as string) : undefined,
+        availableEras: 全部时代配置,
         onEraChange: (actions as any).handleEraChange,
         history: state.历史记录,
         memorySystem: state.记忆系统,

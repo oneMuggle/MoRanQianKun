@@ -12,6 +12,7 @@ export {
   生成里程碑,
 } from './desireStateMachine';
 
+// 露出系统 — 保留重新导出以保持向后兼容，实际逻辑已迁移至 exposureNSFWEngine
 export {
   计算露出偏好推进,
   计算紧张度,
@@ -22,6 +23,7 @@ export {
   计算露出衰减,
 } from './exposureSystem';
 
+// BDSM/SM 系统 — 保留重新导出以保持向后兼容，实际逻辑已迁移至 bdsmNSFWEngine
 export {
   权力倾向分类,
   计算权力天平推进,
@@ -54,6 +56,7 @@ export {
   计算校园祭总NSFW,
 } from './festivalSystem';
 
+// 工厂函数 — 保留重新导出以保持向后兼容
 export {
   创建默认欲望档案,
   从NPC创建欲望档案,
@@ -77,5 +80,7 @@ export {
   时间段修正,
   选择系数,
   欲望阶段冷却修正,
-  欲望阶段列表,
 } from './constants';
+
+// 共享常量从 nsfwCore 重新导出
+export { 权力倾向阈值, 欲望阶段列表 } from '../../../models/nsfwCore';

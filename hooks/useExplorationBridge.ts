@@ -41,6 +41,8 @@ export interface UseExplorationBridgeReturn {
 interface BridgeExtras {
   apiConfig: any;
   onTravelNarrative?: (narrative: string, travelTimeMinutes: number, originName: string, destName: string) => void;
+  /** 处理探索/休息等非移动操作的叙事 */
+  onActionNarrative?: (actionType: string, narrative: string, travelTimeMinutes: number) => void;
 }
 
 export function useExplorationBridge(extras?: BridgeExtras): UseExplorationBridgeReturn {
@@ -159,16 +161,27 @@ function extractTimeOfDay(canonicalTime: string): string {
   const explore = React.useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
-    engine.explore();
+    const result = engine.explore();
     syncStateToZustand();
-  }, [syncStateToZustand]);
+    if (result.success && extras?.onActionNarrative) {
+      // 提取 <叙事> 标签中的文本
+      const narrative = result.narrativeConstraint?.replace(/<\/?叙事>/g, '') ?? '';
+      const travelTime = (result.stateUpdates as any)?.travelTimeMinutes ?? 15;
+      extras.onActionNarrative('探索', narrative, travelTime);
+    }
+  }, [syncStateToZustand, extras]);
 
   const rest = React.useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
-    engine.rest();
+    const result = engine.rest();
     syncStateToZustand();
-  }, [syncStateToZustand]);
+    if (result.success && extras?.onActionNarrative) {
+      const narrative = result.narrativeConstraint?.replace(/<\/?叙事>/g, '') ?? '';
+      const travelTime = (result.stateUpdates as any)?.travelTimeMinutes ?? 30;
+      extras.onActionNarrative('休息', narrative, travelTime);
+    }
+  }, [syncStateToZustand, extras]);
 
   const onChatMessageSent = React.useCallback(() => {
     if (!explorationPaused) {

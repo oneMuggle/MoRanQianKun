@@ -1,5 +1,8 @@
 import type { 校园亲密互动类型 } from '../../../models/intimacy';
-import type { 欲望阶段, 旁观者, 旁观者反应, 权力倾向 } from '../../../models/campusNSFW';
+import type { 欲望阶段, 旁观者, 旁观者反应 } from '../../../models/campusNSFW';
+
+// 从共享核心重新导出
+export { 权力倾向阈值, 欲望阶段列表 } from '../../../models/nsfwCore';
 
 export const 欲望阶段推进基础值: Record<校园亲密互动类型, number> = {
   '眼神交流': 5,
@@ -62,7 +65,6 @@ export const 欲望阶段冷却修正: Record<欲望阶段, number> = {
   '支配': 0.3,
 };
 
-export const 欲望阶段列表: 欲望阶段[] = ['克制', '试探', '渴望', '沉沦', '支配'];
 
 export const 旁观者类型修正: Record<旁观者['类型'], number> = {
   '普通同学': 1.0,
@@ -87,10 +89,3 @@ export const 旁观者反应权重: { 反应: 旁观者反应; 权重: number }[
   { 反应: '暗示嘲弄', 权重: 10 },
 ];
 
-export const 权力倾向阈值: { 最小值: number; 最大值: number; 倾向: 权力倾向 }[] = [
-  { 最小值: -100, 最大值: -50, 倾向: '绝对支配' },
-  { 最小值: -49, 最大值: -10, 倾向: '偏支配' },
-  { 最小值: -9, 最大值: 9, 倾向: '切换者' },
-  { 最小值: 10, 最大值: 49, 倾向: '偏服从' },
-  { 最小值: 50, 最大值: 100, 倾向: '绝对服从' },
-];

@@ -61,6 +61,74 @@ export function useNSFW系统初始化(deps: NSFW系统初始化依赖) {
         }
     }, [gameConfig?.校园NSFW设置?.启用校园NSFW深化系统, 校园系统?.欲望系统, 角色?.姓名, 社交, 设置校园系统]);
 
+    // BDSM 独立系统初始化
+    useEffect(() => {
+        const nsfwEnabled = gameConfig?.BDSMNSFW设置?.启用BDSM独立系统;
+        const BDSM系统已存在 = 校园系统?.BDSM系统;
+        const 游戏已开始 = 角色?.姓名;
+        const 有主要角色 = 社交?.some((n: NPC结构) => n.是否主要角色);
+
+        if (nsfwEnabled && !BDSM系统已存在 && 游戏已开始 && 有主要角色) {
+            const 关系档案: Record<string, any> = {};
+            社交.forEach((npc: NPC结构) => {
+                if (npc.是否主要角色) {
+                    关系档案[npc.id] = {
+                        阶段: '初识', 服从度: 0, 权力天平: 0,
+                        契约记录: [], 任务历史: [], 日常指令: [],
+                        里程碑: [], 安全词: '月光', 底线列表: [], 照片把柄: [],
+                    };
+                }
+            });
+
+            if (Object.keys(关系档案).length > 0) {
+                设置校园系统(prev => ({
+                    ...prev,
+                    BDSM系统: {
+                        关系档案,
+                        SM场景池: [],
+                        契约列表: [],
+                        指令队列: [],
+                        论坛帖子: [],
+                        论坛影响记录: {},
+                        关系网络: null,
+                    }
+                }));
+            }
+        }
+    }, [gameConfig?.BDSMNSFW设置?.启用BDSM独立系统, 校园系统?.BDSM系统, 角色?.姓名, 社交, 设置校园系统]);
+
+    // 露出 NSFW 独立系统初始化
+    useEffect(() => {
+        const nsfwEnabled = gameConfig?.ExposureNSFW设置?.启用露出系统;
+        const Exposure系统已存在 = 校园系统?.Exposure系统;
+        const 游戏已开始 = 角色?.姓名;
+        const 有主要角色 = 社交?.some((n: NPC结构) => n.是否主要角色);
+
+        if (nsfwEnabled && !Exposure系统已存在 && 游戏已开始 && 有主要角色) {
+            const 露出档案: Record<string, any> = {};
+            社交.forEach((npc: NPC结构) => {
+                if (npc.是否主要角色) {
+                    露出档案[npc.id] = {
+                        露出状态: { 当前等级: 0, 等级进度: 0, 最后一次露出尝试: new Date().toISOString(), 成功露出次数: 0, 暴露失败次数: 0, 最大紧张度记录: 0 },
+                        紧张度状态: { 当前值: 0, 周围人数: 0, 互动强度系数: 1.0, 周围人状态: '正常上课', NPC公开行为: '无' },
+                        网络流言: { 当前等级: 0, 传播渠道: [], 有无证据: false, 最新传播时间: new Date().toISOString(), 辟谣状态: '未辟谣' },
+                    };
+                }
+            });
+
+            if (Object.keys(露出档案).length > 0) {
+                设置校园系统(prev => ({
+                    ...prev,
+                    Exposure系统: {
+                        露出档案,
+                        旁观者记录: [],
+                        活动专属回忆: [],
+                    }
+                }));
+            }
+        }
+    }, [gameConfig?.ExposureNSFW设置?.启用露出系统, 校园系统?.Exposure系统, 角色?.姓名, 社交, 设置校园系统]);
+
     // 新增主要角色 NPC 时自动补全欲望档案
     useEffect(() => {
         const nsfwEnabled = gameConfig?.校园NSFW设置?.启用校园NSFW深化系统;
@@ -100,7 +168,20 @@ export function useNSFW系统初始化(deps: NSFW系统初始化依赖) {
                 const 新档案: Record<string, any> = {};
                 社交.forEach((npc: NPC结构) => {
                     if (npc.是否主要角色) {
-                        新档案[npc.id] = 创建乘客欲望档案();
+                        // 检测NPC是否与夜生活/酒吧相关
+                        const 出身 = (npc as any).出身背景?.名称 || '';
+                        const 状态 = (npc as any).状态 || '';
+                        const 当前地点 = (npc as any).当前地点 || '';
+                        const 是夜生活相关 = 出身.includes('调酒') || 出身.includes('酒吧') ||
+                            状态.includes('醉') || 状态.includes('微醺') ||
+                            当前地点.includes('酒吧');
+                        const 初始醉酒状态 = 是夜生活相关 ? {
+                            等级: '微醺' as const,
+                            行为大胆度: 25,
+                            记忆模糊度: 15,
+                            判断力下降: true,
+                        } : undefined;
+                        新档案[npc.id] = 创建乘客欲望档案({ 初始醉酒状态 });
                     }
                 });
                 if (Object.keys(新档案).length > 0) {
@@ -125,7 +206,19 @@ export function useNSFW系统初始化(deps: NSFW系统初始化依赖) {
 
         const 新档案: Record<string, any> = {};
         缺失档案的角色.forEach(npc => {
-            新档案[npc.id] = 创建乘客欲望档案();
+            const 出身 = (npc as any).出身背景?.名称 || '';
+            const 状态 = (npc as any).状态 || '';
+            const 当前地点 = (npc as any).当前地点 || '';
+            const 是夜生活相关 = 出身.includes('调酒') || 出身.includes('酒吧') ||
+                状态.includes('醉') || 状态.includes('微醺') ||
+                当前地点.includes('酒吧');
+            const 初始醉酒状态 = 是夜生活相关 ? {
+                等级: '微醺' as const,
+                行为大胆度: 25,
+                记忆模糊度: 15,
+                判断力下降: true,
+            } : undefined;
+            新档案[npc.id] = 创建乘客欲望档案({ 初始醉酒状态 });
         });
 
         设置都市网约车系统(prev => {
