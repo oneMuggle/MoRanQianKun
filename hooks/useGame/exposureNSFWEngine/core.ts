@@ -5,7 +5,7 @@
 
 import type { 露出状态, 露出偏好等级, 旁观者, 旁观者反应, 紧张度状态, 网络流言状态 } from '../../../models/exposureNSFW';
 import type { 欲望阶段 } from '../../../models/nsfwCore';
-import { 旁观者距离基础察觉率, 旁观者类型修正, 旁观者反应权重 } from '../campusNSFW/constants';
+import { 旁观者距离基础察觉率, 旁观者类型修正, 旁观者反应权重 } from '../../../models/exposureNSFW/constants';
 
 export function 计算露出偏好推进(
   当前档案: { 露出状态?: 露出状态 },

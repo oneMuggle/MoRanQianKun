@@ -4,7 +4,20 @@
  * 从 campusNSFW/bdsm-forum.ts 迁移，去校园化
  */
 
-import type { 论坛帖子 } from '../campusPhone';
+/** 通用基础帖子类型，不依赖校园手机模块 */
+export interface 基础帖子 {
+  id: string;
+  作者: string;
+  标题: string;
+  内容: string;
+  分类: string;
+  发布时间: string;
+  回复数: number;
+  浏览数: number;
+  点赞数: number;
+  是否置顶: boolean;
+  是否精华: boolean;
+}
 
 export type BDSM帖子分类 =
   | '匿名讨论'
@@ -30,7 +43,7 @@ export interface 寻主召奴信息 {
   解锁NPC姓名?: string;
 }
 
-export interface BDSM论坛帖子 extends 论坛帖子 {
+export interface BDSM论坛帖子 extends 基础帖子 {
   子分类: BDSM帖子分类;
   影响等级: 影响等级;
   寻主召奴信息?: 寻主召奴信息;

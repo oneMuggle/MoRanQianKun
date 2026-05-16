@@ -23,6 +23,7 @@ const settingsComponentMap: Record<string, React.LazyExoticComponent<React.FC<an
   photographyNSFW: React.lazy(() => import('../Settings/PhotographyNSFWSettings')),
   urbanDriverNSFW: React.lazy(() => import('../Settings/UrbanDriverNSFWSettings')),
   bdsmNSFW: React.lazy(() => import('../Settings/BDSMNSFWSettings')),
+  exposureNSFW: React.lazy(() => import('../Settings/ExposureNSFWSettings')),
   boardGameNSFW: React.lazy(() => import('../Settings/BoardGameNSFWSettings')),
 };
 
@@ -31,6 +32,7 @@ const dashboardLabelMap: Record<string, string> = {
   photographyNSFW: '写真仪表盘',
   urbanDriverNSFW: '网约车仪表盘',
   bdsmNSFW: 'BDSM 仪表盘',
+  exposureNSFW: '露出仪表盘',
   boardGameNSFW: '桌游社交仪表盘',
 };
 

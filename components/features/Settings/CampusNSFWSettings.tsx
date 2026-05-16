@@ -64,51 +64,6 @@ export const CampusNSFWSettings: React.FC<Props> = ({ settings, onChange }) => {
             onChange={(v) => update('启用多角关系', v)}
           />
 
-          {/* v1.1 露出与公开隐秘 */}
-          <NsfwSectionHeader title="露出与公开隐秘" />
-          <NsfwToggleSwitch
-            label="启用露出系统"
-            description="开启后 NPC 可能从被动风险转为主动追求暴露"
-            checked={settings.启用露出系统}
-            onChange={(v) => update('启用露出系统', v)}
-          />
-          <NsfwSelectOption
-            label="露出内容强度"
-            description="关闭: 不生成露出叙事 | 轻度: 私密半公开 | 中度: 半公共场所 | 深度: 公共场所"
-            value={settings.露出内容强度}
-            options={['关闭', '轻度', '中度', '深度']}
-            onChange={(v) => update('露出内容强度', v as any)}
-            disabled={!settings.启用露出系统}
-          />
-          <NsfwToggleSwitch
-            label="启用公开隐秘侵犯"
-            description="开启后在教室、会议、活动等场合可能触发秘密互动"
-            checked={settings.启用公开隐秘侵犯}
-            onChange={(v) => update('启用公开隐秘侵犯', v)}
-            disabled={!settings.启用露出系统}
-          />
-          <NsfwToggleSwitch
-            label="启用旁观者反应"
-            description="开启后周围人可能注意到并触发流言/后果"
-            checked={settings.启用旁观者反应}
-            onChange={(v) => update('启用旁观者反应', v)}
-            disabled={!settings.启用公开隐秘侵犯}
-          />
-          <NsfwToggleSwitch
-            label="启用网络传播"
-            description="开启后可能有偷拍、论坛讨论、群聊传播"
-            checked={settings.启用网络传播}
-            onChange={(v) => update('启用网络传播', v)}
-            disabled={!settings.启用旁观者反应}
-          />
-          <NsfwSelectOption
-            label="校园活动 NSFW 频率"
-            description="关闭: 活动不触发 NSFW | 低: 仅特殊活动 | 中: 中型活动 | 高: 所有活动"
-            value={settings.校园活动NSFW频率}
-            options={['关闭', '低', '中', '高']}
-            onChange={(v) => update('校园活动NSFW频率', v as any)}
-          />
-
           {/* v1.2 SM/支配服从 */}
           <NsfwSectionHeader title="SM/支配服从系统" />
           <NsfwToggleSwitch
@@ -247,66 +202,7 @@ export const CampusNSFWSettings: React.FC<Props> = ({ settings, onChange }) => {
             disabled={!settings.启用校园祭NSFW}
           />
 
-          {/* v1.5 BDSM 论坛 */}
-          <NsfwSectionHeader title="BDSM 论坛系统" />
-          <NsfwToggleSwitch
-            label="启用 BDSM 论坛"
-            description="开启后校园深夜板块增加 BDSM 子论坛，包含匿名讨论、寻主召奴等子分类"
-            checked={settings.启用BDSM论坛}
-            onChange={(v) => update('启用BDSM论坛', v)}
-          />
-          <NsfwSelectOption
-            label="BDSM 内容强度"
-            description="关闭: 不生成 | 轻度: 心理暗示 | 中度: 明确行为 | 深度: 详细场景"
-            value={settings.BDSM内容强度}
-            options={['关闭', '轻度', '中度', '深度']}
-            onChange={(v) => update('BDSM内容强度', v as any)}
-            disabled={!settings.启用BDSM论坛}
-          />
-          <NsfwToggleSwitch
-            label="启用 NPC 影响"
-            description="开启后浏览 BDSM 帖子会推进 NPC 欲望阶段"
-            checked={settings.启用BDSM_NPC影响}
-            onChange={(v) => update('启用BDSM_NPC影响', v)}
-            disabled={!settings.启用BDSM论坛}
-          />
-          <NsfwToggleSwitch
-            label="启用流言传播"
-            description="开启后严重/中等帖子会增加校园流言等级"
-            checked={settings.启用BDSM_流言传播}
-            onChange={(v) => update('启用BDSM_流言传播', v)}
-            disabled={!settings.启用BDSM论坛}
-          />
-
-          {/* v1.6 BDSM 关系管线 */}
-          <NsfwSectionHeader title="BDSM 关系管线" />
-          <NsfwToggleSwitch
-            label="启用 BDSM 关系管线"
-            description="开启后 NPC 欲望档案将追踪 BDSM 关系状态、服从度、权力天平等"
-            checked={settings.启用BDSM关系管线}
-            onChange={(v) => update('启用BDSM关系管线', v)}
-          />
-          <NsfwToggleSwitch
-            label="启用 BDSM 调教任务"
-            description="开启后 AI 每回合生成调教任务/日常指令，玩家可接受、报告完成或放弃"
-            checked={settings.启用BDSM调教任务}
-            onChange={(v) => update('启用BDSM调教任务', v)}
-            disabled={!settings.启用BDSM关系管线}
-          />
-          <NsfwToggleSwitch
-            label="启用 BDSM 契约系统"
-            description="开启后可与 NPC 协商并缔结 BDSM 契约，约定双方权利与义务"
-            checked={settings.启用BDSM契约系统}
-            onChange={(v) => update('启用BDSM契约系统', v)}
-            disabled={!settings.启用BDSM关系管线}
-          />
-          <NsfwToggleSwitch
-            label="启用 BDSM 见面预约"
-            description="开启后可与 NPC 预约见面时间与地点，系统将生成对应场景"
-            checked={settings.启用BDSM见面预约}
-            onChange={(v) => update('启用BDSM见面预约', v)}
-            disabled={!settings.启用BDSM关系管线}
-          />
+          {/* v1.5 BDSM 论坛 — 已迁移到独立 BDSM NSFW 系统 */}
         </>
       )}
     </div>
