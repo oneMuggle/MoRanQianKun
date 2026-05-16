@@ -33,6 +33,8 @@ import {
   MobileCampusDesireApp,
   UrbanDriverDashboard,
   MobileUrbanDriverApp,
+  ExposureDashboard,
+  MobileExposureDashboard,
   NsfwControlCenter,
   WorldbookManagerModal,
   MobileWorldbookManagerModal,
@@ -887,7 +889,7 @@ UIFeatureRegistry.register({
     desktopComponent: CampusDesireDashboard,
     mobileComponent: MobileCampusDesireApp,
     visibility: 'config-dependent',
-    configKey: '启用校园NSFW模式',
+    configKey: '启用校园NSFW深化系统',
     configValue: true,
     propsFactory: ({ state, setters, actions, modalManager }) => {
       const 校园系统 = (state as any).校园系统 || {};
@@ -939,7 +941,7 @@ UIFeatureRegistry.register({
     desktopComponent: PhotographyDashboard,
     mobileComponent: MobilePhotographyDashboard,
     visibility: 'config-dependent',
-    configKey: '启用写真NSFW模式',
+    configKey: '启用写真NSFW系统',
     configValue: true,
     propsFactory: ({ state, setters, modalManager }) => {
       const 写真系统 = (state as any).写真系统 || {};
@@ -970,13 +972,57 @@ UIFeatureRegistry.register({
     desktopComponent: UrbanDriverDashboard,
     mobileComponent: MobileUrbanDriverApp,
     visibility: 'config-dependent',
-    configKey: '启用都市网约车NSFW模式',
+    configKey: '启用都市网约车NSFW系统',
     configValue: true,
     propsFactory: ({ state, setters, modalManager }) => ({
       都市网约车系统: (state as any).都市网约车系统,
       onClose: () => {        modalManager.close('urbanDriver');
       },
     }),
+  },
+});
+
+// ExposureDashboard — 已迁移到新系统（完整 propsFactory）
+UIFeatureRegistry.register({
+  id: 'exposureDashboard',
+  name: '露出',
+  icon: '👁',
+  category: 'nsfw',
+  priority: 75,
+  version: '1.0.0',
+  eraId: 'contemporary',
+  dependencies: ['exposureNSFW'],
+  storyModuleId: 'exposureNSFW',
+  modal: {
+    desktopComponent: ExposureDashboard,
+    mobileComponent: MobileExposureDashboard,
+    visibility: 'config-dependent',
+    configKey: '启用露出系统',
+    configValue: true,
+    propsFactory: ({ state, modalManager }) => {
+      const 校园系统 = (state as any).校园系统 || {};
+      const Exposure系统 = 校园系统.Exposure系统 || {};
+      const 露出档案 = Exposure系统.露出档案 ?? {};
+      const 社交 = (state as any).社交 || [];
+      const 旁观者记录 = Exposure系统.旁观者记录 ?? [];
+      const 档案 = Object.fromEntries(
+        Object.entries(露出档案).map(([id, data]: [string, any]) => [
+          id,
+          {
+            npcId: id,
+            npcName: 社交.find((n: any) => n.id === id)?.姓名 ?? id,
+            露出状态: data.露出状态,
+            紧张度状态: data.紧张度状态,
+            网络流言: data.网络流言,
+          },
+        ])
+      );
+      return {
+        露出档案: 档案,
+        旁观者记录,
+        onClose: () => modalManager.close('exposureDashboard'),
+      };
+    },
   },
 });
 
@@ -1000,11 +1046,19 @@ UIFeatureRegistry.register({
       onClose: () => {        modalManager.close('nsfwCenter');
       },
       onOpenDashboard: (moduleId: string) => {
-        modalManager.close('nsfwCenter');
-        if (moduleId === 'campusNSFW') modalManager.open('campusDesire');
-        else if (moduleId === 'photographyNSFW') modalManager.open('photography');
-        else if (moduleId === 'urbanDriverNSFW') modalManager.open('urbanDriver');
-        else if (moduleId === 'boardGameNSFW') modalManager.open('boardGameDashboard');
+        const dashboardMap: Record<string, string> = {
+          campusNSFW: 'campusDesire',
+          photographyNSFW: 'photography',
+          urbanDriverNSFW: 'urbanDriver',
+          exposureNSFW: 'exposureDashboard',
+          boardGameNSFW: 'boardGameDashboard',
+          bdsmNSFW: 'campusDesire', // BDSM 没有独立仪表盘，打开校园欲望（内含BDSM子弹窗）
+        };
+        const target = dashboardMap[moduleId];
+        if (!target) return;
+        // 统一使用事件系统，确保 close 和 open 都走同一条路径
+        window.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'nsfwCenter' } }));
+        window.dispatchEvent(new CustomEvent('modal:open', { detail: { id: target } }));
       },
     }),
   },

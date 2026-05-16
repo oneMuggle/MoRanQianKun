@@ -197,48 +197,83 @@ interface ExposureDashboardProps {
   旁观者记录: 旁观者[];
 }
 
-export const ExposureDashboard: React.FC<ExposureDashboardProps> = ({ 露出档案, 旁观者记录 }) => {
+export const ExposureDashboard: React.FC<ExposureDashboardProps & { onClose?: () => void }> = ({ 露出档案, 旁观者记录, onClose }) => {
   const 档案列表 = useMemo(() => Object.values(露出档案), [露出档案]);
   const 有数据的档案 = 档案列表.filter(
     d => (d.露出状态?.当前等级 ?? 0) > 0 || (d.紧张度状态?.当前值 ?? 0) > 0 || (d.网络流言?.当前等级 ?? 0) > 0
   );
 
+  const 内容 = (
+    <>
+      {/* 头部 */}
+      <div className="shrink-0 px-6 py-5 border-b border-wuxia-gold/20 flex items-center justify-between">
+        <div>
+          <h2 className="text-wuxia-gold font-serif font-bold text-xl tracking-[0.28em]">露出仪表盘</h2>
+          <p className="text-xs text-gray-500 mt-1">{有数据的档案.length} / {档案列表.length} 活跃</p>
+        </div>
+        {onClose && (
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-700 bg-black/50 text-gray-300 hover:text-white hover:border-gray-500 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        )}
+      </div>
+
+      {/* 内容区 */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar">
+        <div className="space-y-4">
+          {/* 旁观者记录 */}
+          {旁观者记录.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-400 mb-2">旁观者记录</h3>
+              <div className="space-y-1">
+                {旁观者记录.map((w, i) => (
+                  <旁观者记录Card key={w.id || i} 旁观者={w} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* NPC 露出档案 */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-400 mb-2">NPC 露出档案</h3>
+            <div className="space-y-2">
+              {档案列表.map(d => (
+                <ExposureProfileCard key={d.npcId} 数据={d} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   if (档案列表.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-600">
-        <p className="text-lg">暂无露出档案</p>
-        <p className="text-sm mt-2">启用露出系统后，主要角色 NPC 将自动创建露出档案</p>
+      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
+        <div className="w-full max-w-4xl max-h-[85vh] bg-[#0b0b0c]/95 border border-wuxia-gold/30 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.9)] flex flex-col">
+          <div className="shrink-0 px-6 py-5 border-b border-wuxia-gold/20 flex items-center justify-between">
+            <h2 className="text-wuxia-gold font-serif font-bold text-xl tracking-[0.28em]">露出仪表盘</h2>
+            {onClose && (
+              <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-700 bg-black/50 text-gray-300 hover:text-white hover:border-gray-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            )}
+          </div>
+          <div className="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar">
+            <div className="text-center py-16 text-gray-600">
+              <p className="text-lg">暂无露出档案</p>
+              <p className="text-sm mt-2">启用露出系统后，主要角色 NPC 将自动创建露出档案</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">露出仪表盘</h2>
-        <span className="text-xs text-gray-500">{有数据的档案.length} / {档案列表.length} 活跃</span>
-      </div>
-
-      {/* 旁观者记录 */}
-      {旁观者记录.length > 0 && (
-        <div>
-          <h3 className="text-sm font-semibold text-gray-400 mb-2">旁观者记录</h3>
-          <div className="space-y-1">
-            {旁观者记录.map((w, i) => (
-              <旁观者记录Card key={w.id || i} 旁观者={w} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* NPC 露出档案 */}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-400 mb-2">NPC 露出档案</h3>
-        <div className="space-y-2">
-          {档案列表.map(d => (
-            <ExposureProfileCard key={d.npcId} 数据={d} />
-          ))}
-        </div>
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
+      <div className="w-full max-w-4xl max-h-[85vh] bg-[#0b0b0c]/95 border border-wuxia-gold/30 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.9)] flex flex-col">
+        {内容}
       </div>
     </div>
   );

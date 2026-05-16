@@ -86,6 +86,9 @@ export function ModalRenderer({
             window.dispatchEvent(new CustomEvent('modal:open', { detail: { id, payload } }));
           },
           close: onClose,
+          replace: (closeId: string, openId: string, payload?: unknown) => {
+            window.dispatchEvent(new CustomEvent('modal:replace', { detail: { closeId, openId, payload } }));
+          },
           closeAll: () => {
             window.dispatchEvent(new CustomEvent('modal:closeAll'));
           },

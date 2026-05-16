@@ -69,6 +69,10 @@ export const MobileCampusDesireApp = 创建可预加载懒组件(() => import('.
 export const UrbanDriverDashboard = 创建可预加载懒组件(() => import('./UrbanDriverDashboard'));
 export const MobileUrbanDriverApp = 创建可预加载懒组件(() => import('./MobileUrbanDriverApp'));
 
+// Exposure NSFW
+export const ExposureDashboard = 创建可预加载懒组件(() => import('./ExposureDashboard'));
+export const MobileExposureDashboard = 创建可预加载懒组件(() => import('./MobileExposureDashboard'));
+
 // NSFW Center
 export const NsfwControlCenter = 创建可预加载懒组件(() => import('./NSFWCenter/NsfwControlCenter'));
 

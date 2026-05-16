@@ -64,6 +64,15 @@ export function useModalManager(): ModalManager {
     [openModals],
   );
 
+  const replace = React.useCallback((closeId: string, openId: string, payload?: unknown) => {
+    setOpenModals(prev => {
+      const next = new Map(prev);
+      next.delete(closeId);
+      next.set(openId, payload ?? true);
+      return next;
+    });
+  }, []);
+
   // 自动从注册表生成 openers/closers
   const openers = React.useMemo(() => {
     const result: Record<string, () => void> = {};
@@ -81,5 +90,5 @@ export function useModalManager(): ModalManager {
     return result;
   }, [close]);
 
-  return { open, close, closeAll, toggle, isOpen, openModals, openers, closers };
+  return { open, close, replace, closeAll, toggle, isOpen, openModals, openers, closers };
 }

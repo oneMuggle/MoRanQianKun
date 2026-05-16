@@ -20,6 +20,7 @@ const App: React.FC = () => {
     const modalManager = useModalManager();
 
     // 监听新系统弹窗事件（由 ModalRenderer 的 modalManager 派发）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     React.useEffect(() => {
         const handleOpen = (e: Event) => {
             const detail = (e as CustomEvent).detail as { id: string; payload?: unknown };
@@ -29,6 +30,10 @@ const App: React.FC = () => {
             const detail = (e as CustomEvent).detail as { id: string };
             modalManager.close(detail.id);
         };
+        const handleReplace = (e: Event) => {
+            const detail = (e as CustomEvent).detail as { closeId: string; openId: string; payload?: unknown };
+            modalManager.replace(detail.closeId, detail.openId, detail.payload);
+        };
         const handleCloseAll = () => modalManager.closeAll();
         const handleToggle = (e: Event) => {
             const detail = (e as CustomEvent).detail as { id: string };
@@ -36,15 +41,17 @@ const App: React.FC = () => {
         };
         window.addEventListener('modal:open', handleOpen);
         window.addEventListener('modal:close', handleClose);
+        window.addEventListener('modal:replace', handleReplace);
         window.addEventListener('modal:closeAll', handleCloseAll);
         window.addEventListener('modal:toggle', handleToggle);
         return () => {
             window.removeEventListener('modal:open', handleOpen);
             window.removeEventListener('modal:close', handleClose);
+            window.removeEventListener('modal:replace', handleReplace);
             window.removeEventListener('modal:closeAll', handleCloseAll);
             window.removeEventListener('modal:toggle', handleToggle);
         };
-    }, [modalManager]);
+    }, []); // modalManager 方法全部是 useCallback，引用稳定，无需依赖
 
     // --- activeMobileWindow (needed for useAppModalState deps) ---
     const activeMobileWindow = React.useMemo(() => {

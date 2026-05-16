@@ -16,6 +16,7 @@ export type ModuleVisibility = 'always' | 'era-dependent' | 'config-dependent' |
 export interface ModalManagerAPI {
   open: (moduleId: string, payload?: unknown) => void;
   close: (moduleId: string) => void;
+  replace: (closeId: string, openId: string, payload?: unknown) => void;
   closeAll: () => void;
   toggle: (moduleId: string) => void;
   isOpen: (moduleId: string) => boolean;

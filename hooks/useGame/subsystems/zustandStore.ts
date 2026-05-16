@@ -18,6 +18,9 @@ import type { 角色数据结构 } from '../../../models/character';
 import type { OpeningConfig } from '../../../models/system';
 import type { 桌游类型 } from '../../../models/boardGameNSFW/core';
 import type { EngineType, PauseReason, ActionLogEntry, ScheduledEvent } from '../engine/types';
+import type { GalgameState } from '../../../models/avg/galgame';
+import type { BattleLogEntry, BattleOutcome } from '../engine/rpgBattleEngine';
+import type { BattlePhase } from '../rpg/battle/battleStateMachine';
 
 // Type helpers for slices (defined locally to avoid circular deps with useGame.ts)
 type 最近开局配置结构 = {
@@ -767,9 +770,99 @@ const createActionLogSlice: ZustandSlice<ActionLogSlice> = (set) => ({
   incrementLogTurn: () => set((state) => ({ logTurn: state.logTurn + 1 })),
 });
 
+// ==================== RPG Slice (Zustand) ====================
+
+interface RpgSliceState {
+  rpgBattleActive: boolean;
+  rpgBattlePhase: BattlePhase | null;
+  rpgBattleRound: number;
+  rpgBattleCurrentActor: string | null;
+  rpgBattleLog: BattleLogEntry[];
+  rpgBattlePlayerHP: { current: number; max: number } | null;
+  rpgBattleOutcome: BattleOutcome['winner'] | null;
+}
+
+interface RpgSliceActions {
+  setRpgState: (partial: Partial<RpgSliceState>) => void;
+  resetRpgState: () => void;
+}
+
+interface RpgSlice extends RpgSliceState, RpgSliceActions {}
+
+const createRpgSlice: ZustandSlice<RpgSlice> = (set) => ({
+  rpgBattleActive: false,
+  rpgBattlePhase: null,
+  rpgBattleRound: 0,
+  rpgBattleCurrentActor: null,
+  rpgBattleLog: [],
+  rpgBattlePlayerHP: null,
+  rpgBattleOutcome: null,
+  setRpgState: (partial) => set((state) => ({ ...state, ...partial })),
+  resetRpgState: () => set({
+    rpgBattleActive: false,
+    rpgBattlePhase: null,
+    rpgBattleRound: 0,
+    rpgBattleCurrentActor: null,
+    rpgBattleLog: [],
+    rpgBattlePlayerHP: null,
+    rpgBattleOutcome: null,
+  }),
+});
+
+// ==================== AVG / Galgame Slice (Zustand) ====================
+
+interface AvgSliceState {
+  avgGalgameState: GalgameState | null;
+  avgActiveRouteId: string | null;
+  avgActiveRouteName: string | null;
+  avgUnlockedRouteIds: string[];
+  avgLockedRouteIds: string[];
+  avgCompletedEndingIds: string[];
+  avgUnlockedCGIds: string[];
+  avgTriggeredEventIds: string[];
+  avgIntimacyLevel: string | null;
+  avgAvailableCGs: number;
+  avgUnlockedCGs: number;
+}
+
+interface AvgSliceActions {
+  setAvgState: (partial: Partial<AvgSliceState>) => void;
+  resetAvgState: () => void;
+}
+
+interface AvgSlice extends AvgSliceState, AvgSliceActions {}
+
+const createAvgSlice: ZustandSlice<AvgSlice> = (set) => ({
+  avgGalgameState: null,
+  avgActiveRouteId: null,
+  avgActiveRouteName: null,
+  avgUnlockedRouteIds: [],
+  avgLockedRouteIds: [],
+  avgCompletedEndingIds: [],
+  avgUnlockedCGIds: [],
+  avgTriggeredEventIds: [],
+  avgIntimacyLevel: null,
+  avgAvailableCGs: 0,
+  avgUnlockedCGs: 0,
+  setAvgState: (partial) => set((state) => ({ ...state, ...partial })),
+  resetAvgState: () => set({
+    avgGalgameState: null,
+    avgActiveRouteId: null,
+    avgActiveRouteName: null,
+    avgUnlockedRouteIds: [],
+    avgLockedRouteIds: [],
+    avgCompletedEndingIds: [],
+    avgUnlockedCGIds: [],
+    avgTriggeredEventIds: [],
+    avgIntimacyLevel: null,
+    avgAvailableCGs: 0,
+    avgUnlockedCGs: 0,
+  }),
+});
+
 // ==================== Store ====================
 
-export interface GameStore extends UISlice, TravelSlice, DeviceSlice, ImageSlice, SettingsSlice, WorldSlice, MemorySlice, VariableSlice, OpeningSlice, SceneConfigSlice, BoardGameSlice, ExplorationSlice, EngineSlice, TurnSlice, ActionLogSlice {}
+export interface GameStore extends UISlice, TravelSlice, DeviceSlice, ImageSlice, SettingsSlice, WorldSlice, MemorySlice, VariableSlice, OpeningSlice, SceneConfigSlice, BoardGameSlice, ExplorationSlice, EngineSlice, TurnSlice, ActionLogSlice, RpgSlice, AvgSlice {}
 
 export const useGameStore = create<GameStore>()((...a) => ({
     ...createUISlice(...a),
@@ -787,5 +880,7 @@ export const useGameStore = create<GameStore>()((...a) => ({
     ...createEngineSlice(...a),
     ...createTurnSlice(...a),
     ...createActionLogSlice(...a),
+    ...createRpgSlice(...a),
+    ...createAvgSlice(...a),
 }));
 
