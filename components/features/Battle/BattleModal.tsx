@@ -2,6 +2,7 @@ import React from 'react';
 import { 角色数据结构, 战斗状态结构 } from '../../../types';
 import { IconSwords, IconYinYang } from '../../ui/Icons';
 import BattleActionPanel from './BattleActionPanel';
+import { RpgBattleIntegration, shouldUseRpgBattle } from './RpgBattleIntegration';
 import { 战斗行动结果 } from '../../../hooks/useGame/combatCalculation';
 
 interface Props {
@@ -180,8 +181,16 @@ const BattleModal: React.FC<Props> = ({ character, battle, onClose, onAction }) 
                                 })}
                                 </div>
 
-                                {/* 战斗操作面板 */}
-                                {onAction && (
+                                {/* 战斗操作面板 — RPG 引擎模式 */}
+                                {shouldUseRpgBattle(battle) && (
+                                    <RpgBattleIntegration
+                                        character={character}
+                                        battle={battle}
+                                    />
+                                )}
+
+                                {/* 战斗操作面板 — 传统模式 */}
+                                {!shouldUseRpgBattle(battle) && onAction && (
                                     <div className="border-t border-wuxia-gold/10 pt-4">
                                         <h4 className="text-sm text-wuxia-gold/80 font-serif tracking-widest mb-2">
                                             战斗指令

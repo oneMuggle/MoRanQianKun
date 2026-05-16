@@ -14,6 +14,7 @@ import ChatList from '../features/Chat/ChatList';
 import InputArea from '../features/Chat/InputArea';
 import { GalgameView } from './GalgameView';
 import { 懒加载边界, MobileMusicPlayer } from '../features/lazyComponents';
+import { useGalgameEngine } from '../../hooks/useGalgameEngine';
 
 // ============================================================================
 // 类型
@@ -126,6 +127,9 @@ export function GameView({
     renderTickerItems,
     requestConfirm,
 }: GameViewProps) {
+    // Galgame 引擎连接
+    const galgameEngine = useGalgameEngine();
+
     const playerProfile = React.useMemo(
         () => ({ 姓名: (state.角色 as any)?.姓名, 头像图片URL: 玩家头像地址 }),
         [(state.角色 as any)?.姓名, 玩家头像地址]
@@ -297,6 +301,9 @@ export function GameView({
                                     }}
                                     onSend={(actions as any).handleSend}
                                     onStop={(actions as any).handleStop}
+                                    avgSnapshot={galgameEngine.avgSnapshot}
+                                    onEnterRoute={galgameEngine.onEnterRoute}
+                                    engineSuggestedOptions={galgameEngine.engineSuggestedOptions}
                                 />
                             ) : (
                                 <>

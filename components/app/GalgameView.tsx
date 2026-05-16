@@ -12,6 +12,7 @@ import { GalgameDialogueBox } from '../features/Galgame/GalgameDialogueBox';
 import type { DialogueOption } from '../features/Galgame/GalgameDialogueBox';
 import { DialogueBacklog } from '../features/Galgame/DialogueBacklog';
 import { useAggregatedDialogue } from '../../hooks/useGame/ui/useAggregatedDialogue';
+import type { AvgStateBridgeSnapshot } from '../../hooks/useAvgStateBridge';
 
 interface GalgameViewProps {
   /** 聊天历史记录 */
@@ -36,6 +37,12 @@ interface GalgameViewProps {
   onSend: (text: string) => void;
   /** 停止生成 */
   onStop: () => void;
+  /** AVG 引擎状态快照（可选，接入引擎后提供） */
+  avgSnapshot?: AvgStateBridgeSnapshot | null;
+  /** 进入路线回调（可选） */
+  onEnterRoute?: (routeId: string, npcId: string) => boolean;
+  /** 引擎建议的路线选项 */
+  engineSuggestedOptions?: Array<{ id: string; text: string; npcId: string }>;
 }
 
 export const GalgameView: React.FC<GalgameViewProps> = ({
@@ -48,6 +55,9 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
   sceneName,
   timeOfDay = '上午',
   onOptionSelect,
+  avgSnapshot,
+  onEnterRoute,
+  engineSuggestedOptions,
 }) => {
   const [showBacklog, setShowBacklog] = useState(false);
   // 段进度计数器：当前显示到第几段（0 = 最新段，递增向前翻阅）
@@ -111,6 +121,16 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
   const options: DialogueOption[] = useMemo(
     () => (currentOptions || []).map((opt, idx) => ({ id: `opt-${idx}`, text: opt })),
     [currentOptions],
+  );
+
+  // 引擎建议的选项（当无 currentOptions 但引擎有路线建议时显示）
+  const suggestedOptions: DialogueOption[] = useMemo(
+    () => (engineSuggestedOptions || []).map((opt) => ({
+      id: `route-${opt.id}`,
+      text: opt.text,
+      consequence: undefined,
+    })),
+    [engineSuggestedOptions],
   );
 
   // 空状态
@@ -188,10 +208,47 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
         />
       ))}
 
+      {/* 路线状态指示器（引擎接入后显示） */}
+      {avgSnapshot?.activeRouteName && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30">
+          <div className="px-4 py-1.5 bg-gray-900/80 backdrop-blur-sm border border-wuxia-gold/30 rounded-full">
+            <span className="text-xs text-wuxia-gold/80">路线: {avgSnapshot.activeRouteName}</span>
+            {avgSnapshot.intimacyLabel && (
+              <span className="text-xs text-wuxia-gold/50 ml-2">· {avgSnapshot.intimacyLabel}</span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* 对话区域 */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
         <div className="mx-4 mb-4 md:mx-auto md:mb-6 md:max-w-3xl">
-          {/* 选项列表 — Galgame 风格：在正文上方，紧凑排列 */}
+          {/* 引擎建议的路线选项 */}
+          {suggestedOptions.length > 0 && !loading && segmentIndex === 0 && (
+            <div className="mb-2 space-y-1.5">
+              {suggestedOptions.map((option) => (
+                <button
+                  key={option.id}
+                  className="w-full text-left bg-gray-900/90 border border-pink-500/30 hover:border-pink-400/60 rounded px-3 py-2 transition-colors group flex items-center gap-2"
+                  onClick={() => {
+                    // 尝试进入路线
+                    const suggested = engineSuggestedOptions?.find((s) => s.id === option.id.replace('route-', ''));
+                    if (suggested && onEnterRoute) {
+                      onEnterRoute(suggested.id, suggested.npcId);
+                    }
+                    onOptionSelect(option.id);
+                  }}
+                >
+                  <span className="w-4 h-4 rounded-full border border-pink-500/30 flex items-center justify-center shrink-0 group-hover:border-pink-400/60 group-hover:bg-pink-500/10">
+                    <span className="w-1.5 h-1.5 rounded-full bg-pink-400/40 group-hover:bg-pink-400/70" />
+                  </span>
+                  <span className="text-sm text-pink-300/90 group-hover:text-pink-200">{option.text}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* 普通选项（AI 给出的选项） */}
           {options.length > 0 && !loading && segmentIndex === 0 && (
             <div className="mb-2 space-y-1.5">
               {options.map((option) => (

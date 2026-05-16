@@ -8,8 +8,12 @@
 - [x] Phase A1: 创建 Engine-to-React-State Bridge（`useAvgStateBridge.ts`, `useRpgStateBridge.ts`）
 - [x] Phase A2: 创建 UI Action-to-Engine Dispatcher（`avgActionDispatcher.ts`, `rpgActionDispatcher.ts`）
 - [x] Zustand Store 扩展（AVG slice + RPG slice）
-- [ ] Phase A3: Galgame Engine-UI Connection
-- [ ] Phase B: Galgame 完善
+- [x] Phase A3: Galgame Engine-UI Connection（GalgameView 接入引擎 + 路线指示器 + 建议选项）
+- [x] Phase B1: Galgame 事件系统（galgameEventBus.ts）
+- [x] Phase B2: Save/Load 序列化（galgameSerializer.ts + 存档结构扩展）
+- [x] Phase B3: AI 驱动的 CG 生成管线（galgameCgGenerator.ts）
+- [ ] Phase B4: 路线/结局 UI 提示
+- [ ] Phase B5: 对话树与分支叙事
 - [ ] Phase C: RPG UI 集成
 - [ ] Phase D: 系统优化
 
@@ -107,11 +111,11 @@
 
 ### Phase C: RPG UI 集成
 
-#### C1. RPG Battle UI
-- 修改 `components/features/BattleModal.tsx` — 接入 `rpgBattleEngine`
-- 实现回合制战斗 UI：行动顺序、技能选择、伤害显示、Buff 状态
-- 用户操作 → dispatcher → engine → state bridge → UI 更新
-- **预期产出**: 1 个文件大幅修改
+#### C1. RPG Battle UI — [x] 已完成
+- 创建 `components/features/Battle/RpgBattleIntegration.tsx` — RPG 战斗引擎集成组件
+- 修改 `components/features/Battle/BattleModal.tsx` — 条件渲染 RPG/传统两种模式
+- 实现回合制战斗 UI：回合计数、当前行动者、HP 显示、战斗日志
+- 用户操作 → engine → state bridge → Zustand → UI 更新
 
 #### C2. RPG Equipment UI
 - 修改 `components/features/EquipmentModal.tsx` — 接入 `rpgEquipEngine`
