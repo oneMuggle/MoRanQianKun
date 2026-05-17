@@ -220,6 +220,7 @@ export interface NPC结构 {
     外貌描写?: string;
     身材描写?: string;
     衣着风格?: string;
+    穿着风格演变趋势?: string; // 当NPC性癖/经历/人格变化时，穿着风格可能的演变方向
 
     // --- 新增：详细服饰档案 ---
     服饰档案?: NPC服饰档案;

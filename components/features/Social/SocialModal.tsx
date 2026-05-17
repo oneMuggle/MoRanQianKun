@@ -875,6 +875,13 @@ const SocialModal: React.FC<Props> = ({
                                                                                 </div>
                                                                             </div>
                                                                         )}
+                                                                        {/* 穿着风格演变趋势 */}
+                                                                        {currentNPC.穿着风格演变趋势 && (
+                                                                            <div className="bg-black/20 rounded-lg p-3 space-y-2">
+                                                                                <div className="text-pink-300/60 text-xs font-semibold mb-1">风格演变趋势</div>
+                                                                                <div className="text-gray-400 text-xs leading-relaxed">{currentNPC.穿着风格演变趋势}</div>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 )}
                                                             </div>

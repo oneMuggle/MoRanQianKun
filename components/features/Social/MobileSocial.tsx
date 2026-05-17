@@ -817,6 +817,13 @@ const MobileSocial: React.FC<Props> = ({
                                                                         </div>
                                                                     </div>
                                                                 )}
+                                                                {/* 穿着风格演变趋势 */}
+                                                                {currentNPC.穿着风格演变趋势 && (
+                                                                    <div className="bg-black/20 rounded-lg p-2.5 space-y-1.5">
+                                                                        <div className="text-pink-300/60 text-[10px] font-semibold">风格演变趋势</div>
+                                                                        <div className="text-gray-400 text-[11px] leading-relaxed">{currentNPC.穿着风格演变趋势}</div>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </div>
