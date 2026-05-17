@@ -368,9 +368,9 @@ export const useGame = () => {
     } = memoryRuntime;
 
     // 社交列表安全包装器（在 workflowDomain 之前定义，供 imageDomain 使用）
-    const 规范化社交列表安全 = (raw?: any[], options?: { 合并同名?: boolean }) => {
+    const 规范化社交列表安全 = (raw?: any[], options?: { 合并同名?: boolean; eraId?: string | null }) => {
         const list = Array.isArray(raw) ? raw : [];
-        return 规范化社交列表(list, options);
+        return 规范化社交列表(list, { ...options, eraId: options?.eraId ?? currentEra });
     };
 
     // ==================== 图片生成域 ====================

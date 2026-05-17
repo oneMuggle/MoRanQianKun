@@ -494,7 +494,27 @@ export const 构建NPC上下文 = (
             亲密度等级: typeof npc?.亲密度等级 === 'number' ? npc.亲密度等级 : undefined,
             里象心法: npc?.里象心法 ? 清理空字段({ ...npc.里象心法 }) : undefined,
             当前服装状态: npc?.当前服装状态 ? 清理空字段({ ...npc.当前服装状态 }) : undefined,
-            NSFW行为特征: npc?.NSFW行为特征 ? 清理空字段({ ...npc.NSFW行为特征 }) : undefined
+            NSFW行为特征: npc?.NSFW行为特征 ? 清理空字段({ ...npc.NSFW行为特征 }) : undefined,
+
+            // 分部位服饰档案
+            服饰档案: npc?.服饰档案 ? 清理空字段({ ...npc.服饰档案 }) : undefined,
+
+            // NSFW 道具档案
+            道具档案: npc?.道具档案 ? 清理空字段({ ...npc.道具档案 }) : undefined,
+
+            // NSFW 增强档案
+            性癖档案: npc?.性癖档案 ? (() => {
+                const 档案 = { ...npc.性癖档案 };
+                return 清理空字段({
+                    核心偏好: Array.isArray(档案.核心偏好) ? 档案.核心偏好 : undefined,
+                    隐藏偏好: Array.isArray(档案.隐藏偏好) && 档案.隐藏偏好.length > 0 ? 档案.隐藏偏好 : undefined,
+                    绝对禁忌: Array.isArray(档案.绝对禁忌) && 档案.绝对禁忌.length > 0 ? 档案.绝对禁忌 : undefined,
+                    可协商: Array.isArray(档案.可协商) && 档案.可协商.length > 0 ? 档案.可协商 : undefined,
+                    倾向摘要: typeof 档案.倾向摘要 === 'string' ? 档案.倾向摘要 : undefined,
+                });
+            })() : undefined,
+            敏感点档案: npc?.敏感点档案 ? 清理空字段({ ...npc.敏感点档案 }) : undefined,
+            人格档案: npc?.人格档案 ? 清理空字段({ ...npc.人格档案 }) : undefined
         });
     };
 

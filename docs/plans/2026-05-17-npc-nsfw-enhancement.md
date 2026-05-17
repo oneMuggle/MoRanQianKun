@@ -289,6 +289,14 @@ export function 生成NSFW画像(npc: NPC结构, eraId: string): NPCNSFW画像 {
 - [x] 在 `hooks/useGame/systemPromptBuilder.ts` 中传递 `启用NSFW模式` 选项
 - [x] `hooks/useGame/npcContext/contextBuilder.ts` 同步注入（备用路径）
 
+### Phase 8：自动填充机制
+- [x] 在 `规范化社交列表()` 中集成 `自动填充NSFW档案()` 调用
+- [x] 新增 `规范化社交列表选项` 接口，支持 `eraId` 参数
+- [x] `useGame.ts` 中 `规范化社交列表安全` 自动传递 `currentEra`
+- [x] 更新所有 deps 接口类型声明（saveCoordinator, sessionLifecycleWorkflow, useHistoryAndMemory, useWorldAndPlanning）
+- [x] 导出 `规范化社交列表选项` 类型
+- [x] TypeScript 编译验证通过（修改文件无新增错误）
+
 ---
 
 ## 复杂度评估
