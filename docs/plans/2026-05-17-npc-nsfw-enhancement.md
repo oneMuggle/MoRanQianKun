@@ -285,6 +285,9 @@ export function 生成NSFW画像(npc: NPC结构, eraId: string): NPCNSFW画像 {
 ### Phase 7：验证与集成
 - [x] TypeScript 编译通过（0 错误）
 - [x] 验证与现有 flat string 字段的向后兼容（NPC结构保留原字段，新字段可选）
+- [x] 在 `hooks/useGame/npc/npcContext.ts` 的 `构建NPC上下文` 中注入 `NSFW增强注入`
+- [x] 在 `hooks/useGame/systemPromptBuilder.ts` 中传递 `启用NSFW模式` 选项
+- [x] `hooks/useGame/npcContext/contextBuilder.ts` 同步注入（备用路径）
 
 ---
 

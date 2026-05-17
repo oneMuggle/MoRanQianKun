@@ -1690,7 +1690,8 @@ export const 构建系统提示词 = ({
         cultivationSystemEnabled: 启用修炼体系,
         eraId: options?.eraId,
         启用子纪元里模式: normalizedGameConfig.启用子纪元里模式,
-        子纪元里模式阶段: normalizedGameConfig.子纪元里模式阶段
+        子纪元里模式阶段: normalizedGameConfig.子纪元里模式阶段,
+        启用NSFW模式: normalizedGameConfig.启用NSFW模式 ?? false
     });
     const contextMapAndBuilding = 构建地图建筑状态文本(statePayload);
     const promptHeader = [

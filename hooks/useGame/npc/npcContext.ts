@@ -6,6 +6,7 @@ import { 解析境界映射值 } from '../../../prompts/runtime/fandom';
 import { 计算亲密度等级 } from '../../../models/intimacy';
 import { 构建NPC表里切换注入, 构建里模式阶段注入 } from '../../../prompts/runtime/eraLiMode';
 import type { LiModeStage } from '../../../models/eraTheme/types';
+import { 构建NPCNSFW注入 } from '../../../prompts/runtime/npcNSFWEnhancement';
 
 type 生图基础数据选项 = {
     cultivationSystemEnabled?: boolean;
@@ -140,6 +141,7 @@ export const 构建NPC上下文 = (
         eraId?: string | null;
         启用子纪元里模式?: Record<string, boolean>;
         子纪元里模式阶段?: Record<string, LiModeStage>;
+        启用NSFW模式?: boolean;
     }
 ): {
     在场数据块: string;
@@ -575,6 +577,8 @@ export const 构建NPC上下文 = (
         const 里模式注入 = 构建NPC表里切换注入(npc, eraId, liModeEnabled);
         const stage: LiModeStage = npc.里模式阶段 ?? options?.子纪元里模式阶段?.[eraId ?? ''] ?? '羞耻';
         const 里模式阶段注入 = 构建里模式阶段注入(eraId, stage, liModeEnabled);
+        const nsfwEnabled = options?.启用NSFW模式 ?? false;
+        const NSFW增强注入 = 构建NPCNSFW注入(npc, eraId, nsfwEnabled);
         return {
             索引: 基础数据.索引,
             id: 基础数据.id,
@@ -595,7 +599,8 @@ export const 构建NPC上下文 = (
             总结记忆: 记忆展示.总结记忆,
             记忆: 记忆展示.记忆,
             ...(里模式注入 ? { 里模式注入 } : {}),
-            ...(里模式阶段注入 ? { 里模式阶段注入 } : {})
+            ...(里模式阶段注入 ? { 里模式阶段注入 } : {}),
+            ...(NSFW增强注入 ? { NSFW增强注入 } : {})
         };
     };
 
@@ -626,7 +631,8 @@ export const 构建NPC上下文 = (
                         }])
                     )
                 } : {}),
-                ...(n.队伍战斗附加 ? { 战斗状态: n.队伍战斗附加 } : {})
+                ...(n.队伍战斗附加 ? { 战斗状态: n.队伍战斗附加 } : {}),
+                ...(n.NSFW增强注入 ? { NSFW增强注入: n.NSFW增强注入 } : {})
             });
         });
 
