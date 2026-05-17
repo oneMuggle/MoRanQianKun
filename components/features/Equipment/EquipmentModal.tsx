@@ -289,6 +289,21 @@ const EquipmentModal: React.FC<Props> = ({ character, onClose, rpgMode: rpgModeP
                                     {bottomSlots.map(renderSlot)}
                                 </div>
                             </div>
+
+                            {/* Clothing Style Info */}
+                            {character.外貌 && (
+                                <div className="w-full max-w-md mx-auto mt-4 md:mt-6 relative z-10 px-2.5 md:px-6">
+                                    <div className="bg-black/60 rounded-xl md:rounded-2xl border border-wuxia-gold/10 p-3 md:p-4 backdrop-blur-sm">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="w-1.5 h-1.5 rotate-45 bg-pink-400/50"></span>
+                                            <div className="text-[10px] md:text-xs text-pink-300/60 uppercase tracking-widest font-serif font-semibold">外貌描述</div>
+                                        </div>
+                                        <div className="text-gray-300 text-xs md:text-sm font-serif leading-relaxed italic">
+                                            {character.外貌}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 

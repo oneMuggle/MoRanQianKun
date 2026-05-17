@@ -158,6 +158,21 @@ const MobileEquipmentModal: React.FC<Props> = ({ character, onClose, rpgMode: rp
                 </div>
             </div>
 
+            {/* Clothing/Appearance Info */}
+            {character.外貌 && (
+                <div className="mt-4 px-4">
+                    <div className="bg-black/40 rounded-xl border border-wuxia-gold/10 p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-1.5 h-1.5 rotate-45 bg-pink-400/50"></span>
+                            <div className="text-[10px] text-pink-300/60 uppercase tracking-widest font-serif font-semibold">外貌描述</div>
+                        </div>
+                        <div className="text-gray-300 text-xs font-serif leading-relaxed italic">
+                            {character.外貌}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Rich item detail panel */}
             {selectedItem && (
                 <div className="fixed inset-0 z-60 flex items-end bg-black/80" onClick={() => setSelectedItem(null)}>

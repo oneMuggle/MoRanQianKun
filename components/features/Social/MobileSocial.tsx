@@ -726,24 +726,50 @@ const MobileSocial: React.FC<Props> = ({
                                                         </div>
                                                         {服饰面板展开 && (
                                                             <div className="ml-6 mt-2 space-y-2 text-xs">
-                                                                {读取服饰档案(currentNPC) && (
-                                                                    <div className="bg-black/20 rounded-lg p-2.5 space-y-1.5">
-                                                                        <div className="text-pink-300/60 text-[10px] font-semibold">服饰</div>
-                                                                        {获取已装备部位(currentNPC).map(部位 => {
-                                                                            const 数据 = currentNPC.服饰档案?.[部位];
-                                                                            if (!数据) return null;
-                                                                            return (
-                                                                                <div key={部位} className="flex flex-col gap-0.5">
-                                                                                    <span className="text-pink-400/50 text-[10px]">{服饰部位标签[部位]}</span>
-                                                                                    <span className="text-gray-300">{数据.名称}</span>
-                                                                                    {数据.描述 && 数据.描述 !== 数据.名称 && (
-                                                                                        <span className="text-gray-500 text-[10px] leading-relaxed">{数据.描述}</span>
-                                                                                    )}
-                                                                                </div>
-                                                                            );
-                                                                        })}
-                                                                    </div>
-                                                                )}
+                                                                {读取服饰档案(currentNPC) && (() => {
+                                                                    const 装备部位列表 = 获取已装备部位(currentNPC);
+                                                                    return (
+                                                                        <div className="bg-black/20 rounded-lg p-2.5 space-y-1.5">
+                                                                            <div className="text-pink-300/60 text-[10px] font-semibold">服饰</div>
+                                                                            {装备部位列表.map(部位 => {
+                                                                                const 数据 = currentNPC.服饰档案?.[部位];
+                                                                                if (!数据) return null;
+
+                                                                                // 获取服装状态
+                                                                                const 服装状态 = currentNPC.当前服装状态;
+                                                                                let 状态值: string | undefined;
+                                                                                if (部位 === '上衣') 状态值 = 服装状态?.上衣状态;
+                                                                                else if (部位 === '下着') 状态值 = 服装状态?.下装状态;
+                                                                                else if (部位 === '内衣') 状态值 = 服装状态?.内衣状态;
+                                                                                else if (部位 === '内裤') 状态值 = 服装状态?.内裤状态;
+                                                                                else if (部位 === '袜子') 状态值 = 服装状态?.袜饰状态;
+
+                                                                                const 状态样式: Record<string, { color: string; icon: string }> = {
+                                                                                    '穿着': { color: 'text-green-400/70', icon: '✓' },
+                                                                                    '半敞': { color: 'text-yellow-400/70', icon: '◐' },
+                                                                                    '褪下': { color: 'text-orange-400/70', icon: '◑' },
+                                                                                    '移除': { color: 'text-red-400/70', icon: '✗' },
+                                                                                };
+                                                                                const 样式 = 状态值 ? 状态样式[状态值] : null;
+
+                                                                                return (
+                                                                                    <div key={部位} className="flex flex-col gap-0.5">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <span className="text-pink-400/50 text-[10px]">{服饰部位标签[部位]}</span>
+                                                                                            {样式 && 状态值 && (
+                                                                                                <span className={`${样式.color} text-[9px]`}>{样式.icon}</span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <span className="text-gray-300">{数据.名称}</span>
+                                                                                        {数据.描述 && 数据.描述 !== 数据.名称 && (
+                                                                                            <span className="text-gray-500 text-[10px] leading-relaxed">{数据.描述}</span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    );
+                                                                })()}
                                                                 {读取道具档案(currentNPC) && (
                                                                     <div className="bg-black/20 rounded-lg p-2.5 space-y-1.5">
                                                                         <div className="text-pink-300/60 text-[10px] font-semibold">道具</div>
@@ -763,6 +789,32 @@ const MobileSocial: React.FC<Props> = ({
                                                                                 </div>
                                                                             );
                                                                         })}
+                                                                    </div>
+                                                                )}
+                                                                {/* 服装变更历史 */}
+                                                                {currentNPC.服装变更历史 && currentNPC.服装变更历史.length > 0 && (
+                                                                    <div className="bg-black/20 rounded-lg p-2.5 space-y-1.5">
+                                                                        <div className="text-pink-300/60 text-[10px] font-semibold">换装记录</div>
+                                                                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                                                                            {currentNPC.服装变更历史.slice(-8).reverse().map((记录, idx) => (
+                                                                                <div key={idx} className="flex items-start gap-1.5 text-[10px]">
+                                                                                    <div className="w-1 h-1 rounded-full bg-pink-400/40 mt-1 shrink-0"></div>
+                                                                                    <div className="flex-1 min-w-0">
+                                                                                        <div className="text-gray-400">
+                                                                                            <span className="text-pink-400/60">{记录.部位}</span>
+                                                                                            {记录.旧名称 && (
+                                                                                                <span className="text-gray-500 line-through mx-0.5">{记录.旧名称}</span>
+                                                                                            )}
+                                                                                            <span className="text-gray-500">→</span>
+                                                                                            <span className="text-gray-300 ml-0.5">{记录.新名称}</span>
+                                                                                        </div>
+                                                                                        {记录.变更原因 && (
+                                                                                            <div className="text-gray-600 text-[9px] mt-0.5">{记录.变更原因}</div>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
                                                                 )}
                                                             </div>

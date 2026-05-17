@@ -1060,6 +1060,17 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         onComplete(effectiveWorldConfig, charData, effectiveOpeningConfig, 'all', true, effectiveOpeningExtraRequirement.trim());
     };
 
+    // 推荐天赋/气运名称集合（基于当前选中的背景）
+    const 推荐天赋名称 = useMemo(() => {
+        const rec = 背景推荐映射[selectedBackground.名称];
+        return rec ? new Set(rec.天赋) : new Set<string>();
+    }, [selectedBackground.名称]);
+
+    const 推荐气运名称 = useMemo(() => {
+        const rec = 背景推荐映射[selectedBackground.名称];
+        return rec ? new Set(rec.气运) : new Set<string>();
+    }, [selectedBackground.名称]);
+
     return {
         // State
         step, setStep,
@@ -1113,6 +1124,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         当前性别模式,
         totalStatBudget, usedPoints, remainingPoints,
         stepProgress, currentStepLabel, selectedTalentNames,
+        推荐天赋名称, 推荐气运名称,
         背景长期说明, 天赋说明,
         当前附加小说数据集, 当前角色替换规则列表,
         // 动态分类列表（从当前可用选项中提取）

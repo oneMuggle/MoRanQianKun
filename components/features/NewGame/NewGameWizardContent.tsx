@@ -219,6 +219,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         背景分类列表, 天赋分类列表,
         当前性别模式,
         背景长期说明, 天赋说明,
+        推荐天赋名称, 推荐气运名称,
         当前附加小说数据集, 当前角色替换规则列表,
         选择性别, handleStatChange, toggleRelationFocus,
         选择附加小说数据集, 新增附加角色替换规则, 更新附加角色替换规则, 删除附加角色替换规则,
@@ -980,6 +981,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             ) : null}
                             {过滤后背景选项.map((bg, idx) => {
                                 const isSelected = selectedBackground.名称 === bg.名称;
+                                const nsfwLevel = (bg as any).nsfw等级;
                                 return (
                                     <div
                                         key={idx}
@@ -997,7 +999,11 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                                     {bg.名称}
                                                     {!预设背景.some(p => p.名称 === bg.名称) ? ' · 自定义' : ''}
                                                 </div>
-                                                <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500 group-hover:text-wuxia-cyan/70'}`}>IDENTITY</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    {nsfwLevel === 1 && <span className="text-[10px] px-1.5 py-0.5 rounded bg-pink-900/50 text-pink-300 border border-pink-700/40">暧昧</span>}
+                                                    {nsfwLevel === 2 && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-900/50 text-red-300 border border-red-700/40">激情</span>}
+                                                    <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500 group-hover:text-wuxia-cyan/70'}`}>IDENTITY</span>
+                                                </div>
                                             </div>
                                             <div className="mt-3 text-sm text-gray-400 leading-6">{bg.描述}</div>
                                             <时代标签 时代适配={bg.时代适配} />
@@ -1115,6 +1121,8 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             ) : null}
                             {过滤后天赋选项.map((t, idx) => {
                                 const isSelected = !!selectedTalents.find(x => x.名称 === t.名称);
+                                const isRecommended = 推荐天赋名称.has(t.名称);
+                                const nsfwLevel = (t as any).nsfw等级;
                                 return (
                                     <div
                                         key={idx}
@@ -1122,16 +1130,23 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                         className={`group rounded-2xl border cursor-pointer transition-all duration-300 overflow-hidden ${
                                             isSelected
                                                 ? 'border-wuxia-red bg-gradient-to-br from-wuxia-red/15 via-black/70 to-black/70 shadow-[0_0_22px_rgba(190,30,45,0.16)]'
-                                                : 'border-gray-700 bg-black/25 hover:border-wuxia-red/45 hover:bg-black/35'
+                                                : isRecommended
+                                                    ? 'border-amber-600/50 bg-gradient-to-br from-amber-900/10 via-black/70 to-black/70 hover:border-amber-500/60'
+                                                    : 'border-gray-700 bg-black/25 hover:border-wuxia-red/45 hover:bg-black/35'
                                         }`}
                                     >
                                         <div className="p-5">
                                             <div className="flex items-center justify-between gap-3">
-                                                <div className={`font-bold text-base font-serif ${isSelected ? 'text-wuxia-red' : 'text-gray-200'}`}>
+                                                <div className={`font-bold text-base font-serif ${isSelected ? 'text-wuxia-red' : isRecommended ? 'text-amber-300' : 'text-gray-200'}`}>
                                                     {t.名称}
                                                     {!预设天赋.some(p => p.名称 === t.名称) ? ' · 自定义' : ''}
                                                 </div>
-                                                <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500 group-hover:text-wuxia-cyan/70'}`}>{isSelected ? 'SELECTED' : 'TRAIT'}</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    {isRecommended && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/50 text-amber-300 border border-amber-600/40">推荐</span>}
+                                                    {nsfwLevel === 1 && <span className="text-[10px] px-1.5 py-0.5 rounded bg-pink-900/50 text-pink-300 border border-pink-700/40">暧昧</span>}
+                                                    {nsfwLevel === 2 && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-900/50 text-red-300 border border-red-700/40">激情</span>}
+                                                    <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500 group-hover:text-wuxia-cyan/70'}`}>{isSelected ? 'SELECTED' : 'TRAIT'}</span>
+                                                </div>
                                             </div>
                                             <div className="mt-3 text-sm text-gray-400 leading-6">{t.描述}</div>
                                             <时代标签 时代适配={t.时代适配} />
@@ -1220,6 +1235,8 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             ) : null}
                             {过滤后气运选项.map((q, idx) => {
                                 const isSelected = !!selectedQiyun.find(x => x.名称 === q.名称);
+                                const isRecommended = 推荐气运名称.has(q.名称);
+                                const nsfwLevel = (q as any).nsfw等级;
                                 return (
                                     <div
                                         key={idx}
@@ -1227,17 +1244,24 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                         className={`group rounded-2xl border cursor-pointer transition-all duration-300 overflow-hidden ${
                                             isSelected
                                                 ? 'border-wuxia-red bg-gradient-to-br from-wuxia-red/15 via-black/70 to-black/70 shadow-[0_0_22px_rgba(190,30,45,0.16)]'
-                                                : 'border-gray-700 bg-black/25 hover:border-wuxia-red/45 hover:bg-black/35'
+                                                : isRecommended
+                                                    ? 'border-amber-600/50 bg-gradient-to-br from-amber-900/10 via-black/70 to-black/70 hover:border-amber-500/60'
+                                                    : 'border-gray-700 bg-black/25 hover:border-wuxia-red/45 hover:bg-black/35'
                                         }`}
                                     >
                                         <div className="p-4">
                                             <div className="flex items-center justify-between gap-2">
-                                                <div className={`font-bold text-sm font-serif ${isSelected ? 'text-wuxia-red' : 'text-gray-200'}`}>
+                                                <div className={`font-bold text-sm font-serif ${isSelected ? 'text-wuxia-red' : isRecommended ? 'text-amber-300' : 'text-gray-200'}`}>
                                                     {q.名称}
                                                 </div>
-                                                <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500'}`}>
-                                                    {q.稀有度}
-                                                </span>
+                                                <div className="flex items-center gap-1.5">
+                                                    {isRecommended && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/50 text-amber-300 border border-amber-600/40">推荐</span>}
+                                                    {nsfwLevel === 1 && <span className="text-[10px] px-1.5 py-0.5 rounded bg-pink-900/50 text-pink-300 border border-pink-700/40">暧昧</span>}
+                                                    {nsfwLevel === 2 && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-900/50 text-red-300 border border-red-700/40">激情</span>}
+                                                    <span className={`text-[10px] tracking-[0.25em] font-mono ${isSelected ? 'text-wuxia-cyan' : 'text-gray-500'}`}>
+                                                        {q.稀有度}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div className="mt-2 text-xs text-gray-400 leading-5">{q.描述}</div>
                                             <时代标签 时代适配={q.时代适配} />
