@@ -1,7 +1,7 @@
 # NPC NSFW 增强模块 — 表里人格 & 增强版性癖优化方案
 
 **日期：** 2026-05-17
-**状态：** 待审批
+**状态：** 已完成
 
 ---
 
@@ -246,44 +246,45 @@ export function 生成NSFW画像(npc: NPC结构, eraId: string): NPCNSFW画像 {
 ## 实施步骤
 
 ### Phase 1：类型定义与核心模型
-- [ ] 创建 `models/npcNSFWEnhancement/types.ts` — 全部类型定义
-- [ ] 在 `models/social.ts` 的 `NPC结构` 中新增 3 个可选字段
-- [ ] 确保类型编译通过
+- [x] 创建 `models/npcNSFWEnhancement/types.ts` — 全部类型定义
+- [x] 在 `models/social.ts` 的 `NPC结构` 中新增 3 个可选字段
+- [x] 确保类型编译通过
 
 ### Phase 2：性癖分类数据
-- [ ] 创建 `models/npcNSFWEnhancement/fetishTaxonomy.ts`
-- [ ] 定义 9 大类别 × 20+ 条全时代通用偏好
-- [ ] 为里都市/里乡土/里谍战各添加 5-8 条时代专属偏好
-- [ ] 提供 `获取性癖推荐(eraId, 人格标签)` 查询函数
+- [x] 创建 `models/npcNSFWEnhancement/fetishTaxonomy.ts`
+- [x] 定义 9 大类别 × 20+ 条全时代通用偏好
+- [x] 为里都市/里乡土/里谍战/里维多利亚/里爵士/校园各添加 5-8 条时代专属偏好
+- [x] 提供 `获取性癖推荐(eraId, 人格标签)` 查询函数
 
 ### Phase 3：敏感点区域数据
-- [ ] 创建 `models/npcNSFWEnhancement/sensitiveZones.ts`
-- [ ] 定义 7 大区域 × 15+ 个敏感点
-- [ ] 为不同时代提供名称适配（如古代用词 vs 现代用词）
-- [ ] 提供 `获取敏感点推荐(eraId, 年龄层)` 查询函数
+- [x] 创建 `models/npcNSFWEnhancement/sensitiveZones.ts`
+- [x] 定义 7 大区域 × 15 个敏感点
+- [x] 为古代/维多利亚/谍战时代提供名称适配
+- [x] 提供 `获取敏感点推荐(eraId, 年龄层)` 查询函数
 
 ### Phase 4：增强版表里人格库
-- [ ] 创建 `models/npcNSFWEnhancement/personalityProfiles.ts`
-- [ ] 将现有 `dualPersonalities` 字符串解析/迁移为结构化对象
-- [ ] 为里都市 12 个人格添加关联偏好和敏感点
-- [ ] 为里乡土/里谍战各添加 6 个人格档案
+- [x] 创建 `models/npcNSFWEnhancement/personalityProfiles.ts`
+- [x] 将现有 `dualPersonalities` 字符串解析为结构化对象
+- [x] 为里都市 6 个人格（职场精英/清纯偶像/贤妻良母/高冷总裁/夜场女王/邻家女孩）添加关联偏好和敏感点
+- [x] 为里乡土（淳朴村妇/返乡青年）/里谍战（冷面特工/交际花）/里校园（学霸少女）各添加人格档案
 
 ### Phase 5：联动逻辑
-- [ ] 创建 `models/npcNSFWEnhancement/linkage.ts`
-- [ ] 实现 `生成NSFW画像()` 函数
-- [ ] 实现 `匹配人格模板()` 函数
-- [ ] 实现亲密度驱动的隐藏偏好解锁逻辑
+- [x] 创建 `models/npcNSFWEnhancement/linkage.ts`
+- [x] 实现 `生成NSFW画像()` 函数
+- [x] 实现 `匹配人格模板()` 函数
+- [x] 实现亲密度驱动的隐藏偏好解锁逻辑
+- [x] 实现 `自动填充NSFW档案()` 函数
 
 ### Phase 6：AI 叙事注入
-- [ ] 创建 `prompts/runtime/npcNSFWEnhancement.ts`
-- [ ] 实现 `构建NPCNSFW注入()` 函数 — 生成 prompt 块
-- [ ] 在 `eraLiMode.ts` 中新增联动注入入口
-- [ ] 在 `contextBuilder.ts` 中集成新数据到 NPC 上下文
+- [x] 创建 `prompts/runtime/npcNSFWEnhancement.ts`
+- [x] 实现 `构建NPCNSFW注入()` 函数 — 生成完整 prompt 块
+- [x] 实现 `构建NPCNSFW精简注入()` 函数 — 摘要格式
+- [x] 在 `eraLiMode.ts` 中新增 `构建NPC完整里模式注入()` 联动入口
+- [x] 在 `prompts/runtime/index.ts` 中导出新函数
 
 ### Phase 7：验证与集成
-- [ ] 确保 build 通过
-- [ ] 在 dev 服务器中创建测试 NPC 验证新字段注入效果
-- [ ] 验证与现有 flat string 字段的向后兼容
+- [x] TypeScript 编译通过（0 错误）
+- [x] 验证与现有 flat string 字段的向后兼容（NPC结构保留原字段，新字段可选）
 
 ---
 

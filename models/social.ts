@@ -1,6 +1,6 @@
 
 import type { LiModeStage } from './eraTheme/types';
-
+import type { 性癖档案, 敏感点档案, 表里人格档案 } from './npcNSFWEnhancement/types';
 import type { NPC图片档案 } from './imageGeneration';
 
 export type NPC性别 = '男' | '女';
@@ -250,6 +250,11 @@ export interface NPC结构 {
     亲密度等级?: number;
     当前服装状态?: 服装状态结构;
     NSFW行为特征?: NSFW行为特征结构;
+
+    // --- NSFW 增强档案（结构化性癖/敏感点/表里人格） ---
+    性癖档案?: 性癖档案;
+    敏感点档案?: 敏感点档案;
+    人格档案?: 表里人格档案;
 
     // --- 里志怪角色卡片 ---
     物种类型?: '人类' | '妖' | '鬼' | '精怪' | '僵尸' | '画皮' | '神仙' | '鬼王' | '大妖' | '地仙';

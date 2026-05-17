@@ -11,6 +11,7 @@ import { resolveEraNode } from '../../models/eraTheme';
 import { EraLiModeEnhanced, LiModeStage } from '../../models/eraTheme/types';
 import { NPC结构 } from '../../models/social';
 import { 计算亲密度等级 } from '../../models/intimacy';
+import { 构建NPCNSFW注入 } from './npcNSFWEnhancement';
 
 /** 里模式强度级别 */
 export type LiModeIntensity = '微暗' | '暧昧' | '露骨';
@@ -264,4 +265,28 @@ export function 构建里模式阶段注入(
     if (!rule) return null;
 
     return `## 里模式阶段：${stage}\n${rule}`;
+}
+
+/**
+ * 构建 NPC 完整里模式注入 — 组合表里人格、性癖、敏感点于一体的统一注入
+ * 替代单独调用 构建NPC表里切换注入 + 构建NPCNSFW注入
+ */
+export function 构建NPC完整里模式注入(
+  npc: NPC结构,
+  eraId: string | null | undefined,
+  liModeEnabled: boolean,
+  nsfwEnabled: boolean = true,
+  intensity?: LiModeIntensity
+): string | null {
+  const 组件: string[] = [];
+
+  // 表里人格切换
+  const 人格注入 = 构建NPC表里切换注入(npc, eraId, liModeEnabled);
+  if (人格注入) 组件.push(人格注入);
+
+  // NSFW 增强
+  const nsfw注入 = 构建NPCNSFW注入(npc, eraId, nsfwEnabled, intensity);
+  if (nsfw注入) 组件.push(nsfw注入);
+
+  return 组件.length > 0 ? 组件.join('\n\n') : null;
 }

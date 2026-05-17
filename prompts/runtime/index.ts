@@ -58,6 +58,7 @@ export { 剧情回忆检索COT提示词, 剧情回忆检索输出格式提示词
 // NSFW
 export { 默认NSFW模式提示词, 构建里象修行叙事约束, 构建现代情感叙事约束, 默认文生图NSFW模式提示词, 自动选择叙事约束 } from './nsfw';
 export { 构建NPC_NSWF卡片, 构建在场NPC_NSWF卡片组 } from './nsfwCard';
+export { 构建NPCNSFW注入, 构建NPCNSFW精简注入 } from './npcNSFWEnhancement';
 
 // Campus / BDSM
 export { 构建校园NSFW完整叙事约束, 构建欲望状态约束, 构建暴露风险约束, 构建露出叙事约束, 构建紧张度叙事约束 } from './campusNSFW';
