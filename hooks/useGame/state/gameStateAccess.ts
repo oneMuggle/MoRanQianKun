@@ -214,7 +214,7 @@ export interface GameStateAccess {
 
     // Opening Slice
     最近开局配置: GameStoreSlice['最近开局配置'];
-    设置最近开局配置: GameStateSlice['设置开局配置'];
+    设置最近开局配置: GameStoreSlice['set最近开局配置'];
 
     // Scene Config Slice
     场景图片档案: GameStoreSlice['场景图片档案'];
@@ -510,7 +510,7 @@ export function createGameStateAccess(
 
         // Opening Slice
         最近开局配置: store.最近开局配置,
-        设置最近开局配置: gameState.设置开局配置,
+        设置最近开局配置: store.set最近开局配置,
 
         // Scene Config Slice
         场景图片档案: store.场景图片档案,

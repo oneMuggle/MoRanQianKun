@@ -983,6 +983,49 @@ const SocialModal: React.FC<Props> = ({
                                                             <PrivateTag label="敏感点" value={读取敏感点(currentNPC) || '暂无记录'} color="text-red-400" />
                                                         </div>
 
+                                                        {/* 敏感点详情展开 */}
+                                                        {currentNPC.敏感点档案?.主要敏感点 && currentNPC.敏感点档案.主要敏感点.length > 0 && (() => {
+                                                            const 开发程度样式: Record<string, { color: string; label: string }> = {
+                                                                '未开发': { color: 'text-gray-500', label: '未开发' },
+                                                                '初步探索': { color: 'text-blue-400/70', label: '初步' },
+                                                                '渐入佳境': { color: 'text-yellow-400/70', label: '渐入' },
+                                                                '深度开发': { color: 'text-orange-400/70', label: '深度' },
+                                                                '完全开发': { color: 'text-red-400/70', label: '完全' },
+                                                            };
+                                                            const 发现状态样式: Record<string, { color: string; icon: string }> = {
+                                                                '未发觉': { color: 'text-gray-600', icon: '○' },
+                                                                '已发现': { color: 'text-blue-400/60', icon: '◐' },
+                                                                '已开发': { color: 'text-pink-400/70', icon: '●' },
+                                                            };
+                                                            return (
+                                                                <div className="bg-gradient-to-br from-red-950/10 to-black/60 border border-red-900/20 rounded-lg p-4 mb-5 space-y-2">
+                                                                    <div className="text-red-300/60 text-xs font-semibold mb-2">敏感点详情</div>
+                                                                    {currentNPC.敏感点档案!.主要敏感点.map((pt, idx) => {
+                                                                        const 名 = pt.时代名称 || pt.名称;
+                                                                        const 开发 = pt.开发程度 ? 开发程度样式[pt.开发程度] : null;
+                                                                        const 发现 = 发现状态样式[pt.发现状态] || 发现状态样式['未发觉'];
+                                                                        const 敏感度星星 = '★'.repeat(pt.敏感度) + '☆'.repeat(5 - pt.敏感度);
+                                                                        return (
+                                                                            <div key={idx} className="bg-black/30 rounded p-2.5 space-y-1">
+                                                                                <div className="flex items-center justify-between">
+                                                                                    <span className="text-pink-400/70 text-xs">{pt.区域} · {名}</span>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <span className="text-yellow-500/80 text-[10px]">{敏感度星星}</span>
+                                                                                        {开发 && <span className={`${开发.color} text-[10px]`}>{开发.label}</span>}
+                                                                                        <span className={`${发现.color} text-[10px]`} title={pt.发现状态}>{发现.icon}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="text-gray-500 text-[11px] leading-relaxed">{pt.反应描述}</div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                    {currentNPC.敏感点档案.弱点摘要 && (
+                                                                        <div className="text-gray-600 text-[10px] italic pt-1 border-t border-white/5">{currentNPC.敏感点档案.弱点摘要}</div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })()}
+
                                                         {/* Womb & Pregnancy Records (New Section) */}
                                                         <div className="bg-gradient-to-br from-pink-950/20 to-black/80 border border-pink-900/30 rounded-lg p-4 relative overflow-hidden group">
                                                             <div className="absolute -top-6 -right-6 w-24 h-24 bg-pink-600/5 rounded-full filter blur-xl group-hover:bg-pink-600/10 transition-colors"></div>

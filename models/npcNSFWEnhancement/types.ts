@@ -69,6 +69,8 @@ export type 身体区域分类 =
 
 export type 敏感点发现状态 = '未发觉' | '已发现' | '已开发';
 
+export type 敏感点开发程度 = '未开发' | '初步探索' | '渐入佳境' | '深度开发' | '完全开发';
+
 export interface 敏感点条目 {
   区域: 身体区域分类;
   名称: string;
@@ -77,6 +79,7 @@ export interface 敏感点条目 {
   反应描述: string;
   发现状态: 敏感点发现状态;
   描写提示词: string;
+  开发程度?: 敏感点开发程度;
 }
 
 export interface 敏感点档案 {
