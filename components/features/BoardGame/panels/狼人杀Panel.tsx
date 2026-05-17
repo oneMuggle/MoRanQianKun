@@ -3,6 +3,7 @@
  *
  * 夜间选择 → 白天投票 → 阵营胜负判定
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 中文组件名不满足 ESLint 大写首字母检测，但为合法 React 组件 */
 
 import React, { useCallback, useMemo, useState } from 'react';
 import type { 狼人杀状态 } from '../../../../models/boardGameNSFW/core';

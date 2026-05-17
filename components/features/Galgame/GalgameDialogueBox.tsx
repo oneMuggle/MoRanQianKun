@@ -40,9 +40,10 @@ export const GalgameDialogueBox: React.FC<GalgameDialogueBoxProps> = ({
   onClick,
   disableTypewriter = false,
 }) => {
-  const { displayedText, isComplete, skip } = disableTypewriter
-    ? { displayedText: text, isComplete: true, skip: () => {} }
-    : useTypewriter(text, { speed: typewriterSpeed });
+  const { displayedText: typewriterText, isComplete: typewriterComplete, skip: typewriterSkip } = useTypewriter(text, { speed: typewriterSpeed });
+  const displayedText = disableTypewriter ? text : typewriterText;
+  const isComplete = disableTypewriter ? true : typewriterComplete;
+  const skip = disableTypewriter ? () => {} : typewriterSkip;
 
   const handleClick = () => {
     if (!isComplete) {

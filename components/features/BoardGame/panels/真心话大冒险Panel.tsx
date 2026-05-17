@@ -1,6 +1,7 @@
 /**
  * 真心话大冒险Panel.tsx — 真心话/大冒险选择面板
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 中文组件名不满足 ESLint 大写首字母检测，但为合法 React 组件 */
 
 import React, { useCallback, useState } from 'react';
 import type { 派对游戏状态 } from '../../../../models/boardGameNSFW/core';

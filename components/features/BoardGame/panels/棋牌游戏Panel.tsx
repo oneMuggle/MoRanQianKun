@@ -3,6 +3,7 @@
  *
  * 选牌出牌 → 胜负判定 → Bluff心理战
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 中文组件名不满足 ESLint 大写首字母检测，但为合法 React 组件 */
 
 import React, { useCallback, useMemo, useState } from 'react';
 import type { 棋牌游戏状态, 棋牌游戏子类型 } from '../../../../models/boardGameNSFW/core';

@@ -3,6 +3,7 @@
  *
  * 掷骰移动 → 地块购买/决策 → 资产结算
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 中文组件名不满足 ESLint 大写首字母检测，但为合法 React 组件 */
 
 import React, { useCallback, useMemo, useState } from 'react';
 import type { 大富翁状态, 大富翁地产 } from '../../../../models/boardGameNSFW/core';

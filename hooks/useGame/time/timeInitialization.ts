@@ -2,6 +2,7 @@
  * 时间初始化 + 消息辅助工具
  * 从 useGame.ts 提取的节日同步、游戏时间初始化 useEffect，以及消息辅助函数
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 中文命名的 Hook 不被 ESLint 识别 */
 import { useEffect } from 'react';
 import { normalizeCanonicalGameTime, 环境时间转标准串, 提取环境月日 } from './timeUtils';
 import type { 聊天记录结构, 游戏设置结构 } from '../../../types';

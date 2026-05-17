@@ -4,6 +4,7 @@
  * 将 useGame 中分散的 ~20 个 Ref 整合到统一的注册表中，
  * 提供类型安全的访问和同步机制。
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 工厂函数使用 hooks 接收状态，非独立组件 */
 
 import { useRef, useEffect } from 'react';
 import type { 场景图片档案, 时代信息结构, 图片管理设置结构, 香闺秘档部位类型 } from '../../../types';

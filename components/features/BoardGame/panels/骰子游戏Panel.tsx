@@ -3,6 +3,7 @@
  *
  * 策略选择 → 掷骰操作 → 引擎结算 → 叙事桥接 → 状态继承
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 中文组件名不满足 ESLint 大写首字母检测，但为合法 React 组件 */
 
 import React, { useCallback, useMemo, useState } from 'react';
 import type { 骰子游戏状态, 骰子面类型 } from '../../../../models/boardGameNSFW/core';

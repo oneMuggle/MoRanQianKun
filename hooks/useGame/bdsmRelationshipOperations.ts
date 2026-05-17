@@ -2,6 +2,7 @@
  * BDSM 关系操作工作流
  * 从 useGame.ts 提取的同步 + 异步 BDSM 关系管理操作
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 工厂函数使用 hooks 接收状态，非独立组件 */
 import { useCallback } from 'react';
 import { 触发任务生成, 触发日常指令刷新 } from './bdsmTaskTrigger';
 import { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './bdsmTaskWorkflow';

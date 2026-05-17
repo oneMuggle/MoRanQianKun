@@ -4,6 +4,7 @@
  * 聚合 featureFlags、设置持久化、BDSM、系统提示词构建、命令处理、
  * 历史回合、变量校准协调、handleStop、世界演变控制、记忆系统更新、运行时变量工作流。
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 工厂函数使用 hooks 接收状态，非独立组件 */
 
 export interface WorkflowDomainInput {
     apiConfig: any; gameConfig: any; 历史记录: any; 环境: any; 剧情: any;

@@ -6,6 +6,7 @@
  *
  * 模式：直接接收 stateAccess 和 refs，内部解构所需字段。
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 工厂函数使用 hooks 接收状态，非独立组件 */
 
 import { useEffect } from 'react';
 import * as dbService from '../../../services/dbService';

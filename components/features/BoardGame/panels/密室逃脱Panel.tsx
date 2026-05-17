@@ -3,6 +3,7 @@
  *
  * 路径选择 → 属性检定 → 线索发现/意外事件
  */
+/* eslint-disable react-hooks/rules-of-hooks -- 中文组件名不满足 ESLint 大写首字母检测，但为合法 React 组件 */
 
 import React, { useCallback, useMemo, useState } from 'react';
 import type { 密室逃脱状态, 密室主题 } from '../../../../models/boardGameNSFW/core';
