@@ -18,13 +18,34 @@ export type 性癖大类 =
 
 export type 性癖强度 = 1 | 2 | 3 | 4 | 5;
 
+export type 解锁条件类型 = '亲密度阈值' | '事件触发' | '行为累积' | '场景触发' | '人格切换';
+
+export interface 解锁条件 {
+  类型: 解锁条件类型;
+  值: number | string;
+  描述?: string;
+}
+
+export type 性癖条目来源 = '人格模板' | '事件觉醒' | '行为演化' | 'AI叙事';
+
+export interface 性癖觉醒记录 {
+  触发事件: string;
+  触发时间: string;
+  初始强度: number;
+  累积次数: number;
+}
+
 export interface 性癖条目 {
   类别: 性癖大类;
   子类型: string;
   强度: 性癖强度;
-  解锁条件?: { 类型: '亲密度阈值' | '事件触发'; 值: number | string };
+  解锁条件?: 解锁条件;
   描述: string;
   时代适配?: string[];
+  来源?: 性癖条目来源;
+  觉醒事件?: 性癖觉醒记录;
+  衰减率?: number;
+  最近活跃时间?: string;
 }
 
 export interface 性癖档案 {
@@ -123,4 +144,31 @@ export interface 敏感点查询参数 {
   eraId?: string;
   年龄层?: '少女' | '青年' | '成熟' | '中年';
   最大条目数?: number;
+}
+
+// ==================== 性癖动态变化（演化系统） ====================
+
+export type 性癖变化类型 =
+  | '强度提升'
+  | '强度降低'
+  | '新性癖觉醒'
+  | '禁忌软化'
+  | '偏好升级'
+  | '衰减淡化';
+
+export interface 性癖变化日志 {
+  时间: string;
+  变化类型: 性癖变化类型;
+  性癖类别: 性癖大类;
+  性癖子类型: string;
+  旧值: number;
+  新值: number;
+  触发原因: string;
+  关联事件: string;
+}
+
+export interface 性癖演化状态 {
+  演化日志: 性癖变化日志[];
+  事件计数器: Record<string, number>;
+  最后演化时间: string;
 }

@@ -5,6 +5,7 @@
 
 import { NPC结构 } from '../../models/social';
 import { 生成NSFW画像, 应启用增强档案 } from '../../models/npcNSFWEnhancement/linkage';
+import { 生成触发事件列表 } from '../../models/npcNSFWEnhancement/eventMapping';
 import type { LiModeIntensity } from './eraLiMode';
 
 /**
@@ -69,6 +70,15 @@ export function 构建NPCNSFW注入(
     const 名 = 最敏感.时代名称 || 最敏感.名称;
     组件.push(`- 触碰${名}时应描写"${最敏感.反应描述.substring(0, 20)}…"`);
   }
+
+  组件.push('');
+  组件.push('【性癖变化报告】');
+  组件.push('当该NPC经历了可能影响其性癖的事件时，在响应末尾输出：');
+  组件.push('<性癖变化>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "触发事件": "{事件类型}", "事件描述": "{简短描述}"}`);
+  组件.push('</性癖变化>');
+  组件.push(`可用触发事件：${生成触发事件列表()}`);
+  组件.push('注意：仅在确实发生了显著影响性癖的事件时才输出，不要每回合都输出。');
 
   return 组件.join('\n');
 }

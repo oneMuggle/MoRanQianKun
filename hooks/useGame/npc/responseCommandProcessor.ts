@@ -15,6 +15,8 @@ import type { 校园系统数据 } from '../../../models/campusPhone';
 import type { 校园NSFW系统扩展 } from '../../../models/campusNSFW';
 import type { 写真系统扩展 } from '../../../models/photographyNSFW';
 import { applyStateCommand } from '../../../utils/stateHelpers';
+import type { 性癖触发事件 } from '../../../models/npcNSFWEnhancement/eventMapping';
+import { 记录性癖触发事件, 批量应用性癖衰减 } from '../../../models/npcNSFWEnhancement/evolutionEngine';
 
 const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
@@ -144,8 +146,11 @@ export const 执行响应命令处理 = (
         socialBuffer = deps.规范化社交列表(socialBuffer);
         storyBuffer = deps.规范化剧情状态(storyBuffer);
 
-        // 解析 <欲望系统状态> XML 标签，应用 AI 返回的欲望档案更新
+        // 解析 XML 标签：欲望系统状态、关系状态更新、性癖变化
         if (typeof rawContent === 'string') {
+            const 游戏时间 = envBuffer?.时间 ?? '';
+
+            // 解析 <欲望系统状态> XML 标签，应用 AI 返回的欲望档案更新
             const 欲望系统状态匹配 = rawContent.match(/<欲望系统状态>\s*([\s\S]*?)\s*<\/欲望系统状态>/);
             if (欲望系统状态匹配) {
                 try {
@@ -217,6 +222,49 @@ export const 执行响应命令处理 = (
                     }
                 } catch {
                     // JSON 解析失败，忽略本次更新
+                }
+            }
+
+            // 解析 <性癖变化> XML 标签，应用性癖动态变化
+            const 性癖变化匹配 = rawContent.match(/<性癖变化>\s*([\s\S]*?)\s*<\/性癖变化>/g);
+            if (性癖变化匹配 && 性癖变化匹配.length > 0) {
+                const 游戏时间 = envBuffer?.时间 ?? '';
+                for (const 匹配项 of 性癖变化匹配) {
+                    try {
+                        const json = 匹配项.replace(/<\/?性癖变化>/g, '').trim();
+                        const 解析结果 = JSON.parse(json) as {
+                            npc姓名: string;
+                            触发事件: 性癖触发事件;
+                            事件描述: string;
+                        };
+                        if (!解析结果.npc姓名 || !解析结果.触发事件) continue;
+
+                        const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                        if (idx < 0) continue;
+
+                        const npc = { ...socialBuffer[idx] };
+                        const 结果 = 记录性癖触发事件(npc, 解析结果.触发事件, 游戏时间, 解析结果.事件描述);
+                        if (结果.有变化) {
+                            socialBuffer = [...socialBuffer];
+                            socialBuffer[idx] = npc;
+                        }
+                    } catch {
+                        // JSON 解析失败，忽略本条
+                    }
+                }
+            }
+
+            // 回合结束：对所有女性 NPC 应用性癖衰减
+            if (游戏时间) {
+                const 衰减结果 = 批量应用性癖衰减(socialBuffer, 游戏时间);
+                if (衰减结果.length > 0) {
+                    for (const 结果 of 衰减结果) {
+                        const idx = socialBuffer.findIndex((n: any) => n.姓名 === 结果.npc姓名);
+                        if (idx >= 0) {
+                            socialBuffer = [...socialBuffer];
+                            socialBuffer[idx] = { ...socialBuffer[idx] };
+                        }
+                    }
                 }
             }
         }
