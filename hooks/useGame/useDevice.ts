@@ -61,15 +61,17 @@ export function useDevice(deps: UseDeviceDeps) {
         return 'normal';
     }, [gameConfig, currentEra]);
 
-    // 设备打开：打开时同步设置当前时代的里模式状态
+    // 设备打开：打开时同步设置当前时代的里模式状态，并通知 ModalRenderer 渲染
     const 设备打开 = useCallback(() => {
         const mode = 派生设备模式();
         set设备状态((prev) => ({ ...prev, isOpen: true, mode }));
+        window.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'mobileDevice' } }));
     }, [派生设备模式]);
 
     // 设备关闭
     const 设备关闭 = useCallback(() => {
         set设备状态((prev) => ({ ...prev, isOpen: false, activeApp: null }));
+        window.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'mobileDevice' } }));
     }, []);
 
     // 设备返回主页
