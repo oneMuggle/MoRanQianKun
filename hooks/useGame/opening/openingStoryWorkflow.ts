@@ -151,7 +151,20 @@ type 开场剧情生成依赖 = {
     setWorldEvents: (value: string[]) => void;
     应用并同步记忆系统: (memory: 记忆系统结构) => void;
     performAutoSave: (snapshot?: 自动存档快照结构) => Promise<void>;
-    构建系统提示词: (promptPool: 提示词结构[], memoryData: 记忆系统结构, socialData: any[], statePayload: any, options?: any) => 酒馆上下文结构 & {
+    构建系统提示词: (params: {
+        promptPool: 提示词结构[];
+        memoryData: 记忆系统结构;
+        socialData: any[];
+        statePayload: any;
+        gameConfig: any;
+        memoryConfig: any;
+        fallbackPlayerName?: string;
+        builtinPromptEntries?: any[];
+        worldbooks?: any[];
+        worldEvolutionEnabled: boolean;
+        deviceMessages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }>;
+        options?: any;
+    }) => 酒馆上下文结构 & {
         contextPieces: 酒馆上下文结构['contextPieces'] & {
             AI角色声明?: string;
             输出协议提示词?: string;
@@ -533,12 +546,17 @@ export const 执行开场剧情生成工作流 = async (
             ? `【小说分解章节锚点】\n${filteredOpeningNovelDecompositionPrompt}`
             : '';
 
-        const openingContext = deps.构建系统提示词(
-            openingPromptSnapshot,
-            openingMem,
-            contextData.社交 || [],
-            openingStatePayload,
-            {
+        const openingContext = deps.构建系统提示词({
+            promptPool: openingPromptSnapshot,
+            memoryData: openingMem,
+            socialData: contextData.社交 || [],
+            statePayload: openingStatePayload,
+            gameConfig: openingGameConfig,
+            memoryConfig: deps.memoryConfig,
+            builtinPromptEntries: deps.builtinPromptEntries,
+            worldbooks: deps.worldbooks,
+            worldEvolutionEnabled: false,
+            options: {
                 禁用世界演变分流: true,
                 注入剧情推动协议: false,
                 注入女主剧情规划协议: false,
@@ -551,9 +569,10 @@ export const 执行开场剧情生成工作流 = async (
                     typeof options?.开局额外要求 === 'string' ? options.开局额外要求 : ''
                 ],
                 openingConfig: options?.开局配置,
-                强制剧情COT提示词ID: 'core_cot'
+                强制剧情COT提示词ID: 'core_cot',
+                eraId: options?.eraId
             }
-        );
+        });
 
         streamMarker = Date.now();
         if (useStreaming) {
@@ -642,6 +661,15 @@ export const 执行开场剧情生成工作流 = async (
             cultivationSystemEnabled: 启用修炼体系
         });
         const openingConfigText = 构建开局配置提示词(options?.开局配置);
+        const openingNSFWAppearancePrompt = openingGameConfig.启用NSFW模式 === true
+            ? [
+                '【NSFW开场外观描写要求】',
+                '- 对首幕中登场的具名NPC，在正文中自然融入其外观细节：衣着风格与穿着状态、身材外貌特征。',
+                '- 若NPC档案中提供敏感点、性癖、NSFW行为特征等字段，应在描写中适度暗示或点到，保持与当前场景氛围一致。',
+                '- 外观描写服务于角色塑造和沉浸感，不脱离情境硬塞色情内容。',
+                '- 若NPC的衣着、外貌等信息缺失，可根据其身份、时代背景和场景合理推断。'
+            ].join('\n')
+            : '';
         const openingLatestUserInputRole: 'assistant' | 'user' = (
             openingTavernPresetModeEnabled
             || openingRuntimeGptMode
@@ -659,6 +687,7 @@ export const 执行开场剧情生成工作流 = async (
             openingRoleSetupText,
             '',
             openingConfigText,
+            openingNSFWAppearancePrompt ? ['', openingNSFWAppearancePrompt].join('\n') : '',
             '',
             '【执行要求】',
             '- 先完成沉浸式第一幕，再把需要落地的可写域整理成完整详细的 `<变量规划>`。',

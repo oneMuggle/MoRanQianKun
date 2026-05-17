@@ -177,17 +177,37 @@ export function createWorkflowDomain(input: WorkflowDomainInput) {
     } = bdsm;
 
     // --- 系统提示词构建 ---
-    const 构建系统提示词 = (
-        promptPool: any[], memoryData: any, socialData: any[],
-        statePayload: any, options?: any, deviceMessages?: any[],
-        overrideGameConfig?: any
-    ) => 构建系统提示词工作流({
-        promptPool, memoryData, socialData, statePayload,
-        gameConfig: overrideGameConfig ?? gameConfig,
-        memoryConfig, fallbackPlayerName: 角色姓名,
-        builtinPromptEntries: 内置提示词列表, worldbooks: 世界书列表,
-        worldEvolutionEnabled: worldEvolutionEnabled(), deviceMessages,
-        options: { ...options, eraId: options?.eraId ?? currentEra },
+    const 构建系统提示词 = (params: {
+        promptPool: any[];
+        memoryData: any;
+        socialData: any[];
+        statePayload: any;
+        gameConfig: any;
+        memoryConfig?: any;
+        fallbackPlayerName?: string;
+        builtinPromptEntries?: any[];
+        worldbooks?: any[];
+        worldEvolutionEnabled: boolean;
+        deviceMessages?: any[];
+        options?: any;
+    }) => 构建系统提示词工作流({
+        promptPool: params.promptPool,
+        memoryData: params.memoryData,
+        socialData: params.socialData,
+        statePayload: params.statePayload,
+        gameConfig: params.gameConfig ?? gameConfig,
+        memoryConfig: params.memoryConfig ?? memoryConfig,
+        fallbackPlayerName: params.fallbackPlayerName ?? 角色姓名,
+        builtinPromptEntries: params.builtinPromptEntries ?? 内置提示词列表,
+        worldbooks: params.worldbooks ?? 世界书列表,
+        worldEvolutionEnabled: params.worldEvolutionEnabled !== undefined
+            ? params.worldEvolutionEnabled
+            : worldEvolutionEnabled(),
+        deviceMessages: params.deviceMessages,
+        options: {
+            ...(params.options || {}),
+            eraId: params.options?.eraId ?? currentEra
+        },
     });
 
     // --- 命令处理 (使用 featureFlags 输出的规范化函数) ---

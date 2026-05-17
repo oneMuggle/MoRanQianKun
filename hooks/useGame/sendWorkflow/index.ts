@@ -166,7 +166,20 @@ type 主剧情发送依赖 = {
     onBDSM见面预约更新?: (更新: { npcId: string; 新状态: string }) => void;
     设置写真系统?: (value: any) => void;
     设置校园系统?: (value: any) => void;
-    构建系统提示词: (promptPool: any[], memoryData: 记忆系统结构, socialData: any[], statePayload: any, options?: any, deviceMessages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }>, overrideGameConfig?: any) => 主剧情系统上下文 & {
+    构建系统提示词: (params: {
+        promptPool: any[];
+        memoryData: 记忆系统结构;
+        socialData: any[];
+        statePayload: any;
+        gameConfig: any;
+        memoryConfig: any;
+        fallbackPlayerName?: string;
+        builtinPromptEntries?: any[];
+        worldbooks?: any[];
+        worldEvolutionEnabled: boolean;
+        deviceMessages?: Array<{ app: string; title: string; content: string; timestamp: number; read: boolean }>;
+        options?: any;
+    }) => 主剧情系统上下文 & {
         runtimePromptStates: Record<string, any>;
     };
     processResponseCommands: (
@@ -435,11 +448,11 @@ export const 执行主剧情发送工作流 = async (
 
     try {
         // ─── 构建系统提示词 ────────────────────────────────────────────
-        const builtContext = deps.构建系统提示词(
-            currentState.prompts,
-            updatedMemSys,
-            currentState.社交,
-            {
+        const builtContext = deps.构建系统提示词({
+            promptPool: currentState.prompts,
+            memoryData: updatedMemSys,
+            socialData: currentState.社交,
+            statePayload: {
                 角色: currentState.角色,
                 环境: deps.规范化环境信息(currentState.环境),
                 世界: currentState.世界,
@@ -455,16 +468,11 @@ export const 执行主剧情发送工作流 = async (
                 校规系统: currentState.校规系统,
                 催眠系统: currentState.催眠系统
             },
-            {
-                ...(recallFeatureEnabled && recallTag
-                    ? { 禁用中期长期记忆: true, 禁用短期记忆: true }
-                    : {}),
-                世界书作用域: 规范化游戏设置(currentState.gameConfig).启用酒馆预设模式 === true
-                    ? ['main', 'tavern']
-                    : ['main'],
-                世界书附加文本: [sendInput, recallTag || '']
-            },
-            currentState.设备状态?.messages?.length > 0
+            gameConfig: currentState.gameConfig,
+            memoryConfig: currentState.memoryConfig,
+            worldbooks: currentState.世界书列表,
+            worldEvolutionEnabled: true,
+            deviceMessages: currentState.设备状态?.messages?.length > 0
                 ? currentState.设备状态.messages.map(m => ({
                     app: m.app,
                     title: m.title,
@@ -473,8 +481,16 @@ export const 执行主剧情发送工作流 = async (
                     read: m.read,
                 }))
                 : undefined,
-            currentState.gameConfig
-        );
+            options: {
+                ...(recallFeatureEnabled && recallTag
+                    ? { 禁用中期长期记忆: true, 禁用短期记忆: true }
+                    : {}),
+                世界书作用域: 规范化游戏设置(currentState.gameConfig).启用酒馆预设模式 === true
+                    ? ['main', 'tavern']
+                    : ['main'],
+                世界书附加文本: [sendInput, recallTag || '']
+            }
+        });
 
         // ─── 流式标记 ──────────────────────────────────────────────────
         let streamMarker = 0;
