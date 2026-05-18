@@ -298,6 +298,9 @@ interface ReturnMapperDeps {
     设备返回主页: any;
     设置设备状态: any;
     performanceConfig: any;
+    perfData: any;
+    perfActions: any;
+    renderProfilerRef: any;
 }
 
 export function 构建useGame返回值(deps: ReturnMapperDeps) {
@@ -525,6 +528,9 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             returnDeviceHome: deps.设备返回主页,
             setDeviceState: deps.设置设备状态,
             performanceConfig: deps.performanceConfig,
+            perfData: deps.perfData,
+            perfActions: deps.perfActions,
+            renderProfilerRef: deps.renderProfilerRef,
             boardGameBridge: deps.boardGameBridge,
             explorationBridge: deps.explorationBridge,
             lazyInitExploration: deps.lazyInitExploration,

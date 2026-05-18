@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Profiler } from 'react';
 import LandingPage from './components/layout/LandingPage';
 import { useGame } from './hooks/useGame';
 import { useResponsive } from './hooks/useResponsive';
@@ -12,12 +12,27 @@ import { ModalLayer } from './components/app/ModalLayer';
 import { MemoryModals } from './components/app/MemoryModals';
 import { ModalRenderer, useModalManager } from './utils/moduleRegistry';
 import './utils/moduleRegistry/bootstrap'; // 激活所有模块注册
+import FPSDisplay from './components/features/Performance/FPSDisplay';
+import PerformanceDashboard from './components/features/Performance/PerformanceDashboard';
 
 const App: React.FC = () => {
     const { state, meta, setters, actions } = useGame();
     const { isMobile } = useResponsive();
     const { requestConfirm, ConfirmModal } = useConfirmSystem();
     const modalManager = useModalManager();
+
+    // --- 性能面板快捷键 Ctrl+Shift+P ---
+    const [showPerfDashboard, setShowPerfDashboard] = React.useState(false);
+    React.useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+                e.preventDefault();
+                setShowPerfDashboard(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, []);
 
     // 监听新系统弹窗事件（由 ModalRenderer 的 modalManager 派发）
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -189,64 +204,77 @@ const App: React.FC = () => {
                 )}
 
                 {state.view === 'game' && (
-                    <GameView
-                        state={state}
-                        meta={meta}
-                        actions={actions}
-                        isMobile={isMobile}
-                        currentOptions={currentOptions}
-                        当前背景图片地址={当前背景图片地址}
-                        玩家头像地址={玩家头像地址}
-                        hideBottomTicker={hideBottomTicker}
-                        启用修炼体系={启用修炼体系}
-                        chatContentHidden={chatContentHidden}
-                        setChatContentHidden={setChatContentHidden}
-                        galgameModeEnabled={galgameModeEnabled}
-                        toggleGalgameMode={toggleGalgameMode}
-                        rpgModeEnabled={rpgModeEnabled}
-                        toggleRpgMode={toggleRpgMode}
-                        sceneQuickGenHint={sceneQuickGenHint}
-                        sceneQuickGenToastVisible={sceneQuickGenToastVisible}
-                        tickerEvents={tickerEvents}
-                        fontFaceStyleText={fontFaceStyleText}
-                        uiTextStyleVars={uiTextStyleVars}
-                        openDevice={(actions as any).openDevice}
-                        openCharacter={openCharacter}
-                        openSettings={openSettings}
-                        openInventory={openInventory}
-                        openEquipment={openEquipment}
-                        openBattle={openBattle}
-                        openTeam={openTeam}
-                        openSocial={openSocial}
-                        openKungfu={openKungfu}
-                        openWorld={openWorld}
-                        openMap={openMap}
-                        openSect={openSect}
-                        openTask={openTask}
-                        openAgreement={openAgreement}
-                        openStory={openStory}
-                        openHeroinePlan={openHeroinePlan}
-                        openMemory={openMemory}
-                        openCGGallery={openCGGallery}
-                        openMapExplorer={openMapExplorer}
-                        openImageManagerWithCheck={() => { modalManager.open('imageManager'); }}
-                        openNovelDecompositionWorkbench={openNovelDecompositionWorkbench}
-                        openSave={openSave}
-                        openLoad={openLoad}
-                        openNsfwCenter={() => modalManager.open('nsfwCenter')}
-                        openRpgBattle={() => modalManager.open('rpgBattle')}
-                        openRpgEquipment={() => modalManager.open('rpgEquipment')}
-                        openRpgKungfu={() => modalManager.open('rpgKungfu')}
-                        openRpgTask={() => modalManager.open('rpgTask')}
-                        openRpgSect={() => modalManager.open('rpgSect')}
-                        closeMobileMusic={closeMobileMusic}
-                        showMobileMusic={showMobileMusic}
-                        activeMobileWindow={activeMobileWindowResolved}
-                        handleMobileMenuClick={handleMobileMenuClick}
-                        dismissNotification={(actions as any).dismissNotification}
-                        renderTickerItems={renderTickerItems}
-                        requestConfirm={requestConfirm}
-                    />
+                    (() => {
+                        const gameViewContent = (
+                            <GameView
+                                state={state}
+                                meta={meta}
+                                actions={actions}
+                                isMobile={isMobile}
+                                currentOptions={currentOptions}
+                                当前背景图片地址={当前背景图片地址}
+                                玩家头像地址={玩家头像地址}
+                                hideBottomTicker={hideBottomTicker}
+                                启用修炼体系={启用修炼体系}
+                                chatContentHidden={chatContentHidden}
+                                setChatContentHidden={setChatContentHidden}
+                                galgameModeEnabled={galgameModeEnabled}
+                                toggleGalgameMode={toggleGalgameMode}
+                                rpgModeEnabled={rpgModeEnabled}
+                                toggleRpgMode={toggleRpgMode}
+                                sceneQuickGenHint={sceneQuickGenHint}
+                                sceneQuickGenToastVisible={sceneQuickGenToastVisible}
+                                tickerEvents={tickerEvents}
+                                fontFaceStyleText={fontFaceStyleText}
+                                uiTextStyleVars={uiTextStyleVars}
+                                openDevice={(actions as any).openDevice}
+                                openCharacter={openCharacter}
+                                openSettings={openSettings}
+                                openInventory={openInventory}
+                                openEquipment={openEquipment}
+                                openBattle={openBattle}
+                                openTeam={openTeam}
+                                openSocial={openSocial}
+                                openKungfu={openKungfu}
+                                openWorld={openWorld}
+                                openMap={openMap}
+                                openSect={openSect}
+                                openTask={openTask}
+                                openAgreement={openAgreement}
+                                openStory={openStory}
+                                openHeroinePlan={openHeroinePlan}
+                                openMemory={openMemory}
+                                openCGGallery={openCGGallery}
+                                openMapExplorer={openMapExplorer}
+                                openImageManagerWithCheck={() => { modalManager.open('imageManager'); }}
+                                openNovelDecompositionWorkbench={openNovelDecompositionWorkbench}
+                                openSave={openSave}
+                                openLoad={openLoad}
+                                openNsfwCenter={() => modalManager.open('nsfwCenter')}
+                                openRpgBattle={() => modalManager.open('rpgBattle')}
+                                openRpgEquipment={() => modalManager.open('rpgEquipment')}
+                                openRpgKungfu={() => modalManager.open('rpgKungfu')}
+                                openRpgTask={() => modalManager.open('rpgTask')}
+                                openRpgSect={() => modalManager.open('rpgSect')}
+                                closeMobileMusic={closeMobileMusic}
+                                showMobileMusic={showMobileMusic}
+                                activeMobileWindow={activeMobileWindowResolved}
+                                handleMobileMenuClick={handleMobileMenuClick}
+                                dismissNotification={(actions as any).dismissNotification}
+                                renderTickerItems={renderTickerItems}
+                                requestConfirm={requestConfirm}
+                            />
+                        );
+                        const renderProfilingEnabled = state.gameConfig?.性能监控配置?.启用渲染分析;
+                        if (renderProfilingEnabled && actions.renderProfilerRef?.current) {
+                            return (
+                                <Profiler id="GameView" onRender={actions.renderProfilerRef.current.onRender}>
+                                    {gameViewContent}
+                                </Profiler>
+                            );
+                        }
+                        return gameViewContent;
+                    })()
                 )}
 
                 {/* Modal Layer (global decorative frame only) */}
@@ -274,6 +302,26 @@ const App: React.FC = () => {
                 />
 
                 {ConfirmModal}
+
+                {/* 性能监控 */}
+                {state.view === 'game' && state.gameConfig?.性能监控配置?.启用性能监控 && (
+                    <FPSDisplay
+                        fps={actions.perfActions?.获取FPS?.() ?? 0}
+                        memoryMB={actions.perfData?.当前内存MB}
+                        enabled={state.gameConfig.性能监控配置.显示FPS}
+                    />
+                )}
+                {state.view === 'game' && showPerfDashboard && (
+                    <PerformanceDashboard
+                        perfData={actions.perfData ?? { fps: 0 }}
+                        aiQueueStats={actions.perfActions?.AI队列统计?.() ?? { activeCount: 0, pendingCount: 0, totalCount: 0, completedCount: 0, failedCount: 0, averageDurationMs: 0, longestPending: null }}
+                        renderReport={actions.perfActions?.渲染报告 ?? []}
+                        memoryAlerts={actions.perfActions?.内存告警 ?? []}
+                        slowOps={actions.perfActions?.获取慢操作记录?.() ?? []}
+                        maxSlowOps={state.gameConfig?.性能监控配置?.慢操作显示条数 ?? 10}
+                        onClose={() => setShowPerfDashboard(false)}
+                    />
+                )}
             </div>
         </MusicProvider>
     );

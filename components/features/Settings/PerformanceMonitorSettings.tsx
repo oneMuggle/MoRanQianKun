@@ -102,6 +102,88 @@ const PerformanceMonitorSettings: React.FC<Props> = ({ settings, onSave }) => {
                 </div>
             </div>
 
+            {/* 慢操作显示条数 */}
+            <div className="space-y-2 bg-black/20 p-4 rounded border border-gray-800">
+                <label className="text-xs text-wuxia-cyan font-bold uppercase tracking-widest">慢操作显示条数</label>
+                <div className="flex items-center gap-3">
+                    <input
+                        type="number"
+                        min="5"
+                        max="20"
+                        value={form.慢操作显示条数}
+                        onChange={(e) => setForm({ ...form, 慢操作显示条数: Math.min(20, Math.max(5, parseInt(e.target.value) || 10)) })}
+                        className="bg-black/50 border border-gray-600 p-2 text-white font-mono w-28 text-center focus:border-wuxia-gold outline-none"
+                    />
+                    <span className="text-gray-500 text-xs">性能面板中显示的慢操作记录条数（5-20）</span>
+                </div>
+            </div>
+
+            {/* 启用渲染分析 */}
+            <div className="space-y-2 bg-black/20 p-4 rounded border border-gray-800">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <label className="text-xs text-wuxia-cyan font-bold uppercase tracking-widest">启用渲染分析</label>
+                        <p className="text-gray-500 text-xs mt-1">使用 React Profiler 追踪组件渲染耗时，定位卡顿来源（有性能开销）</p>
+                    </div>
+                    <button
+                        onClick={() => setForm({ ...form, 启用渲染分析: !form.启用渲染分析 })}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            form.启用渲染分析 ? 'bg-wuxia-gold' : 'bg-gray-700'
+                        }`}
+                    >
+                        <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                form.启用渲染分析 ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                    </button>
+                </div>
+            </div>
+
+            {/* 启用内存追踪 */}
+            <div className="space-y-2 bg-black/20 p-4 rounded border border-gray-800">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <label className="text-xs text-wuxia-cyan font-bold uppercase tracking-widest">启用内存追踪</label>
+                        <p className="text-gray-500 text-xs mt-1">定期采样核心状态对象体积，检测内存泄漏</p>
+                    </div>
+                    <button
+                        onClick={() => setForm({ ...form, 启用内存追踪: !form.启用内存追踪 })}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            form.启用内存追踪 ? 'bg-wuxia-gold' : 'bg-gray-700'
+                        }`}
+                    >
+                        <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                form.启用内存追踪 ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                    </button>
+                </div>
+            </div>
+
+            {/* 启用 AI 队列监控 */}
+            <div className="space-y-2 bg-black/20 p-4 rounded border border-gray-800">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <label className="text-xs text-wuxia-cyan font-bold uppercase tracking-widest">启用 AI 队列监控</label>
+                        <p className="text-gray-500 text-xs mt-1">追踪 AI 请求队列状态，统计平均等待时间和拥堵情况</p>
+                    </div>
+                    <button
+                        onClick={() => setForm({ ...form, 启用AI队列监控: !form.启用AI队列监控 })}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            form.启用AI队列监控 ? 'bg-wuxia-gold' : 'bg-gray-700'
+                        }`}
+                    >
+                        <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                form.启用AI队列监控 ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                    </button>
+                </div>
+            </div>
+
             {/* 保存按钮 */}
             <div className="flex justify-end pt-4 border-t border-gray-800/50">
                 <GameButton
@@ -120,6 +202,9 @@ const PerformanceMonitorSettings: React.FC<Props> = ({ settings, onSave }) => {
                     <li>内存信息仅 Chrome 浏览器支持</li>
                     <li>慢操作警告输出到浏览器控制台</li>
                     <li>AI 响应时间包含网络延迟和模型推理时间</li>
+                    <li>渲染分析使用 React Profiler，会引入额外开销，建议调试时开启</li>
+                    <li>内存追踪使用 <code className="text-wuxia-cyan">requestIdleCallback</code> 每 30s 采样</li>
+                    <li>按 <code className="text-wuxia-cyan">Ctrl+Shift+P</code> 可快速切换性能面板</li>
                 </ul>
             </div>
         </div>

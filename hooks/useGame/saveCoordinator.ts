@@ -20,7 +20,8 @@ import type {
     场景图片档案,
     角色锚点结构,
     OpeningConfig,
-    时代信息结构
+    时代信息结构,
+    最近开局配置结构
 } from '../../types';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级, 校园系统数据 } from '../../models/campusPhone';
 import type { 关系网络数据 } from '../../models/relationship';
@@ -54,6 +55,7 @@ export type 自动存档快照结构 = {
     sceneImageArchive?: 场景图片档案;
     写真系统?: unknown;
     都市网约车系统?: unknown;
+    最近开局配置?: 最近开局配置结构;
     force?: boolean;
 };
 
@@ -97,6 +99,8 @@ type 存档协调当前状态 = {
     explorationCurrentNodeId?: string | null;
     // Galgame 引擎
     avgGalgameEngine?: AvgRelationEngine | null;
+    // 快速重开配置
+    最近开局配置?: 最近开局配置结构 | null;
 };
 
 type 存档协调依赖 = {
@@ -267,6 +271,7 @@ export const 创建存档数据 = (
     const 都市网约车系统Source = snapshot?.都市网约车系统
         ? snapshot.都市网约车系统
         : (currentState as any).都市网约车系统;
+    const recentOpeningConfigSource = snapshot?.最近开局配置 ?? currentState.最近开局配置;
     const coreWorldPrompt = 读取核心提示词内容(currentState.提示词池, 'core_world');
     const coreRealmPrompt = 读取核心提示词内容(currentState.提示词池, 'core_realm');
     const 核心提示词快照 = (coreWorldPrompt || coreRealmPrompt)
@@ -330,6 +335,8 @@ export const 创建存档数据 = (
         galgameSaveData: currentState.avgGalgameEngine
             ? serializeGalgameState(currentState.avgGalgameEngine)
             : undefined,
+        // 快速重开配置
+        最近开局配置: recentOpeningConfigSource ? deps.深拷贝(recentOpeningConfigSource) : undefined,
     };
 };
 
@@ -383,7 +390,7 @@ export const 执行读取存档 = async (
 ): Promise<void> => {
     deps.清空重Roll快照();
     deps.重置自动存档状态();
-    deps.设置最近开局配置(null);
+    deps.设置最近开局配置(save.最近开局配置 ? deps.深拷贝(save.最近开局配置) : null);
 
     const saveGameConfig = save.游戏设置 ? deps.规范化游戏设置(save.游戏设置) : undefined;
     deps.设置角色(deps.规范化角色物品容器映射(save.角色数据));

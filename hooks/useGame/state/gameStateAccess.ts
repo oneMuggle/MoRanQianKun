@@ -113,6 +113,7 @@ export interface GameStateAccess {
     memoryConfig: GameStateSlice['memoryConfig'];
     setMemoryConfig: GameStateSlice['setMemoryConfig'];
     performanceConfig: GameStateSlice['performanceConfig'];
+    setPerformanceConfig: GameStateSlice['setPerformanceConfig'];
     prompts: GameStateSlice['prompts'];
     setPrompts: GameStateSlice['setPrompts'];
     ensurePromptsLoaded: GameStateSlice['ensurePromptsLoaded'];
@@ -409,6 +410,7 @@ export function createGameStateAccess(
         memoryConfig: gameState.memoryConfig,
         setMemoryConfig: gameState.setMemoryConfig,
         performanceConfig: gameState.performanceConfig,
+        setPerformanceConfig: gameState.setPerformanceConfig,
         prompts: gameState.prompts,
         setPrompts: gameState.setPrompts,
         ensurePromptsLoaded: gameState.ensurePromptsLoaded,

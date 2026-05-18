@@ -1,41 +1,17 @@
 /**
  * FPSDisplay Component
- * 在游戏角落显示实时 FPS
+ * 在游戏角落显示实时 FPS（消费 performanceMonitor.ts 的共享数据）
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import { usePerformanceMonitor, type 性能监控数据 } from '../../hooks/useGame/performanceMonitor';
+import React from 'react';
 
 interface Props {
+  fps: number;
+  memoryMB?: number;
   enabled: boolean;
 }
 
-const FPSDisplay: React.FC<Props> = ({ enabled }) => {
-  const [fps, setFps] = useState(0);
-  const frameCountRef = useRef(0);
-  const lastTimeRef = useRef(performance.now());
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    let rafId: number;
-
-    const 计算FPS = () => {
-      frameCountRef.current++;
-      const now = performance.now();
-      const delta = now - lastTimeRef.current;
-      if (delta >= 1000) {
-        setFps(Math.round((frameCountRef.current * 1000) / delta));
-        frameCountRef.current = 0;
-        lastTimeRef.current = now;
-      }
-      rafId = requestAnimationFrame(计算FPS);
-    };
-
-    rafId = requestAnimationFrame(计算FPS);
-    return () => cancelAnimationFrame(rafId);
-  }, [enabled]);
-
+const FPSDisplay: React.FC<Props> = ({ fps, memoryMB, enabled }) => {
   if (!enabled) return null;
 
   return (
@@ -55,7 +31,7 @@ const FPSDisplay: React.FC<Props> = ({ enabled }) => {
         borderRadius: '4px',
       }}
     >
-      {fps} FPS
+      {fps} FPS{memoryMB ? ` · ${memoryMB}MB` : ''}
     </div>
   );
 };

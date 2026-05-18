@@ -20,6 +20,9 @@ export * from './models/campusPhone';
 export * from './models/campusNSFW';
 export * from './models/relationship';
 
+// Re-export 最近开局配置结构 from game-settings (type conflicts prevent full re-export)
+export type { 最近开局配置结构 } from './models/game-settings';
+
 // New types for the advanced chat system
 
 export interface TavernCommand {

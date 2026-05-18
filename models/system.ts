@@ -11,6 +11,7 @@ import type { 桌游社交NSFW设置 } from './boardGameNSFW';
 import { 生图目标类型, 生图筛选性别类型, 生图筛选重要性类型, 场景图片档案 } from './imageGeneration';
 import { NPC结构 } from './social';
 import type { 关系网络数据 } from './relationship';
+import type { 最近开局配置结构 } from './game-settings';
 import { 世界数据结构 } from './world';
 import { 详细门派结构 } from './sect';
 import { 任务结构, 约定结构 } from './task';
@@ -463,6 +464,11 @@ export interface 性能监控配置结构 {
     显示FPS: boolean;           // 默认 false
     AI响应慢阈值ms: number;     // 默认 10000ms (10秒)
     生图慢阈值ms: number;        // 默认 30000ms (30秒)
+    显示性能面板: boolean;       // 默认 false
+    启用渲染分析: boolean;       // 默认 false
+    启用内存追踪: boolean;       // 默认 false
+    启用AI队列监控: boolean;     // 默认 false
+    慢操作显示条数: number;      // 默认 10
 }
 
 export const 默认性能监控配置: 性能监控配置结构 = {
@@ -470,6 +476,11 @@ export const 默认性能监控配置: 性能监控配置结构 = {
     显示FPS: false,
     AI响应慢阈值ms: 10000,
     生图慢阈值ms: 30000,
+    显示性能面板: false,
+    启用渲染分析: false,
+    启用内存追踪: false,
+    启用AI队列监控: false,
+    慢操作显示条数: 10,
 };
 
 export type 剧情风格类型 = '后宫' | '修炼' | '一般' | '修罗场' | '纯爱' | 'NTL后宫';
@@ -1770,6 +1781,7 @@ export interface 存档结构 {
     写真系统?: 写真系统扩展; // 写真约拍系统（现代纪元NSFW模块）
     都市网约车系统?: Record<string, unknown>; // 都市网约车NSFW系统
     关系谱?: 关系网络数据; // 人物关系谱系统
+    最近开局配置?: 最近开局配置结构; // 快速重开配置（读档后保留重开能力）
     // Galgame 引擎状态
     galgameSaveData?: { version: number; engineData: Record<string, unknown>; relationGraphSnapshot?: { npcIds: string[] } };
     // 探索引擎状态

@@ -24,6 +24,7 @@ export interface WorkflowDomainInput {
     imageManagerConfigRef: any; imageManagerConfig: any; 默认图片管理设置: any;
     规范化图片管理设置: any; setGameConfig: any; setMemoryConfig: any;
     setPrompts: any; setFestivals: any; 创建设置持久化工作流: any;
+    performanceConfig: any; setPerformanceConfig: any;
     // BDSM
     校园系统: any; 设置校园系统: any; 创建BDSM关系操作工作流: any;
     // 系统提示词
@@ -84,6 +85,7 @@ export function createWorkflowDomain(input: WorkflowDomainInput) {
         imageManagerConfig, 默认图片管理设置, 规范化图片管理设置,
         setGameConfig, setMemoryConfig, setPrompts, setFestivals,
         创建设置持久化工作流,
+        performanceConfig, setPerformanceConfig,
         校园系统, 设置校园系统, 创建BDSM关系操作工作流,
         记忆系统, memoryConfig, 内置提示词列表, 世界书列表,
         角色姓名, currentEra, 构建系统提示词工作流,
@@ -148,6 +150,7 @@ export function createWorkflowDomain(input: WorkflowDomainInput) {
         setModelConverterPresetEnabled, savePromptConverterPreset,
         deletePromptConverterPreset, exportPresets, importPresets,
         saveGameSettings, saveMemorySettings, updatePrompts, updateFestivals,
+        savePerformanceSettings,
     } = 创建设置持久化工作流({
         获取接口配置: () => apiConfigRef.current,
         同步接口配置: (config: any) => { apiConfigRef.current = config; setApiConfig(config); },
@@ -163,6 +166,8 @@ export function createWorkflowDomain(input: WorkflowDomainInput) {
         设置记忆配置: setMemoryConfig,
         设置提示词池: setPrompts,
         设置节日列表: setFestivals,
+        设置性能监控配置: setPerformanceConfig,
+        获取性能监控配置: () => performanceConfig,
     });
 
     // --- BDSM ---
@@ -340,6 +345,7 @@ export function createWorkflowDomain(input: WorkflowDomainInput) {
         setModelConverterPresetEnabled, savePromptConverterPreset,
         deletePromptConverterPreset, exportPresets, importPresets,
         saveGameSettings, saveMemorySettings, updatePrompts, updateFestivals,
+        savePerformanceSettings,
         更新BDSM关系状态, 添加BDSM任务, 更新BDSM任务状态,
         更新契约状态, 添加BDSM里程碑, 设置日常指令,
         请求生成BDSM任务, 请求生成BDSM日常指令, 请求评价BDSM任务,

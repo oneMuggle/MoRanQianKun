@@ -121,6 +121,10 @@ import { createMemoryRuntimeDomain } from './useGame/domains/memoryRuntimeDomain
 import { createWorkflowDomain } from './useGame/domains/workflowDomain';
 import { useBoardGameBridge } from './useBoardGameBridge';
 import { useExplorationBridge } from './useExplorationBridge';
+import { usePerformanceMonitor, usePerformanceTracker } from './useGame/quality/performanceMonitor';
+import { useAIQueueMonitor } from './useGame/quality/aiQueueMonitor';
+import { useMemoryTracker } from './useGame/quality/memoryTracker';
+import { createRenderProfiler } from './useGame/quality/renderProfiler';
 
 const 加载图片AI服务 = () => import('../services/ai/image/runtime');
 const 加载NPC生图工作流 = () => import('./useGame/image/npcImageWorkflow');
@@ -165,7 +169,7 @@ export const useGame = () => {
         imageManagerConfig, setImageManagerConfig,
         gameConfig, setGameConfig,
         memoryConfig, setMemoryConfig,
-        performanceConfig,
+        performanceConfig, setPerformanceConfig,
         prompts, setPrompts,
         ensurePromptsLoaded,
         festivals, setFestivals,
@@ -262,6 +266,19 @@ export const useGame = () => {
     // Ref 同步（确保持久化工作流读取到最新值）
     useSyncRef(apiConfigRef, apiConfig);
     useSyncRef(visualConfigRef, visualConfig);
+
+    // --- 性能监控初始化 ---
+    const perfTracker = usePerformanceTracker();
+    const perfMonitor = usePerformanceMonitor({
+        onSlowOperation: perfTracker.处理慢操作,
+        config: performanceConfig,
+    });
+    const aiQueueMonitor = useAIQueueMonitor();
+    const memoryTracker = useMemoryTracker(performanceConfig.启用内存追踪, stateAccess as unknown as Record<string, unknown>);
+    const renderProfilerRef = useRef<ReturnType<typeof createRenderProfiler> | null>(null);
+    if (performanceConfig.启用渲染分析 && !renderProfilerRef.current) {
+        renderProfilerRef.current = createRenderProfiler();
+    }
 
     // 世界演变时间管理（封装游戏内时间 + 现实时间戳）
     const { 世界演变时间管理 } = stateAccess;
@@ -495,6 +512,7 @@ export const useGame = () => {
         imageManagerConfig, 默认图片管理设置, 规范化图片管理设置,
         setGameConfig, setMemoryConfig, setPrompts, setFestivals,
         创建设置持久化工作流,
+        performanceConfig, setPerformanceConfig,
         校园系统, 设置校园系统, 创建BDSM关系操作工作流,
         记忆系统, memoryConfig, 内置提示词列表, 世界书列表,
         角色姓名: 角色?.姓名, currentEra, 构建系统提示词工作流,
@@ -540,6 +558,7 @@ export const useGame = () => {
         setModelConverterPresetEnabled, savePromptConverterPreset,
         deletePromptConverterPreset, exportPresets, importPresets,
         saveGameSettings, saveMemorySettings, updatePrompts, updateFestivals,
+        savePerformanceSettings,
         更新BDSM关系状态, 添加BDSM任务, 更新BDSM任务状态,
         更新契约状态, 添加BDSM里程碑, 设置日常指令,
         请求生成BDSM任务, 请求生成BDSM日常指令, 请求评价BDSM任务,
@@ -1131,6 +1150,16 @@ export const useGame = () => {
         设备打开应用,
         设备返回主页,
         设置设备状态,
-        performanceConfig
+        performanceConfig,
+        perfData: perfMonitor.获取当前数据(),
+        perfActions: {
+            获取FPS: perfMonitor.获取FPS,
+            获取慢操作记录: perfTracker.获取慢操作记录,
+            清除慢操作记录: perfTracker.清除慢操作记录,
+            AI队列统计: aiQueueMonitor.getStats,
+            内存告警: memoryTracker.alerts,
+            渲染报告: renderProfilerRef.current?.getHotComponents() ?? [],
+        },
+        renderProfilerRef
     });
 };

@@ -41,6 +41,8 @@ type 设置持久化工作流依赖 = {
     设置记忆配置: (config: 记忆配置结构) => void;
     设置提示词池: (prompts: 提示词结构[]) => void;
     设置节日列表: (festivals: 节日结构[]) => void;
+    设置性能监控配置: (config: 性能监控配置结构) => void;
+    获取性能监控配置: () => 性能监控配置结构;
 };
 
 const 生成预设ID = (): string => `preset_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -349,6 +351,12 @@ export const 创建设置持久化工作流 = (deps: 设置持久化工作流依
         await dbService.保存设置(设置键.节日配置, newFestivals);
     };
 
+    const savePerformanceSettings = async (newConfig: 性能监控配置结构) => {
+        const normalized = 规范化性能监控设置(newConfig);
+        deps.设置性能监控配置(normalized);
+        await dbService.保存设置(设置键.性能监控设置, normalized);
+    };
+
     return {
         loadBuiltinPromptEntries,
         loadWorldbooks,
@@ -372,6 +380,7 @@ export const 创建设置持久化工作流 = (deps: 设置持久化工作流依
         saveGameSettings,
         saveMemorySettings,
         updatePrompts,
-        updateFestivals
+        updateFestivals,
+        savePerformanceSettings
     };
 };

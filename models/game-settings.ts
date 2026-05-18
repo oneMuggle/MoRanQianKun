@@ -208,6 +208,15 @@ export interface WorldGenConfig {
     古代体系选择?: '武侠' | '志怪' | '双修';
 }
 
+/** 快速重开所需的开局配置快照 */
+export interface 最近开局配置结构 {
+    worldConfig: WorldGenConfig;
+    charData: 角色数据结构;
+    openingConfig?: OpeningConfig;
+    openingStreaming: boolean;
+    openingExtraPrompt: string;
+}
+
 export type SaveType = 'manual' | 'auto';
 
 // === 酒馆预设 ===
@@ -396,6 +405,8 @@ export interface 存档结构 {
     校园系统?: 校园系统数据;
     写真系统?: 写真系统扩展; // 写真约拍系统（现代纪元NSFW模块）
     关系谱?: 关系网络数据; // 人物关系谱系统
+    /** 快速重开配置（用于读档后保留重开能力） */
+    最近开局配置?: 最近开局配置结构;
 }
 
 // === 提示词与节日 ===
