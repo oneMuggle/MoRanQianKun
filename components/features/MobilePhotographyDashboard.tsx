@@ -51,7 +51,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ label, value, color = 'bg-wux
   );
 };
 
-type TabId = 'projects' | 'leaks' | 'models' | 'photographers';
+type TabId = 'projects' | 'leaks' | 'models' | 'photographers' | 'reputation';
 
 interface Props {
   模特档案: Record<string, 模特核心状态>;
@@ -59,11 +59,40 @@ interface Props {
   进行中的拍摄项目: 拍摄项目状态[];
   历史拍摄记录: 拍摄项目状态[];
   泄露事件列表: 泄露事件状态[];
+  关系网络?: Record<string, {
+    信任度: number;
+    亲密度: number;
+    默契度: number;
+    合作次数: number;
+    关系等级: string;
+    里程碑: string[];
+  }>;
+  摄影师声望?: Record<string, {
+    业内声望: number;
+    圈内声誉: number;
+    风评: string;
+    标签: string[];
+    粉丝数量: number;
+    合作意向: number;
+  }>;
+  模特声望?: Record<string, {
+    知名度: number;
+    风评: string;
+    标签: string[];
+    黑料风险: number;
+  }>;
+  摄影集索引?: Record<string, {
+    作品总数: number;
+    发布数量: number;
+    代表作?: string[];
+  }>;
   onClose: () => void;
 }
 
 export const MobilePhotographyDashboard: React.FC<Props> = ({
-  模特档案, 摄影师档案, 进行中的拍摄项目, 泄露事件列表, onClose
+  模特档案, 摄影师档案, 进行中的拍摄项目, 泄露事件列表,
+  关系网络 = {}, 摄影师声望 = {}, 模特声望 = {}, 摄影集索引 = {},
+  onClose
 }) => {
   const [activeTab, setActiveTab] = React.useState<TabId>('projects');
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
@@ -94,6 +123,7 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
     { id: 'leaks', label: '泄露', count: 活跃泄露.length },
     { id: 'models', label: '模特', count: Object.keys(模特档案).length },
     { id: 'photographers', label: '摄影师', count: Object.keys(摄影师档案).length },
+    { id: 'reputation', label: '声望', count: Object.keys(摄影师声望).length + Object.keys(模特声望).length },
   ];
 
   const toggleExpand = (id: string) => setExpandedId(prev => prev === id ? null : id);
@@ -222,13 +252,15 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
   const renderPhotographers = () => (
     <div className="space-y-2 p-3">
       {Object.keys(摄影师档案).length === 0 && <div className="text-center text-gray-600 py-12 text-sm">暂无摄影师数据</div>}
-      {Object.entries(摄影师档案).map(([id, 摄影师]) => (
+      {Object.entries(摄影师档案).map(([id, 摄影师]) => {
+        const 显示姓名 = 摄影师姓名映射[id] || 摄影师.姓名;
+        return (
         <div key={id} className="bg-black/40 border border-white/10 rounded-xl overflow-hidden">
           <button type="button" onClick={() => toggleExpand(id)} className="w-full flex items-center justify-between p-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-black/60 border border-wuxia-gold/30 flex items-center justify-center text-sm font-serif text-wuxia-gold/60">{摄影师.姓名[0]}</div>
+              <div className="w-8 h-8 rounded-full bg-black/60 border border-wuxia-gold/30 flex items-center justify-center text-sm font-serif text-wuxia-gold/60">{显示姓名[0]}</div>
               <div className="text-left">
-                <div className="text-wuxia-gold font-bold text-sm">{摄影师.姓名}</div>
+                <div className="text-wuxia-gold font-bold text-sm">{显示姓名}</div>
                 <div className="text-[10px] text-gray-500">{摄影师.类型}</div>
               </div>
             </div>
@@ -241,7 +273,109 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
             </div>
           )}
         </div>
+        );
+      })}
+    </div>
+  );
+
+  const renderReputation = () => (
+    <div className="space-y-2 p-3">
+      {Object.keys(摄影师声望).length === 0 && Object.keys(模特声望).length === 0 && (
+        <div className="text-center text-gray-600 py-12 text-sm">暂无声望数据</div>
+      )}
+      {/* 摄影师声望 */}
+      {Object.entries(摄影师声望).map(([id, rep]) => {
+        const 姓名 = 摄影师姓名映射[id] || id;
+        const 风评颜色 = rep.风评 === '优秀' ? 'text-emerald-400'
+          : rep.风评 === '良好' ? 'text-green-400'
+          : rep.风评 === '一般' ? 'text-yellow-400'
+          : rep.风评 === '争议' ? 'text-orange-400'
+          : 'text-red-400';
+        return (
+          <div key={`ph-${id}`} className="bg-black/40 border border-white/10 rounded-xl p-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-wuxia-gold font-bold text-sm">{姓名} <span className="text-gray-500 text-xs">(摄影师)</span></div>
+              <div className={`text-xs ${风评颜色}`}>{rep.风评}</div>
+            </div>
+            <div className="grid grid-cols-4 gap-1 text-center text-xs">
+              <div><div className="text-gray-600 text-[10px]">声望</div><div className="text-blue-400 font-mono">{rep.业内声望}</div></div>
+              <div><div className="text-gray-600 text-[10px]">声誉</div><div className="text-purple-400 font-mono">{rep.圈内声誉}</div></div>
+              <div><div className="text-gray-600 text-[10px]">粉丝</div><div className="text-pink-400 font-mono">{rep.粉丝数量}</div></div>
+              <div><div className="text-gray-600 text-[10px]">意向</div><div className="text-green-400 font-mono">{rep.合作意向}%</div></div>
+            </div>
+            {rep.标签.length > 0 && (
+              <div className="flex gap-1 mt-1 flex-wrap">
+                {rep.标签.map((tag, i) => (
+                  <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-white/5">{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {/* 模特声望 */}
+      {Object.entries(模特声望).map(([id, rep]) => (
+        <div key={`md-${id}`} className="bg-black/40 border border-white/10 rounded-xl p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-wuxia-gold font-bold text-sm">{模特姓名映射[id] || id} <span className="text-gray-500 text-xs">(模特)</span></div>
+            <div className="text-xs text-gray-300">{rep.风评}</div>
+          </div>
+          <div className="grid grid-cols-3 gap-1 text-center text-xs">
+            <div><div className="text-gray-600 text-[10px]">知名度</div><div className="text-yellow-400 font-mono">{rep.知名度}</div></div>
+            <div><div className="text-gray-600 text-[10px]">黑料风险</div><div className={`font-mono ${rep.黑料风险 >= 70 ? 'text-red-400' : rep.黑料风险 >= 40 ? 'text-yellow-400' : 'text-green-400'}`}>{rep.黑料风险}</div></div>
+            <div><div className="text-gray-600 text-[10px]">风评</div><div className="text-gray-300 text-[10px] truncate max-w-[60px]">{rep.风评}</div></div>
+          </div>
+          {rep.标签 && rep.标签.length > 0 && (
+            <div className="flex gap-1 mt-1 flex-wrap">
+              {rep.标签.map((tag, i) => (
+                <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-white/5">{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
       ))}
+      {/* 关系网络 */}
+      {Object.keys(关系网络).length > 0 && (
+        <>
+          <div className="text-[10px] text-gray-500 uppercase tracking-widest px-1 mt-3 mb-1">关系网络</div>
+          {Object.entries(关系网络).map(([key, rel]) => {
+            const [模特Id, 摄影师Id] = key.split('-');
+            const 模特名 = 模特姓名映射[模特Id] || 模特Id;
+            const 摄影师名 = 摄影师姓名映射[摄影师Id] || 摄影师Id;
+            return (
+              <div key={key} className="bg-black/40 border border-white/10 rounded-xl p-3">
+                <div className="text-wuxia-gold font-bold text-sm mb-1">{模特名} ↔ {摄影师名}</div>
+                <div className="grid grid-cols-4 gap-1 text-center text-xs">
+                  <div><div className="text-gray-600 text-[10px]">信任</div><div className="text-blue-400 font-mono">{rel.信任度}</div></div>
+                  <div><div className="text-gray-600 text-[10px]">亲密</div><div className="text-pink-400 font-mono">{rel.亲密度}</div></div>
+                  <div><div className="text-gray-600 text-[10px]">默契</div><div className="text-green-400 font-mono">{rel.默契度}</div></div>
+                  <div><div className="text-gray-600 text-[10px]">合作</div><div className="text-wuxia-gold font-mono">{rel.合作次数}</div></div>
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
+      {/* 摄影集索引 */}
+      {Object.keys(摄影集索引).length > 0 && (
+        <>
+          <div className="text-[10px] text-gray-500 uppercase tracking-widest px-1 mt-3 mb-1">摄影集</div>
+          <div className="grid grid-cols-2 gap-2">
+            {Object.entries(摄影集索引).map(([id, col]) => {
+              const 姓名 = 模特姓名映射[id] || 摄影师姓名映射[id] || id;
+              return (
+                <div key={id} className="bg-black/40 border border-white/10 rounded-xl p-3">
+                  <div className="text-wuxia-gold font-bold text-sm mb-1">{姓名}</div>
+                  <div className="grid grid-cols-2 gap-1 text-center text-xs">
+                    <div><div className="text-gray-600 text-[10px]">作品</div><div className="text-purple-400 font-mono">{col.作品总数}</div></div>
+                    <div><div className="text-gray-600 text-[10px]">发布</div><div className="text-green-400 font-mono">{col.发布数量}</div></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 
@@ -275,6 +409,7 @@ export const MobilePhotographyDashboard: React.FC<Props> = ({
         {activeTab === 'leaks' && renderLeaks()}
         {activeTab === 'models' && renderModels()}
         {activeTab === 'photographers' && renderPhotographers()}
+        {activeTab === 'reputation' && renderReputation()}
       </div>
     </div>
   );

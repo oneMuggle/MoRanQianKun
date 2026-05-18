@@ -7,6 +7,8 @@ export type {
   服装类型, 拍摄尺度, 后期处理,
   越界行为类型, 泄露类型, 传播范围,
   玩法层类型, 写真玩法配置,
+  药物酒精等级, 把柄分级, 操控行为类型,
+  行业潜规则类型, 依赖类型, 定制需求等级,
 } from './types';
 
 export { 默认写真玩法配置 } from './types';
@@ -58,4 +60,38 @@ export interface 写真系统扩展 {
   进行中的拍摄项目?: import('./states').拍摄项目状态[];
   历史拍摄记录?: import('./states').拍摄项目状态[];
   泄露事件列表?: import('./states').泄露事件状态[];
+
+  // 新增：关系网络（key: "模特Id-摄影师Id"）
+  关系网络?: Record<string, {
+    信任度: number;
+    亲密度: number;
+    默契度: number;
+    合作次数: number;
+    关系等级: string;
+    里程碑: string[];
+  }>;
+
+  // 新增：摄影集索引（key: 模特Id 或 摄影师Id）
+  摄影集索引?: Record<string, {
+    作品总数: number;
+    发布数量: number;
+    代表作?: string[];  // 项目ID列表
+  }>;
+
+  // 新增：声望系统
+  摄影师声望?: Record<string, {
+    业内声望: number;
+    圈内声誉: number;
+    风评: '优秀' | '良好' | '一般' | '争议' | '恶劣';
+    标签: string[];
+    粉丝数量: number;
+    合作意向: number;
+  }>;
+
+  模特声望?: Record<string, {
+    知名度: number;
+    风评: string;
+    标签: string[];
+    黑料风险: number;
+  }>;
 }
