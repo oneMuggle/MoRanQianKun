@@ -21,6 +21,7 @@ import { 剧情规划结构 } from './storyPlan';
 import { 女主剧情规划结构 } from './heroinePlan';
 import { 同人剧情规划结构 } from './fandomPlanning/story';
 import { 同人女主剧情规划结构 } from './fandomPlanning/heroinePlan';
+import type { 房产数据结构, 房产系统状态 } from './property/types';
 import { 战斗状态结构 } from './battle';
 
 import type { LiModeStage } from './eraTheme/types';
@@ -1790,6 +1791,8 @@ export interface 存档结构 {
     explorationCurrentAp?: number;
     explorationMaxAp?: number;
     explorationCurrentNodeId?: string | null;
+    房产系统?: 房产系统状态;
+    当前房产存档?: 房产数据结构;
 }
 
 export type PromptCategory = '核心设定' | '数值设定' | '难度设定' | '写作设定' | '自定义';

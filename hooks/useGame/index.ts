@@ -193,3 +193,19 @@ export { 触发任务生成, 触发日常指令刷新 } from './bdsmTaskTrigger'
 
 // 校园 NSFW
 export { 从NPC创建欲望档案, 创建默认欲望档案 } from './campusNSFWEngine';
+
+// 房产 SLG 经营系统
+export { 创建空房产状态, 创建初始房产 } from './storyState';
+export {
+    计算房产吸引力, 计算舒适度, 计算安全性, 计算房客满意度,
+    计算应付租金, 计算维护费用, 计算经验值获取,
+    推进经营回合, 检查房客退租, 生成经营摘要
+} from './property/propertyEngine';
+export {
+    开始建造设施, 完成建造设施, 升级设施, 拆除设施,
+    扩建房间, 升级房间, 处理建造队列, 检查建造资金
+} from './property/facilityWorkflow';
+export {
+    招揽房客, 处理房客退租, 自动退租检查, 更新房客满意度,
+    获取房客满意度报告, 驱逐房客, 分配房间
+} from './property/tenantWorkflow';

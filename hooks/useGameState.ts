@@ -35,6 +35,8 @@ import { 节日列表 } from '../data/world';
 import { 初始设备状态, type DeviceState, type MobileApp } from './useGame/device/mobileDeviceWorkflow';
 import type { 校园系统数据 } from '../models/campusPhone';
 import type { 关系网络数据 } from '../models/relationship';
+import type { 房产系统状态, 房产数据结构 } from '../models/property/types';
+import { 创建空房产状态, 创建初始房产 } from './useGame/storyState';
 import * as dbService from '../services/dbService';
 import { THEMES, 应用主题到根元素, 应用时代主题到根元素 } from '../styles/themes';
 import { 获取时代主题方案 } from '../models/system';
@@ -232,6 +234,10 @@ export const useGameState = () => {
 
     // Urban Driver NSFW System Data
     const [都市网约车系统, 设置都市网约车系统] = useState<unknown>({});
+
+    // Property SLG System
+    const [房产系统, 设置房产系统] = useState<房产系统状态>(() => 创建空房产状态());
+    const [当前房产, 设置当前房产] = useState<房产数据结构 | null>(() => null);
 
     const [activeTab, setActiveTab] = useState<'api' | 'image_generation' | 'integrated_models' | 'independent_api_gpt' | 'novel_decomposition' | 'novel_decomposition_runtime' | 'prompt' | 'storage' | 'theme' | 'visual' | 'world' | 'game' | 'reality' | 'tavern_preset' | 'memory' | 'history' | 'context' | 'music' | 'npc_management' | 'variable_manager'>('api');
     
@@ -477,6 +483,10 @@ export const useGameState = () => {
         // NSFW Systems
         写真系统, 设置写真系统,
         都市网约车系统, 设置都市网约车系统,
+
+        // Property SLG System
+        房产系统, 设置房产系统,
+        当前房产, 设置当前房产,
 
         // Configs
         apiConfig, setApiConfig,
