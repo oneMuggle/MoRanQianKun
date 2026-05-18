@@ -43,7 +43,7 @@ export function assignToPost(
   assignments: PostAssignment[],
   memberId: string,
   postId: string,
-): DispatchResult {
+): DispatchResult & { newAssignments?: PostAssignment[] } {
   const config = POST_CONFIGS[postId];
   if (!config) {
     return { success: false, reason: `未知岗位: ${postId}` };
@@ -64,21 +64,33 @@ export function assignToPost(
     }
   }
 
-  return { success: true };
+  // 不可变更新：返回新的 assignments 数组
+  const newAssignments = assignments.map((a) =>
+    a.postId === postId
+      ? { ...a, assignedMembers: [...a.assignedMembers, memberId] }
+      : a,
+  );
+
+  return { success: true, newAssignments };
 }
 
 export function removeFromPost(
   assignments: PostAssignment[],
   memberId: string,
-): DispatchResult {
-  for (const a of assignments) {
-    const index = a.assignedMembers.indexOf(memberId);
-    if (index >= 0) {
-      a.assignedMembers.splice(index, 1);
-      return { success: true };
-    }
+): DispatchResult & { newAssignments?: PostAssignment[] } {
+  const idx = assignments.findIndex((a) => a.assignedMembers.includes(memberId));
+  if (idx < 0) {
+    return { success: false, reason: '成员未在任何岗位' };
   }
-  return { success: false, reason: '成员未在任何岗位' };
+
+  // 不可变更新：返回新的 assignments 数组
+  const newAssignments = assignments.map((a, i) =>
+    i === idx
+      ? { ...a, assignedMembers: a.assignedMembers.filter((id) => id !== memberId) }
+      : a,
+  );
+
+  return { success: true, newAssignments };
 }
 
 export function calculatePostOutput(

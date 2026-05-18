@@ -13,6 +13,7 @@ import type { RpgTaskEngine } from './useGame/engine/rpgTaskEngine';
 import type { RpgSectEngine } from './useGame/engine/rpgSectEngine';
 import type { RpgItemEngine } from './useGame/engine/rpgItemEngine';
 import type { CombatStats } from './useGame/rpg/battle/damageCalculator';
+import type { PostAssignment } from './useGame/rpg/sect/memberDispatcher';
 import type { BattlePhase } from './useGame/rpg/battle/battleStateMachine';
 import type { PlayerAction } from './useGame/engine/types';
 import type { 功法结构 } from '../models/kungfu';
@@ -332,15 +333,25 @@ export function useRpgStateBridge(): UseRpgStateBridgeReturn {
   }, [setRpgState]);
 
   // === Sect Engine Sync ===
+  // 融合后：同步完整门派数据到 Zustand，同时注入 Zustand 状态到引擎
   const syncSectState = React.useCallback(() => {
     const engine = sectEngineRef.current;
     if (!engine) return;
     const sectData = engine.sectData;
     if (!sectData) {
-      setRpgState({ rpgSectId: null, rpgSectContribution: 0 });
+      setRpgState({
+        rpgSectData: null,
+        rpgPostAssignments: [],
+        // Deprecated: 保留兼容性
+        rpgSectId: null,
+        rpgSectContribution: 0,
+      });
       return;
     }
     setRpgState({
+      rpgSectData: sectData,
+      rpgPostAssignments: Array.from(engine.postAssignments) as PostAssignment[],
+      // Deprecated: 保留兼容性
       rpgSectId: sectData.ID,
       rpgSectContribution: sectData.玩家贡献,
     });

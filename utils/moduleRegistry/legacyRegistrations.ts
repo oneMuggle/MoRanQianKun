@@ -82,7 +82,6 @@ import {
   RpgEquipmentIntegration,
   RpgKungfuIntegration,
   RpgTaskIntegration,
-  RpgSectIntegration,
 } from '../../components/features/lazyComponents';
 
 // ============================================================================
@@ -1574,25 +1573,6 @@ UIFeatureRegistry.register({
     propsFactory: ({ state, actions, modalManager }) => ({
       tasks: state.任务列表,
       onClose: () => modalManager.close('rpgTask'),
-    }),
-  },
-});
-
-// RPG 门派 — 门派信息/贡献面板
-UIFeatureRegistry.register({
-  id: 'rpgSect',
-  name: 'RPG 门派',
-  icon: '🏯',
-  category: 'core',
-  priority: 80,
-  version: '1.1.0',
-  dependencies: [],
-  modal: {
-    desktopComponent: RpgSectIntegration,
-    visibility: 'always',
-    propsFactory: ({ state, modalManager }) => ({
-      sectData: state.玩家门派,
-      onClose: () => modalManager.close('rpgSect'),
     }),
   },
 });

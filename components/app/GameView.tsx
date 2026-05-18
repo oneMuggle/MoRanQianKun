@@ -66,11 +66,12 @@ interface GameViewProps {
     openSave: () => void;
     openLoad: () => void;
     openNsfwCenter: () => void;
+    togglePerfDashboard: () => void;
+    perfDashboardOpen: boolean;
     openRpgBattle: () => void;
     openRpgEquipment: () => void;
     openRpgKungfu: () => void;
     openRpgTask: () => void;
-    openRpgSect: () => void;
     closeMobileMusic: () => void;
     showMobileMusic: boolean;
     activeMobileWindow: string | null;
@@ -129,11 +130,12 @@ export function GameView({
     openSave,
     openLoad,
     openNsfwCenter,
+    togglePerfDashboard,
+    perfDashboardOpen,
     openRpgBattle,
     openRpgEquipment,
     openRpgKungfu,
     openRpgTask,
-    openRpgSect,
     closeMobileMusic,
     showMobileMusic,
     activeMobileWindow,
@@ -178,6 +180,24 @@ export function GameView({
                             (actions.saveGameSettings as any)?.({ ...(state.gameConfig as any), 子纪元里模式强度: { ...prev, [eraId]: intensity } });
                         }}
                     />
+                    {/* 性能面板入口 */}
+                    <button
+                        type="button"
+                        onClick={togglePerfDashboard}
+                        className={`absolute top-2 right-12 z-50 w-8 h-8 flex items-center justify-center rounded-full border transition-colors text-[10px] ${
+                            perfDashboardOpen
+                                ? 'border-cyan-400/60 bg-cyan-950/60 text-cyan-300 hover:bg-cyan-900/40'
+                                : 'border-gray-700/50 bg-gray-900/40 text-gray-500 hover:text-gray-300 hover:border-gray-500'
+                        }`}
+                        title="性能监控面板 (Ctrl+Shift+P)"
+                        aria-label="性能监控面板"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                            <path d="M12 20V10" />
+                            <path d="M18 20V4" />
+                            <path d="M6 20v-4" />
+                        </svg>
+                    </button>
                     {/* NSFW 管理中心入口 */}
                     <button
                         type="button"
@@ -433,7 +453,6 @@ export function GameView({
                             onOpenRpgEquipment={openRpgEquipment}
                             onOpenRpgKungfu={openRpgKungfu}
                             onOpenRpgTask={openRpgTask}
-                            onOpenRpgSect={openRpgSect}
                         />
                     </div>
                 </div>

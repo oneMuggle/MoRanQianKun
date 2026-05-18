@@ -251,11 +251,12 @@ const App: React.FC = () => {
                                 openSave={openSave}
                                 openLoad={openLoad}
                                 openNsfwCenter={() => modalManager.open('nsfwCenter')}
+                                togglePerfDashboard={() => setShowPerfDashboard(prev => !prev)}
+                                perfDashboardOpen={showPerfDashboard}
                                 openRpgBattle={() => modalManager.open('rpgBattle')}
                                 openRpgEquipment={() => modalManager.open('rpgEquipment')}
                                 openRpgKungfu={() => modalManager.open('rpgKungfu')}
                                 openRpgTask={() => modalManager.open('rpgTask')}
-                                openRpgSect={() => modalManager.open('rpgSect')}
                                 closeMobileMusic={closeMobileMusic}
                                 showMobileMusic={showMobileMusic}
                                 activeMobileWindow={activeMobileWindowResolved}
@@ -304,11 +305,11 @@ const App: React.FC = () => {
                 {ConfirmModal}
 
                 {/* 性能监控 */}
-                {state.view === 'game' && state.gameConfig?.性能监控配置?.启用性能监控 && (
+                {state.view === 'game' && (state as any).performanceConfig?.启用性能监控 && (
                     <FPSDisplay
                         fps={actions.perfActions?.获取FPS?.() ?? 0}
                         memoryMB={actions.perfData?.当前内存MB}
-                        enabled={state.gameConfig.性能监控配置.显示FPS}
+                        enabled={(state as any).performanceConfig?.显示FPS}
                     />
                 )}
                 {state.view === 'game' && showPerfDashboard && (
@@ -318,7 +319,7 @@ const App: React.FC = () => {
                         renderReport={actions.perfActions?.渲染报告 ?? []}
                         memoryAlerts={actions.perfActions?.内存告警 ?? []}
                         slowOps={actions.perfActions?.获取慢操作记录?.() ?? []}
-                        maxSlowOps={state.gameConfig?.性能监控配置?.慢操作显示条数 ?? 10}
+                        maxSlowOps={(state as any).performanceConfig?.慢操作显示条数 ?? 10}
                         onClose={() => setShowPerfDashboard(false)}
                     />
                 )}

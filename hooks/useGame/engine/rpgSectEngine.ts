@@ -2,6 +2,9 @@
  * rpgSectEngine.ts
  *
  * RPG 门派引擎 — 管理门派经济、成员派遣、任务刷新、商品定价
+ *
+ * 融合后设计：引擎从外部注入当前 state（Zustand），不再独立持有数据。
+ * setState 由桥接层在每次 action 前调用，确保引擎操作的是最新状态。
  */
 
 import { BaseEngine } from '../engine/baseEngine';
@@ -15,6 +18,7 @@ import type {
   EngineType,
 } from '../engine/types';
 import type { 详细门派结构, 门派商品 } from '../../../models/sect';
+import type { PostAssignment, SectMember } from '../rpg/sect/memberDispatcher';
 import {
   addFunds,
   spendFunds,
@@ -34,8 +38,6 @@ import {
   assignToPost,
   removeFromPost,
   calculatePostOutput,
-  type PostAssignment,
-  type SectMember,
 } from '../rpg/sect/memberDispatcher';
 import {
   calculateFinalPrice,
@@ -44,28 +46,38 @@ import {
 } from '../rpg/sect/dynamicPricing';
 
 export class RpgSectEngine extends BaseEngine {
-  private _sectData: 详细门派结构 | null = null;
-  private _postAssignments: PostAssignment[] = [];
+  /** 当前状态 — 由桥接层从 Zustand 注入，引擎不自行持有 */
+  private _currentSect: 详细门派结构 | null = null;
+  private _currentAssignments: PostAssignment[] = [];
   private _turnNumber = 0;
 
   constructor() {
     super('rpgSect' as EngineType);
   }
 
+  /**
+   * 从 Zustand 注入当前状态
+   */
+  setState(sect: 详细门派结构 | null, assignments: PostAssignment[] = []): void {
+    this._currentSect = sect;
+    this._currentAssignments = assignments;
+  }
+
   get sectData(): 详细门派结构 | null {
-    return this._sectData;
+    return this._currentSect;
   }
 
   get postAssignments(): ReadonlyArray<PostAssignment> {
-    return this._postAssignments;
+    return this._currentAssignments;
   }
 
   /**
    * 初始化门派数据
    */
   initialize(sectData: 详细门派结构): ActionResult {
-    this._sectData = { ...sectData };
-    this._postAssignments = initializePosts();
+    const assignments = initializePosts();
+    this._currentSect = { ...sectData };
+    this._currentAssignments = assignments;
 
     this._publishSectEvent('SECT_INITIALIZE', {
       sectId: sectData.ID,
@@ -85,11 +97,9 @@ export class RpgSectEngine extends BaseEngine {
    * 增加贡献
    */
   gainContribution(amount: number): ActionResult {
-    if (!this._sectData) {
-      return this._notInSect();
-    }
+    if (!this._currentSect) return this._notInSect();
 
-    const result = addContribution(this._sectData.玩家贡献, amount);
+    const result = addContribution(this._currentSect.玩家贡献, amount);
     if (!result.success) {
       return {
         success: false,
@@ -101,8 +111,8 @@ export class RpgSectEngine extends BaseEngine {
     }
 
     const newRank = calculateRank(result.newContribution);
-    this._sectData = {
-      ...this._sectData,
+    this._currentSect = {
+      ...this._currentSect,
       玩家贡献: result.newContribution,
       玩家职位: newRank,
     };
@@ -122,11 +132,9 @@ export class RpgSectEngine extends BaseEngine {
    * 消耗贡献
    */
   useContribution(amount: number): ActionResult {
-    if (!this._sectData) {
-      return this._notInSect();
-    }
+    if (!this._currentSect) return this._notInSect();
 
-    const result = spendContribution(this._sectData.玩家贡献, amount);
+    const result = spendContribution(this._currentSect.玩家贡献, amount);
     if (!result.success) {
       return {
         success: false,
@@ -137,8 +145,8 @@ export class RpgSectEngine extends BaseEngine {
       };
     }
 
-    this._sectData = {
-      ...this._sectData,
+    this._currentSect = {
+      ...this._currentSect,
       玩家贡献: result.newContribution,
     };
 
@@ -155,12 +163,12 @@ export class RpgSectEngine extends BaseEngine {
    * 增加门派资金
    */
   addSectFunds(amount: number): ActionResult {
-    if (!this._sectData) return this._notInSect();
+    if (!this._currentSect) return this._notInSect();
 
     const economy: EconomyState = {
-      门派资金: this._sectData.门派资金,
-      门派物资: this._sectData.门派物资,
-      建设度: this._sectData.建设度,
+      门派资金: this._currentSect.门派资金,
+      门派物资: this._currentSect.门派物资,
+      建设度: this._currentSect.建设度,
     };
     const result = addFunds(economy, amount);
     if (!result.success) {
@@ -173,7 +181,7 @@ export class RpgSectEngine extends BaseEngine {
       };
     }
 
-    this._sectData = { ...this._sectData, 门派资金: result.newState.门派资金 };
+    this._currentSect = { ...this._currentSect, 门派资金: result.newState.门派资金 };
     return {
       success: true,
       stateUpdates: { sectFunds: result.newState.门派资金 },
@@ -187,12 +195,12 @@ export class RpgSectEngine extends BaseEngine {
    * 投入建设
    */
   investInConstruction(funds: number): ActionResult {
-    if (!this._sectData) return this._notInSect();
+    if (!this._currentSect) return this._notInSect();
 
     const economy: EconomyState = {
-      门派资金: this._sectData.门派资金,
-      门派物资: this._sectData.门派物资,
-      建设度: this._sectData.建设度,
+      门派资金: this._currentSect.门派资金,
+      门派物资: this._currentSect.门派物资,
+      建设度: this._currentSect.建设度,
     };
     const result = investConstruction(economy, funds);
     if (!result.success) {
@@ -205,8 +213,8 @@ export class RpgSectEngine extends BaseEngine {
       };
     }
 
-    this._sectData = {
-      ...this._sectData,
+    this._currentSect = {
+      ...this._currentSect,
       门派资金: result.newState.门派资金,
       建设度: result.newState.建设度,
     };
@@ -226,12 +234,12 @@ export class RpgSectEngine extends BaseEngine {
    * 刷新任务列表
    */
   refreshTasks(missionCountPerType: number = 2): ActionResult {
-    if (!this._sectData) return this._notInSect();
+    if (!this._currentSect) return this._notInSect();
 
-    const currentTasks = this._sectData.任务列表 ?? [];
+    const currentTasks = this._currentSect.任务列表 ?? [];
     const newTasks = refreshMissions(currentTasks, missionCountPerType);
 
-    this._sectData = { ...this._sectData, 任务列表: newTasks };
+    this._currentSect = { ...this._currentSect, 任务列表: newTasks };
 
     this._publishSectEvent('SECT_TASK_REFRESH', { taskCount: newTasks.length });
 
@@ -248,10 +256,10 @@ export class RpgSectEngine extends BaseEngine {
    * 分配成员到岗位
    */
   dispatchMember(memberId: string, postId: string): ActionResult {
-    if (!this._sectData) return this._notInSect();
+    if (!this._currentSect) return this._notInSect();
 
-    const result = assignToPost(this._postAssignments, memberId, postId);
-    if (!result.success) {
+    const result = assignToPost(this._currentAssignments, memberId, postId);
+    if (!result.success || !result.newAssignments) {
       return {
         success: false,
         stateUpdates: {},
@@ -261,10 +269,7 @@ export class RpgSectEngine extends BaseEngine {
       };
     }
 
-    const assignment = this._postAssignments.find((a) => a.postId === postId);
-    if (assignment) {
-      assignment.assignedMembers.push(memberId);
-    }
+    this._currentAssignments = result.newAssignments;
 
     return {
       success: true,
@@ -276,13 +281,13 @@ export class RpgSectEngine extends BaseEngine {
   }
 
   /**
-   * 从岗位移除成员
+   * 从岗位召回成员
    */
   recallMember(memberId: string): ActionResult {
-    if (!this._sectData) return this._notInSect();
+    if (!this._currentSect) return this._notInSect();
 
-    const result = removeFromPost(this._postAssignments, memberId);
-    if (!result.success) {
+    const result = removeFromPost(this._currentAssignments, memberId);
+    if (!result.success || !result.newAssignments) {
       return {
         success: false,
         stateUpdates: {},
@@ -291,6 +296,8 @@ export class RpgSectEngine extends BaseEngine {
         sideEffects: [],
       };
     }
+
+    this._currentAssignments = result.newAssignments;
 
     return {
       success: true,
@@ -305,11 +312,11 @@ export class RpgSectEngine extends BaseEngine {
    * 计算岗位产出
    */
   calculateAllPostOutputs(members: SectMember[]): { postId: string; postName: string; dailyYield: number }[] {
-    return this._postAssignments.map((assignment) => {
+    return this._currentAssignments.map((assignment) => {
       const output = calculatePostOutput(assignment, members);
       return {
         postId: output.postId,
-        postName: output.postName,
+        postName: assignment.postName,
         dailyYield: output.dailyYield,
       };
     });
@@ -341,13 +348,13 @@ export class RpgSectEngine extends BaseEngine {
     needed: number;
     contribution: number;
   } {
-    if (!this._sectData) {
+    if (!this._currentSect) {
       return { currentRank: '无门派', nextRank: null, needed: 0, contribution: 0 };
     }
-    const rankInfo = getNextRankInfo(this._sectData.玩家贡献);
+    const rankInfo = getNextRankInfo(this._currentSect.玩家贡献);
     return {
       ...rankInfo,
-      contribution: this._sectData.玩家贡献,
+      contribution: this._currentSect.玩家贡献,
     };
   }
 
@@ -355,14 +362,14 @@ export class RpgSectEngine extends BaseEngine {
    * 每日经济维护
    */
   dailyMaintenance(): ActionResult {
-    if (!this._sectData) return this._notInSect();
+    if (!this._currentSect) return this._notInSect();
 
-    const maintenance = calculateDailyMaintenance(this._sectData.建设度);
+    const maintenance = calculateDailyMaintenance(this._currentSect.建设度);
 
     const economy: EconomyState = {
-      门派资金: this._sectData.门派资金,
-      门派物资: this._sectData.门派物资,
-      建设度: this._sectData.建设度,
+      门派资金: this._currentSect.门派资金,
+      门派物资: this._currentSect.门派物资,
+      建设度: this._currentSect.建设度,
     };
 
     const netFunds = maintenance.income - maintenance.expense;
@@ -370,8 +377,8 @@ export class RpgSectEngine extends BaseEngine {
       ? addFunds(economy, netFunds).newState
       : spendFunds(economy, Math.abs(netFunds)).newState;
 
-    this._sectData = {
-      ...this._sectData,
+    this._currentSect = {
+      ...this._currentSect,
       门派资金: newState.门派资金,
     };
 
@@ -418,6 +425,11 @@ export class RpgSectEngine extends BaseEngine {
       return this.investInConstruction(funds);
     }
 
+    if (type === 'add_funds') {
+      const amount = (payload.amount as number) ?? 0;
+      return this.addSectFunds(amount);
+    }
+
     if (type === 'refresh_tasks') {
       const count = (payload.missionCountPerType as number) ?? 2;
       return this.refreshTasks(count);
@@ -448,6 +460,7 @@ export class RpgSectEngine extends BaseEngine {
       'gain_contribution',
       'use_contribution',
       'invest_construction',
+      'add_funds',
       'refresh_tasks',
       'dispatch_member',
       'recall_member',
@@ -460,14 +473,14 @@ export class RpgSectEngine extends BaseEngine {
       timestamp: Date.now(),
       engineStates: {
         rpgSect: {
-          sectName: this._sectData?.名称 ?? null,
-          playerPosition: this._sectData?.玩家职位 ?? null,
-          playerContribution: this._sectData?.玩家贡献 ?? 0,
-          sectFunds: this._sectData?.门派资金 ?? 0,
-          sectSupplies: this._sectData?.门派物资 ?? 0,
-          constructionLevel: this._sectData?.建设度 ?? 0,
-          taskCount: this._sectData?.任务列表?.length ?? 0,
-          postAssignments: this._postAssignments.map((a) => ({
+          sectName: this._currentSect?.名称 ?? null,
+          playerPosition: this._currentSect?.玩家职位 ?? null,
+          playerContribution: this._currentSect?.玩家贡献 ?? 0,
+          sectFunds: this._currentSect?.门派资金 ?? 0,
+          sectSupplies: this._currentSect?.门派物资 ?? 0,
+          constructionLevel: this._currentSect?.建设度 ?? 0,
+          taskCount: this._currentSect?.任务列表?.length ?? 0,
+          postAssignments: this._currentAssignments.map((a) => ({
             postId: a.postId,
             memberCount: a.assignedMembers.length,
             maxSlots: a.maxSlots,
@@ -479,10 +492,10 @@ export class RpgSectEngine extends BaseEngine {
 
   getNarrativeConstraints(): NarrativeConstraint {
     return {
-      scene: this._sectData?.名称 ?? '无门派',
+      scene: this._currentSect?.名称 ?? '无门派',
       turn: this._turnNumber,
       tension: 0,
-      playerAction: this._sectData?.玩家职位 ?? '散修',
+      playerAction: this._currentSect?.玩家职位 ?? '散修',
       keyStep: false,
       nsfwTriggered: false,
       participants: [],
@@ -491,8 +504,8 @@ export class RpgSectEngine extends BaseEngine {
   }
 
   reset(): void {
-    this._sectData = null;
-    this._postAssignments = [];
+    this._currentSect = null;
+    this._currentAssignments = [];
     this._turnNumber = 0;
     super.pause('phase-change');
     super.resume();
@@ -502,8 +515,9 @@ export class RpgSectEngine extends BaseEngine {
     return {
       engineType: 'rpgSect',
       turnNumber: this._turnNumber,
-      sectData: this._sectData,
-      postAssignments: this._postAssignments,
+      hasSect: this._currentSect !== null,
+      sectData: this._currentSect,
+      postAssignments: this._currentAssignments,
     };
   }
 
@@ -511,10 +525,10 @@ export class RpgSectEngine extends BaseEngine {
     const engine = new RpgSectEngine();
     if (typeof state.turnNumber === 'number') engine._turnNumber = state.turnNumber;
     if (state.sectData !== undefined && state.sectData !== null) {
-      engine._sectData = state.sectData as 详细门派结构;
+      engine._currentSect = state.sectData as 详细门派结构;
     }
     if (Array.isArray(state.postAssignments)) {
-      engine._postAssignments = state.postAssignments as PostAssignment[];
+      engine._currentAssignments = state.postAssignments as PostAssignment[];
     }
     return engine;
   }

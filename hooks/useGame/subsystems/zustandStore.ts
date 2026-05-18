@@ -21,6 +21,8 @@ import type { EngineType, PauseReason, ActionLogEntry, ScheduledEvent } from '..
 import type { GalgameState } from '../../../models/avg/galgame';
 import type { BattleLogEntry, BattleOutcome } from '../engine/rpgBattleEngine';
 import type { BattlePhase } from '../rpg/battle/battleStateMachine';
+import type { 详细门派结构 } from '../../../models/sect';
+import type { PostAssignment } from '../rpg/sect/memberDispatcher';
 
 // Type helpers for slices (defined locally to avoid circular deps with useGame.ts)
 type 最近开局配置结构 = {
@@ -789,7 +791,10 @@ interface RpgSliceState {
   rpgActiveKungfuIds: string[];
   // Task
   rpgActiveTaskIds: string[];
-  // Sect
+  // Sect — 完整门派数据（融合后）
+  rpgSectData: 详细门派结构 | null;
+  rpgPostAssignments: PostAssignment[];
+  // Deprecated: 保留兼容性，后续 Phase 移除
   rpgSectId: string | null;
   rpgSectContribution: number;
 }
@@ -803,6 +808,9 @@ interface RpgSliceActions {
   toggleTask: (taskId: string) => void;
   setRpgSect: (sectId: string | null) => void;
   setRpgSectContribution: (amount: number) => void;
+  // Sect — 融合后新 action
+  setRpgSectData: (sect: 详细门派结构 | null) => void;
+  setRpgPostAssignments: (assignments: PostAssignment[] | ((prev: PostAssignment[]) => PostAssignment[])) => void;
 }
 
 interface RpgSlice extends RpgSliceState, RpgSliceActions {}
@@ -821,6 +829,9 @@ const createRpgSlice: ZustandSlice<RpgSlice> = (set) => ({
   rpgEquipAccessory: null,
   rpgActiveKungfuIds: [],
   rpgActiveTaskIds: [],
+  rpgSectData: null,
+  rpgPostAssignments: [],
+  // Deprecated: 保留兼容性
   rpgSectId: null,
   rpgSectContribution: 0,
   setRpgState: (partial) => set((state) => ({ ...state, ...partial })),
@@ -839,6 +850,9 @@ const createRpgSlice: ZustandSlice<RpgSlice> = (set) => ({
     rpgEquipAccessory: null,
     rpgActiveKungfuIds: [],
     rpgActiveTaskIds: [],
+    rpgSectData: null,
+    rpgPostAssignments: [],
+    // Deprecated: 保留兼容性
     rpgSectId: null,
     rpgSectContribution: 0,
   }),
@@ -858,6 +872,11 @@ const createRpgSlice: ZustandSlice<RpgSlice> = (set) => ({
   })),
   setRpgSect: (sectId) => set({ rpgSectId: sectId }),
   setRpgSectContribution: (amount) => set({ rpgSectContribution: amount }),
+  // Sect — 融合后新 action
+  setRpgSectData: (sect) => set({ rpgSectData: sect }),
+  setRpgPostAssignments: (updater) => set((state) => ({
+    rpgPostAssignments: typeof updater === 'function' ? updater(state.rpgPostAssignments) : updater,
+  })),
 });
 
 // ==================== AVG / Galgame Slice (Zustand) ====================

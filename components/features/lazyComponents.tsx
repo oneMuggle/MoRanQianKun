@@ -152,4 +152,3 @@ export const RpgBattleIntegration = 创建可预加载懒组件(() => import('./
 export const RpgEquipmentIntegration = 创建可预加载懒组件(() => import('./Equipment/RpgEquipmentIntegration').then(m => ({ default: m.RpgEquipmentIntegration })));
 export const RpgKungfuIntegration = 创建可预加载懒组件(() => import('./Kungfu/RpgKungfuIntegration').then(m => ({ default: m.RpgKungfuIntegration })));
 export const RpgTaskIntegration = 创建可预加载懒组件(() => import('./Task/RpgTaskIntegration').then(m => ({ default: m.RpgTaskIntegration })));
-export const RpgSectIntegration = 创建可预加载懒组件(() => import('./Sect/RpgSectIntegration').then(m => ({ default: m.RpgSectIntegration })));

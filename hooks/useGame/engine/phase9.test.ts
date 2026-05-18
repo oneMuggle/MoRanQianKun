@@ -374,7 +374,9 @@ describe('RpgSectEngine', () => {
       expect(data.hasSect).toBe(true);
 
       const restored = RpgSectEngine.fromJSON(data);
-      expect(restored.sectData).toBeNull();
+      expect(restored.sectData).not.toBeNull();
+      expect(restored.sectData?.名称).toBe('华山派');
+      expect(restored.postAssignments).toBeDefined();
     });
   });
 });
@@ -642,7 +644,11 @@ describe('memberDispatcher', () => {
     patrol.assignedMembers = ['member-1'];
     const result = removeFromPost(posts, 'member-1');
     expect(result.success).toBe(true);
-    expect(patrol.assignedMembers).toHaveLength(0);
+    expect(result.newAssignments).toBeDefined();
+    const newPatrol = result.newAssignments!.find(p => p.postId === '巡逻')!;
+    expect(newPatrol.assignedMembers).toHaveLength(0);
+    // Original should not be mutated
+    expect(patrol.assignedMembers).toHaveLength(1);
   });
 
   it('removeFromPost fails when not in any post', () => {

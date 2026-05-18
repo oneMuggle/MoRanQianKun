@@ -23,15 +23,23 @@ const SectModal: React.FC<Props> = ({ sectData, currentTime, onClose, rpgMode: r
     const [activeTab, setActiveTab] = useState<Tab>('hall');
     const [missionFilter, setMissionFilter] = useState<'all' | 'active' | 'available'>('all');
 
+    // 融合后：RPG action 前先注入 Zustand 最新状态
+    const injectSectState = useCallback(() => {
+        const store = useGameStore.getState();
+        getRpgDispatcher().injectSectState(store.rpgSectData, store.rpgPostAssignments);
+    }, []);
+
     const handleRpgGainContribution = useCallback(() => {
         if (!rpgMode) return;
+        injectSectState();
         getRpgDispatcher().gainContribution(10);
-    }, [rpgMode]);
+    }, [rpgMode, injectSectState]);
 
     const handleRpgInvestConstruction = useCallback(() => {
         if (!rpgMode) return;
+        injectSectState();
         getRpgDispatcher().investConstruction(100);
-    }, [rpgMode]);
+    }, [rpgMode, injectSectState]);
 
     // Helper: Parse Time
     const parseTime = (timeStr: string) => {

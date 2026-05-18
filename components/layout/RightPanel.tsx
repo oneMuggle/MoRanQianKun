@@ -40,7 +40,6 @@ interface Props {
     onOpenRpgEquipment?: () => void;
     onOpenRpgKungfu?: () => void;
     onOpenRpgTask?: () => void;
-    onOpenRpgSect?: () => void;
 }
 
 const RightPanel: React.FC<Props> = ({
@@ -55,7 +54,7 @@ const RightPanel: React.FC<Props> = ({
     enableKungfu = true,
     onSave, onLoad, visualConfig,
     rpgModeEnabled = false,
-    onOpenRpgBattle, onOpenRpgEquipment, onOpenRpgKungfu, onOpenRpgTask, onOpenRpgSect,
+    onOpenRpgBattle, onOpenRpgEquipment, onOpenRpgKungfu, onOpenRpgTask,
 }) => {
     const { enabled, currentLyric } = useMusic();
     const 文案 = useUIText();
@@ -96,7 +95,6 @@ const RightPanel: React.FC<Props> = ({
         { label: '🛡 RPG装备', action: onOpenRpgEquipment, color: 'secondary' as const },
         { label: '📜 RPG功法', action: onOpenRpgKungfu, color: 'secondary' as const },
         { label: '📋 RPG任务', action: onOpenRpgTask, color: 'secondary' as const },
-        { label: '🏯 RPG门派', action: onOpenRpgSect, color: 'secondary' as const },
     ].filter(item => item.action) : [];
 
     const SYSTEM_ITEMS = [

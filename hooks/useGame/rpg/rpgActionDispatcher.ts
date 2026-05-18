@@ -16,6 +16,8 @@ import type { 游戏物品 } from '../../../models/item';
 import type { 任务结构 } from '../../../models/task';
 import type { 角色数据结构 } from '../../../models/character';
 import type { 功法结构 } from '../../../models/kungfu';
+import type { 详细门派结构 } from '../../../models/sect';
+import type { PostAssignment } from '../rpg/sect/memberDispatcher';
 
 export interface RpgActionDispatcher {
   // ==================== Battle ====================
@@ -50,6 +52,7 @@ export interface RpgActionDispatcher {
 
   // ==================== Sect ====================
   setSectEngine: (engine: RpgSectEngine) => void;
+  injectSectState: (sect: 详细门派结构 | null, assignments: PostAssignment[]) => void;
   gainContribution: (amount: number) => ActionResult | null;
   useContribution: (amount: number) => ActionResult | null;
   investConstruction: (funds: number) => ActionResult | null;
@@ -148,6 +151,10 @@ export function createRpgActionDispatcher(): RpgActionDispatcher {
 
     // Sect
     setSectEngine: (engine) => { sectEngine = engine; },
+    /** 从 Zustand 注入最新门派状态（在每个 sect action 前调用） */
+    injectSectState: (sect: 详细门派结构 | null, assignments: PostAssignment[]) => {
+      if (sectEngine) sectEngine.setState(sect, assignments);
+    },
     gainContribution: (amount) => requireSect().gainContribution(amount),
     useContribution: (amount) => requireSect().useContribution(amount),
     investConstruction: (funds) => requireSect().investInConstruction(funds),
