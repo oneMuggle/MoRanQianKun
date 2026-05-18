@@ -3,7 +3,7 @@ import { OrnateBorder } from '../../ui/decorations/OrnateBorder';
 import {
     接口设置结构, 提示词结构, ThemePreset, 视觉设置结构, 节日结构, 聊天记录结构,
     游戏设置结构, 记忆配置结构, 记忆系统结构, NPC结构, TavernCommand, OpeningConfig, 剧情系统结构,
-    时代配置, 时代信息结构
+    时代配置, 时代信息结构, 性能监控配置结构
 } from '../../../types';
 import { 时代主题方案 } from '../../../models/eraTheme';
 
@@ -28,6 +28,7 @@ const MusicSettings = React.lazy(() => import('./MusicSettings'));
 const NpcManager = React.lazy(() => import('./NpcManager'));
 const VariableManager = React.lazy(() => import('./VariableManager'));
 const DebugPanel = React.lazy(() => import('./DebugPanel'));
+const PerformanceMonitorSettings = React.lazy(() => import('./PerformanceMonitorSettings'));
 
 type RuntimeStateSections = Record<'角色' | '环境' | '社交' | '世界' | '战斗' | '剧情' | '女主剧情规划' | '玩家门派' | '任务列表' | '约定列表' | '记忆系统', unknown>;
 
@@ -73,6 +74,7 @@ export interface SettingsPanelProps {
     visualConfig: 视觉设置结构;
     gameConfig?: 游戏设置结构;
     memoryConfig?: 记忆配置结构;
+    performanceConfig?: 性能监控配置结构;
     prompts: 提示词结构[];
     festivals: 节日结构[];
     currentTheme: ThemePreset;
@@ -93,6 +95,7 @@ export interface SettingsPanelProps {
     onSaveVisual: (config: 视觉设置结构) => void;
     onSaveGame?: (config: 游戏设置结构) => void;
     onSaveMemory?: (config: 记忆配置结构) => void;
+    onSavePerformance?: (config: 性能监控配置结构) => void;
     onCreateNpc: (seed?: Partial<NPC结构>) => NPC结构 | void;
     onSaveNpc: (npcId: string, npc: NPC结构) => void;
     onDeleteNpc: (npcId: string) => void;
@@ -119,8 +122,8 @@ const 设置加载占位 = (
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
     activeTab, onTabChange, onClose,
-    apiConfig, visualConfig, gameConfig, memoryConfig, prompts, festivals, currentTheme, currentEra, eraInfo, eraTheme, availableEras, onEraChange, history, memorySystem, socialList, runtimeState, currentStory, openingConfig, contextSnapshot,
-    onSaveApi, onSaveVisual, onSaveGame, onSaveMemory, onCreateNpc, onSaveNpc, onDeleteNpc, onStartNpcMemorySummary, onUploadNpcImage, onReplaceVariableSection, onApplyVariableCommand, onUpdatePrompts, onUpdateFestivals, onThemeChange, onEraChange: onEraChangeProp,
+    apiConfig, visualConfig, gameConfig, memoryConfig, performanceConfig, prompts, festivals, currentTheme, currentEra, eraInfo, eraTheme, availableEras, onEraChange, history, memorySystem, socialList, runtimeState, currentStory, openingConfig, contextSnapshot,
+    onSaveApi, onSaveVisual, onSaveGame, onSaveMemory, onSavePerformance, onCreateNpc, onSaveNpc, onDeleteNpc, onStartNpcMemorySummary, onUploadNpcImage, onReplaceVariableSection, onApplyVariableCommand, onUpdatePrompts, onUpdateFestivals, onThemeChange, onEraChange: onEraChangeProp,
     onReturnToHome, isHome, requestConfirm,
     navMode, tabs,
 }) => {
@@ -199,6 +202,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 />
             </React.Suspense>
         );
+        if (activeTab === 'performance' && performanceConfig && onSavePerformance) return <PerformanceMonitorSettings settings={performanceConfig} onSave={onSavePerformance} />;
         return null;
     };
 

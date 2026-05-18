@@ -173,6 +173,7 @@ interface ReturnMapperDeps {
     saveImageManagerSettings: any;
     saveGameSettings: any;
     saveMemorySettings: any;
+    savePerformanceSettings: any;
     saveBuiltinPromptEntries: any;
     saveWorldbooks: any;
     saveWorldbookPresetGroups: any;
@@ -402,6 +403,7 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             saveImageManagerSettings: deps.saveImageManagerSettings,
             saveGameSettings: deps.saveGameSettings,
             saveMemorySettings: deps.saveMemorySettings,
+            savePerformanceSettings: deps.savePerformanceSettings,
             saveBuiltinPromptEntries: deps.saveBuiltinPromptEntries,
             saveWorldbooks: deps.saveWorldbooks,
             saveWorldbookPresetGroups: deps.saveWorldbookPresetGroups,

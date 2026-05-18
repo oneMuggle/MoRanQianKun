@@ -1028,7 +1028,7 @@ export const useGame = () => {
         handleRegenerate,
         handlePolishTurn,
         handleRecoverFromParseErrorRaw,
-        saveSettings, saveVisualSettings, saveImageManagerSettings, saveGameSettings, saveMemorySettings,
+        saveSettings, saveVisualSettings, saveImageManagerSettings, saveGameSettings, saveMemorySettings, savePerformanceSettings,
         saveBuiltinPromptEntries,
         saveWorldbooks, saveWorldbookPresetGroups,
         updatePrompts, updateFestivals,
