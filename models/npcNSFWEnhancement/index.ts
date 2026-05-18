@@ -14,7 +14,8 @@ export type {
 export { 全时代通用性癖, 时代专属性癖, 获取性癖推荐, 生成性癖摘要 } from './fetishTaxonomy';
 export { 全时代通用敏感点, 时代敏感点名称映射, 获取敏感点推荐, 生成敏感点摘要 } from './sensitiveZones';
 export { 全部人格档案, 里都市人格档案, 里乡土人格档案, 里谍战人格档案, 里校园人格档案, 匹配人格档案, 解锁隐藏偏好 } from './personalityProfiles';
-export { 生成NSFW画像, 应启用增强档案, 自动填充NSFW档案 } from './linkage';
+export { 生成NSFW画像, 应启用增强档案, 自动填充NSFW档案, 计算露出倾向 } from './linkage';
+export type { 露出个性系数 } from './linkage';
 export { 事件性癖映射, 获取事件映射, 获取所有触发事件, 生成触发事件列表 } from './eventMapping';
 export type { 性癖触发事件, 事件映射配置 } from './eventMapping';
 export {

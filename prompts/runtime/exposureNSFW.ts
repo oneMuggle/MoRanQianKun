@@ -1,27 +1,115 @@
 /**
  * 露出 NSFW 独立系统 — 叙事约束
- * 从 campusNSFW.ts 提取
+ * 从 campusNSFW.ts 提取，增强为跨时代自适应
  */
 
-import type { 露出偏好等级 } from '../../models/exposureNSFW';
+import type { 露出偏好等级, 露出后果记录 } from '../../models/exposureNSFW';
 
-// ==================== 露出叙事约束 ====================
+// ==================== 时代自适应等级描述 ====================
 
-export const 构建露出叙事约束 = (等级: 露出偏好等级): string => {
-  const 等级描述: Record<露出偏好等级, string> = {
+/** 各时代露出等级描述 */
+const 时代露出等级描述: Record<string, Record<露出偏好等级, string>> = {
+  // 古代东方（武侠/修仙/志怪通用风格）
+  'ancient_eastern': {
+    0: '',
+    1: 'NPC对半私密场所的露出不排斥（屏风后、帐幔内、厢房角落），但仍会紧张地确认门窗是否闩好。',
+    2: 'NPC在半公共场所的露出会紧张但也有兴奋感（回廊尽头、假山后、偏殿角落），时不时竖耳倾听是否有人经过。',
+    3: 'NPC开始享受被偷看的刺激感，在庭院角落有人经过时会故意做出暗示动作。',
+    4: 'NPC主动寻找可能被发现的机会，在集市边、客栈走廊等公共场所也有大胆行为。',
+    5: 'NPC以被更多人看到为终极快感，在公开场合（庙会、大典）也可能进行秘密互动。',
+  },
+  // 维多利亚
+  'modern_western': {
+    0: '',
+    1: 'NPC对半私密场所的露出不排斥（书房帘后、温室植物后），但仍会紧张地确认门锁。',
+    2: 'NPC在半公共场所的露出会紧张但也有兴奋感（走廊转角、花园凉亭），时不时查看是否有人经过。',
+    3: 'NPC开始享受被偷看的刺激感，在舞会露台有人经过时会故意做出暗示动作。',
+    4: 'NPC主动寻找可能被发现的机会，在公园长椅、剧院包厢等公共场所也有大胆行为。',
+    5: 'NPC以被更多人看到为终极快感，在公开社交场合也可能进行秘密互动。',
+  },
+  // 当代（都市/校园）
+  'contemporary': {
     0: '',
     1: 'NPC对半私密场所的露出不排斥（窗帘后、门后），但仍会紧张地确认门锁和窗帘。',
     2: 'NPC在半公共场所的露出会紧张但也有兴奋感（走廊尽头、楼梯转角），时不时查看是否有人经过。',
     3: 'NPC开始享受被偷看的刺激感，在走廊角落有人经过时会故意做出暗示动作。',
     4: 'NPC主动寻找可能被发现的机会，在操场边、教学楼走廊等公共场所也有大胆行为。',
     5: 'NPC以被更多人看到为终极快感，在公开活动场合也可能进行秘密互动。',
+  },
+};
+
+/** 根据 eraId 获取露出等级描述 */
+function 获取露出等级描述(等级: 露出偏好等级, eraId?: string): string {
+  const 时代风格 = !eraId || eraId.startsWith('ancient_eastern')
+    ? 'ancient_eastern'
+    : eraId.startsWith('modern_western') || eraId.startsWith('victorian')
+      ? 'modern_western'
+      : 'contemporary';
+  return 时代露出等级描述[时代风格][等级];
+}
+
+// ==================== 时代自适应传播渠道 ====================
+
+/** 各时代传播渠道描述 */
+const 时代传播渠道: Record<string, Record<string, string>> = {
+  'ancient_eastern': {
+    0: '无流言',
+    1: '茶馆/酒肆有零星传闻',
+    2: '江湖/门派间开始流传',
+    3: '有目击者绘制的画像在流传',
+    4: '已在城中/宗门内广为流传',
+  },
+  'modern_western': {
+    0: '无流言',
+    1: '社交圈有零星八卦',
+    2: '沙龙和俱乐部中开始流传',
+    3: '报纸副刊有暗示性报道',
+    4: '已在社交季广泛传播',
+  },
+  'contemporary': {
+    0: '无流言',
+    1: '匿名论坛讨论',
+    2: '群组中传播',
+    3: '截图流传',
+    4: '社交媒体扩散',
+  },
+};
+
+/** 根据 eraId 和网络流言等级获取传播渠道描述 */
+function 获取传播渠道描述(等级: number, eraId?: string): string {
+  const 时代风格 = !eraId || eraId.startsWith('ancient_eastern')
+    ? 'ancient_eastern'
+    : eraId.startsWith('modern_western') || eraId.startsWith('victorian')
+      ? 'modern_western'
+      : 'contemporary';
+  return 时代传播渠道[时代风格][String(等级)] ?? '无流言';
+}
+
+/** 根据 eraId 获取传播渠道列表 */
+function 获取时代传播渠道(eraId?: string): string[] {
+  const 时代风格 = !eraId || eraId.startsWith('ancient_eastern')
+    ? 'ancient_eastern'
+    : eraId.startsWith('modern_western') || eraId.startsWith('victorian')
+      ? 'modern_western'
+      : 'contemporary';
+  const 渠道映射: Record<string, string[]> = {
+    'ancient_eastern': ['茶馆传言', '江湖传闻', '门派流言', '画像流传'],
+    'modern_western': ['社交圈八卦', '沙龙私语', '报纸暗讽', '舞会传闻'],
+    'contemporary': ['匿名论坛', '群组传播', '截图流传', '社交媒体'],
   };
+  return 渠道映射[时代风格];
+}
+
+// ==================== 露出叙事约束 ====================
+
+export const 构建露出叙事约束 = (等级: 露出偏好等级, eraId?: string): string => {
+  const 等级描述 = 获取露出等级描述(等级, eraId);
 
   if (等级 === 0) return '';
 
   return `【露出系统】
 NPC露出偏好等级：${等级}/5
-${等级描述[等级]}
+${等级描述}
 
 注意：露出偏好等级越高，NPC对暴露的恐惧越低、期待越高。描写时应体现这种心理变化。`;
 };
@@ -66,19 +154,35 @@ export const 构建旁观者反应约束 = (有旁观者: boolean, 紧张度: nu
 
 // ==================== 网络传播约束 ====================
 
-export const 构建网络传播约束 = (网络流言等级: number, 有无证据: boolean): string => {
+export const 构建网络传播约束 = (网络流言等级: number, 有无证据: boolean, eraId?: string): string => {
   if (网络流言等级 === 0) return '';
 
-  const 等级描述 = 网络流言等级 >= 4 ? '已在社交媒体广泛传播'
-    : 网络流言等级 >= 3 ? '有证据的截图在流传'
-      : 网络流言等级 >= 2 ? '在校园群中讨论'
-        : '匿名论坛有零星讨论';
+  const 等级描述 = 获取传播渠道描述(网络流言等级, eraId);
+  const 渠道列表 = 获取时代传播渠道(eraId);
 
   return `【网络传播系统】
 网络流言等级：${网络流言等级}/4（${等级描述}）
-${有无证据 ? '有偷拍证据在流传，增加了可信度。' : '目前仅是口头流言，尚无确凿证据。'}
+${有无证据 ? '有目击证据在流传，增加了可信度。' : '目前仅是口头流言，尚无确凿证据。'}
+可用传播渠道：${渠道列表.join('、')}
 
 网络传播会随时间自然衰减，但如果出现新证据则可能升级。`;
+};
+
+// ==================== 后果叙事约束 ====================
+
+export const 构建后果叙事约束 = (活跃后果: 露出后果记录[]): string => {
+  if (活跃后果.length === 0) return '';
+
+  const 后果列表 = 活跃后果
+    .filter(c => !c.已解决)
+    .map(c => `  - [${c.严重等级}] ${c.描述}（剩余 ${c.剩余回合} 回合）`)
+    .join('\n');
+
+  return `【露出后果系统】
+当前活跃后果：
+${后果列表}
+
+描写时应体现后果对NPC行为和社交关系的影响。`;
 };
 
 // ==================== 完整叙事约束 ====================
@@ -93,12 +197,14 @@ export const 构建Exposure完整叙事约束 = (参数: {
   有旁观者?: boolean;
   网络流言等级?: number;
   有无证据?: boolean;
+  eraId?: string;
+  活跃后果?: 露出后果记录[];
 }): string => {
-  const { 露出偏好等级, 紧张度, 有旁观者, 网络流言等级, 有无证据 } = 参数;
+  const { 露出偏好等级, 紧张度, 有旁观者, 网络流言等级, 有无证据, eraId, 活跃后果 } = 参数;
   const 组件: string[] = [];
 
   if (露出偏好等级 !== undefined && 露出偏好等级 > 0) {
-    组件.push(构建露出叙事约束(露出偏好等级));
+    组件.push(构建露出叙事约束(露出偏好等级, eraId));
   }
 
   if (紧张度 !== undefined && 紧张度 > 0) {
@@ -110,7 +216,11 @@ export const 构建Exposure完整叙事约束 = (参数: {
   }
 
   if (网络流言等级 !== undefined && 网络流言等级 > 0) {
-    组件.push(构建网络传播约束(网络流言等级, 有无证据 ?? false));
+    组件.push(构建网络传播约束(网络流言等级, 有无证据 ?? false, eraId));
+  }
+
+  if (活跃后果 && 活跃后果.length > 0) {
+    组件.push(构建后果叙事约束(活跃后果));
   }
 
   return 组件.join('\n\n');

@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { 从NPC创建欲望档案 } from '../campusNSFWEngine';
 import { 创建乘客欲望档案 } from '../urbanDriverNSFWEngine';
+import { 计算露出倾向 } from '../../../models/npcNSFWEnhancement';
 import type { NPC结构 } from '../../../types';
 
 interface NSFW系统初始化依赖 {
@@ -108,9 +109,15 @@ export function useNSFW系统初始化(deps: NSFW系统初始化依赖) {
             const 露出档案: Record<string, any> = {};
             社交.forEach((npc: NPC结构) => {
                 if (npc.是否主要角色) {
+                    // 基于人格计算初始露出等级
+                    const 个性系数 = 计算露出倾向(npc);
+                    let 初始等级 = 0;
+                    if (个性系数.冒险倾向 >= 70) 初始等级 = 1;
+                    if (个性系数.冒险倾向 >= 85 && 个性系数.刺激渴望 >= 50) 初始等级 = 2;
+
                     露出档案[npc.id] = {
-                        露出状态: { 当前等级: 0, 等级进度: 0, 最后一次露出尝试: new Date().toISOString(), 成功露出次数: 0, 暴露失败次数: 0, 最大紧张度记录: 0 },
-                        紧张度状态: { 当前值: 0, 周围人数: 0, 互动强度系数: 1.0, 周围人状态: '正常上课', NPC公开行为: '无' },
+                        露出状态: { 当前等级: 初始等级, 等级进度: 0, 最后一次露出尝试: new Date().toISOString(), 成功露出次数: 0, 暴露失败次数: 0, 最大紧张度记录: 0, 个性系数 },
+                        紧张度状态: { 当前值: 0, 周围人数: 0, 互动强度系数: 1.0, 周围人状态: '专注事务', NPC公开行为: '无' },
                         网络流言: { 当前等级: 0, 传播渠道: [], 有无证据: false, 最新传播时间: new Date().toISOString(), 辟谣状态: '未辟谣' },
                     };
                 }

@@ -15,6 +15,16 @@ export interface 露出状态 {
   成功露出次数: number;
   暴露失败次数: number;
   最大紧张度记录: number;
+  /** 当前选择的场景 ID */
+  当前场景Id?: string;
+  /** 场景所需的最低露出等级（用于验证场景可行性） */
+  所需最低露出等级?: 露出偏好等级;
+  /** 名誉状态 */
+  名誉?: 名誉状态;
+  /** 个性系数（由人格/性癖推导） */
+  个性系数?: { 冒险倾向: number; 羞耻敏感度: number; 刺激渴望: number; 从众压力: number; 关系信赖: number };
+  /** 活跃后果列表 */
+  活跃后果?: 露出后果记录[];
 }
 
 export interface 露出场景配置 {
@@ -26,6 +36,22 @@ export interface 露出场景配置 {
   紧张度基础值: number;
   周围人数范围: [number, number];
   适合互动: string[];
+}
+
+/** 场景模板，包含时代适配信息 */
+export interface 露出场景模板 {
+  id: string;
+  名称: string;
+  适用时代: string[];
+  场所类型: '半私密' | '半公开' | '公开';
+  描述: string;
+  隐秘度: 1 | 2 | 3 | 4 | 5;
+  基础发现概率: number;
+  紧张度基础值: number;
+  周围人数范围: [number, number];
+  适合互动: string[];
+  所需最低露出等级?: 露出偏好等级;
+  时代变体?: Record<string, { 名称: string; 描述: string }>;
 }
 
 export type 旁观者反应 =
@@ -60,6 +86,10 @@ export interface 旁观者 {
   察觉概率: number;
   已察觉: boolean;
   反应?: 旁观者反应;
+  /** 关联的 NPC ID（如果有） */
+  关联NPCId?: string;
+  /** 与该 NPC 的关系亲密度 0-100 */
+  关系亲密度?: number;
 }
 
 /** 通用周围人活动状态 */
@@ -77,6 +107,8 @@ export interface 紧张度状态 {
   互动强度系数: number;
   周围人状态: 周围人活动状态;
   NPC公开行为: '无' | '倾听' | '需要回应' | '正在发言' | '表演中';
+  /** 关联的 NPC ID */
+  关联NPCId?: string;
 }
 
 export interface 网络流言状态 {
@@ -86,6 +118,56 @@ export interface 网络流言状态 {
   最新传播时间: string;
   辟谣状态: '未辟谣' | '正在辟谣' | '已辟谣';
 }
+
+// ==================== 后果系统 ====================
+
+export type 后果严重等级 = '轻微' | '中等' | '严重' | '毁灭';
+
+export type 后果类型 =
+  | '短暂尴尬'
+  | '旁人窃语'
+  | '流言扩散'
+  | '信任危机'
+  | '名誉受损'
+  | '强制分离'
+  | '公开曝光'
+  | '社会性死亡';
+
+export interface 露出后果记录 {
+  id: string;
+  后果类型: 后果类型;
+  严重等级: 后果严重等级;
+  描述: string;
+  触发时间: string;
+  持续回合: number;
+  剩余回合: number;
+  已解决: boolean;
+  影响NPCId?: string;
+}
+
+export interface 名誉状态 {
+  公开名誉: number;    // 0-100
+  私密名誉: number;    // 0-100
+  风评: string;         // 文本描述
+  标签: string[];       // 如 ['风流', '放荡', '神秘']
+  黑历史: { 事件: string; 时间: string; 影响: string }[];
+}
+
+// ==================== 旁观者记忆 ====================
+
+export interface 旁观者记忆 {
+  旁观者Id: string;
+  事件: string;
+  时间: string;
+  反应: 旁观者反应;
+  是否有证据: boolean;
+  后续影响: string;
+  已解决: boolean;
+}
+
+// ==================== 紧张度阶段 ====================
+
+export type 紧张度阶段 = '安全' | '微险' | '危险' | '极限' | '崩溃';
 
 /**
  * @deprecated 校园活动是校园专属概念，非校园时代忽略此类型

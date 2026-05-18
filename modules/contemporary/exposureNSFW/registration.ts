@@ -14,6 +14,8 @@ interface Exposure运行时参数 {
   有旁观者: boolean;
   网络流言等级: number;
   有无证据: boolean;
+  eraId?: string;
+  活跃后果?: any[];
 }
 
 // ==================== 参数提取 ====================
@@ -38,6 +40,7 @@ function 提取Exposure参数(
   let 有旁观者 = false;
   let 最高网络流言等级 = 0;
   let 有无证据 = false;
+  const 所有活跃后果: any[] = [];
 
   if (露出档案) {
     for (const [, profile] of Object.entries(露出档案)) {
@@ -46,6 +49,9 @@ function 提取Exposure参数(
       if (p.紧张度状态?.当前值 > 最高紧张度) 最高紧张度 = p.紧张度状态.当前值;
       if (p.网络流言?.当前等级 > 最高网络流言等级) 最高网络流言等级 = p.网络流言.当前等级;
       if (p.网络流言?.有无证据) 有无证据 = true;
+      if (p.露出状态?.活跃后果) {
+        所有活跃后果.push(...p.露出状态.活跃后果.filter((c: any) => !c.已解决));
+      }
     }
   }
 
@@ -56,6 +62,9 @@ function 提取Exposure参数(
       if (n.紧张度状态?.当前值 > 最高紧张度) 最高紧张度 = n.紧张度状态.当前值;
       if (n.网络流言?.当前等级 > 最高网络流言等级) 最高网络流言等级 = n.网络流言.当前等级;
       if (n.网络流言?.有无证据) 有无证据 = true;
+      if (n.露出状态?.活跃后果) {
+        所有活跃后果.push(...n.露出状态.活跃后果.filter((c: any) => !c.已解决));
+      }
     }
   }
 
@@ -72,31 +81,53 @@ function 提取Exposure参数(
     有旁观者,
     网络流言等级: 最高网络流言等级,
     有无证据,
+    eraId: gameState.eraId,
+    活跃后果: 所有活跃后果,
   };
 }
 
 // ==================== 提示词构建 ====================
 
-function 构建Exposure叙事约束(params: Exposure运行时参数): string {
+function 构建Exposure叙事约束(params: Exposure运行时参数, eraId?: string): string {
   return 构建Exposure完整叙事约束({
     露出偏好等级: params.露出偏好等级 as any,
     紧张度: params.紧张度,
     有旁观者: params.有旁观者,
     网络流言等级: params.网络流言等级,
     有无证据: params.有无证据,
+    eraId,
+    活跃后果: params.活跃后果,
   });
 }
 
 // ==================== 模块注册 ====================
 
+/** 露出系统适用的所有时代 ID */
+const 露出系统适用时代 = [
+  // 古代东方
+  'ancient_eastern_wuxia',
+  'ancient_eastern_xianxia',
+  'ancient_eastern_strange',
+  // 现代西方
+  'modern_western_victorian',
+  // 民国
+  'modern_eastern_republic',
+  // 当代
+  'contemporary_urban',
+  'contemporary_campus',
+  'contemporary_campus_urban',
+  'contemporary_rural',
+];
+
 const exposureNSFW模块: StoryModule<ExposureNSFW设置, Exposure运行时参数> = {
   id: 'exposureNSFW',
   name: '露出NSFW',
-  eraId: 'contemporary',
-  version: '1.0.0',
+  eraId: 'shared',
+  parentEraIds: 露出系统适用时代,
+  version: '1.1.0',
   priority: 70,
   category: 'nsfw',
-  description: '露出 NSFW 独立系统：紧张度、旁观者、网络传播',
+  description: '露出 NSFW 独立系统：紧张度、旁观者、网络传播（跨时代）',
   masterToggleKey: '启用露出系统',
   dependencies: [],
   defaultSettings: 默认ExposureNSFW设置,

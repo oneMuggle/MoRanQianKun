@@ -10,6 +10,74 @@ import { 获取性癖推荐, 生成性癖摘要 } from './fetishTaxonomy';
 import { 获取敏感点推荐, 生成敏感点摘要 } from './sensitiveZones';
 import { 匹配人格档案, 解锁隐藏偏好 } from './personalityProfiles';
 
+// ==================== 露出个性系数 ====================
+
+/** 露出个性系数：由人格/性癖推导的露出倾向参数 */
+export interface 露出个性系数 {
+  冒险倾向: number;      // 0-100
+  羞耻敏感度: number;    // 0-100
+  刺激渴望: number;      // 0-100
+  从众压力: number;      // 0-100
+  关系信赖: number;      // 0-100
+}
+
+/**
+ * 根据 NPC 的人格和性癖计算露出倾向系数
+ */
+export function 计算露出倾向(npc: NPC结构): 露出个性系数 {
+  const 系数: 露出个性系数 = {
+    冒险倾向: 30,
+    羞耻敏感度: 50,
+    刺激渴望: 20,
+    从众压力: 40,
+    关系信赖: 30,
+  };
+
+  const 人格 = 匹配人格档案(npc.核心性格特征, npc.身份, undefined);
+  const 性癖 = npc.性癖档案;
+
+  // 人格修正
+  if (人格) {
+    if (人格.里.反差触发器.includes('暴露')) {
+      系数.冒险倾向 += 20;
+      系数.刺激渴望 += 15;
+    }
+    if (npc.核心性格特征 && (npc.核心性格特征.includes('谨慎') || npc.核心性格特征.includes('保守'))) {
+      系数.羞耻敏感度 += 20;
+    }
+    if (npc.身份 && (npc.身份.includes('侠') || npc.身份.includes('浪') || npc.身份.includes('游'))) {
+      系数.刺激渴望 += 15;
+      系数.从众压力 -= 10;
+    }
+  }
+
+  // 性癖修正
+  if (性癖) {
+    for (const 偏好 of 性癖.核心偏好) {
+      if (偏好.类别 === '暴露窥视') {
+        系数.冒险倾向 += 偏好.强度 * 5;
+        系数.刺激渴望 += 偏好.强度 * 3;
+      }
+      if (偏好.类别 === '公共冒险') {
+        系数.冒险倾向 += 偏好.强度 * 4;
+        系数.羞耻敏感度 -= 偏好.强度 * 3;
+      }
+    }
+  }
+
+  系数.冒险倾向 = clamp(系数.冒险倾向, 0, 100);
+  系数.羞耻敏感度 = clamp(系数.羞耻敏感度, 0, 100);
+  系数.刺激渴望 = clamp(系数.刺激渴望, 0, 100);
+  系数.从众压力 = clamp(系数.从众压力, 0, 100);
+  系数.关系信赖 = clamp(系数.关系信赖, 0, 100);
+
+  return 系数;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
 export function 生成NSFW画像(npc: NPC结构, eraId: string | null | undefined): NPCNSFW画像 {
   const 亲密度等级 = 计算亲密度等级(npc.好感度 ?? 0);
 
