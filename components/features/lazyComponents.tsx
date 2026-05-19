@@ -144,6 +144,9 @@ export const MobileBoardGameModal = 创建可预加载懒组件(() => import('./
 export const CGGalleryModal = 创建可预加载懒组件(() => import('./Galgame/CGGalleryModal'));
 export const MobileCGGalleryModal = 创建可预加载懒组件(() => import('./Galgame/MobileCGGalleryModal'));
 
+// Relation Graph (AVG)
+export const RelationGraphView = 创建可预加载懒组件(() => import('./Galgame/RelationGraphView'));
+
 export const MapExplorerModal = 创建可预加载懒组件(() => import('./Exploration/MapExplorerModal'));
 export const MobileMapExplorerModal = 创建可预加载懒组件(() => import('./Exploration/MobileMapExplorerModal'));
 

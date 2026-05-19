@@ -13,6 +13,7 @@ import MobileQuickMenu from '../layout/MobileQuickMenu';
 import ChatList from '../features/Chat/ChatList';
 import InputArea from '../features/Chat/InputArea';
 import { GalgameView } from './GalgameView';
+import { MobileGalgameView } from '../features/Galgame/mobile/MobileGalgameView';
 import { 懒加载边界, MobileMusicPlayer } from '../features/lazyComponents';
 import { useGalgameEngine } from '../../hooks/useGalgameEngine';
 import { getCurrentMode, switchMode } from '../../hooks/useGame/modeManager';
@@ -60,6 +61,7 @@ interface GameViewProps {
     openHeroinePlan: () => void;
     openMemory: () => void;
     openCGGallery: () => void;
+    openRelationGraph: () => void;
     openMapExplorer: () => void;
     openImageManagerWithCheck: () => void;
     openNovelDecompositionWorkbench: () => void;
@@ -124,6 +126,7 @@ export function GameView({
     openHeroinePlan,
     openMemory,
     openCGGallery,
+    openRelationGraph,
     openMapExplorer,
     openImageManagerWithCheck,
     openNovelDecompositionWorkbench,
@@ -349,28 +352,44 @@ export function GameView({
                             aria-hidden={chatContentHidden}
                         >
                             {galgameModeEnabled ? (
-                                <GalgameView
-                                    history={state.历史记录 as any[]}
-                                    loading={state.loading as boolean}
-                                    socialList={state.社交 as any[]}
-                                    playerProfile={playerProfile}
-                                    currentOptions={currentOptions}
-                                    backgroundImage={当前背景图片地址}
-                                    sceneName={(state.环境 as any)?.当前地点}
-                                    timeOfDay={(state.环境 as any)?.时间}
-                                    onOptionSelect={(optionId: string) => {
-                                        const optionText = currentOptions[parseInt(optionId.split('-')[1], 10)];
-                                        if (optionText) {
-                                            (actions as any).handleSend?.(optionText);
-                                        }
-                                    }}
-                                    onSend={(actions as any).handleSend}
-                                    onStop={(actions as any).handleStop}
-                                    avgSnapshot={galgameEngine.avgSnapshot}
-                                    onEnterRoute={galgameEngine.onEnterRoute}
-                                    engineSuggestedOptions={galgameEngine.engineSuggestedOptions}
-                                    engineRef={galgameEngine.engineRef}
-                                />
+                                isMobile ? (
+                                    <MobileGalgameView
+                                        backgroundImage={当前背景图片地址}
+                                        sceneName={(state.环境 as any)?.当前地点}
+                                        timeOfDay={(state.环境 as any)?.时间 === '清晨' ? '清晨' : (state.环境 as any)?.时间 === '上午' ? '上午' : (state.环境 as any)?.时间 === '下午' ? '下午' : (state.环境 as any)?.时间 === '黄昏' ? '黄昏' : (state.环境 as any)?.时间 === '夜晚' ? '夜晚' : (state.环境 as any)?.时间 === '深夜' ? '深夜' : '上午'}
+                                        onOptionSelect={(optionId: string) => {
+                                            const optionText = currentOptions[parseInt(optionId.split('-')[1], 10)];
+                                            if (optionText) {
+                                                (actions as any).handleSend?.(optionText);
+                                            }
+                                        }}
+                                        onClick={(actions as any).handleSend ? () => { /* 推进由输入区处理 */ } : undefined}
+                                    />
+                                ) : (
+                                    <GalgameView
+                                        history={state.历史记录 as any[]}
+                                        loading={state.loading as boolean}
+                                        socialList={state.社交 as any[]}
+                                        playerProfile={playerProfile}
+                                        currentOptions={currentOptions}
+                                        backgroundImage={当前背景图片地址}
+                                        sceneName={(state.环境 as any)?.当前地点}
+                                        timeOfDay={(state.环境 as any)?.时间}
+                                        onOptionSelect={(optionId: string) => {
+                                            const optionText = currentOptions[parseInt(optionId.split('-')[1], 10)];
+                                            if (optionText) {
+                                                (actions as any).handleSend?.(optionText);
+                                            }
+                                        }}
+                                        onSend={(actions as any).handleSend}
+                                        onStop={(actions as any).handleStop}
+                                        avgSnapshot={galgameEngine.avgSnapshot}
+                                        onEnterRoute={galgameEngine.onEnterRoute}
+                                        engineSuggestedOptions={galgameEngine.engineSuggestedOptions}
+                                        engineRef={galgameEngine.engineRef}
+                                        onOpenRelationGraph={openRelationGraph}
+                                    />
+                                )
                             ) : (
                                 <>
                                     <ChatList

@@ -9,6 +9,8 @@ import * as React from 'react';
 import type { AvgRelationEngine } from './useGame/engine/avgRelationEngine';
 import type { GalgameRoute, GalgameCG, EndingJudgment } from '../models/avg/galgame';
 import type { NpcRelationSummary, IntimacyLevel } from '../models/avg/relationGraph';
+import type { IntimacyMappingInfo } from './useGame/avg/intimacy/intimacyMapping';
+import { syncWuxiaToAvg, wuxiaIntimacyLevel } from './useGame/avg/intimacy/intimacyMapping';
 import { useGameStore } from './useGame/subsystems/zustandStore';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -23,6 +25,8 @@ export interface AvgStateBridgeSnapshot {
   intimacyLabel: string | null;
   suggestedRouteId: string | null;
   currentEnding: EndingJudgment | null;
+  /** 武侠好感度映射信息 */
+  intimacyMapping: IntimacyMappingInfo | null;
 }
 
 export interface UseAvgStateBridgeReturn {
@@ -46,6 +50,10 @@ export interface UseAvgStateBridgeReturn {
   completeEnding: (endingId: string) => boolean;
   /** 设置 flag */
   setFlag: (key: string, value: boolean) => void;
+  /** 同步武侠 NPC 好感度到 AVG 系统 */
+  syncNpcWuxiaToAvg: (npcId: string, wuxiaIntimacy: number) => number;
+  /** 获取指定 NPC 的好感度映射信息 */
+  getNpcIntimacyMapping: (npcId: string) => ReturnType<AvgRelationEngine['getNpcIntimacyMapping']>;
 }
 
 export function useAvgStateBridge(): UseAvgStateBridgeReturn {
@@ -88,6 +96,14 @@ export function useAvgStateBridge(): UseAvgStateBridgeReturn {
 
     const currentEnding = engine.getLastResolvedEnding();
 
+    // 获取第一个 NPC 的好感度映射信息
+    let intimacyMapping: IntimacyMappingInfo | null = null;
+    if (allNpcs.length > 0) {
+      const npcId = allNpcs[0];
+      const mapping = engine.getNpcIntimacyMapping(npcId);
+      if (mapping) intimacyMapping = mapping.mapping;
+    }
+
     return {
       galgameState,
       activeRoute,
@@ -99,6 +115,7 @@ export function useAvgStateBridge(): UseAvgStateBridgeReturn {
       intimacyLabel,
       suggestedRouteId,
       currentEnding,
+      intimacyMapping,
     };
   }, []);
 

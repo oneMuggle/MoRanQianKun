@@ -121,7 +121,7 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, onEraSelect, loa
                                     下一步
                                 </GameButton>
                             ) : (
-                                <GameButton onClick={() => { void handleGenerate(); }} variant="primary" className="px-10 py-3 text-base tracking-widest shadow-[0_0_20px_rgba(212,175,55,0.4)] bg-gradient-to-r from-wuxia-gold/90 to-wuxia-gold text-black font-bold">
+                                <GameButton onClick={() => { void handleGenerate(); }} variant="primary" active className="px-10 py-3 text-base tracking-widest">
                                     开启世界推演
                                 </GameButton>
                             )}

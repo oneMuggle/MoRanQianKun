@@ -24,6 +24,7 @@ export type EngineType =
   | 'avgDialogue'
   | 'avgRelation'
   | 'avgBranch'
+  | 'avgEvent'
   // Exploration engine (Phase 14)
   | 'exploration'
   // Daily town engine (Phase 10)
@@ -203,6 +204,7 @@ export const ENGINE_PRIORITY: Record<EngineType, EnginePriority> = {
   avgDialogue: 'high',
   avgRelation: 'medium',
   avgBranch: 'medium',
+  avgEvent: 'medium',
   // Exploration
   exploration: 'high',
   // Daily town

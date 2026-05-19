@@ -13,6 +13,7 @@ import type { DialogueOption } from '../features/Galgame/GalgameDialogueBox';
 import { DialogueBacklog } from '../features/Galgame/DialogueBacklog';
 import { EndingNotification } from '../features/Galgame/EndingNotification';
 import { RouteIndicator } from '../features/Galgame/RouteIndicator';
+import { useGalgameAudio } from '../../hooks/useGalgameAudio';
 import { useAggregatedDialogue } from '../../hooks/useGame/ui/useAggregatedDialogue';
 import { useDialogueTree } from '../../hooks/useGame/avg/dialogue/useDialogueTree';
 import type { AvgStateBridgeSnapshot } from '../../hooks/useAvgStateBridge';
@@ -50,6 +51,8 @@ interface GalgameViewProps {
   engineSuggestedOptions?: Array<{ id: string; text: string; npcId: string }>;
   /** 引擎 ref（对话树集成用） */
   engineRef?: React.RefObject<AvgRelationEngine | null>;
+  /** 打开关系图谱 */
+  onOpenRelationGraph?: () => void;
 }
 
 export const GalgameView: React.FC<GalgameViewProps> = ({
@@ -66,6 +69,7 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
   onEnterRoute,
   engineSuggestedOptions,
   engineRef,
+  onOpenRelationGraph,
 }) => {
   const [showBacklog, setShowBacklog] = useState(false);
   // 段进度计数器：当前显示到第几段（0 = 最新段，递增向前翻阅）
@@ -73,6 +77,18 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
 
   // 对话树集成（当引擎可用时）
   const dialogueTree = useDialogueTree({ engineRef: engineRef as React.RefObject<AvgRelationEngine | null> });
+
+  // 音频系统集成
+  const audio = useGalgameAudio();
+
+  // 场景变化时切换 BGM
+  const lastSceneName = useRef(sceneName);
+  useEffect(() => {
+    if (sceneName && sceneName !== lastSceneName.current) {
+      audio.switchSceneBGM(sceneName);
+      lastSceneName.current = sceneName;
+    }
+  }, [sceneName, audio.switchSceneBGM]);
 
   const {
     allEntries,
@@ -380,6 +396,19 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16ZM6.75 9.25a.75.75 0 01.75-.75h5a.75.75 0 010 1.5h-5a.75.75 0 01-.75-.75Zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H7.5Z" clipRule="evenodd" />
                   </svg>
                 </button>
+                {/* 关系图谱按钮 */}
+                {onOpenRelationGraph && (
+                  <button
+                    onClick={onOpenRelationGraph}
+                    className="p-1 rounded text-gray-500 hover:text-wuxia-gold hover:bg-white/5 transition-colors"
+                    title="关系图谱"
+                    aria-label="查看关系图谱"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10 2a3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3zM5 8a3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3zM15 8a3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3zM7 13l-1.5 3a1 1 0 001.707.707L10 14l2.793 2.707A1 1 0 0014.5 16L13 13M5 11v1M15 11v1" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
 

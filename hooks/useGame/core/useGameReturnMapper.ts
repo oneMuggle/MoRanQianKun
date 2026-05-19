@@ -140,6 +140,8 @@ interface ReturnMapperDeps {
     setShowRelationship: (v: any) => void;
     showCGGallery: boolean;
     setShowCGGallery: (v: boolean) => void;
+    showRelationGraph: boolean;
+    setShowRelationGraph: (v: boolean) => void;
     showMapExplorer: boolean;
     setShowMapExplorer: (v: boolean) => void;
 
@@ -364,6 +366,8 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             setShowRelationship: deps.setShowRelationship,
             showCGGallery: deps.showCGGallery,
             setShowCGGallery: deps.setShowCGGallery,
+            showRelationGraph: deps.showRelationGraph,
+            setShowRelationGraph: deps.setShowRelationGraph,
             showMapExplorer: deps.showMapExplorer,
             setShowMapExplorer: deps.setShowMapExplorer,
             // Exploration state

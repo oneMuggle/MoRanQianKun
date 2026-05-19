@@ -117,7 +117,7 @@ const MobileNewGameWizard: React.FC<Props> = ({ onComplete, onCancel, onEraSelec
                                 下一步
                             </GameButton>
                         ) : (
-                            <GameButton onClick={() => { void handleGenerate(); }} variant="primary" className="flex-1 py-3 text-sm font-bold bg-gradient-to-r from-wuxia-gold/90 to-wuxia-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+                            <GameButton onClick={() => { void handleGenerate(); }} variant="primary" active className="flex-1 py-3 text-sm font-bold shadow-[0_0_15px_rgba(212,175,55,0.3)]">
                                 推演世界
                             </GameButton>
                         )}

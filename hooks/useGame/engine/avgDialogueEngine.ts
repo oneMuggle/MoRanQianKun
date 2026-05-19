@@ -530,6 +530,221 @@ export class AvgDialogueEngine extends BaseEngine {
     return engine;
   }
 
+  // ==================== AI 对话树生成管线 ====================
+
+  /**
+   * 基于当前上下文生成 AI 对话树
+   *
+   * @param params 生成参数
+   * @returns 生成的对话树
+   */
+  generateDialogueTreeFromAI(params: {
+    npcId: string;
+    routeId?: string;
+    intimacyLevel: number;
+    eventType: 'greeting' | 'event' | 'conflict' | 'romance' | 'farewell';
+    customPrompt?: string;
+    choiceCount?: number;
+    treeIdPrefix?: string;
+  }): DialogueTree {
+    const treeId = `${params.treeIdPrefix ?? 'ai'}-${params.npcId}-${Date.now()}`;
+    const choiceCount = Math.min(4, Math.max(2, params.choiceCount ?? 3));
+    const nodes = this._generateAIDialogueNodes({ ...params, choiceCount });
+
+    return {
+      id: treeId,
+      name: `${params.eventType}_${params.npcId}`,
+      description: `AI 生成的 ${params.eventType} 对话`,
+      rootNodeId: nodes[0]?.id ?? 'root',
+      nodes,
+    };
+  }
+
+  /**
+   * 生成 AI 对话节点（结构化生成，后续可接入 AI API 实现真正的动态生成）
+   */
+  private _generateAIDialogueNodes(params: {
+    npcId: string;
+    eventType: string;
+    intimacyLevel: number;
+    choiceCount: number;
+  }): DialogueNode[] {
+    const baseId = `ai-${params.eventType}-${params.npcId}`;
+    const intimacyLabels = ['陌生人', '认识', '熟悉', '好友', '挚友', '恋人'];
+    const levelLabel = intimacyLabels[params.intimacyLevel] ?? '陌生人';
+    const templates = this._getEventTemplates(params.eventType, levelLabel, params.npcId);
+
+    const nodes: DialogueNode[] = [];
+
+    nodes.push({
+      id: `${baseId}-root`,
+      type: 'text',
+      speaker: params.npcId,
+      text: templates.opening,
+      nextNodeId: `${baseId}-choice`,
+      tags: ['ai-generated', params.eventType],
+      actions: [],
+    });
+
+    const choices = templates.choices.slice(0, params.choiceCount).map((choice, i) => ({
+      id: `${baseId}-choice-${i}`,
+      text: choice.text,
+      targetNodeId: `${baseId}-result-${i}`,
+      consequenceHint: choice.consequence,
+      actions: [],
+    }));
+
+    nodes.push({
+      id: `${baseId}-choice`,
+      type: 'choice',
+      speaker: undefined,
+      text: templates.choicePrompt,
+      choices,
+      tags: ['ai-generated'],
+      actions: [],
+    });
+
+    for (let i = 0; i < choices.length; i++) {
+      nodes.push({
+        id: `${baseId}-result-${i}`,
+        type: 'text',
+        speaker: params.npcId,
+        text: templates.results[i] ?? templates.defaultResult,
+        nextNodeId: `${baseId}-end`,
+        tags: ['ai-generated', `choice-${i}`],
+        actions: [],
+      });
+    }
+
+    nodes.push({
+      id: `${baseId}-end`,
+      type: 'text',
+      speaker: undefined,
+      text: templates.closing,
+      nextNodeId: undefined,
+      tags: ['ai-generated', 'ending'],
+      actions: [],
+    });
+
+    return nodes;
+  }
+
+  private _getEventTemplates(eventType: string, levelLabel: string, npcId: string): {
+    opening: string;
+    choicePrompt: string;
+    choices: { text: string; consequence: string }[];
+    results: string[];
+    defaultResult: string;
+    closing: string;
+  } {
+    switch (eventType) {
+      case 'greeting':
+        return {
+          opening: `${npcId}微笑着看向你："好久不见，最近好吗？"`,
+          choicePrompt: '你如何回应？',
+          choices: [
+            { text: '热情回应', consequence: '好感度上升' },
+            { text: '平淡回应', consequence: '关系不变' },
+            { text: '转移话题', consequence: '可能错失互动机会' },
+          ],
+          results: [
+            `${npcId}眼中闪过一丝欣喜："你能这么说，我很开心。"`,
+            `${npcId}点点头："嗯，大家都挺忙的。"`,
+            `${npcId}微微一愣，随即笑道："哈哈，说到这个……"`,
+          ],
+          defaultResult: `${npcId}若有所思地看着你。`,
+          closing: '寒暄结束，你们各自继续手头上的事。',
+        };
+      case 'event':
+        return {
+          opening: `${npcId}急匆匆地走来："有件事想跟你说。"`,
+          choicePrompt: '你准备怎么做？',
+          choices: [
+            { text: '认真倾听', consequence: '好感度上升，获取信息' },
+            { text: '主动帮忙', consequence: '好感度大幅上升' },
+            { text: '表示没空', consequence: '好感度下降' },
+          ],
+          results: [
+            `${npcId}详细地讲述了事情经过，你认真地听着。`,
+            `${npcId}感动地说："有你帮忙真是太好了！"`,
+            `${npcId}有些失望："好吧，那我自己想办法。"`,
+          ],
+          defaultResult: `${npcId}欲言又止，最终还是点了点头。`,
+          closing: '话题告一段落。',
+        };
+      case 'conflict':
+        return {
+          opening: `${npcId}的脸色不太好看："我想我们需要谈谈。"`,
+          choicePrompt: '你如何应对？',
+          choices: [
+            { text: '耐心解释', consequence: '可能化解误会' },
+            { text: '据理力争', consequence: '冲突升级或达成共识' },
+            { text: '暂时回避', consequence: '关系暂时冷却' },
+          ],
+          results: [
+            `${npcId}的表情渐渐缓和："原来如此，是我误会了。"`,
+            `你们各抒己见，虽然激烈但也加深了彼此的了解。`,
+            `${npcId}沉默片刻，转身离去。`,
+          ],
+          defaultResult: `${npcId}叹了口气。`,
+          closing: '矛盾暂时平息，但还需要时间修复关系。',
+        };
+      case 'romance':
+        return {
+          opening: levelLabel === '恋人'
+            ? `${npcId}轻轻靠在你的肩上："有你在身边，真好。"`
+            : `${npcId}有些害羞地看着你："其实……我一直有话想对你说。"`,
+          choicePrompt: '你的心跳加速，该如何回应？',
+          choices: [
+            { text: '温柔回应', consequence: '好感度大幅上升' },
+            { text: '开玩笑缓解气氛', consequence: '好感度小幅上升' },
+            { text: '不知所措地沉默', consequence: '关系微妙变化' },
+          ],
+          results: [
+            `${npcId}的脸微微泛红，嘴角不自觉地上扬。`,
+            `${npcId}被你逗笑了，紧张的情绪一扫而空。`,
+            `两人沉默了片刻，${npcId}轻声说道："没关系，我可以等。"`,
+          ],
+          defaultResult: `${npcId}的眼神中闪过一丝温柔。`,
+          closing: '此刻的氛围，将永远留在彼此的回忆中。',
+        };
+      case 'farewell':
+        return {
+          opening: `${npcId}站在路口："一路顺风，我们会再见面的。"`,
+          choicePrompt: '临别之际，你想说些什么？',
+          choices: [
+            { text: '承诺再会', consequence: '好感度上升' },
+            { text: '赠送礼物', consequence: '好感度上升，留下纪念' },
+            { text: '默默点头', consequence: '关系不变' },
+          ],
+          results: [
+            `"嗯，一言为定。"${npcId}笑着挥了挥手。`,
+            `${npcId}接过礼物，眼眶微微泛红。`,
+            `你们相视无言，一切尽在不言中。`,
+          ],
+          defaultResult: `${npcId}的身影渐行渐远。`,
+          closing: '离别是为了更好的重逢。',
+        };
+      default:
+        return {
+          opening: `${npcId}向你走来。`,
+          choicePrompt: '你想怎么做？',
+          choices: [
+            { text: '主动搭话', consequence: '开始对话' },
+            { text: '等待对方开口', consequence: '被动回应' },
+            { text: '点头示意', consequence: '简单寒暄' },
+          ],
+          results: [
+            `${npcId}很高兴地与你聊了起来。`,
+            `${npcId}犹豫了一下，然后开口说道……`,
+            `${npcId}回以微笑。`,
+          ],
+          defaultResult: `${npcId}点了点头。`,
+          closing: '对话结束。',
+        };
+    }
+  }
+
   // ==================== 内部辅助 ====================
 
   private _failResult(reason: string): ActionResult {

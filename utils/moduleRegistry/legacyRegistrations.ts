@@ -76,6 +76,7 @@ import {
   MobileBoardGameModal,
   CGGalleryModal,
   MobileCGGalleryModal,
+  RelationGraphView,
   MapExplorerModal,
   MobileMapExplorerModal,
   RpgBattleIntegration,
@@ -820,6 +821,32 @@ UIFeatureRegistry.register({
       onClose: () => {
         setters.setShowCGGallery?.(false);
         modalManager.close('cgGallery');
+      },
+    }),
+  },
+});
+
+// Relation Graph (AVG/Galgame) — 新增关系网络可视化
+UIFeatureRegistry.register({
+  id: 'relationGraph',
+  name: '关系图谱',
+  icon: '🔗',
+  category: 'entertainment',
+  priority: 70,
+  version: '1.0.0',
+  dependencies: [],
+  modal: {
+    desktopComponent: RelationGraphView,
+    visibility: 'always',
+    stateKey: 'showRelationGraph',
+    propsFactory: ({ state, modalManager }) => ({
+      npcRelations: (state as any).avgState?.npcRelations ?? [],
+      playerName: (state.角色 as any)?.姓名 ?? '主角',
+      onNpcSelect: (npcId: string) => {
+        // 选中 NPC 后可跳转到社交面板详情
+        if (npcId) {
+          modalManager.open('social', { selectedNpcId: npcId });
+        }
       },
     }),
   },

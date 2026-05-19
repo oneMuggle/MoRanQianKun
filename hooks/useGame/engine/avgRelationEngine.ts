@@ -17,6 +17,12 @@ import type {
 import { RelationGraph, createRelationGraph } from '../avg/relation/relationGraph';
 import { IntimacyTrigger, IntimacyStateMachine, createIntimacyTrigger } from '../avg/intimacy/intimacyStateMachine';
 import type { IntimacyEvent } from '../avg/intimacy/intimacyStateMachine';
+import {
+  syncWuxiaToAvg,
+  syncAvgToWuxia,
+  getIntimacyMappingInfo,
+  type IntimacyMappingInfo,
+} from '../avg/intimacy/intimacyMapping';
 import { RouteResolver, createRouteResolver } from '../avg/galgame/routeResolver';
 import { EndingResolver, createEndingResolver, CGManager, createCGManager } from '../avg/galgame/endingResolver';
 import type {
@@ -26,6 +32,7 @@ import type {
   NpcRelationSummary,
   IntimacyChange,
 } from '../../../models/avg/relationGraph';
+import { DEFAULT_GALGAME_PRESET, DEFAULT_GALGAME_ROUTES, DEFAULT_GALGAME_ENDINGS, DEFAULT_GALGAME_CGS } from '../../../data/galgamePresets';
 import type {
   GalgameRoute,
   GalgameEnding,
@@ -175,6 +182,79 @@ export class AvgRelationEngine extends BaseEngine {
 
   getRemainingToNext(level: IntimacyLevel): number {
     return IntimacyStateMachine.remainingToNext(level);
+  }
+
+  // ==================== 好感度映射同步 ====================
+
+  /**
+   * 将武侠系统 NPC 好感度同步到 AVG 系统
+   *
+   * @param npcId NPC ID
+   * @param wuxiaIntimacy 武侠系统好感度 (0-100)
+   * @returns 同步后的 AVG 好感度 (0-200)
+   */
+  syncNpcWuxiaToAvg(npcId: string, wuxiaIntimacy: number): number {
+    const avgIntimacy = syncWuxiaToAvg(wuxiaIntimacy);
+    this._graph.updateIntimacy('player', npcId, avgIntimacy - this._graph.getIntimacy('player', npcId));
+    return avgIntimacy;
+  }
+
+  /**
+   * 获取指定 AVG 好感度对应的武侠系统好感度
+   *
+   * @param avgIntimacy AVG 系统好感度
+   * @returns 武侠系统好感度 (0-100)
+   */
+  getWuxiaEquivalent(avgIntimacy: number): number {
+    return syncAvgToWuxia(avgIntimacy);
+  }
+
+  /**
+   * 获取指定武侠好感度的完整映射信息
+   *
+   * @param wuxiaIntimacy 武侠系统好感度
+   * @returns 映射信息
+   */
+  getWuxiaMappingInfo(wuxiaIntimacy: number): IntimacyMappingInfo {
+    return getIntimacyMappingInfo(wuxiaIntimacy);
+  }
+
+  /**
+   * 批量同步所有 NPC 的武侠好感度到 AVG 系统
+   *
+   * @param npcIntimacies Map of NPC ID -> wuxia intimacy (0-100)
+   * @returns 同步结果 Map of NPC ID -> avg intimacy (0-200)
+   */
+  syncAllNpcsWuxiaToAvg(npcIntimacies: Map<string, number>): Map<string, number> {
+    const results = new Map<string, number>();
+    for (const [npcId, wuxiaIntimacy] of npcIntimacies) {
+      const avgIntimacy = this.syncNpcWuxiaToAvg(npcId, wuxiaIntimacy);
+      results.set(npcId, avgIntimacy);
+    }
+    return results;
+  }
+
+  /**
+   * 获取指定 NPC 的好感度映射信息
+   *
+   * @param npcId NPC ID
+   * @returns 映射信息，包含武侠和 AVG 双系统的数值
+   */
+  getNpcIntimacyMapping(npcId: string): {
+    avgIntimacy: number;
+    wuxiaIntimacy: number;
+    level: IntimacyLevel;
+    mapping: IntimacyMappingInfo;
+  } | null {
+    const avgIntimacy = this._graph.getIntimacy('player', npcId);
+    if (avgIntimacy === 0 && !this._graph.hasNode(npcId)) return null;
+    const wuxiaIntimacy = syncAvgToWuxia(avgIntimacy);
+    return {
+      avgIntimacy,
+      wuxiaIntimacy,
+      level: this._graph.getLevel('player', npcId),
+      mapping: getIntimacyMappingInfo(wuxiaIntimacy),
+    };
   }
 
   // ==================== 路线判定 ====================
@@ -501,5 +581,11 @@ export function createAvgRelationEngine(
   endings?: GalgameEnding[],
   cgs?: GalgameCG[]
 ): AvgRelationEngine {
-  return new AvgRelationEngine(graphData, events, routes, endings, cgs);
+  return new AvgRelationEngine(
+    graphData,
+    events ?? DEFAULT_GALGAME_PRESET.events,
+    routes ?? DEFAULT_GALGAME_ROUTES,
+    endings ?? DEFAULT_GALGAME_ENDINGS,
+    cgs ?? DEFAULT_GALGAME_CGS
+  );
 }

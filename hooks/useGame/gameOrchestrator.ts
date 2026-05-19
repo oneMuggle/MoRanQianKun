@@ -11,6 +11,7 @@ import type { SLGEngine, EngineType, TurnResult, PlayerAction, ActionResult } fr
 import { createAvgBranchEngine } from './engine/avgBranchEngine';
 import { createAvgDialogueEngine } from './engine/avgDialogueEngine';
 import { createAvgRelationEngine } from './engine/avgRelationEngine';
+import { createAvgEventEngine } from './engine/avgEventEngine';
 import { createExplorationEngine, type ExplorationEngineConfig } from './engine/explorationEngine';
 import { createDailyTownEngine } from './engine/dailyTownEngine';
 import { createRpgBattleEngine } from './engine/rpgBattleEngine';
@@ -65,6 +66,7 @@ export class GameOrchestrator {
       { type: 'avgBranch', factory: createAvgBranchEngine },
       { type: 'avgDialogue', factory: createAvgDialogueEngine },
       { type: 'avgRelation', factory: createAvgRelationEngine },
+      { type: 'avgEvent', factory: createAvgEventEngine },
       { type: 'exploration', factory: () => createExplorationEngine(config?.exploration) },
       { type: 'dailyTown', factory: createDailyTownEngine },
       { type: 'rpgBattle', factory: createRpgBattleEngine },

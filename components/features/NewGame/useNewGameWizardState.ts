@@ -139,6 +139,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
     const manualRealmPromptInputRef = useRef<HTMLInputElement>(null);
 
     const [step, setStep] = useState(0);
+    const [appliedPresetId, setAppliedPresetId] = useState<string | null>(null);
     const [stats, setStats] = useState<属性结构>(创建默认属性分配);
     const [openingConfig, setOpeningConfig] = useState<OpeningConfig>(默认开局配置);
     const [openingConfigEnabled, setOpeningConfigEnabled] = useState(false);
@@ -530,7 +531,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         setSelectedSceneId(normalizedOpeningConfig?.selectedSceneId || '');
         setSelectedArchetypeIds(normalizedOpeningConfig?.selectedArchetypeIds || []);
         setSelectedWritingSampleIds(normalizedOpeningConfig?.selectedWritingSampleIds || []);
-        setStep(1);
+        setAppliedPresetId(preset.id);
     };
 
     const 当前性别模式: '男' | '女' | '自定义' = charGender.trim() === '男' || charGender.trim() === '女'
@@ -1074,6 +1075,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
     return {
         // State
         step, setStep,
+        appliedPresetId,
         worldConfig, setWorldConfig,
         selectedQiyun, setSelectedQiyun,
         charName, setCharName, charGender, setCharGender, charAge, setCharAge,

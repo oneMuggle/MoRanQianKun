@@ -76,6 +76,7 @@ export interface ModalOpeners {
     openNovelDecompositionWorkbench: () => Promise<void>;
     openImageManagerWithCheck: () => Promise<void>;
     openCGGallery: () => void;
+    openRelationGraph: () => void;
     openMapExplorer: () => void;
     openNsfwCenter: () => void;
     openCampusDesire: () => void;
@@ -122,6 +123,7 @@ export function useModalOpeners(deps: UseModalOpenersDeps): ModalOpeners {
     const closeMobileMusic = React.useCallback(() => emitClose('music'), []);
     const openWorldbookManager = React.useCallback(() => emitOpen('worldbookManager'), []);
     const openCGGallery = React.useCallback(() => emitOpen('cgGallery'), []);
+    const openRelationGraph = React.useCallback(() => emitOpen('relationGraph'), []);
     const openMapExplorer = React.useCallback(() => emitOpen('mapExplorer'), []);
     const openNsfwCenter = React.useCallback(() => emitOpen('nsfwCenter'), []);
     const openCampusDesire = React.useCallback(() => emitOpen('campusDesire'), []);
@@ -253,7 +255,7 @@ export function useModalOpeners(deps: UseModalOpenersDeps): ModalOpeners {
         closeSettings, closeNovelDecompositionWorkbench, closeNovelWritingWorkbench,
         closeMobileMusic,
         openWorldbookManager, openNovelDecompositionWorkbench,
-        openImageManagerWithCheck, openCGGallery, openMapExplorer, handleMobileMenuClick, handleStartFromLanding,
+        openImageManagerWithCheck, openCGGallery, openRelationGraph, openMapExplorer, handleMobileMenuClick, handleStartFromLanding,
         openNsfwCenter, openCampusDesire, openPhotography, openUrbanDriver,
         openBoardGameDashboard, openBoardGame,
         handleReturnToHomeFromSettings,

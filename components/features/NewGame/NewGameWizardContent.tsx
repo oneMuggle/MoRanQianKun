@@ -187,6 +187,7 @@ interface NewGameWizardContentProps {
 export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wizard, openEraSelector }) => {
     const {
         step,
+        appliedPresetId,
         worldConfig, setWorldConfig,
         charName, setCharName, charGender, setCharGender, charAge, setCharAge,
         charAppearance, setCharAppearance, charPersonality, setCharPersonality,
@@ -1769,13 +1770,24 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                             <div className="space-y-3">
                                 <div className="text-xs text-gray-300 font-bold tracking-widest">已保存的开局方案</div>
                                 <div className="space-y-2 max-h-[240px] md:max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
-                                    {自定义开局预设列表.map((preset) => (
+                                    {自定义开局预设列表.map((preset) => {
+                                        const isApplied = appliedPresetId === preset.id;
+                                        return (
                                         <div
                                             key={preset.id}
-                                            className="rounded-xl border border-gray-800 bg-black/30 px-4 py-3 flex items-center justify-between gap-3"
+                                            className={`rounded-xl border px-4 py-3 flex items-center justify-between gap-3 transition-all ${
+                                                isApplied
+                                                    ? 'border-wuxia-gold/60 bg-wuxia-gold/10 shadow-[0_0_12px_rgba(217,169,56,0.15)]'
+                                                    : 'border-gray-800 bg-black/30'
+                                            }`}
                                         >
                                             <div className="min-w-0 flex-1">
-                                                <div className="text-sm text-gray-200 truncate">{preset.名称}</div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="text-sm text-gray-200 truncate">{preset.名称}</div>
+                                                    {isApplied && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-wuxia-gold/20 text-wuxia-gold shrink-0">已应用</span>
+                                                    )}
+                                                </div>
                                                 {preset.简介 && (
                                                     <div className="text-[11px] text-gray-500 truncate">{preset.简介}</div>
                                                 )}
@@ -1785,13 +1797,15 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2 shrink-0">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => 应用预设到表单(preset)}
-                                                    className="text-[11px] text-wuxia-gold hover:text-white"
-                                                >
-                                                    使用
-                                                </button>
+                                                {!isApplied && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => 应用预设到表单(preset)}
+                                                        className="text-[11px] text-wuxia-gold hover:text-white"
+                                                    >
+                                                        使用
+                                                    </button>
+                                                )}
                                                 <button
                                                     type="button"
                                                     onClick={() => 编辑自定义开局方案信息(preset)}
@@ -1815,7 +1829,8 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                                                 </button>
                                             </div>
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </OrnateBorder>
