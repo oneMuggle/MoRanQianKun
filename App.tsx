@@ -83,6 +83,7 @@ const App: React.FC = () => {
         sceneQuickGenToastVisible, setSceneQuickGenToastVisible,
         contextSnapshot, setContextSnapshot,
         galgameModeEnabled, toggleGalgameMode,
+        galgameImmersion, toggleGalgameImmersion,
         rpgModeEnabled, toggleRpgMode,
         modalOpeners,
     } = useAppModalState({
@@ -220,6 +221,8 @@ const App: React.FC = () => {
                                 setChatContentHidden={setChatContentHidden}
                                 galgameModeEnabled={galgameModeEnabled}
                                 toggleGalgameMode={toggleGalgameMode}
+                                galgameImmersion={galgameImmersion}
+                                toggleGalgameImmersion={toggleGalgameImmersion}
                                 rpgModeEnabled={rpgModeEnabled}
                                 toggleRpgMode={toggleRpgMode}
                                 sceneQuickGenHint={sceneQuickGenHint}

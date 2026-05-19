@@ -53,6 +53,10 @@ interface GalgameViewProps {
   engineRef?: React.RefObject<AvgRelationEngine | null>;
   /** 打开关系图谱 */
   onOpenRelationGraph?: () => void;
+  /** 切换沉浸模式 */
+  onToggleImmersion?: () => void;
+  /** 是否处于沉浸模式 */
+  isImmersion?: boolean;
 }
 
 export const GalgameView: React.FC<GalgameViewProps> = ({
@@ -70,10 +74,14 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
   engineSuggestedOptions,
   engineRef,
   onOpenRelationGraph,
+  onToggleImmersion,
+  isImmersion,
 }) => {
   const [showBacklog, setShowBacklog] = useState(false);
   // 段进度计数器：当前显示到第几段（0 = 最新段，递增向前翻阅）
   const [segmentIndex, setSegmentIndex] = useState(0);
+  // 对话内容滚动引用
+  const contentScrollRef = useRef<HTMLDivElement>(null);
 
   // 对话树集成（当引擎可用时）
   const dialogueTree = useDialogueTree({ engineRef: engineRef as React.RefObject<AvgRelationEngine | null> });
@@ -111,29 +119,17 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
     wasLoading.current = loading;
   }, [loading]);
 
-  // 当前场景的段分组：按连续旁白/角色对话分组
+  // 新内容出现时自动滚动到底部
+  useEffect(() => {
+    if (contentScrollRef.current) {
+      contentScrollRef.current.scrollTop = contentScrollRef.current.scrollHeight;
+    }
+  }, [currentSceneEntries, loading, segmentIndex]);
+
+  // 当前场景的段分组：每条消息独立为一段
   const sceneSegments = useMemo(() => {
     if (currentSceneEntries.length === 0) return [];
-
-    const segments: Array<typeof currentSceneEntries> = [];
-    let currentSegment: typeof currentSceneEntries = [];
-
-    for (const entry of currentSceneEntries) {
-      currentSegment.push(entry);
-      // 每当遇到角色对话（非旁白），结束当前段
-      if (!entry.isNarrator) {
-        if (currentSegment.length > 0) {
-          segments.push([...currentSegment]);
-          currentSegment = [];
-        }
-      }
-    }
-    // 剩余条目
-    if (currentSegment.length > 0) {
-      segments.push(currentSegment);
-    }
-
-    return segments;
+    return currentSceneEntries.map((entry) => [entry]);
   }, [currentSceneEntries]);
 
   // 当前显示的段
@@ -239,6 +235,24 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
 
   return (
     <div className="relative w-full h-full overflow-hidden">
+      {/* 沉浸模式指示器 — 左上角，hover 显示退出按钮 */}
+      {isImmersion && onToggleImmersion && (
+        <div className="absolute top-2 left-2 z-30 group">
+          <div className="h-7 w-7 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center backdrop-blur-sm opacity-40 group-hover:opacity-100 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3.5 w-3.5 text-cyan-300">
+              <rect x="2" y="2" width="20" height="20" rx="2" />
+              <circle cx="12" cy="12" r="4" />
+            </svg>
+          </div>
+          <button
+            onClick={onToggleImmersion}
+            className="absolute left-9 top-0 whitespace-nowrap rounded-full bg-black/70 px-3 py-1 text-[11px] text-cyan-200 border border-cyan-400/30 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            退出全屏沉浸（ESC）
+          </button>
+        </div>
+      )}
+
       {/* 场景背景 */}
       <SceneBackground
         imageUrl={backgroundImage}
@@ -412,8 +426,8 @@ export const GalgameView: React.FC<GalgameViewProps> = ({
               </div>
             </div>
 
-            {/* 当前段内容 */}
-            <div>
+            {/* 当前段内容 — 可滚动 */}
+            <div ref={contentScrollRef} className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-wuxia-gold/20 scrollbar-track-transparent">
               {displaySegment.map((entry, idx) => {
                 const isLast = idx === displaySegment.length - 1;
                 // 旁白样式

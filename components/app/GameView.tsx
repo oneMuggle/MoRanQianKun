@@ -36,6 +36,8 @@ interface GameViewProps {
     setChatContentHidden: (v: React.SetStateAction<boolean>) => void;
     galgameModeEnabled: boolean;
     toggleGalgameMode: () => void;
+    galgameImmersion: boolean;
+    toggleGalgameImmersion: () => void;
     rpgModeEnabled: boolean;
     toggleRpgMode: () => void;
     sceneQuickGenHint: boolean;
@@ -101,6 +103,8 @@ export function GameView({
     setChatContentHidden,
     galgameModeEnabled,
     toggleGalgameMode,
+    galgameImmersion,
+    toggleGalgameImmersion,
     rpgModeEnabled,
     toggleRpgMode,
     sceneQuickGenHint,
@@ -149,6 +153,19 @@ export function GameView({
 }: GameViewProps) {
     // Galgame 引擎连接
     const galgameEngine = useGalgameEngine();
+
+    // ESC 退出沉浸模式
+    React.useEffect(() => {
+        if (!galgameImmersion) return;
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                toggleGalgameImmersion();
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [galgameImmersion, toggleGalgameImmersion]);
 
     const playerProfile = React.useMemo(
         () => ({ 姓名: (state.角色 as any)?.姓名, 头像图片URL: 玩家头像地址 }),
@@ -217,7 +234,7 @@ export function GameView({
                 <div className="flex-1 flex overflow-hidden relative z-10 mx-1 mb-1">
 
                     {/* 左侧栏 */}
-                    <div className={`hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-r border-wuxia-gold/20 flex flex-col shadow-[10px_0_20px_rgba(0,0,0,0.5)] lixia-panel-left ${(state.gameConfig as any)?.启用里志怪模式 ? 'lizhiguai-panel-left' : ''}`}>
+                    <div className={`hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-r border-wuxia-gold/20 flex flex-col shadow-[10px_0_20px_rgba(0,0,0,0.5)] lixia-panel-left ${(state.gameConfig as any)?.启用里志怪模式 ? 'lizhiguai-panel-left' : ''} transition-all duration-500 ${galgameImmersion ? 'opacity-0 pointer-events-none md:w-0 overflow-hidden' : ''}`}>
                         <LeftPanel
                             角色={state.角色}
                             onOpenCharacter={openCharacter}
@@ -226,6 +243,15 @@ export function GameView({
                             gameConfig={state.gameConfig}
                         />
                     </div>
+
+                    {/* 沉浸模式边缘热区 — 左侧 */}
+                    {galgameImmersion && (
+                        <div
+                            className="hidden md:block absolute left-0 top-0 bottom-0 w-5 z-30 cursor-default group"
+                        >
+                            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-r from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                    )}
 
                     {/* 中间栏 - Chat Area */}
                     <div className="flex-1 flex flex-col relative z-0 min-w-0 transition-colors duration-500">
@@ -243,28 +269,53 @@ export function GameView({
                             }`}
                         ></div>
                         <div className="absolute right-3 top-3 z-30 flex items-center gap-2">
-                            {/* Galgame 模式切换 */}
+                            {/* Galgame 模式切换 — 三态循环：关闭 → Galgame → 沉浸全屏 → 关闭 */}
                             <button
                                 type="button"
-                                onClick={toggleGalgameMode}
+                                onClick={() => {
+                                    if (!galgameModeEnabled) {
+                                        toggleGalgameMode(); // 关闭 → Galgame
+                                    } else if (!galgameImmersion) {
+                                        toggleGalgameImmersion(); // Galgame → 沉浸
+                                    } else {
+                                        toggleGalgameImmersion(); // 沉浸 → Galgame（带侧栏）
+                                        toggleGalgameMode();     // Galgame → 关闭
+                                    }
+                                }}
                                 className={`inline-flex h-[27px] w-[27px] items-center justify-center rounded-full border bg-black/55 backdrop-blur-sm transition-colors hover:text-white ${
-                                    galgameModeEnabled
+                                    galgameModeEnabled && galgameImmersion
+                                        ? 'border-cyan-400 text-cyan-100 ring-2 ring-cyan-400/60'
+                                        : galgameModeEnabled
                                         ? 'border-purple-400 text-purple-100 ring-2 ring-purple-400/60'
                                         : 'border-gray-600/60 text-gray-300 hover:border-purple-400'
                                 }`}
-                                title={galgameModeEnabled ? '切换为传统聊天视图' : '切换为 Galgame 沉浸视图'}
+                                title={
+                                    !galgameModeEnabled ? '切换为 Galgame 沉浸视图' :
+                                    !galgameImmersion ? '切换为全屏沉浸（隐藏侧栏）' :
+                                    '退出 Galgame 模式'
+                                }
                                 aria-label="Galgame 模式切换"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-[14px] w-[14px]">
-                                    {galgameModeEnabled ? (
+                                    {!galgameModeEnabled ? (
+                                        // 关闭状态 → 眼镜图标
                                         <>
                                             <rect x="2" y="4" width="20" height="16" rx="2" />
                                             <path d="M8 10h.01M12 10h.01M16 10h.01" strokeWidth="3" strokeLinecap="round" />
                                         </>
-                                    ) : (
+                                    ) : !galgameImmersion ? (
+                                        // Galgame 状态 → 扩展图标
                                         <>
-                                            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36" />
-                                            <path d="m9 12 2 2 4-4" />
+                                            <path d="M15 3h6v6" />
+                                            <path d="M9 21H3v-6" />
+                                            <path d="M21 3l-7 7" />
+                                            <path d="M3 21l7-7" />
+                                        </>
+                                    ) : (
+                                        // 沉浸状态 → 全屏图标
+                                        <>
+                                            <rect x="2" y="2" width="20" height="20" rx="2" />
+                                            <circle cx="12" cy="12" r="4" />
                                         </>
                                     )}
                                 </svg>
@@ -388,6 +439,8 @@ export function GameView({
                                         engineSuggestedOptions={galgameEngine.engineSuggestedOptions}
                                         engineRef={galgameEngine.engineRef}
                                         onOpenRelationGraph={openRelationGraph}
+                                        onToggleImmersion={toggleGalgameImmersion}
+                                        isImmersion={galgameImmersion}
                                     />
                                 )
                             ) : (
@@ -437,7 +490,7 @@ export function GameView({
                     </div>
 
                     {/* 右侧栏 */}
-                    <div className={`hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-l border-wuxia-gold/20 flex flex-col shadow-[-10px_0_20px_rgba(0,0,0,0.5)] lixia-panel-right ${(state.gameConfig as any)?.启用里志怪模式 ? 'lizhiguai-panel-right' : ''}`}>
+                    <div className={`hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-l border-wuxia-gold/20 flex flex-col shadow-[-10px_0_20px_rgba(0,0,0,0.5)] lixia-panel-right ${(state.gameConfig as any)?.启用里志怪模式 ? 'lizhiguai-panel-right' : ''} transition-all duration-500 ${galgameImmersion ? 'opacity-0 pointer-events-none md:w-0 overflow-hidden' : ''}`}>
                         <RightPanel
                             onOpenSettings={openSettings}
                             onOpenInventory={openInventory}
@@ -474,6 +527,15 @@ export function GameView({
                             onOpenRpgTask={openRpgTask}
                         />
                     </div>
+
+                    {/* 沉浸模式边缘热区 — 右侧 */}
+                    {galgameImmersion && (
+                        <div
+                            className="hidden md:block absolute right-0 top-0 bottom-0 w-5 z-30 cursor-default"
+                        >
+                            <div className="absolute inset-y-0 right-0 w-1 bg-gradient-to-l from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                        </div>
+                    )}
                 </div>
 
                 {meta.notifications && (meta.notifications as any[]).length > 0 && (

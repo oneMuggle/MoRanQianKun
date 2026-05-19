@@ -27,6 +27,8 @@ export interface AppModalState {
     setContextSnapshot: React.Dispatch<React.SetStateAction<Awaited<ReturnType<any>> | undefined>>;
     galgameModeEnabled: boolean;
     toggleGalgameMode: () => void;
+    galgameImmersion: boolean;
+    toggleGalgameImmersion: () => void;
     rpgModeEnabled: boolean;
     toggleRpgMode: () => void;
 }
@@ -108,6 +110,14 @@ export function useAppModalState({
         }))
     );
 
+    // Galgame immersion backed by Zustand
+    const { galgameImmersion, toggleGalgameImmersion } = useGameStore(
+        useShallow((s) => ({
+            galgameImmersion: s.galgameImmersion,
+            toggleGalgameImmersion: s.toggleGalgameImmersion,
+        }))
+    );
+
     // --- 弹窗开启器（通过 modalManager 事件系统） ---
     const modalStates = {
         showBDSMRelationship, setShowBDSMRelationship,
@@ -133,6 +143,7 @@ export function useAppModalState({
         sceneQuickGenToastVisible, setSceneQuickGenToastVisible,
         contextSnapshot, setContextSnapshot,
         galgameModeEnabled, toggleGalgameMode,
+        galgameImmersion, toggleGalgameImmersion,
         rpgModeEnabled, toggleRpgMode,
         requestConfirm,
         modalOpeners,
