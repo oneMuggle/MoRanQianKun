@@ -9,6 +9,8 @@ import { 获取图片展示地址 } from '../../../utils/imageAssets';
 import { 获取已装备部位, 获取已装备道具 } from '../../../utils/clothingHelpers';
 import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';
 import RelationshipGraph from '../Relationship/RelationshipGraph';
+import { SensitivePointMeridianMap } from './SensitivePointMeridianMap';
+import { ClothingLayerMap } from './ClothingLayerMap';
 
 interface Props {
     socialList: NPC结构[];
@@ -50,6 +52,8 @@ const SocialModal: React.FC<Props> = ({
     const [showFullBackground, setShowFullBackground] = useState(false);
     const [imageViewer, setImageViewer] = useState<{ src: string; alt: string } | null>(null);
     const [服饰面板展开, set服饰面板展开] = useState(false);
+    const [敏感点展示模式, set敏感点展示模式] = useState<'文字' | '经络图'>('文字');
+    const [服饰展示模式, set服饰展示模式] = useState<'文字' | '层次图'>('文字');
 
     const 获取欲望阶段颜色 = (npcId: string): { bg: string; text: string; label: string } => {
         const 档案 = 欲望系统?.NPC欲望档案?.[npcId];
@@ -784,7 +788,21 @@ const SocialModal: React.FC<Props> = ({
                                                                             const 装备部位列表 = 获取已装备部位(currentNPC);
                                                                             return (
                                                                                 <div className="bg-black/20 rounded-lg p-3 space-y-2">
-                                                                                    <div className="text-pink-300/60 text-xs font-semibold mb-1">服饰</div>
+                                                                                    <div className="flex items-center justify-between mb-1">
+                                                                                        <div className="text-pink-300/60 text-xs font-semibold">服饰</div>
+                                                                                        <button
+                                                                                            onClick={() => set服饰展示模式(prev => prev === '文字' ? '层次图' : '文字')}
+                                                                                            className="text-xs text-pink-400/60 hover:text-pink-400 transition-colors"
+                                                                                        >
+                                                                                            {服饰展示模式 === '文字' ? '层次图' : '文字'}
+                                                                                        </button>
+                                                                                    </div>
+                                                                                    {服饰展示模式 === '层次图' ? (
+                                                                                        <div className="h-[300px]">
+                                                                                            <ClothingLayerMap npc={currentNPC} />
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <>
                                                                                     {装备部位列表.map(部位 => {
                                                                                         const 数据 = currentNPC.服饰档案?.[部位];
                                                                                         if (!数据) return null;
@@ -824,6 +842,8 @@ const SocialModal: React.FC<Props> = ({
                                                                                             </div>
                                                                                         );
                                                                                     })}
+                                                                                        </>
+                                                                                    )}
                                                                                 </div>
                                                                             );
                                                                         })()}
@@ -999,7 +1019,21 @@ const SocialModal: React.FC<Props> = ({
                                                             };
                                                             return (
                                                                 <div className="bg-gradient-to-br from-red-950/10 to-black/60 border border-red-900/20 rounded-lg p-4 mb-5 space-y-2">
-                                                                    <div className="text-red-300/60 text-xs font-semibold mb-2">敏感点详情</div>
+                                                                    <div className="flex items-center justify-between mb-2">
+                                                                        <div className="text-red-300/60 text-xs font-semibold">敏感点详情</div>
+                                                                        <button
+                                                                            onClick={() => set敏感点展示模式(prev => prev === '文字' ? '经络图' : '文字')}
+                                                                            className="text-xs text-red-400/60 hover:text-red-400 transition-colors"
+                                                                        >
+                                                                            {敏感点展示模式 === '文字' ? '经络图' : '文字'}
+                                                                        </button>
+                                                                    </div>
+                                                                    {敏感点展示模式 === '经络图' ? (
+                                                                        <div className="h-[360px]">
+                                                                            <SensitivePointMeridianMap npc={currentNPC} />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <>
                                                                     {currentNPC.敏感点档案!.主要敏感点.map((pt, idx) => {
                                                                         const 名 = pt.时代名称 || pt.名称;
                                                                         const 开发 = pt.开发程度 ? 开发程度样式[pt.开发程度] : null;
@@ -1021,6 +1055,8 @@ const SocialModal: React.FC<Props> = ({
                                                                     })}
                                                                     {currentNPC.敏感点档案.弱点摘要 && (
                                                                         <div className="text-gray-600 text-[10px] italic pt-1 border-t border-white/5">{currentNPC.敏感点档案.弱点摘要}</div>
+                                                                    )}
+                                                                        </>
                                                                     )}
                                                                 </div>
                                                             );
