@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 创建历史回合工作流 } from './historyTurnWorkflow';
 
-vi.mock('../../services/novel-decomposition/novelDecompositionCalibration', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionCalibration', () => ({
     同步剧情小说分解时间校准: vi.fn((p: any) => Promise.resolve(p.nextStory || {})),
 }));
 

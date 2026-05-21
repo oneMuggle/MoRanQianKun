@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 创建变量校准协调器 } from './variableCalibrationCoordinator';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generateText: vi.fn(() => Promise.resolve('calibrated text'))
 }));
 

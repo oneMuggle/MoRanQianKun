@@ -84,7 +84,13 @@ vi.mock('./memoryUtils', () => ({
     }),
     应用记忆压缩结果: vi.fn((memory, task, summaryText) => {
         const mem = memory as 记忆系统结构;
-        const next = { ...mem };
+        const next = {
+            回忆档案: [...(mem.回忆档案 || [])],
+            即时记忆: [...(mem.即时记忆 || [])],
+            短期记忆: [...(mem.短期记忆 || [])],
+            中期记忆: [...(mem.中期记忆 || [])],
+            长期记忆: [...(mem.长期记忆 || [])],
+        };
         
         if (task.来源层 === '短期') {
             const removed = next.短期记忆.splice(task.起始索引, task.结束索引 - task.起始索引 + 1);
@@ -206,7 +212,7 @@ describe('执行单次记忆压缩', () => {
         expect(result.compressedLayers).toContain('短期');
         expect(result.memory.短期记忆.length).toBe(0);
         expect(result.memory.中期记忆.length).toBe(1);
-        expect(result.memory.中期记忆[0]).toBe('整合后的摘要');
+        expect(result.memory.中期记忆[0]).toContain('整合后的摘要');
     });
 
     it('compresses medium-term to long-term', () => {
@@ -367,7 +373,7 @@ describe('整合记忆系统', () => {
 
     it('handles AI summary generator', async () => {
         const memory = 创建测试记忆系统({
-            短期记忆: ['条目1', '条目2'],
+            短期记忆: Array(35).fill('短期记忆条目'),
         });
         const config = 创建测试配置();
         

@@ -88,6 +88,8 @@ vi.mock('./storyState', () => ({
 vi.mock('../../prompts/runtime/fandom', () => ({
     构建同人运行时提示词包: vi.fn(() => ({ enabled: false, 同人设定摘要: '' })),
     应用境界体系区块替换: vi.fn((c: string) => c),
+    解析境界映射值: vi.fn(() => 1),
+    校验境界体系提示词完整性: vi.fn(() => ({ ok: true, normalizedText: '', reason: '' })),
 }));
 vi.mock('../../data/qiyun', () => ({
     计算气运属性修正: vi.fn((n: number) => n),
@@ -119,6 +121,11 @@ vi.mock('../../prompts/core/eraRealism', () => ({
 }));
 vi.mock('../../prompts/runtime/eraLiMode', () => ({
     构建子纪元里模式注入: vi.fn(() => ''),
+    子纪元里模式是否已注入: vi.fn(() => false),
+    构建里模式NPC原型注入: vi.fn(() => ''),
+    构建NPC表里切换注入: vi.fn(() => ''),
+    构建里模式阶段注入: vi.fn(() => ''),
+    构建NPC完整里模式注入: vi.fn(() => ''),
 }));
 vi.mock('../../prompts/runtime/promptOwnership', () => ({
     构建主剧情难度摘要提示词: vi.fn(() => ''),

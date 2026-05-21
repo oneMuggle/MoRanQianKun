@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 创建主角图片工作流 } from './playerImageWorkflow';
 
-vi.mock('../../services/ai/image', () => ({
+vi.mock('../../../services/ai/image', () => ({
     generateImageFromPrompt: vi.fn(() => Promise.resolve({ dataUrl: 'data:image/png;base64,xxx' }))
 }));
 

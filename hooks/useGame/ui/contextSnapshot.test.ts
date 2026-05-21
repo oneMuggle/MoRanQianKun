@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 构建上下文快照数据 } from './contextSnapshot';
 
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取剧情回忆接口配置: vi.fn(() => ({})),
     获取主剧情接口配置: vi.fn(() => ({ model: 'gpt-4' })),
     接口配置是否可用: vi.fn(() => false)
 }));
 
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((v: any) => v || {})
 }));
 
@@ -33,17 +33,17 @@ vi.mock('./promptRuntime', () => ({
     构建COT伪装提示词: vi.fn(() => 'COT伪装')
 }));
 
-vi.mock('../../utils/tokenEstimate', () => ({
+vi.mock('../../../utils/tokenEstimate', () => ({
     countOpenAIChatMessagesTokensWithBreakdown: vi.fn((msgs: any[]) => ({
         items: msgs.map(() => ({ totalTokens: 100 }))
     }))
 }));
 
-vi.mock('../../services/novel-decomposition/novelDecompositionInjection', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionInjection', () => ({
     获取激活小说拆分注入文本: vi.fn(() => Promise.resolve(''))
 }));
 
-vi.mock('../../prompts/runtime/recall', () => ({
+vi.mock('../../../prompts/runtime/recall', () => ({
     剧情回忆检索COT提示词: 'recall COT',
     剧情回忆检索输出格式提示词: 'recall format',
     构建剧情回忆检索用户提示词: vi.fn(() => 'recall user prompt')
@@ -152,7 +152,7 @@ describe('contextSnapshot', () => {
         });
 
         it('includes recall sections when recall API is usable', async () => {
-            const { 获取剧情回忆接口配置, 接口配置是否可用 } = await import('../../utils/apiConfig');
+            const { 获取剧情回忆接口配置, 接口配置是否可用 } = await import('../../../utils/apiConfig');
             (获取剧情回忆接口配置 as any).mockReturnValue({ model: 'gpt-4' });
             (接口配置是否可用 as any).mockReturnValue(true);
 

@@ -4,14 +4,14 @@ import * as textAIService from '../../services/ai/text';
 import * as apiConfig from '../../utils/apiConfig';
 import * as memoryRecall from './memory/memoryRecall';
 
-vi.mock('../../../services/ai/text', () => ({
+vi.mock('../../services/ai/text', () => ({
     generateMemoryRecall: vi.fn(),
 }));
-vi.mock('../../../utils/apiConfig', () => ({
+vi.mock('../../utils/apiConfig', () => ({
     获取剧情回忆接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('../../../prompts/runtime/recall', () => ({
+vi.mock('../../prompts/runtime/recall', () => ({
     剧情回忆检索COT提示词: '<回忆COT>',
     剧情回忆检索输出格式提示词: '<回忆输出格式>',
     构建剧情回忆检索用户提示词: vi.fn((input: string, corpus: string) => `用户提示词:${input}|${corpus}`),

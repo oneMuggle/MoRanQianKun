@@ -53,12 +53,12 @@ vi.mock('./npcMemorySummary', () => ({
     构建NPC记忆总结回退文案: vi.fn(() => '回退文案')
 }));
 
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取记忆总结接口配置: vi.fn(() => ({ id: 'test_api', 供应商: 'openai', baseUrl: 'https://api.test', apiKey: 'key', model: 'gpt-4' })),
     接口配置是否可用: vi.fn(() => true)
 }));
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generateMemoryRecall: vi.fn(() => Promise.resolve('AI总结结果'))
 }));
 
