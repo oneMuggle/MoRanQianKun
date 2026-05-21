@@ -4,33 +4,33 @@ import * as apiConfig from '../../../utils/apiConfig';
 import * as gameSettings from '../../../utils/gameSettings';
 import { 执行变量模型校准工作流 } from '../planning/variableModelWorkflow';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generateVariableCalibrationUpdate: vi.fn(),
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取变量计算接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
     变量校准功能已启用: vi.fn(),
 }));
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn(),
 }));
-vi.mock('../../utils/stateHelpers', () => ({
+vi.mock('../../../utils/stateHelpers', () => ({
     normalizeStateCommandKey: vi.fn((key: string) => key),
 }));
-vi.mock('../../utils/worldbook', () => ({
+vi.mock('../../../utils/worldbook', () => ({
     构建世界书注入文本: vi.fn(() => ({ combinedText: '' })),
 }));
-vi.mock('../../prompts/runtime/nsfw', () => ({
+vi.mock('../../../prompts/runtime/nsfw', () => ({
     构建运行时额外提示词: vi.fn((text: string) => text),
 }));
-vi.mock('../../prompts/runtime/variableCalibrationReference', () => ({
+vi.mock('../../../prompts/runtime/variableCalibrationReference', () => ({
     构建变量相关规则提示词: vi.fn(() => ''),
 }));
-vi.mock('../../prompts/runtime/fandom', () => ({
+vi.mock('../../../prompts/runtime/fandom', () => ({
     构建同人运行时提示词包: vi.fn(() => ({ 同人设定摘要: '', 变量校准补丁: '', 境界母板补丁: '' })),
 }));
-vi.mock('../../utils/promptFeatureToggles', () => ({
+vi.mock('../../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((text: string) => text),
     裁剪修炼体系上下文数据: vi.fn((data: any) => data),
 }));

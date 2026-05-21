@@ -4,14 +4,14 @@ import * as apiConfig from '../../../utils/apiConfig';
 import * as gameSettings from '../../../utils/gameSettings';
 import { 执行正文润色 } from './bodyPolish';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generatePolishedBody: vi.fn(),
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取文章优化接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn(),
 }));
 

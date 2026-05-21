@@ -8,7 +8,7 @@ import {
   校验世界状态完整性,
   修复世界状态孤立引用,
   校验并修复世界状态
-} from './worldStateIntegrity';
+} from './world/worldStateIntegrity';
 
 const 创建测试世界 = (overrides: any = {}) => ({
   活跃NPC列表: [

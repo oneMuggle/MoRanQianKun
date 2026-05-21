@@ -3,14 +3,14 @@ import { 创建规划更新工作流 } from './planningUpdateWorkflow';
 import * as textAIService from '../../../services/ai/text';
 import * as apiConfig from '../../../utils/apiConfig';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generatePlanningAnalysis: vi.fn(),
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取规划分析接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => ({
         启用修炼体系: true,
         启用女主剧情规划: false,
@@ -19,22 +19,22 @@ vi.mock('../../utils/gameSettings', () => ({
         ...c,
     })),
 }));
-vi.mock('../../utils/worldbook', () => ({
+vi.mock('../../../utils/worldbook', () => ({
     构建世界书注入文本: vi.fn(() => ({ combinedText: '' })),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionCalibration', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionCalibration', () => ({
     同步剧情小说分解时间校准: vi.fn((p: any) => Promise.resolve(p.nextStory || {})),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionInjection', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionInjection', () => ({
     获取激活小说拆分注入文本: vi.fn(() => Promise.resolve('')),
 }));
-vi.mock('../../prompts/runtime/fandom', () => ({
+vi.mock('../../../prompts/runtime/fandom', () => ({
     构建同人运行时提示词包: vi.fn(() => ({ enabled: false, 同人设定摘要: '', 境界母板补丁: '' })),
 }));
 vi.mock('./thinkingContext', () => ({
     提取响应规划文本: vi.fn(() => ''),
 }));
-vi.mock('../../utils/promptFeatureToggles', () => ({
+vi.mock('../../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((c: string) => c),
     裁剪修炼体系上下文数据: vi.fn((v: any) => v),
 }));

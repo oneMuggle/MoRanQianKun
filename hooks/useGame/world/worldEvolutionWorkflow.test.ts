@@ -3,14 +3,14 @@ import { 执行世界演变更新工作流 } from './worldEvolutionWorkflow';
 import * as textAIService from '../../../services/ai/text';
 import * as apiConfig from '../../../utils/apiConfig';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generateWorldEvolutionUpdate: vi.fn(),
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取世界演变接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => ({
         启用修炼体系: true,
         启用GPT模式: false,
@@ -24,17 +24,17 @@ vi.mock('../../utils/gameSettings', () => ({
         ...c,
     })),
 }));
-vi.mock('../../utils/worldbook', () => ({
+vi.mock('../../../utils/worldbook', () => ({
     构建世界书注入文本: vi.fn(() => ({ combinedText: '' })),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionInjection', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionInjection', () => ({
     获取激活小说拆分注入文本: vi.fn(() => Promise.resolve('')),
 }));
-vi.mock('../../utils/promptFeatureToggles', () => ({
+vi.mock('../../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((c: string) => c),
     裁剪修炼体系上下文数据: vi.fn((w: any) => w),
 }));
-vi.mock('../../prompts/runtime/fandom', () => ({
+vi.mock('../../../prompts/runtime/fandom', () => ({
     构建同人运行时提示词包: vi.fn(() => ({
         enabled: false,
         世界观创建补丁: '',
@@ -47,11 +47,11 @@ vi.mock('../../prompts/runtime/fandom', () => ({
         女主规划补丁: '',
     })),
 }));
-vi.mock('../../prompts/runtime/worldEvolutionCot', () => ({
+vi.mock('../../../prompts/runtime/worldEvolutionCot', () => ({
     构建世界演变COT提示词: vi.fn(() => '<世界演变COT>'),
     世界演变COT伪装历史消息提示词: '<世界演变COT伪装>',
 }));
-vi.mock('../../prompts/stats/world', () => ({
+vi.mock('../../../prompts/stats/world', () => ({
     数值_世界演化: { id: 'stat_world_evo', 内容: '【世界演化】' },
 }));
 vi.mock('./memoryUtils', () => ({

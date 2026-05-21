@@ -35,6 +35,8 @@ vi.mock('../../utils/gameSettings', () => ({
 }));
 vi.mock('../../utils/worldbook', () => ({
     构建世界书注入文本: vi.fn(() => ({ worldLoreText: '', systemRuleText: '', commandRuleText: '', outputRuleText: '' })),
+    世界书存储键: 'extra_worldbooks',
+    世界书预设组存储键: 'worldbook_presets',
     世界书本体槽位: {
         主剧情AI角色声明: 'main_ai_role',
         主剧情输出协议: 'main_output_protocol',
@@ -52,6 +54,7 @@ vi.mock('../../utils/worldbook', () => ({
 }));
 vi.mock('../../utils/builtinPrompts', () => ({
     获取内置提示词槽位内容: vi.fn(({ fallback }: any) => fallback),
+    内置提示词存储键: 'builtin_prompt_entries',
 }));
 vi.mock('./promptRuntime', () => ({
     构建运行时提示词池: vi.fn((pool: any[]) => ({ promptPool: pool, selectedCotPromptIds: ['core_cot'] })),

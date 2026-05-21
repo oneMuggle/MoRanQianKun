@@ -66,10 +66,8 @@ const 提取有效地点名称 = (world: 世界数据结构): Set<string> => {
     addFrom归属(building.归属);
   }
 
-  // NPC当前位置
-  for (const npc of world.活跃NPC列表 || []) {
-    if (npc.当前位置) names.add(npc.当前位置);
-  }
+  // Note: NPC current positions are NOT included in valid locations.
+  // Position validation checks against known maps/buildings only.
 
   return names;
 };

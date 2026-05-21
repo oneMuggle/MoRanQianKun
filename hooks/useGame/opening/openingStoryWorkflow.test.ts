@@ -4,27 +4,27 @@ import * as textAIService from '../../../services/ai/text';
 import * as apiConfig from '../../../utils/apiConfig';
 import * as gameSettings from '../../../utils/gameSettings';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generateStoryResponse: vi.fn(),
     generateFandomRealmData: vi.fn(),
     generateWorldEvolutionUpdate: vi.fn(),
     generatePlanningAnalysis: vi.fn(),
     StoryResponseParseError: class StoryResponseParseError extends Error { name = 'StoryResponseParseError'; },
 }));
-vi.mock('../../services/dbService', () => ({
+vi.mock('../../../services/dbService', () => ({
     保存设置: vi.fn(),
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取主剧情接口配置: vi.fn(),
     获取世界演变接口配置: vi.fn(),
     获取规划分析接口配置: vi.fn(),
     获取变量计算接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => c || {}),
 }));
-vi.mock('../../utils/worldbook', () => ({
+vi.mock('../../../utils/worldbook', () => ({
     构建世界书注入文本: vi.fn(() => ({ combinedText: '' })),
     世界书存储键: 'extra_worldbooks',
     世界书预设组存储键: 'worldbook_preset_groups',
@@ -34,71 +34,71 @@ vi.mock('../../utils/worldbook', () => ({
         真实世界模式: 'real_world_mode',
     },
 }));
-vi.mock('../../utils/builtinPrompts', () => ({
+vi.mock('../../../utils/builtinPrompts', () => ({
     获取内置提示词槽位内容: vi.fn(({ fallback }: any) => fallback),
     获取剧情风格内置槽位: vi.fn(() => 'opening_standard'),
     内置提示词存储键: 'builtin_prompt_entries',
 }));
-vi.mock('../../prompts/core/cotOpening', () => ({
+vi.mock('../../../prompts/core/cotOpening', () => ({
     核心_开局思维链: { id: 'core_cot', 内容: '<开局COT>' },
     获取开局思维链提示词: vi.fn(() => '<开局COT>'),
 }));
-vi.mock('../../prompts/core/realm', () => ({
+vi.mock('../../../prompts/core/realm', () => ({
     核心_境界体系: { id: 'core_realm', 内容: '【境界体系】' },
 }));
-vi.mock('../../prompts/runtime/opening', () => ({
+vi.mock('../../../prompts/runtime/opening', () => ({
     获取开场初始化任务提示词: vi.fn(() => '<开场任务>'),
 }));
-vi.mock('../../prompts/runtime/qiyun', () => ({
+vi.mock('../../../prompts/runtime/qiyun', () => ({
     气运初始化任务提示词: ['<气运任务>'],
 }));
-vi.mock('../../prompts/runtime/eraOpeningScene', () => ({
+vi.mock('../../../prompts/runtime/eraOpeningScene', () => ({
     构建时代开局场景注入: vi.fn(() => ''),
 }));
-vi.mock('../../prompts/runtime/openingConfig', () => ({
+vi.mock('../../../prompts/runtime/openingConfig', () => ({
     构建开局配置提示词: vi.fn(() => ''),
 }));
-vi.mock('../../prompts/runtime/fandom', () => ({
+vi.mock('../../../prompts/runtime/fandom', () => ({
     构建同人运行时提示词包: vi.fn(() => ({ enabled: false, 开局任务补丁: '', 开局COT补丁: '', 境界母板补丁: '' })),
     校验境界体系提示词完整性: vi.fn(() => ({ ok: true, normalizedText: '【境界体系】', reason: '' })),
 }));
-vi.mock('../../prompts/stats/world', () => ({
+vi.mock('../../../prompts/stats/world', () => ({
     数值_世界演化: { 内容: '【世界演化】' },
 }));
-vi.mock('../../prompts/runtime/protocolDirectives', () => ({
+vi.mock('../../../prompts/runtime/protocolDirectives', () => ({
     构建字数要求提示词: vi.fn((n: number) => `<字数>${n}字</字数>`),
 }));
-vi.mock('../../prompts/runtime/storyStyles', () => ({
+vi.mock('../../../prompts/runtime/storyStyles', () => ({
     构建剧情风格助手提示词: vi.fn(() => '<剧情风格>'),
 }));
-vi.mock('../../prompts/runtime/realWorldMode', () => ({
+vi.mock('../../../prompts/runtime/realWorldMode', () => ({
     构建真实世界模式提示词: vi.fn(() => '<真实模式>'),
 }));
-vi.mock('../../prompts/runtime/nsfw', () => ({
+vi.mock('../../../prompts/runtime/nsfw', () => ({
     构建运行时额外提示词: vi.fn(() => ''),
 }));
-vi.mock('../../prompts/runtime/worldEvolutionCot', () => ({
+vi.mock('../../../prompts/runtime/worldEvolutionCot', () => ({
     构建世界演变COT提示词: vi.fn(() => '<世界COT>'),
     世界演变COT伪装历史消息提示词: '<世界COT伪装>',
 }));
-vi.mock('../../prompts/runtime/openingWorldEvolutionInit', () => ({
+vi.mock('../../../prompts/runtime/openingWorldEvolutionInit', () => ({
     构建开局世界演变初始化上下文: vi.fn(() => '<世界初始化>'),
     开局世界演变初始化附加提示词: '<世界初始化附加>',
 }));
-vi.mock('../../prompts/runtime/openingPlanningInit', () => ({
+vi.mock('../../../prompts/runtime/openingPlanningInit', () => ({
     构建开局规划初始化审计重点: vi.fn(() => '<规划审计>'),
     构建开局规划初始化正文上下文: vi.fn(() => '<规划正文>'),
     开局规划初始化附加提示词: '<规划附加>',
 }));
-vi.mock('../../prompts/runtime/openingVariableGenerationInit', () => ({
+vi.mock('../../../prompts/runtime/openingVariableGenerationInit', () => ({
     开局变量生成附加提示词: '<变量附加>',
     构建开局变量生成审计重点: vi.fn(() => '<变量审计>'),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionInjection', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionInjection', () => ({
     获取开局小说拆分注入文本: vi.fn(() => Promise.resolve('')),
     获取激活小说拆分注入文本: vi.fn(() => Promise.resolve('')),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionCalibration', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionCalibration', () => ({
     同步剧情小说分解时间校准: vi.fn((p: any) => Promise.resolve(p.nextStory || {})),
 }));
 vi.mock('./promptRuntime', () => ({
@@ -122,7 +122,7 @@ vi.mock('./memoryUtils', () => ({
 vi.mock('./worldEvolutionUtils', () => ({
     构建世界演变上下文文本: vi.fn(() => '<世界演变上下文>'),
 }));
-vi.mock('./variableModelWorkflow', () => ({
+vi.mock('../planning/variableModelWorkflow', () => ({
     执行变量模型校准工作流: vi.fn(() => Promise.resolve({ commands: [] })),
 }));
 vi.mock('./variableCalibrationMerge', () => ({
@@ -225,7 +225,7 @@ function makeDeps(overrides: any = {}) {
         规范化同人女主剧情规划状态: vi.fn(() => undefined),
         规范化角色物品容器映射: vi.fn((r: any) => r || {}),
         规范化社交列表: vi.fn((l: any[]) => l || []),
-        规范化世界状态: vi.fn((w: any) => w || {}),
+        规范化世界状态: vi.fn((w: any) => w || { 地图: [], 建筑: [], 活跃NPC列表: [], 待执行事件: [], 进行中事件: [], 已结算事件: [] }),
         规范化战斗状态: vi.fn((b: any) => b || {}),
         规范化门派状态: vi.fn((s: any) => s || {}),
         游戏设置启用自动重试: vi.fn(() => false),
@@ -462,7 +462,7 @@ describe('执行开场剧情生成工作流', () => {
             enableBasicMocks();
             mock获取变量计算接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
-            const { 执行变量模型校准工作流 } = await import('./variableModelWorkflow');
+            const { 执行变量模型校准工作流 } = await import('../planning/variableModelWorkflow');
             vi.mocked(执行变量模型校准工作流).mockResolvedValue({
                 commands: [{ action: 'set', key: 'gameState.角色.气血', value: 150 }],
             } as any);

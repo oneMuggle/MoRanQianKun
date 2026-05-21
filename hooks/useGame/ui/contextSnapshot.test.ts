@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { 构建上下文快照数据 } from './ui/contextSnapshot';
+import { 构建上下文快照数据 } from './contextSnapshot';
 
 vi.mock('../../utils/apiConfig', () => ({
     获取剧情回忆接口配置: vi.fn(() => ({})),

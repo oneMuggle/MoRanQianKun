@@ -1,9 +1,15 @@
 /// <reference types="vitest" />
+import path from 'path';
 import { defineConfig as defineViteConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineViteConfig({
     plugins: [react()],
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname),
+        },
+    },
     // @ts-expect-error - vitest extends Vite config, 'test' property is valid at runtime
     test: {
         globals: true,

@@ -5,20 +5,20 @@ import * as dbService from '../../../services/dbService';
 import * as apiConfig from '../../../utils/apiConfig';
 import * as gameSettings from '../../../utils/gameSettings';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generateWorldData: vi.fn(),
     generateFandomRealmData: vi.fn(),
     解析世界观提示词内容: vi.fn((s: string) => s),
     解析境界体系提示词内容: vi.fn((s: string) => s),
 }));
-vi.mock('../../services/dbService', () => ({
+vi.mock('../../../services/dbService', () => ({
     保存设置: vi.fn(),
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取主剧情接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => ({
         启用修炼体系: true,
         启用GPT模式: false,
@@ -32,15 +32,15 @@ vi.mock('../../utils/gameSettings', () => ({
         ...c,
     })),
 }));
-vi.mock('../../prompts/runtime/worldSetup', () => ({
+vi.mock('../../../prompts/runtime/worldSetup', () => ({
     构建世界观种子提示词: vi.fn(() => '<世界观种子>'),
     构建世界生成任务上下文提示词: vi.fn(() => '<世界生成上下文>'),
 }));
-vi.mock('../../prompts/runtime/worldGenerationCot', () => ({
+vi.mock('../../../prompts/runtime/worldGenerationCot', () => ({
     世界观生成COT提示词: '<世界COT>',
     世界观生成COT伪装历史消息提示词: '<世界COT伪装>',
 }));
-vi.mock('../../prompts/runtime/fandom', () => ({
+vi.mock('../../../prompts/runtime/fandom', () => ({
     构建同人运行时提示词包: vi.fn(() => ({
         enabled: false,
         世界观创建补丁: '',
@@ -49,10 +49,10 @@ vi.mock('../../prompts/runtime/fandom', () => ({
         开局COT补丁: '',
     })),
 }));
-vi.mock('../../prompts/core/realm', () => ({
+vi.mock('../../../prompts/core/realm', () => ({
     核心_境界体系: { id: 'core_realm', 内容: '【境界体系】' },
 }));
-vi.mock('../../utils/promptFeatureToggles', () => ({
+vi.mock('../../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((c: string) => c),
     构建修炼体系附加块: vi.fn(() => ''),
 }));
@@ -233,7 +233,7 @@ describe('执行世界生成工作流', () => {
     describe('realm system generation', () => {
         it('generates fandom realm data when fandom enabled and cultivation enabled', async () => {
             enableBasicMocks();
-            const { 构建同人运行时提示词包 } = await import('../../prompts/runtime/fandom');
+            const { 构建同人运行时提示词包 } = await import('../../../prompts/runtime/fandom');
             vi.mocked(构建同人运行时提示词包).mockImplementation(() => ({
                 enabled: true,
                 世界观创建补丁: '',
@@ -437,7 +437,7 @@ describe('执行世界生成工作流', () => {
 
         it('updates streaming status during realm generation', async () => {
             enableBasicMocks();
-            const { 构建同人运行时提示词包 } = await import('../../prompts/runtime/fandom');
+            const { 构建同人运行时提示词包 } = await import('../../../prompts/runtime/fandom');
             vi.mocked(构建同人运行时提示词包).mockImplementation(() => ({
                 enabled: true,
                 世界观创建补丁: '',
