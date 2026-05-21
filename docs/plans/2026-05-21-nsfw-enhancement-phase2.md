@@ -71,24 +71,33 @@
 
 ### Phase 4: 后果系统（Plan B，~8h）
 
-- [ ] 4.1 创建 `models/nsfw/consequences/types.ts`
-- [ ] 4.2 创建 `consequenceEngine.ts`
-- [ ] 4.3 创建 `memoryAnchors.ts`
-- [ ] 4.4 创建 `psychologyTracker.ts`
-- [ ] 4.5 创建 `butterflyEffects.ts`
+- [x] 4.1 创建 `consequences/types.ts` — 后果/记忆/心理/蝴蝶效应类型
+- [x] 4.2 创建 `consequenceEngine.ts` — 后果创建/衰减/查询
+- [x] 4.3 创建 `memoryAnchors.ts` — 记忆锚点创建/衰减/强化
+- [x] 4.4 创建 `psychologyTracker.ts` — 五维度心理追踪
+- [x] 4.5 创建 `butterflyEffects.ts` — 蝴蝶效应检测/触发/转化
+- [x] 4.6 创建 `consequences/index.ts`  barrel导出
+- [x] 4.7 更新主 `index.ts` 导出后果系统
 
 ### Phase 5: 跨模块联动（Plan C，~10h）
 
-- [ ] 5.1 创建 `models/nsfw/linker/types.ts`
-- [ ] 5.2 创建 `eventBus.ts`
-- [ ] 5.3 创建 `npcMemoryTracker.ts`
-- [ ] 5.4 创建 `reputationEngine.ts`
-- [ ] 5.5 创建 `crossModuleLinker.ts`
+- [x] 5.1 创建 `linker/types.ts` — 跨模块联动类型
+- [x] 5.2 创建 `eventBus.ts` — 全局事件总线（发布/订阅）
+- [x] 5.3 创建 `npcMemoryTracker.ts` — NPC跨场景记忆追踪
+- [x] 5.4 创建 `reputationEngine.ts` — 全局声誉引擎
+- [x] 5.5 创建 `crossModuleLinker.ts` — 跨模块联动引擎（7条规则覆盖8个引擎）
+- [x] 5.6 创建 `linker/index.ts` barrel导出 + 更新主 `index.ts`
 
 ### Phase 6: 视觉UI（Plan A，~6h）
 
-- [ ] 6.1 创建 `hooks/useNSFWState.ts`
-- [ ] 6.2 创建 `components/features/NSFW/` 组件集
+- [x] 6.1 创建 `hooks/useNSFWState.ts` — `useNSFWVisualState()` 聚合钩子，计算亲密度阶段、风险等级、服装文本、心理/事后/孕产摘要
+- [x] 6.2 创建 `components/features/NSFW/` 组件集
+  - `NSFWStatusBar.tsx` — 进度条组件（亲密度、防线等）
+  - `ClothingStatePanel.tsx` — 服装层次可视化（损坏、污渍）
+  - `IntimacyMeter.tsx` — 11级亲密度计量器（渐变色）
+  - `MoodIndicator.tsx` — Emoji情绪指示器
+  - `RiskWarning.tsx` — 风险警告面板（暴露/流言/后果/联动）
+  - `MobileNSFWPanel.tsx` — 移动端聚合面板（折叠/展开）
 - [ ] 6.3 集成到 SocialModal + MobileSocial
 
 ### Phase 7: 集成打磨（~4h）
