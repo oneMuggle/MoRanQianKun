@@ -32,7 +32,9 @@ export type EngineType =
   // Notification engine (promoted from standalone class)
   | 'notification'
   // Bar NSFW (contemporary urban)
-  | 'barNSFW';
+  | 'barNSFW'
+  // NSFW enhancement subsystem engines (Phase 6+)
+  | 'nsfwEnhancement';
 
 // ==================== 回合系统 ====================
 
@@ -215,4 +217,6 @@ export const ENGINE_PRIORITY: Record<EngineType, EnginePriority> = {
   notification: 'low',
   // Bar NSFW
   barNSFW: 'medium',
+  // NSFW enhancement
+  nsfwEnhancement: 'low',
 };

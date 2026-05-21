@@ -10,6 +10,8 @@ import { 获取性癖推荐, 生成性癖摘要 } from './fetishTaxonomy';
 import { 获取敏感点推荐, 生成敏感点摘要 } from './sensitiveZones';
 import { 匹配人格档案, 解锁隐藏偏好 } from './personalityProfiles';
 import { 计算偏好漂移 } from './preferenceDrift';
+import { 获取活跃后果 } from './consequences/consequenceEngine';
+import { 初始化跨模块状态, 获取待执行联动 } from './linker/crossModuleLinker';
 
 // ==================== 露出个性系数 ====================
 
@@ -119,6 +121,21 @@ export function 生成NSFW画像(npc: NPC结构, eraId: string | null | undefine
   // --- 新增：注入事后护理状态 ---
   if (npc.完整演化状态?.事后护理 && npc.完整演化状态.事后护理.当前情绪.length > 0) {
     画像.事后护理 = npc.完整演化状态.事后护理;
+  }
+
+  // --- 新增：注入后果数据 ---
+  if (npc.完整演化状态?.后果系统) {
+    const 活跃后果 = 获取活跃后果(npc.完整演化状态.后果系统, npc.姓名);
+    if (活跃后果.length > 0) {
+      画像.后果 = 活跃后果;
+    }
+  }
+
+  // --- 新增：注入跨模块联动数据 ---
+  const 跨模块状态 = npc.完整演化状态?.跨模块联动 ?? 初始化跨模块状态();
+  const 待执行 = 获取待执行联动(跨模块状态);
+  if (待执行.length > 0) {
+    画像.待执行联动 = 待执行;
   }
 
   return 画像;

@@ -386,9 +386,14 @@ export interface 完整演化状态 {
   孕产演化?: 孕产演化状态;
   事后护理?: 事后护理状态;
   服装层次?: 服装层次结构;
+  后果系统?: import('./consequences/types').后果系统状态;
+  跨模块联动?: import('./linker/types').跨模块联动状态;
 }
 
 // ==================== 扩展 NPCNSFW画像 ====================
+
+import type { 后果条目 } from './consequences/types';
+import type { 已激活联动 } from './linker/types';
 
 export interface NPCNSFW画像 {
   人格: 表里人格档案 | null;
@@ -400,6 +405,8 @@ export interface NPCNSFW画像 {
   人格翻转历史?: 人格翻转日志[];
   孕产状态?: 孕产演化状态;
   事后护理?: 事后护理状态;
+  后果?: 后果条目[];
+  待执行联动?: 已激活联动[];
 }
 
 // ==================== 玩家 NSFW 偏好档案 ====================

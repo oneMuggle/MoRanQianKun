@@ -11,6 +11,10 @@ import { IconBeads, IconHeart, IconMars, IconScroll } from '../../ui/Icons';
 import RelationshipGraph from '../Relationship/RelationshipGraph';
 import { SensitivePointMeridianMap } from './SensitivePointMeridianMap';
 import { ClothingLayerMap } from './ClothingLayerMap';
+import { NSFWStatusBar } from '../NSFW/NSFWStatusBar';
+import { ClothingStatePanel } from '../NSFW/ClothingStatePanel';
+import { IntimacyMeter } from '../NSFW/IntimacyMeter';
+import { RiskWarning } from '../NSFW/RiskWarning';
 
 interface Props {
     socialList: NPC结构[];
@@ -236,6 +240,56 @@ const SocialModal: React.FC<Props> = ({
         '深度开发': '深度',
         '完全开发': '完全',
     };
+
+    // ========== NSFW 视觉状态计算 ==========
+    const NSFW状态 = React.useMemo(() => {
+        if (!currentNPC || !nsfwEnabled) return null;
+        const 演化 = currentNPC.完整演化状态;
+        const bars: Array<{ label: string; value: number; max: number; color: string; tooltip?: string }> = [];
+        bars.push({
+            label: '亲密度',
+            value: currentNPC.亲密度等级 ?? 0,
+            max: 100,
+            color: 'from-pink-500 to-rose-500',
+        });
+        if (演化?.心理防线) {
+            const 防线 = 演化.心理防线;
+            bars.push({
+                label: '心理防线',
+                value: 防线.防线值,
+                max: 100,
+                color: 防线.防线值 < 25 ? 'from-red-500 to-orange-500' : 防线.防线值 < 50 ? 'from-yellow-500 to-amber-500' : 'from-blue-500 to-cyan-500',
+                tooltip: `等级: ${防线.当前等级}`,
+            });
+        }
+        // 服装状态文本
+        let 服装状态文本: string | null = null;
+        if (演化?.服装层次?.层次.length) {
+            const 损坏 = 演化.服装层次.层次.filter(l => l.损坏程度 !== '完好');
+            if (损坏.length) 服装状态文本 = `服装异常：${损坏.map(d => `${d.名称}(${d.损坏程度})`).join('、')}`;
+        }
+        // 孕产文本
+        let 孕产阶段文本: string | null = null;
+        if (演化?.孕产演化 && 演化.孕产演化.当前阶段 !== '未受孕') {
+            孕产阶段文本 = 演化.孕产演化.当前阶段;
+        }
+        // 心理摘要
+        let 心理摘要: string | null = null;
+        if (演化?.事后护理?.当前情绪.length) {
+            const 主导 = [...演化.事后护理.当前情绪].sort((a, b) => b.强度 - a.强度)[0];
+            心理摘要 = `${主导.情绪类型}(${Math.round(主导.强度)})`;
+        }
+        // 事后摘要
+        let 事后摘要: string | null = null;
+        if (演化?.事后护理) {
+            事后摘要 = `护理: ${演化.事后护理.护理质量}`;
+        }
+        // 暴露风险
+        const 暴露风险 = 欲望系统?.NPC欲望档案?.[currentNPC.id]?.暴露风险值 ?? 0;
+        const 流言等级 = 欲望系统?.NPC欲望档案?.[currentNPC.id]?.流言等级 ?? 0;
+
+        return { bars, 服装状态文本, 孕产阶段文本, 心理摘要, 事后摘要, 暴露风险, 流言等级 };
+    }, [currentNPC, nsfwEnabled, 欲望系统]);
     const 切换重要角色状态 = (npc: NPC结构) => {
         if (!onToggleMajorRole) return;
         onToggleMajorRole(npc.id, !Boolean(npc.是否主要角色));
@@ -945,6 +999,57 @@ const SocialModal: React.FC<Props> = ({
                                                 </div>
 
                                                 {展示女性私密档案 && (
+                                                    <>
+                                                    {/* NSFW 状态条 */}
+                                                    {NSFW状态 && NSFW状态.bars.length > 0 && (
+                                                        <div className="mb-4 bg-black/40 border border-violet-900/30 rounded-lg p-4">
+                                                            <div className="flex items-center justify-between mb-3">
+                                                                <h4 className="text-violet-400 font-serif font-bold text-sm tracking-widest flex items-center gap-2">
+                                                                    <span className="w-1.5 h-3 bg-violet-500/70 rounded-full"></span>
+                                                                    NSFW 状态
+                                                                </h4>
+                                                                <IntimacyMeter
+                                                                    stage={(() => {
+                                                                        const v = currentNPC.亲密度等级 ?? 0;
+                                                                        const stages = ['陌生人', '初识', '泛泛之交', '朋友', '暧昧', '恋人', '亲密', '挚爱', '灵魂伴侣', '血脉相连', '极致羁绊'] as const;
+                                                                        return stages[Math.min(Math.floor(v / 10), stages.length - 1)];
+                                                                    })()}
+                                                                    value={currentNPC.亲密度等级 ?? 0}
+                                                                    size="sm"
+                                                                />
+                                                            </div>
+                                                            <NSFWStatusBar bars={NSFW状态.bars} />
+                                                            {NSFW状态.孕产阶段文本 && (
+                                                                <div className="mt-2 text-xs text-pink-400">孕产: {NSFW状态.孕产阶段文本}</div>
+                                                            )}
+                                                            {NSFW状态.心理摘要 && (
+                                                                <div className="mt-1 text-xs text-purple-400">情绪: {NSFW状态.心理摘要}</div>
+                                                            )}
+                                                            {NSFW状态.事后摘要 && (
+                                                                <div className="mt-1 text-xs text-blue-400">{NSFW状态.事后摘要}</div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {/* 服装状态面板 */}
+                                                    {currentNPC && (currentNPC.完整演化状态?.服装层次 || currentNPC.当前服装状态) && (
+                                                        <div className="mb-4">
+                                                            <ClothingStatePanel npc={currentNPC} />
+                                                        </div>
+                                                    )}
+
+                                                    {/* 风险警告 */}
+                                                    {NSFW状态 && (NSFW状态.暴露风险 > 20 || NSFW状态.流言等级 > 0) && (
+                                                        <div className="mb-4">
+                                                            <RiskWarning
+                                                                暴露风险={NSFW状态.暴露风险}
+                                                                流言等级={NSFW状态.流言等级}
+                                                                活跃后果数量={欲望系统?.后果列表?.length ?? 0}
+                                                                待执行联动={[]}
+                                                            />
+                                                        </div>
+                                                    )}
+
                                                     <div className="relative bg-black/40 border border-pink-900/40 rounded-xl p-5 shadow-lg group hover:border-pink-900/60 transition-colors">
                                                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-900/50 via-pink-500/20 to-transparent"></div>
                                                         <div className="flex items-center justify-between mb-5 relative z-10">
@@ -1334,6 +1439,7 @@ const SocialModal: React.FC<Props> = ({
                                                             );
                                                         })()}
                                                     </div>
+                                                    </>
                                                 )}
                                             </div>
                                         ) : (

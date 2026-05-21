@@ -13,7 +13,7 @@ import type {
 import type { 场景修饰系数 } from '../models/npcNSFWEnhancement/sceneModifiers';
 import type { NSFW心理状态 } from '../models/npcNSFWEnhancement/consequences/types';
 
-export type 亲密度阶段 = '陌生人' | '初识' | ' acquaintance' | '朋友' | '暧昧' | '恋人' | '亲密' | '挚爱' | '灵魂伴侣' | '血脉相连' | '极致羁绊';
+export type 亲密度阶段 = '陌生人' | '初识' | '泛泛之交' | '朋友' | '暧昧' | '恋人' | '亲密' | '挚爱' | '灵魂伴侣' | '血脉相连' | '极致羁绊';
 
 export interface NSFW情绪指标 {
   主导情绪: string;
@@ -41,7 +41,7 @@ export interface NSFWVisualState {
 }
 
 const 亲密度阶段映射: 亲密度阶段[] = [
-  '陌生人', '初识', ' acquaintance', '朋友', '暧昧',
+  '陌生人', '初识', '泛泛之交', '朋友', '暧昧',
   '恋人', '亲密', '挚爱', '灵魂伴侣', '血脉相连', '极致羁绊',
 ];
 

@@ -15,7 +15,7 @@ interface IntimacyMeterProps {
 const 阶段颜色: Record<亲密度阶段, string> = {
   '陌生人': 'from-gray-500 to-gray-600',
   '初识': 'from-gray-400 to-slate-500',
-  ' acquaintance': 'from-blue-400 to-blue-500',
+  '泛泛之交': 'from-blue-400 to-blue-500',
   '朋友': 'from-green-400 to-emerald-500',
   '暧昧': 'from-pink-400 to-rose-400',
   '恋人': 'from-rose-500 to-pink-600',

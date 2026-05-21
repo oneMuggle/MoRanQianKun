@@ -98,13 +98,20 @@
   - `MoodIndicator.tsx` — Emoji情绪指示器
   - `RiskWarning.tsx` — 风险警告面板（暴露/流言/后果/联动）
   - `MobileNSFWPanel.tsx` — 移动端聚合面板（折叠/展开）
-- [ ] 6.3 集成到 SocialModal + MobileSocial
+- [x] 6.3 集成到 SocialModal + MobileSocial
 
 ### Phase 7: 集成打磨（~4h）
 
-- [ ] 7.1 更新 `hooks/useGame/engine/types.ts` 新增引擎类型
-- [ ] 7.2 更新 `models/system.ts` 添加NSFW设置（含 `启用孕产系统: false` 默认关闭）
-- [ ] 7.3 更新所有叙事prompt
+- [x] 7.1 更新 `hooks/useGame/engine/types.ts` 新增引擎类型（`nsfwEnhancement`）
+- [x] 7.2 更新 `models/system.ts` 添加NSFW设置（`启用NSFW增强系统`, `启用孕产系统: false` 默认关闭）
+- [x] 7.3 更新所有叙事prompt
+  - `npcNSFWEnhancement.ts` 新增 `NSFW注入选项` 接口（启用孕产系统/后果系统/跨模块联动开关）
+  - 孕产报告仅在 `启用孕产系统 === true` 时注入
+  - 新增后果系统报告模板（活跃后果提醒 + 蝴蝶效应叙事指引）
+  - 新增跨模块联动报告模板（待执行联动融入叙事）
+  - `linkage.ts` 的 `生成NSFW画像` 自动填充 `后果` 和 `待执行联动` 字段
+  - `types.ts` 的 `完整演化状态` 新增 `后果系统` 和 `跨模块联动` 字段
+  - `NPCNSFW画像` 新增 `后果` 和 `待执行联动` 可选字段
 
 ## 三、复杂度评估
 

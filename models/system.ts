@@ -1654,6 +1654,8 @@ export interface 游戏设置结构 {
     BDSM系统设置?: BDSM系统设置; // BDSM independent subsystem toggles (all eras)
     桌游社交NSFW设置?: 桌游社交NSFW设置; // Board game social NSFW subsystem toggles (all eras)
     酒吧NSFW设置?: 酒吧NSFW设置; // Bar NSFW subsystem toggles (contemporary_urban only)
+    启用NSFW增强系统?: boolean; // Toggle NSFW enhancement subsystem (pregnancy, aftercare, clothing layers, scene modifiers, consequences, cross-module linker)
+    启用孕产系统?: boolean; // Toggle pregnancy/childbirth engine (default: false, requires 启用NSFW增强系统 === true)
     启用饱腹口渴系统: boolean; // Toggle hunger/thirst prompt injection and UI visibility
     启用修炼体系: boolean; // Toggle cultivation/realm/kungfu prompt injection and related UI visibility
     启用里武侠模式: boolean; // Toggle inner martial arts (里武侠) world: dual-cultivation personality, revealing clothing, 武根 system
