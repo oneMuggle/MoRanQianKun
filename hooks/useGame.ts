@@ -121,6 +121,7 @@ import { createMemoryRuntimeDomain } from './useGame/domains/memoryRuntimeDomain
 import { createWorkflowDomain } from './useGame/domains/workflowDomain';
 import { useBoardGameBridge } from './useBoardGameBridge';
 import { useExplorationBridge } from './useExplorationBridge';
+import { useBarNSFWBridge } from './useBarNSFWBridge';
 import { usePerformanceMonitor, usePerformanceTracker } from './useGame/quality/performanceMonitor';
 import { useAIQueueMonitor } from './useGame/quality/aiQueueMonitor';
 import { useMemoryTracker } from './useGame/quality/memoryTracker';
@@ -644,6 +645,9 @@ export const useGame = () => {
     // ==================== 桌游叙事桥接层 ====================
     const boardGameBridge = useBoardGameBridge();
 
+    // ==================== 酒吧 NSFW 桥接层 ====================
+    const barNSFWBridge = useBarNSFWBridge({ apiConfig });
+
     // ==================== 探索引擎桥接层 ====================
     const handleTravelNarrative = useCallback((narrative: string, travelTimeMinutes: number, originName: string, destName: string) => {
         // 推进游戏时间
@@ -750,9 +754,11 @@ export const useGame = () => {
     const handleSendWithBoardGame: typeof handleSend = async (content, isStreaming, options) => {
         boardGameBridge.onChatMessageSent();
         explorationBridge.onChatMessageSent();
+        barNSFWBridge.onChatMessageSent();
         const result = await handleSend(content, isStreaming, options);
         boardGameBridge.onAIReplyReceived();
         explorationBridge.onAIReplyReceived();
+        barNSFWBridge.onAIReplyReceived();
         return result;
     };
 
@@ -998,6 +1004,7 @@ export const useGame = () => {
         clearActionHistory, clearPendingEvents,
         boardGameBridge,
         explorationBridge,
+        barNSFWBridge,
         lazyInitExploration,
         // Exploration Slice
         explorationPaused, explorationPauseReason,

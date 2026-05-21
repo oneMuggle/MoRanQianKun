@@ -32,3 +32,5 @@ export { AvgEventEngine, createAvgEventEngine } from './avgEventEngine';
 export type { AvgEventState } from './avgEventEngine';
 export { ExplorationEngine, createExplorationEngine } from './explorationEngine';
 export type { ExplorationEngineConfig, ExplorationState } from './explorationEngine';
+export { BarNSFWEngine, createBarNSFWEngine } from './barNSFWEngine';
+export type { 酒吧NSFW状态, 酒吧NSFW设置, 酒吧场景模板 } from './barNSFWEngine';

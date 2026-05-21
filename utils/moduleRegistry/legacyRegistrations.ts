@@ -83,6 +83,8 @@ import {
   RpgEquipmentIntegration,
   RpgKungfuIntegration,
   RpgTaskIntegration,
+  BarNSFWPanel,
+  MobileBarNSFWPanel,
 } from '../../components/features/lazyComponents';
 
 // ============================================================================
@@ -1102,6 +1104,48 @@ UIFeatureRegistry.register({
         window.dispatchEvent(new CustomEvent('modal:open', { detail: { id: target } }));
       },
     }),
+  },
+});
+
+// BarNSFW — 酒吧 NSFW 面板
+UIFeatureRegistry.register({
+  id: 'barNSFW',
+  name: '酒吧面板',
+  icon: '🍸',
+  category: 'nsfw',
+  priority: 80,
+  version: '1.0.0',
+  dependencies: [],
+  modal: {
+    desktopComponent: BarNSFWPanel,
+    mobileComponent: MobileBarNSFWPanel,
+    visibility: 'config-dependent',
+    configKey: '酒吧NSFW设置',
+    configValue: true,
+    propsFactory: ({ state, actions, modalManager, isMobile }) => {
+      const barNSFWSettings = (state as any).gameConfig?.酒吧NSFW设置 ?? {
+        启用: true,
+        内容强度: '暧昧' as const,
+        启用醉酒系统: true,
+        启用危机事件: true,
+        启用陪酒服务: false,
+        尺度上限: '点到为止' as const,
+      };
+      const barState = (state as any).barNSFWState ?? null;
+      return {
+        barState,
+        settings: barNSFWSettings,
+        onAction: (actionType: string, payload?: Record<string, unknown>) => {
+          (actions as any).barNSFWAction?.(actionType, payload);
+        },
+        onLeave: () => {
+          (actions as any).barNSFWLeave?.();
+        },
+        onClose: () => {
+          modalManager.close('barNSFW');
+        },
+      };
+    },
   },
 });
 

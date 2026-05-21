@@ -1,6 +1,6 @@
 
 import type { LiModeStage } from './eraTheme/types';
-import type { 性癖档案, 敏感点档案, 表里人格档案, 性癖演化状态 } from './npcNSFWEnhancement/types';
+import type { 性癖档案, 敏感点档案, 表里人格档案, 性癖演化状态, 完整演化状态 } from './npcNSFWEnhancement/types';
 import type { NPC图片档案 } from './imageGeneration';
 
 export type NPC性别 = '男' | '女';
@@ -257,6 +257,7 @@ export interface NPC结构 {
     敏感点档案?: 敏感点档案;
     人格档案?: 表里人格档案;
     性癖演化状态?: 性癖演化状态;
+    完整演化状态?: 完整演化状态;
 
     // --- 里志怪角色卡片 ---
     物种类型?: '人类' | '妖' | '鬼' | '精怪' | '僵尸' | '画皮' | '神仙' | '鬼王' | '大妖' | '地仙';

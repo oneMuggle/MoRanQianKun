@@ -25,6 +25,7 @@ const settingsComponentMap: Record<string, React.LazyExoticComponent<React.FC<an
   bdsmNSFW: React.lazy(() => import('../Settings/BDSMNSFWSettings')),
   exposureNSFW: React.lazy(() => import('../Settings/ExposureNSFWSettings')),
   boardGameNSFW: React.lazy(() => import('../Settings/BoardGameNSFWSettings')),
+  barNSFW: React.lazy(() => import('../Settings/BarNSFWSettings')),
 };
 
 const dashboardLabelMap: Record<string, string> = {
@@ -34,6 +35,7 @@ const dashboardLabelMap: Record<string, string> = {
   bdsmNSFW: 'BDSM 仪表盘',
   exposureNSFW: '露出仪表盘',
   boardGameNSFW: '桌游社交仪表盘',
+  barNSFW: '酒吧 NSFW 仪表盘',
 };
 
 export function 获取NSFW模块列表(): NsfwModuleUI[] {

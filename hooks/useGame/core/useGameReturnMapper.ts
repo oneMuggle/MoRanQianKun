@@ -109,6 +109,20 @@ interface ReturnMapperDeps {
         isPaused: boolean;
     };
 
+    // Bar NSFW Bridge
+    barNSFWBridge: {
+        engineRef: { current: unknown };
+        enterBar: (sceneTemplate: any, npcList: any[]) => void;
+        leaveBar: () => void;
+        executeAction: (actionType: string, payload?: Record<string, unknown>) => void;
+        onChatMessageSent: () => void;
+        onAIReplyReceived: () => void;
+        getNarrativeConstraints: () => string | null;
+        syncStateToZustand: () => void;
+        isPaused: boolean;
+        isActive: boolean;
+    };
+
     // 探索引擎懒加载初始化
     lazyInitExploration: () => void;
 
@@ -539,6 +553,7 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             renderProfilerRef: deps.renderProfilerRef,
             boardGameBridge: deps.boardGameBridge,
             explorationBridge: deps.explorationBridge,
+            barNSFWBridge: deps.barNSFWBridge,
             lazyInitExploration: deps.lazyInitExploration,
         }
     };

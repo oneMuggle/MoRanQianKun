@@ -675,9 +675,11 @@ function allEngines<T>(fallback: T): Record<EngineType, T> {
     avgDialogue: fallback,
     avgRelation: fallback,
     avgBranch: fallback,
+    avgEvent: fallback,
     exploration: fallback,
     dailyTown: fallback,
     notification: fallback,
+    barNSFW: fallback,
   };
 }
 
@@ -934,9 +936,55 @@ const createAvgSlice: ZustandSlice<AvgSlice> = (set) => ({
   }),
 });
 
+import type { 酒吧NSFW状态, 酒吧NSFW设置 } from '../../../models/contemporary/barNSFW/types';
+
+// ==================== Bar NSFW Slice (Zustand) ====================
+
+interface BarNSFWSliceState {
+  barNSFWActive: boolean;
+  barNSFWState: 酒吧NSFW状态 | null;
+  barNSFWSettings: 酒吧NSFW设置;
+  showBarNSFWPanel: boolean;
+}
+
+interface BarNSFWSliceActions {
+  setBarNSFWActive: (active: boolean) => void;
+  setBarNSFWState: (state: 酒吧NSFW状态 | null | ((prev: 酒吧NSFW状态 | null) => 酒吧NSFW状态 | null)) => void;
+  setBarNSFWSettings: (settings: 酒吧NSFW设置 | ((prev: 酒吧NSFW设置) => 酒吧NSFW设置)) => void;
+  setShowBarNSFWPanel: (show: boolean | ((prev: boolean) => boolean)) => void;
+}
+
+interface BarNSFWSlice extends BarNSFWSliceState, BarNSFWSliceActions {}
+
+const DEFAULT_BAR_NFSW_SETTINGS: 酒吧NSFW设置 = {
+  启用: false,
+  内容强度: '暧昧',
+  启用醉酒系统: true,
+  启用危机事件: true,
+  启用陪酒服务: false,
+  尺度上限: '点到为止',
+};
+
+const createBarNSFWSlice: ZustandSlice<BarNSFWSlice> = (set) => ({
+  barNSFWActive: false,
+  barNSFWState: null,
+  barNSFWSettings: DEFAULT_BAR_NFSW_SETTINGS,
+  showBarNSFWPanel: false,
+  setBarNSFWActive: (active) => set({ barNSFWActive: active }),
+  setBarNSFWState: (updater) => set((state) => ({
+    barNSFWState: typeof updater === 'function' ? (updater as (prev: 酒吧NSFW状态 | null) => 酒吧NSFW状态 | null)(state.barNSFWState) : updater,
+  })),
+  setBarNSFWSettings: (updater) => set((state) => ({
+    barNSFWSettings: typeof updater === 'function' ? (updater as (prev: 酒吧NSFW设置) => 酒吧NSFW设置)(state.barNSFWSettings) : updater,
+  })),
+  setShowBarNSFWPanel: (updater) => set((state) => ({
+    showBarNSFWPanel: typeof updater === 'function' ? (updater as (prev: boolean) => boolean)(state.showBarNSFWPanel) : updater,
+  })),
+});
+
 // ==================== Store ====================
 
-export interface GameStore extends UISlice, TravelSlice, DeviceSlice, ImageSlice, SettingsSlice, WorldSlice, MemorySlice, VariableSlice, OpeningSlice, SceneConfigSlice, BoardGameSlice, ExplorationSlice, EngineSlice, TurnSlice, ActionLogSlice, RpgSlice, AvgSlice {}
+export interface GameStore extends UISlice, TravelSlice, DeviceSlice, ImageSlice, SettingsSlice, WorldSlice, MemorySlice, VariableSlice, OpeningSlice, SceneConfigSlice, BoardGameSlice, ExplorationSlice, EngineSlice, TurnSlice, ActionLogSlice, RpgSlice, AvgSlice, BarNSFWSlice {}
 
 export const useGameStore = create<GameStore>()((...a) => ({
     ...createUISlice(...a),
@@ -956,5 +1004,6 @@ export const useGameStore = create<GameStore>()((...a) => ({
     ...createActionLogSlice(...a),
     ...createRpgSlice(...a),
     ...createAvgSlice(...a),
+    ...createBarNSFWSlice(...a),
 }));
 

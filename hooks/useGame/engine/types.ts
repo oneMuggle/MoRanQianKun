@@ -30,7 +30,9 @@ export type EngineType =
   // Daily town engine (Phase 10)
   | 'dailyTown'
   // Notification engine (promoted from standalone class)
-  | 'notification';
+  | 'notification'
+  // Bar NSFW (contemporary urban)
+  | 'barNSFW';
 
 // ==================== 回合系统 ====================
 
@@ -211,4 +213,6 @@ export const ENGINE_PRIORITY: Record<EngineType, EnginePriority> = {
   dailyTown: 'medium',
   // Notification
   notification: 'low',
+  // Bar NSFW
+  barNSFW: 'medium',
 };

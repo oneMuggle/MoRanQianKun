@@ -4,6 +4,7 @@ import { 构建校园NSFW完整叙事约束 } from './campusNSFW';
 import { 构建Exposure完整叙事约束 } from './exposureNSFW';
 import { 构建都市网约车完整叙事约束 } from './urbanDriverNSFW';
 import { 构建写真NSFW完整叙事约束 } from './photographyNSFW';
+import { 生成酒吧叙事约束 } from '../../models/contemporary/barNSFW';
 import { 
   构建夜场NSFW叙事约束,
   构建夜场NSFW完整叙事约束,
@@ -26,6 +27,7 @@ import type {
   密室主题,
 } from '../../models/campusNSFW';
 import type { 露出偏好等级 as Exposure露出等级 } from '../../models/exposureNSFW';
+import type { 夜场类型, 醉酒程度 as Nightlife醉酒程度, 夜场事件, 场所档次 } from '../../models/contemporary/nightlife/types';
 import type {
   乘客欲望阶段,
   行程关系轨道,
@@ -266,6 +268,16 @@ const 构建运行时NSFW提示词 = (
           泄露事件频率?: '低' | '中' | '高';
           活跃泄露事件摘要?: string;
         };
+        /** 酒吧 NSFW 子系统参数 */
+        酒吧NSFW参数?: {
+          酒吧类型: 夜场类型;
+          醉酒程度: Nightlife醉酒程度;
+          内容强度: '微暗' | '暧昧' | '露骨';
+          场所档次?: 场所档次;
+          在场NPC?: string[];
+          暧昧对象?: { 姓名: string; 身份: string; 好感度: number; 当前情绪: string };
+          当前事件?: 夜场事件;
+        };
     }
 ): string => {
     const custom = typeof customPrompt === 'string' ? customPrompt.trim() : '';
@@ -334,6 +346,14 @@ const 构建运行时NSFW提示词 = (
       });
       if (photographyConstraint) {
         组件.push(photographyConstraint);
+      }
+    }
+
+    // 酒吧 NSFW 约束（仅 contemporary_urban 时代）
+    if (options?.酒吧NSFW参数 && options?.时代配置ID === 'contemporary_urban') {
+      const barConstraint = 生成酒吧叙事约束(options.酒吧NSFW参数);
+      if (barConstraint) {
+        组件.push(barConstraint);
       }
     }
 
@@ -417,6 +437,16 @@ export const 构建运行时额外提示词 = (
           启用泄露事件?: boolean;
           泄露事件频率?: '低' | '中' | '高';
           活跃泄露事件摘要?: string;
+        };
+        /** 酒吧 NSFW 子系统参数 */
+        酒吧NSFW参数?: {
+          酒吧类型: 夜场类型;
+          醉酒程度: Nightlife醉酒程度;
+          内容强度: '微暗' | '暧昧' | '露骨';
+          场所档次?: 场所档次;
+          在场NPC?: string[];
+          暧昧对象?: { 姓名: string; 身份: string; 好感度: number; 当前情绪: string };
+          当前事件?: 夜场事件;
         };
     }
 ): string => {

@@ -7,3 +7,4 @@ import './photographyNSFW/registration';
 import './bdsmNSFW/registration';
 import './boardGameNSFW/registration';
 import './exposureNSFW/registration';
+import './barNSFW/registration';

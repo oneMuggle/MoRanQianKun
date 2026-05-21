@@ -15,7 +15,8 @@ export type RegionType =
   | '衙门'
   | '医馆'
   | '武馆'
-  | '寺庙';
+  | '寺庙'
+  | '酒吧';
 
 export type TimeSlot = '上午' | '下午' | '晚上';
 

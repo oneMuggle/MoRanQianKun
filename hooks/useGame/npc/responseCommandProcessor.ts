@@ -254,6 +254,36 @@ export const 执行响应命令处理 = (
                 }
             }
 
+            // 解析 <人格演化> XML 标签（AI报告的人格变化，实际翻转已由引擎自动处理）
+            const 人格演化匹配 = rawContent.match(/<人格演化>\s*([\s\S]*?)\s*<\/人格演化>/g);
+            if (人格演化匹配 && 人格演化匹配.length > 0) {
+                const 游戏时间 = envBuffer?.时间 ?? '';
+                for (const 匹配项 of 人格演化匹配) {
+                    try {
+                        const json = 匹配项.replace(/<\/?人格演化>/g, '').trim();
+                        const 解析结果 = JSON.parse(json) as {
+                            npc姓名: string;
+                            演化类型: string;
+                            描述: string;
+                        };
+                        if (!解析结果.npc姓名) continue;
+
+                        const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                        if (idx < 0) continue;
+
+                        const npc = { ...socialBuffer[idx] };
+                        // 人格演化已通过 记录性癖触发事件 内部自动处理，此处仅更新时间戳
+                        if (npc.完整演化状态?.人格演化) {
+                            npc.完整演化状态.人格演化.最后演化时间 = 游戏时间;
+                            socialBuffer = [...socialBuffer];
+                            socialBuffer[idx] = npc;
+                        }
+                    } catch {
+                        // JSON 解析失败，忽略本条
+                    }
+                }
+            }
+
             // 回合结束：对所有女性 NPC 应用性癖衰减
             if (游戏时间) {
                 const 衰减结果 = 批量应用性癖衰减(socialBuffer, 游戏时间);

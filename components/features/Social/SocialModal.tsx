@@ -54,6 +54,7 @@ const SocialModal: React.FC<Props> = ({
     const [服饰面板展开, set服饰面板展开] = useState(false);
     const [敏感点展示模式, set敏感点展示模式] = useState<'文字' | '经络图'>('文字');
     const [服饰展示模式, set服饰展示模式] = useState<'文字' | '层次图'>('文字');
+    const [演化面板展开, set演化面板展开] = useState<string | null>(null);
 
     const 获取欲望阶段颜色 = (npcId: string): { bg: string; text: string; label: string } => {
         const 档案 = 欲望系统?.NPC欲望档案?.[npcId];
@@ -201,6 +202,40 @@ const SocialModal: React.FC<Props> = ({
     const 展示关系驱动面板 = 展示女性扩展;
     const 当前关系网 = currentNPC ? 读取关系网(currentNPC) : [];
     const 当前子宫档案 = currentNPC ? 读取当前子宫档案(currentNPC) : undefined;
+
+    // ========== 演化状态辅助函数 ==========
+    const 读取演化状态 = (npc: NPC结构) => (npc as any).完整演化状态 as import('../../../models/npcNSFWEnhancement/types').完整演化状态 | undefined;
+    const 演化数据 = currentNPC ? 读取演化状态(currentNPC) : undefined;
+
+    const 有演化数据 = (数据: ReturnType<typeof 读取演化状态>): boolean => {
+        if (!数据) return false;
+        return !!(数据.心理防线 || 数据.偏好漂移 || 数据.人格演化 || (数据.潜能池 && 数据.潜能池.length > 0) || 数据.敏感点演化);
+    };
+
+    const 获取防线颜色 = (等级: string): string => {
+        const map: Record<string, string> = {
+            '保守': 'text-blue-400',
+            '传统': 'text-green-400',
+            '开放': 'text-orange-400',
+            '放纵': 'text-red-400',
+        };
+        return map[等级] || 'text-gray-400';
+    };
+
+    const 获取防线进度条颜色 = (值: number): string => {
+        if (值 > 75) return 'bg-blue-500';
+        if (值 > 50) return 'bg-green-500';
+        if (值 > 25) return 'bg-orange-500';
+        return 'bg-red-500';
+    };
+
+    const 开发程度标签: Record<string, string> = {
+        '未开发': '未开发',
+        '初步探索': '初步',
+        '渐入佳境': '渐入',
+        '深度开发': '深度',
+        '完全开发': '完全',
+    };
     const 切换重要角色状态 = (npc: NPC结构) => {
         if (!onToggleMajorRole) return;
         onToggleMajorRole(npc.id, !Boolean(npc.是否主要角色));
@@ -1108,6 +1143,196 @@ const SocialModal: React.FC<Props> = ({
                                                                 </div>
                                                             </div>
                                                         </div>
+
+                                                        {/* 演化轨迹面板 */}
+                                                        {(() => {
+                                                            if (!有演化数据(演化数据)) return null;
+                                                            return (
+                                                                <div className="bg-gradient-to-br from-violet-950/10 to-black/60 border border-violet-900/30 rounded-lg p-4 relative overflow-hidden group">
+                                                                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-violet-600/5 rounded-full filter blur-xl group-hover:bg-violet-600/10 transition-colors"></div>
+                                                                    <div className="flex items-center justify-between mb-3 relative z-10">
+                                                                        <h5 className="text-xs text-violet-400/90 font-bold uppercase tracking-[0.2em] flex items-center gap-1.5">
+                                                                            <span className="w-1 h-3 bg-violet-500/70 rounded-full"></span>
+                                                                            演化轨迹
+                                                                        </h5>
+                                                                        <span className="text-[10px] bg-black/60 border border-violet-900/50 px-1.5 py-0.5 rounded text-violet-300 font-mono tracking-wider">EVOLUTION</span>
+                                                                    </div>
+
+                                                                    {/* 紧凑摘要 Tiles */}
+                                                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3 relative z-10">
+                                                                        {/* 心理防线 */}
+                                                                        {演化数据?.心理防线 && (() => {
+                                                                            const 防线 = 演化数据.心理防线;
+                                                                            return (
+                                                                                <button onClick={() => set演化面板展开(演化面板展开 === 'defense' ? null : 'defense')} className="bg-black/40 border border-violet-900/20 rounded p-2.5 text-left hover:border-violet-500/40 transition-colors">
+                                                                                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">心理防线</div>
+                                                                                    <div className={`font-serif text-sm ${获取防线颜色(防线.当前等级)}`}>{防线.当前等级}</div>
+                                                                                    <div className="text-[10px] text-gray-400 mt-0.5">值: {Math.round(防线.防线值)}</div>
+                                                                                    <div className="mt-1.5 h-1 bg-gray-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${获取防线进度条颜色(防线.防线值)}`} style={{ width: `${Math.max(0, Math.min(100, 防线.防线值))}%` }}></div></div>
+                                                                                </button>
+                                                                            );
+                                                                        })()}
+
+                                                                        {/* 偏好漂移 */}
+                                                                        {演化数据?.偏好漂移?.漂移方向 && (() => {
+                                                                            const 漂移 = 演化数据.偏好漂移!;
+                                                                            return (
+                                                                                <button onClick={() => set演化面板展开(演化面板展开 === 'drift' ? null : 'drift')} className="bg-black/40 border border-violet-900/20 rounded p-2.5 text-left hover:border-violet-500/40 transition-colors">
+                                                                                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">偏好漂移</div>
+                                                                                    <div className="font-serif text-sm text-violet-300 truncate">{漂移.漂移方向}</div>
+                                                                                    <div className="text-[10px] text-gray-400 mt-0.5">强度: {Math.round(漂移.漂移强度 * 100)}%</div>
+                                                                                </button>
+                                                                            );
+                                                                        })()}
+
+                                                                        {/* 人格状态 */}
+                                                                        {演化数据?.人格演化 && (() => {
+                                                                            const 人格 = 演化数据.人格演化;
+                                                                            const 翻转数 = 人格.人格翻转历史?.length || 0;
+                                                                            return (
+                                                                                <button onClick={() => set演化面板展开(演化面板展开 === 'personality' ? null : 'personality')} className="bg-black/40 border border-violet-900/20 rounded p-2.5 text-left hover:border-violet-500/40 transition-colors">
+                                                                                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">人格状态</div>
+                                                                                    <div className="font-serif text-sm text-violet-300">{currentNPC.当前人格状态 === '里' ? '里人格' : '表人格'}</div>
+                                                                                    <div className="text-[10px] text-gray-400 mt-0.5">{翻转数 > 0 ? `翻转 ${翻转数} 次` : '未翻转'}</div>
+                                                                                </button>
+                                                                            );
+                                                                        })()}
+
+                                                                        {/* 潜能池 */}
+                                                                        {演化数据?.潜能池 && 演化数据.潜能池.length > 0 && (() => {
+                                                                            const 觉醒数 = 演化数据.潜能池!.filter(p => p.已觉醒).length;
+                                                                            const 总数 = 演化数据.潜能池!.length;
+                                                                            return (
+                                                                                <button onClick={() => set演化面板展开(演化面板展开 === 'potential' ? null : 'potential')} className="bg-black/40 border border-violet-900/20 rounded p-2.5 text-left hover:border-violet-500/40 transition-colors">
+                                                                                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">性癖潜能</div>
+                                                                                    <div className="font-serif text-sm text-violet-300">{觉醒数}/{总数}</div>
+                                                                                    <div className="text-[10px] text-gray-400 mt-0.5">{觉醒数 > 0 ? `${觉醒数} 已觉醒` : '未觉醒'}</div>
+                                                                                </button>
+                                                                            );
+                                                                        })()}
+
+                                                                        {/* 敏感点演化 */}
+                                                                        {演化数据?.敏感点演化 && (() => {
+                                                                            const spEvo = 演化数据.敏感点演化;
+                                                                            const 开发数 = spEvo.开发记录?.length || 0;
+                                                                            const 发现数 = spEvo.新发现记录?.length || 0;
+                                                                            const 总数 = 开发数 + 发现数;
+                                                                            if (总数 === 0) return null;
+                                                                            return (
+                                                                                <button onClick={() => set演化面板展开(演化面板展开 === 'sensitiveEvo' ? null : 'sensitiveEvo')} className="bg-black/40 border border-violet-900/20 rounded p-2.5 text-left hover:border-violet-500/40 transition-colors">
+                                                                                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">敏感演化</div>
+                                                                                    <div className="font-serif text-sm text-violet-300">{开发数 > 0 ? `开发 ${开发数}` : `发现 ${发现数}`}</div>
+                                                                                    <div className="text-[10px] text-gray-400 mt-0.5">{总数} 条记录</div>
+                                                                                </button>
+                                                                            );
+                                                                        })()}
+                                                                    </div>
+
+                                                                    {/* 展开详情 */}
+                                                                    {演化面板展开 === 'defense' && 演化数据?.心理防线 && (
+                                                                        <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10">
+                                                                            <div className="flex items-center justify-between">
+                                                                                <span className="text-[10px] text-violet-400/70">心理防线详情</span>
+                                                                                <button onClick={() => set演化面板展开(null)} className="text-[10px] text-gray-500 hover:text-gray-300">收起</button>
+                                                                            </div>
+                                                                            {(演化数据.心理防线.变化日志 || []).slice(-5).reverse().map((log, idx) => (
+                                                                                <div key={idx} className="bg-black/30 rounded p-2 text-[10px]">
+                                                                                    <div className="text-gray-500 font-mono mb-0.5">{log.时间}</div>
+                                                                                    <div className="text-violet-200/80">
+                                                                                        <span className={获取防线颜色(log.旧等级)}>{log.旧等级}</span>
+                                                                                        {' → '}
+                                                                                        <span className={获取防线颜色(log.新等级)}>{log.新等级}</span>
+                                                                                        {' '}({log.旧防线值}→{Math.round(log.新防线值)})
+                                                                                    </div>
+                                                                                    <div className="text-gray-600 mt-0.5">{log.触发原因}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {演化面板展开 === 'drift' && 演化数据?.偏好漂移 && (
+                                                                        <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10">
+                                                                            <div className="flex items-center justify-between">
+                                                                                <span className="text-[10px] text-violet-400/70">偏好漂移详情</span>
+                                                                                <button onClick={() => set演化面板展开(null)} className="text-[10px] text-gray-500 hover:text-gray-300">收起</button>
+                                                                            </div>
+                                                                            <div className="text-xs text-violet-200/80">漂移方向: {演化数据.偏好漂移.漂移方向}</div>
+                                                                            <div className="text-xs text-gray-400">强度: {Math.round(演化数据.偏好漂移.漂移强度 * 100)}%</div>
+                                                                            {演化数据.偏好漂移.事件频率统计 && Object.keys(演化数据.偏好漂移.事件频率统计).length > 0 && (
+                                                                                <div className="text-[10px] text-gray-500">
+                                                                                    事件分布: {Object.entries(演化数据.偏好漂移.事件频率统计).map(([k, v]) => `${k}(${v}次)`).join('、')}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {演化面板展开 === 'personality' && 演化数据?.人格演化 && (
+                                                                        <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10">
+                                                                            <div className="flex items-center justify-between">
+                                                                                <span className="text-[10px] text-violet-400/70">人格演化详情</span>
+                                                                                <button onClick={() => set演化面板展开(null)} className="text-[10px] text-gray-500 hover:text-gray-300">收起</button>
+                                                                            </div>
+                                                                            {(演化数据.人格演化.人格翻转历史 || []).slice(-5).reverse().map((log, idx) => (
+                                                                                <div key={idx} className="bg-black/30 rounded p-2 text-[10px]">
+                                                                                    <div className="text-gray-500 font-mono mb-0.5">{log.时间}</div>
+                                                                                    <div className="text-violet-300/80 font-semibold">[{log.翻转类型}]</div>
+                                                                                    <div className="text-gray-400 mt-0.5">{log.触发事件}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                            <div className="text-[10px] text-gray-500">当前: {currentNPC.当前人格状态 || '表'}人格 · 偏离度: {演化数据.人格演化.人格偏离度 || 0}/100</div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {演化面板展开 === 'potential' && 演化数据?.潜能池 && 演化数据.潜能池.length > 0 && (
+                                                                        <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10 max-h-48 overflow-y-auto">
+                                                                            <div className="flex items-center justify-between">
+                                                                                <span className="text-[10px] text-violet-400/70">潜能池</span>
+                                                                                <button onClick={() => set演化面板展开(null)} className="text-[10px] text-gray-500 hover:text-gray-300">收起</button>
+                                                                            </div>
+                                                                            {演化数据.潜能池!.sort((a: any, b: any) => (b.已觉醒 ? 1 : 0) - (a.已觉醒 ? 1 : 0) || b.潜能值 - a.潜能值).map((p, idx) => (
+                                                                                <div key={idx} className="bg-black/30 rounded p-2 flex items-center justify-between text-[10px]">
+                                                                                    <div>
+                                                                                        <span className="text-violet-300/80">{p.类别}</span>
+                                                                                        <span className="text-gray-500 ml-1">· {p.子类型}</span>
+                                                                                    </div>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <span className="text-gray-400">潜能 {p.潜能值}/10</span>
+                                                                                        {p.已觉醒 ? (
+                                                                                            <span className="text-green-400/70">已觉醒</span>
+                                                                                        ) : (
+                                                                                            <span className="text-gray-600">累积 {p.当前累积 || 0}/{p.觉醒阈值 || 5}</span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {演化面板展开 === 'sensitiveEvo' && 演化数据?.敏感点演化 && (
+                                                                        <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10 max-h-48 overflow-y-auto">
+                                                                            <div className="flex items-center justify-between">
+                                                                                <span className="text-[10px] text-violet-400/70">敏感点演化</span>
+                                                                                <button onClick={() => set演化面板展开(null)} className="text-[10px] text-gray-500 hover:text-gray-300">收起</button>
+                                                                            </div>
+                                                                            {(演化数据.敏感点演化.开发记录 || []).slice(-5).reverse().map((log: any, idx: number) => (
+                                                                                <div key={`dev-${idx}`} className="bg-black/30 rounded p-2 text-[10px]">
+                                                                                    <div className="text-gray-500 font-mono">{log.时间}</div>
+                                                                                    <div className="text-violet-200/80">{log.敏感点名称}: {开发程度标签[log.旧开发程度] || log.旧开发程度} → {开发程度标签[log.新开发程度] || log.新开发程度}</div>
+                                                                                    <div className="text-gray-600">{log.触发事件}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                            {(演化数据.敏感点演化.新发现记录 || []).slice(-3).reverse().map((log: any, idx: number) => (
+                                                                                <div key={`disc-${idx}`} className="bg-black/30 rounded p-2 text-[10px]">
+                                                                                    <div className="text-gray-500 font-mono">{log.时间}</div>
+                                                                                    <div className="text-violet-200/80">新发现: {log.区域} · {log.敏感点名称}</div>
+                                                                                    <div className="text-gray-600">{log.触发事件}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })()}
                                                     </div>
                                                 )}
                                             </div>

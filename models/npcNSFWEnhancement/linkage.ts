@@ -9,6 +9,7 @@ import type { NPCNSFW画像, 性癖档案, 敏感点档案 } from './types';
 import { 获取性癖推荐, 生成性癖摘要 } from './fetishTaxonomy';
 import { 获取敏感点推荐, 生成敏感点摘要 } from './sensitiveZones';
 import { 匹配人格档案, 解锁隐藏偏好 } from './personalityProfiles';
+import { 计算偏好漂移 } from './preferenceDrift';
 
 // ==================== 露出个性系数 ====================
 
@@ -89,7 +90,28 @@ export function 生成NSFW画像(npc: NPC结构, eraId: string | null | undefine
 
   const 推荐场景 = 人格?.推荐场景 ?? 获取性癖推荐({ eraId, 最大条目数: 3 }).map(f => f.子类型);
 
-  return { 人格, 性癖, 敏感点, 推荐场景 };
+  const 画像: NPCNSFW画像 = { 人格, 性癖, 敏感点, 推荐场景 };
+
+  // --- 新增：注入演化数据 ---
+  if (npc.完整演化状态?.心理防线) {
+    画像.心理防线 = npc.完整演化状态.心理防线;
+  }
+
+  const 漂移结果 = 计算偏好漂移(npc);
+  if (漂移结果.漂移方向) {
+    画像.偏好漂移 = npc.完整演化状态?.偏好漂移 ?? null as any;
+    // Ensure the drift data is up to date
+    if (画像.偏好漂移) {
+      画像.偏好漂移.漂移方向 = 漂移结果.漂移方向;
+      画像.偏好漂移.漂移强度 = 漂移结果.漂移强度;
+    }
+  }
+
+  if (npc.完整演化状态?.人格演化?.人格翻转历史?.length) {
+    画像.人格翻转历史 = npc.完整演化状态.人格演化.人格翻转历史;
+  }
+
+  return 画像;
 }
 
 function 构建性癖档案(

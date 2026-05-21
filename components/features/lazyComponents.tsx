@@ -76,6 +76,10 @@ export const MobileExposureDashboard = 创建可预加载懒组件(() => import(
 // NSFW Center
 export const NsfwControlCenter = 创建可预加载懒组件(() => import('./NSFWCenter/NsfwControlCenter'));
 
+// Bar NSFW
+export const BarNSFWPanel = 创建可预加载懒组件(() => import('./BarNSFW/BarPanel'));
+export const MobileBarNSFWPanel = 创建可预加载懒组件(() => import('./BarNSFW/MobileBarPanel'));
+
 // Worldbook
 export const WorldbookManagerModal = 创建可预加载懒组件(() => import('./Worldbook/WorldbookManagerModal'));
 export const MobileWorldbookManagerModal = 创建可预加载懒组件(() => import('./Worldbook/MobileWorldbookManagerModal'));
