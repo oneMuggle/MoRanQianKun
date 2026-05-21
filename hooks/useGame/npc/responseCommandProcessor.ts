@@ -17,6 +17,8 @@ import type { 写真系统扩展 } from '../../../models/photographyNSFW';
 import { applyStateCommand } from '../../../utils/stateHelpers';
 import type { 性癖触发事件 } from '../../../models/npcNSFWEnhancement/eventMapping';
 import { 记录性癖触发事件, 批量应用性癖衰减 } from '../../../models/npcNSFWEnhancement/evolutionEngine';
+import { 推进妊娠进程 } from '../../../models/npcNSFWEnhancement/pregnancyEngine';
+import { 评估护理质量, 记录事后情绪 } from '../../../models/npcNSFWEnhancement/aftercareSystem';
 
 const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
@@ -282,6 +284,70 @@ export const 执行响应命令处理 = (
                         // JSON 解析失败，忽略本条
                     }
                 }
+            }
+
+            // 解析 <孕产变化> XML 标签，应用孕产状态更新
+            const 孕产变化匹配 = rawContent.match(/<孕产变化>\s*([\s\S]*?)\s*<\/孕产变化>/g);
+            if (孕产变化匹配 && 孕产变化匹配.length > 0) {
+              const 游戏时间 = envBuffer?.时间 ?? '';
+              for (const 匹配项 of 孕产变化匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?孕产变化>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    变化类型: string;
+                    旧阶段: string;
+                    新阶段: string;
+                    描述: string;
+                  };
+                  if (!解析结果.npc姓名) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  // 孕产变化已由引擎自动处理，此处仅更新妊娠进度
+                  推进妊娠进程(npc, 游戏时间);
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <事后护理> XML 标签，应用事后护理状态更新
+            const 事后护理匹配 = rawContent.match(/<事后护理>\s*([\s\S]*?)\s*<\/事后护理>/g);
+            if (事后护理匹配 && 事后护理匹配.length > 0) {
+              const 游戏时间 = envBuffer?.时间 ?? '';
+              for (const 匹配项 of 事后护理匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?事后护理>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    护理质量: '无视' | '敷衍' | '温柔' | '用心';
+                    情绪变化?: { 情绪类型: string; 强度: number }[];
+                  };
+                  if (!解析结果.npc姓名) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  // 评估护理质量
+                  评估护理质量(npc, 解析结果.护理质量, 游戏时间, 'AI叙事触发');
+                  // 记录情绪变化
+                  if (解析结果.情绪变化) {
+                    for (const 情绪 of 解析结果.情绪变化) {
+                      记录事后情绪(npc, 情绪.情绪类型 as any, 情绪.强度, 游戏时间, 'AI叙事触发');
+                    }
+                  }
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
             }
 
             // 回合结束：对所有女性 NPC 应用性癖衰减

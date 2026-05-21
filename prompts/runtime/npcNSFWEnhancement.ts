@@ -6,6 +6,8 @@
 import { NPC结构 } from '../../models/social';
 import { 生成NSFW画像, 应启用增强档案 } from '../../models/npcNSFWEnhancement/linkage';
 import { 生成触发事件列表 } from '../../models/npcNSFWEnhancement/eventMapping';
+import { 计算场景修饰系数, 生成场景修饰摘要 } from '../../models/npcNSFWEnhancement/sceneModifiers';
+import { 生成服装状态文本, 是否暴露 } from '../../models/npcNSFWEnhancement/clothingLayers';
 import type { LiModeIntensity } from './eraLiMode';
 
 /**
@@ -15,7 +17,9 @@ export function 构建NPCNSFW注入(
   npc: NPC结构,
   eraId: string | null | undefined,
   nsfwEnabled: boolean = true,
-  _intensity?: LiModeIntensity
+  _intensity?: LiModeIntensity,
+  环境?: import('../../models/environment').环境信息结构,
+  游戏时间?: string
 ): string | null {
   if (!nsfwEnabled || !应启用增强档案(npc)) return null;
 
@@ -72,6 +76,46 @@ export function 构建NPCNSFW注入(
     组件.push(`人格演化：曾发生"${最近翻转.翻转类型}"（${最近翻转.时间}），人格特质已发生变化。`);
   }
 
+  // --- 新增：孕产状态 ---
+  if (画像.孕产状态 && 画像.孕产状态.当前阶段 !== '未受孕') {
+    组件.push(`孕产状态：${画像.孕产状态.当前阶段}`);
+    if (画像.孕产状态.预产期) {
+      组件.push(`预产期：${画像.孕产状态.预产期}`);
+    }
+  }
+
+  // --- 新增：事后护理 ---
+  if (画像.事后护理 && 画像.事后护理.当前情绪.length > 0) {
+    const 情绪文本 = 画像.事后护理.当前情绪
+      .filter(e => e.强度 > 20)
+      .map(e => `${e.情绪类型}(${e.强度}%)`)
+      .join('、');
+    if (情绪文本) {
+      组件.push(`事后情绪：${情绪文本}（护理质量：${画像.事后护理.护理质量}）`);
+    }
+  }
+
+  // --- 新增：场景修饰器 ---
+  if (环境 && 游戏时间) {
+    const 修饰 = 计算场景修饰系数(环境, 游戏时间);
+    const 摘要 = 生成场景修饰摘要(修饰);
+    if (摘要) {
+      组件.push(摘要);
+    }
+    if (修饰.暴露风险 > 30) {
+      组件.push(`⚠️ 暴露风险：${修饰.暴露风险}%（${修饰.暴露风险 > 60 ? '高' : '中'}）`);
+    }
+  }
+
+  // --- 新增：服装层次 ---
+  const 服装状态 = 生成服装状态文本(npc);
+  if (服装状态) {
+    组件.push(`服装：${服装状态}`);
+  }
+  if (是否暴露(npc)) {
+    组件.push('注意：该角色当前处于暴露状态。');
+  }
+
   组件.push('');
   组件.push('叙事指引：');
 
@@ -111,6 +155,24 @@ export function 构建NPCNSFW注入(
   组件.push(`{"npc姓名": "${npc.姓名}", "演化类型": "{表里互换|欲望觉醒|解放突破}", "描述": "{简短描述}"}`);
   组件.push('</人格演化>');
   组件.push('注意：仅在确实发生了人格级别的显著变化时才输出。');
+
+  // --- 新增：孕产变化报告模板 ---
+  组件.push('');
+  组件.push('【孕产变化报告】');
+  组件.push('当该NPC发生受孕、妊娠推进、分娩或产后恢复时，在响应末尾输出：');
+  组件.push('<孕产变化>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "变化类型": "{受孕成功|妊娠推进|分娩完成|产后恢复|受孕失败}", "旧阶段": "{原阶段}", "新阶段": "{新阶段}", "描述": "{简短描述}"}`);
+  组件.push('</孕产变化>');
+  组件.push('注意：仅在确实发生了孕产级别的变化时才输出。');
+
+  // --- 新增：事后护理报告模板 ---
+  组件.push('');
+  组件.push('【事后护理报告】');
+  组件.push('当该NPC在NSFW场景结束后表现出明显的情绪变化或玩家进行了事后护理时，在响应末尾输出：');
+  组件.push('<事后护理>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "护理质量": "{无视|敷衍|温柔|用心}", "情绪变化": [{"情绪类型": "{羞耻|依恋|后悔|安心|空虚|兴奋|恐惧|麻木}", "强度": 0-100}]}`);
+  组件.push('</事后护理>');
+  组件.push('注意：仅在NSFW场景结束后有明显情绪表现时才输出。');
 
   return 组件.join('\n');
 }

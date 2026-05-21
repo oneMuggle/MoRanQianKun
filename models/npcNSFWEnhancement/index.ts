@@ -16,6 +16,10 @@ export type {
   人格翻转类型, 人格演化状态, 人格翻转日志,
   敏感点演化状态, 敏感点开发日志, 敏感点发现日志,
   完整演化状态,
+  // 孕产系统
+  妊娠阶段, 孕产变化类型, 孕产变化日志, 孕产演化状态,
+  // 事后护理系统
+  事后情绪类型, 事后情绪条目, 事后护理状态, 情感余波日志,
 } from './types';
 
 export { 全时代通用性癖, 时代专属性癖, 获取性癖推荐, 生成性癖摘要 } from './fetishTaxonomy';
@@ -51,3 +55,46 @@ export {
 export {
   初始化敏感点演化, 更新敏感点开发, 事件敏感点映射,
 } from './sensitivePointEvolution';
+
+export {
+  初始化孕产状态, 记录内射, 检查受孕判定, 推进妊娠进程, 应用产后恢复,
+} from './pregnancyEngine';
+
+export {
+  初始化事后状态, 记录事后情绪, 评估护理质量, 应用事后恢复,
+  获取主导情绪, 生成事后状态摘要,
+} from './aftercareSystem';
+
+export {
+  计算场景修饰系数, 生成场景修饰摘要,
+  评估时间修饰器, 评估地点修饰器, 评估天气修饰器,
+} from './sceneModifiers';
+export type { 场景修饰系数 } from './sceneModifiers';
+
+export {
+  初始化服装层次, 移除服装层, 记录服装损坏,
+  添加污渍, 重新穿着, 生成服装状态文本,
+  获取剩余穿着数量, 是否暴露,
+} from './clothingLayers';
+export type { 服装损坏程度, 服装层次条目, 服装层次结构, 服装变更日志 } from './types';
+
+export {
+  初始化玩家偏好档案, 记录玩家偏好,
+  计算NPC契合度, 更新NPC契合度,
+  获取玩家偏好排行, 获取高契合度NPC,
+  生成玩家偏好摘要,
+} from './playerProfile';
+export type {
+  偏好强度等级, 玩家NSFW偏好条目, NPC契合度条目,
+  玩家NSFW偏好档案, 玩家偏好变化日志,
+} from './types';
+
+export {
+  全部里程碑定义, 初始化里程碑状态, 检查里程碑,
+  更新里程碑进度, 获取已解锁里程碑, 获取未解锁里程碑,
+  按类别分组里程碑, 生成里程碑摘要,
+} from './milestoneTracker';
+export type {
+  里程碑类别, 里程碑稀有度, 里程碑定义,
+  里程碑触发上下文, 已解锁里程碑, 里程碑追踪状态,
+} from './types';
