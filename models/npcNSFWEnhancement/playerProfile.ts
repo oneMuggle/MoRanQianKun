@@ -90,7 +90,7 @@ export function 计算NPC契合度(
     else if (性癖匹配分 > 30) 原因.push('性癖部分匹配');
   }
 
-  if (npc.敏感点档案) {
+  if (npc.敏感点档案?.主要敏感点?.length) {
     const 数量 = npc.敏感点档案.主要敏感点.length;
     if (数量 >= 5) { 评分 += 15; 原因.push('敏感点丰富'); }
     else if (数量 >= 3) 评分 += 10;

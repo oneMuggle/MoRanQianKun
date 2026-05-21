@@ -67,7 +67,7 @@ export function 更新敏感点开发(
     return { 有变化: false, 日志: [] };
   }
 
-  if (!npc.敏感点档案) {
+  if (!npc.敏感点档案?.主要敏感点) {
     return { 有变化: false, 日志: [] };
   }
 

@@ -14,12 +14,12 @@ function checkFandomPromptAssembly() {
   const cases = [
     {
       name: 'world_generation',
-      file: 'hooks/useGame/worldGenerationWorkflow.ts',
+      file: 'hooks/useGame/world/worldGenerationWorkflow.ts',
       needles: ['构建同人运行时提示词包', '世界观创建补丁', 'generateFandomRealmData', '核心_境界体系.id']
     },
     {
       name: 'opening_prompt_chain',
-      file: 'hooks/useGame/openingStoryWorkflow.ts',
+      file: 'hooks/useGame/opening/openingStoryWorkflow.ts',
       needles: ['openingTaskPromptWithFandom', '开局COT补丁', '同人设定摘要', '境界体系提示词']
     },
     {
@@ -29,12 +29,12 @@ function checkFandomPromptAssembly() {
     },
     {
       name: 'planning_prompt_chain',
-      file: 'hooks/useGame/planningUpdateWorkflow.ts',
-      needles: ['同人设定摘要', '境界母板补丁', 'fandomEnabled: fandomPromptBundle.enabled']
+      file: 'hooks/useGame/planning/planningUpdateWorkflow.ts',
+      needles: ['同人设定摘要', '境界母板补丁', 'const fandomEnabled = fandomPromptBundle.enabled']
     },
     {
       name: 'world_evolution_prompt_chain',
-      file: 'hooks/useGame/worldEvolutionWorkflow.ts',
+      file: 'hooks/useGame/world/worldEvolutionWorkflow.ts',
       needles: ['构建世界演变COT提示词', '境界母板补丁', '构建同人运行时提示词包']
     },
     {
@@ -44,7 +44,7 @@ function checkFandomPromptAssembly() {
     },
     {
       name: 'realm_generation_runtime',
-      file: 'services/ai/text/storyTasks.ts',
+      file: 'services/ai/text/storyCoreTasks.ts',
       needles: ['generateFandomRealmData', '同人境界体系生成系统提示词', '校验境界体系提示词完整性']
     },
     {
@@ -302,7 +302,6 @@ function judgeValue(state, rng, mode) {
       : 0;
   const effStr = effectiveAttr(state.角色.力量);
   const effAgi = effectiveAttr(state.角色.敏捷);
-  const effVit = effectiveAttr(state.角色.体质);
   const effBone = effectiveAttr(state.角色.根骨);
   const effWis = effectiveAttr(state.角色.悟性);
   const effLuck = effectiveAttr(state.角色.福源);
