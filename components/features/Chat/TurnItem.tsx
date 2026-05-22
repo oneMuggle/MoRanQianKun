@@ -164,10 +164,21 @@ const TurnItem: React.FC<Props> = ({
     const commands = Array.isArray(response.tavern_commands) ? response.tavern_commands : [];
     const calibrationReports = Array.isArray(response.variable_calibration_report) ? response.variable_calibration_report : [];
     const calibrationCommands = Array.isArray(response.variable_calibration_commands) ? response.variable_calibration_commands : [];
-    const hasCalibrationRecord = calibrationReports.length > 0 || calibrationCommands.length > 0;
-    const [showCommandChanges, setShowCommandChanges] = useState(false);
-    const [showCalibrationDetails, setShowCalibrationDetails] = useState(false);
+    const hasAnyVariableChange = commands.length > 0 || calibrationReports.length > 0 || calibrationCommands.length > 0;
+    const [showVariableDetails, setShowVariableDetails] = useState(false);
     const [commandViewMode, setCommandViewMode] = useState<'compact' | 'full'>('compact');
+    // 命令来源识别：将 calibrationCommands 序列化去重键集合，用于判断 tavern_commands 中的命令是否来自校准
+    const 序列化命令去重键 = (cmd: { action?: string; key?: string; value?: unknown }): string => {
+        const action = cmd?.action || '';
+        const key = cmd?.key || '';
+        let valueStr = '';
+        try { valueStr = JSON.stringify(cmd?.value ?? null); } catch { valueStr = String(cmd?.value ?? ''); }
+        return `${action}||${key}||${valueStr}`;
+    };
+    const 校准命令去重键集合 = new Set(calibrationCommands.map(序列化命令去重键));
+    const 补充校准命令 = calibrationCommands.filter(cmd => !commands.some(c => 序列化命令去重键(c) === 序列化命令去重键(cmd)));
+
+    // 主命令统计
     const commandStats = commands.reduce((acc, cmd) => {
         if (cmd?.action === 'set') acc.set += 1;
         if (cmd?.action === 'add') acc.add += 1;
@@ -213,7 +224,6 @@ const TurnItem: React.FC<Props> = ({
         return String(value);
     };
 
-    const commandPanelTitle = isLatest ? '最新变量变化' : '本回合变量变化';
     const canEditRaw = isLatest;
 
     const handleSave = async () => {
@@ -334,28 +344,13 @@ const TurnItem: React.FC<Props> = ({
                             <span className="text-[8px] font-mono leading-none ml-0.5">调试</span>
                         </div>
                     )}
-                    {hasCalibrationRecord && (
+                    {hasAnyVariableChange && (
                         <button
-                            onClick={() => {
-                                setShowCalibrationDetails(prev => !prev);
-                                setShowCommandChanges(false);
-                            }}
-                            className={`p-1 sm:p-1.5 rounded-lg border transition-all shrink-0 ${showCalibrationDetails ? 'bg-sky-500/20 border-sky-500/60 text-sky-200' : 'border-white/10 text-sky-400 hover:text-sky-300 hover:border-sky-500/50 hover:bg-white/5'}`}
-                            title="查看变量生成记录"
+                            onClick={() => setShowVariableDetails(prev => !prev)}
+                            className={`p-1 sm:p-1.5 rounded-lg border transition-all shrink-0 ${showVariableDetails ? 'bg-sky-500/20 border-sky-500/60 text-sky-200' : 'border-white/10 text-sky-400 hover:text-sky-300 hover:border-sky-500/50 hover:bg-white/5'}`}
+                            title={`查看${commands.length > 0 ? `${commands.length}条` : ''}变量变更记录`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m6 2.25a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                        </button>
-                    )}
-                    {isLatest && commands.length > 0 && (
-                        <button 
-                            onClick={() => {
-                                setShowCommandChanges(prev => !prev);
-                                setShowCalibrationDetails(false);
-                            }} 
-                            className={`p-1 sm:p-1.5 rounded-lg border transition-all shrink-0 ${showCommandChanges ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-200' : 'border-white/10 text-emerald-400 hover:text-emerald-300 hover:border-emerald-500/50 hover:bg-white/5'}`} 
-                            title={`查看${commandPanelTitle}`}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 6.75h16.5m-16.5 6.75h16.5" /></svg>
                         </button>
                     )}
                     <button 
@@ -399,102 +394,119 @@ const TurnItem: React.FC<Props> = ({
 
             {/* 展开面板区域：居中展开，不使用绝对定位，避免移动端溢出并保证清晰度 */}
             <div className="px-4 space-y-4 mb-6">
-                {showCommandChanges && isLatest && commands.length > 0 && (
-                    <div className="mx-auto w-[min(100%,720px)] p-4 bg-[#121417] border-y border-emerald-500/30 text-xs text-gray-300 font-mono leading-relaxed shadow-xl animate-in fade-in slide-in-from-top-2 duration-300 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500/40"></div>
-                        <div className="flex items-center justify-between gap-3 mb-4 pb-2 border-b border-white/5">
-                            <div className="flex flex-col">
-                                <div className="text-emerald-300 font-bold tracking-[0.2em] flex items-center gap-2 uppercase">
-                                    {commandPanelTitle}
-                                </div>
-                                <div className="text-[10px] text-emerald-500/60 mt-0.5 tracking-tighter">
-                                    COUNT: {commands.length} | SET:{commandStats.set} ADD:{commandStats.add} PUSH:{commandStats.push} DEL:{commandStats.delete}
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-1 bg-black/40 p-1 rounded-md border border-white/5">
-                                <button onClick={() => setCommandViewMode('compact')} className={`px-2 py-0.5 text-[9px] rounded transition-all ${commandViewMode === 'compact' ? 'bg-emerald-500/30 text-emerald-100 border border-emerald-500/40' : 'text-gray-600 hover:text-gray-400'}`}>简约</button>
-                                <button onClick={() => setCommandViewMode('full')} className={`px-2 py-0.5 text-[9px] rounded transition-all ${commandViewMode === 'full' ? 'bg-emerald-500/30 text-emerald-100 border border-emerald-500/40' : 'text-gray-600 hover:text-gray-400'}`}>详情</button>
-                            </div>
-                        </div>
-                        <div className="max-h-[50vh] overflow-y-auto custom-scrollbar-thin space-y-2 pr-1">
-                            {commands.map((cmd, idx) => {
-                                const valueText = 格式化命令值(cmd?.value);
-                                const compactValueText = 生成简约值文本(cmd?.value);
-                                const needPre = 是否使用预格式化(cmd?.value);
-                                const isCompact = commandViewMode === 'compact';
-                                return (
-                                    <div key={`${cmd.action}-${cmd.key}-${idx}`} className={`rounded border transition-all ${isCompact ? 'border-white/5 bg-black/20 hover:bg-black/40' : 'border-emerald-500/10 bg-black/40'}`}>
-                                        <div className="flex items-center justify-between p-2 flex-wrap gap-2">
-                                            <div className="flex items-center gap-2">
-                                                <span className={`inline-flex px-1.5 py-0.5 rounded text-[9px] font-black tracking-tighter uppercase ${命令样式映射[cmd.action]}`}>{命令标签映射[cmd.action]}</span>
-                                                <span className="font-mono text-[11px] text-gray-200 font-bold">{cmd.key}</span>
-                                            </div>
-                                            {isCompact && cmd.action !== 'delete' && (
-                                                <div className="text-[10px] flex items-center gap-1.5">
-                                                    <span className="opacity-30 text-emerald-500/50">{cmd.action === 'set' ? '→' : cmd.action === 'add' ? 'Δ' : '≫'}</span>
-                                                    <span className={cmd.action === 'add' ? 'text-emerald-400 font-bold' : 'text-emerald-400/80'}>{cmd.action === 'add' && !compactValueText.startsWith('-') ? `+${compactValueText}` : compactValueText}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {!isCompact && cmd.action !== 'delete' && (
-                                            <div className="px-2 pb-2">
-                                                <pre className="rounded bg-black/60 border border-white/5 p-2 text-[10px] leading-relaxed text-emerald-100/90 whitespace-pre-wrap break-words">{valueText}</pre>
-                                            </div>
-                                        )}
-                                        {cmd.action === 'delete' && (
-                                            <div className="px-2 pb-2 text-[9px] text-rose-500/40 italic flex items-center gap-1">
-                                                <span className="not-italic">✕</span> 已移除
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-
-                {showCalibrationDetails && hasCalibrationRecord && (
+                {showVariableDetails && hasAnyVariableChange && (
                     <div className="mx-auto w-[min(100%,720px)] p-4 bg-[#0f1216] border-y border-sky-500/30 text-xs text-gray-300 leading-relaxed shadow-xl animate-in fade-in slide-in-from-top-2 duration-300 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1.5 h-full bg-sky-500/40"></div>
                         <div className="flex items-center justify-between gap-3 mb-4 pb-2 border-b border-white/5">
                             <div className="flex flex-col">
                                 <div className="text-sky-300 font-bold tracking-[0.2em] flex items-center gap-2 uppercase">
-                                    变量生成报告
+                                    {isLatest ? '最新变量变更记录' : '本回合变量变更记录'}
                                 </div>
                                 <div className="text-[10px] text-sky-500/60 mt-0.5 tracking-tighter">
-                                    {response.variable_calibration_model ? `ENGINE: ${response.variable_calibration_model}` : 'UNKNOWN ENGINE'}
+                                    COUNT: {commands.length + 补充校准命令.length} | SET:{commandStats.set} ADD:{commandStats.add} PUSH:{commandStats.push} DEL:{commandStats.delete}
+                                    {response.variable_calibration_model ? ` · ENGINE: ${response.variable_calibration_model}` : ''}
                                 </div>
                             </div>
-                            <button onClick={() => setShowCalibrationDetails(false)} className="px-2 py-0.5 text-[9px] rounded border border-white/10 text-gray-500 hover:text-white transition-all uppercase">CLOSE</button>
+                            <div className="flex items-center gap-1">
+                                <button onClick={() => setCommandViewMode(commandViewMode === 'compact' ? 'full' : 'compact')} className={`px-2 py-0.5 text-[9px] rounded transition-all ${commandViewMode === 'full' ? 'bg-sky-500/30 text-sky-100 border border-sky-500/40' : 'text-gray-600 hover:text-gray-400 border border-white/10'}`}>{commandViewMode === 'compact' ? '详情' : '简约'}</button>
+                                <button onClick={() => setShowVariableDetails(false)} className="px-2 py-0.5 text-[9px] rounded border border-white/10 text-gray-500 hover:text-white transition-all uppercase ml-1">CLOSE</button>
+                            </div>
                         </div>
-                        <div className="max-h-[50vh] overflow-y-auto custom-scrollbar-thin pr-1">
+                        <div className="max-h-[50vh] overflow-y-auto custom-scrollbar-thin pr-1 space-y-4">
+                            {/* 主命令区域 */}
+                            {commands.length > 0 && (
+                                <div>
+                                    <div className="text-[9px] font-black text-emerald-400/50 mb-2 uppercase tracking-widest border-b border-emerald-500/10 pb-1">
+                                        变量变更命令 · {commands.length}
+                                    </div>
+                                    <div className="space-y-2">
+                                        {commands.map((cmd, idx) => {
+                                            const valueText = 格式化命令值(cmd?.value);
+                                            const compactValueText = 生成简约值文本(cmd?.value);
+                                            const needPre = 是否使用预格式化(cmd?.value);
+                                            const isCompact = commandViewMode === 'compact';
+                                            const isFromCalibration = 校准命令去重键集合.has(序列化命令去重键(cmd));
+                                            return (
+                                                <div key={`cmd-${cmd.action}-${cmd.key}-${idx}`} className={`rounded border transition-all ${isCompact ? 'border-white/5 bg-black/20 hover:bg-black/40' : 'border-sky-500/10 bg-black/40'}`}>
+                                                    <div className="flex items-center justify-between p-2 flex-wrap gap-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`inline-flex px-1.5 py-0.5 rounded text-[9px] font-black tracking-tighter uppercase ${命令样式映射[cmd.action]}`}>{命令标签映射[cmd.action]}</span>
+                                                            <span className="font-mono text-[11px] text-gray-200 font-bold">{cmd.key}</span>
+                                                            <span className={`text-[7px] px-1 py-0.5 rounded border ${isFromCalibration ? 'border-sky-500/30 text-sky-400/70' : 'border-emerald-500/30 text-emerald-400/70'}`}>
+                                                                {isFromCalibration ? '校准' : '主命令'}
+                                                            </span>
+                                                        </div>
+                                                        {isCompact && cmd.action !== 'delete' && (
+                                                            <div className="text-[10px] flex items-center gap-1.5">
+                                                                <span className="opacity-30 text-sky-500/50">{cmd.action === 'set' ? '→' : cmd.action === 'add' ? 'Δ' : '≫'}</span>
+                                                                <span className={cmd.action === 'add' ? 'text-emerald-400 font-bold' : 'text-sky-400/80'}>{cmd.action === 'add' && !compactValueText.startsWith('-') ? `+${compactValueText}` : compactValueText}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {!isCompact && cmd.action !== 'delete' && (
+                                                        <div className="px-2 pb-2">
+                                                            <pre className="rounded bg-black/60 border border-white/5 p-2 text-[10px] leading-relaxed text-sky-100/90 whitespace-pre-wrap break-words">{valueText}</pre>
+                                                        </div>
+                                                    )}
+                                                    {cmd.action === 'delete' && (
+                                                        <div className="px-2 pb-2 text-[9px] text-rose-500/40 italic flex items-center gap-1">
+                                                            <span className="not-italic">✕</span> 已移除
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 校准补充命令（未在 tavern_commands 中出现的） */}
+                            {补充校准命令.length > 0 && (
+                                <div>
+                                    <div className="text-[9px] font-black text-sky-400/50 mb-2 uppercase tracking-widest border-b border-sky-500/10 pb-1">
+                                        校准补充命令 · {补充校准命令.length}
+                                    </div>
+                                    <div className="space-y-2">
+                                        {补充校准命令.map((cmd, idx) => {
+                                            const compactValueText = 生成简约值文本(cmd?.value);
+                                            const isCompact = commandViewMode === 'compact';
+                                            return (
+                                                <div key={`cal-sup-${cmd.action}-${cmd.key}-${idx}`} className={`rounded border transition-all ${isCompact ? 'border-sky-500/10 bg-black/20 hover:bg-black/40' : 'border-sky-500/10 bg-black/40'}`}>
+                                                    <div className="flex items-center justify-between p-2 flex-wrap gap-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`inline-flex px-1.5 py-0.5 rounded text-[9px] font-black tracking-tighter uppercase ${命令样式映射[cmd.action]}`}>{命令标签映射[cmd.action]}</span>
+                                                            <span className="font-mono text-[11px] text-sky-100/90 font-bold">{cmd.key}</span>
+                                                            <span className="text-[7px] px-1 py-0.5 rounded border border-sky-500/30 text-sky-400/70">校准</span>
+                                                        </div>
+                                                        {isCompact && (
+                                                            <div className="text-[10px] flex items-center gap-1.5">
+                                                                <span className="opacity-30 text-sky-500/50">{cmd.action === 'set' ? '→' : cmd.action === 'add' ? 'Δ' : '≫'}</span>
+                                                                <span className="text-sky-400/80">{compactValueText}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {!isCompact && (
+                                                        <div className="px-2 pb-2">
+                                                            <pre className="rounded bg-black/60 border border-white/5 p-2 text-[10px] leading-relaxed text-sky-100/70 whitespace-pre-wrap break-words italic">{生成简约值文本(cmd?.value)}</pre>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 变量生成报告 */}
                             {calibrationReports.length > 0 && (
-                                <div className="mb-6">
-                                    <div className="text-[9px] font-black text-sky-400/50 mb-2 uppercase tracking-widest border-b border-sky-500/10 pb-1">Summary</div>
+                                <div>
+                                    <div className="text-[9px] font-black text-sky-400/50 mb-2 uppercase tracking-widest border-b border-sky-500/10 pb-1">
+                                        变量生成报告 · {calibrationReports.length}
+                                    </div>
                                     <div className="space-y-2">
                                         {calibrationReports.map((report, index) => (
                                             <div key={`report-${index}`} className="p-3 bg-black/40 border border-sky-500/10 text-[11px] text-gray-200">
                                                 {report}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            {calibrationCommands.length > 0 && (
-                                <div>
-                                    <div className="text-[9px] font-black text-sky-400/50 mb-2 uppercase tracking-widest border-b border-sky-500/10 pb-1">
-                                        Supplements（补充命令） · {calibrationCommands.length}
-                                    </div>
-                                    <div className="space-y-2.5 font-mono">
-                                        {calibrationCommands.map((cmd, idx) => (
-                                            <div key={`cal-${cmd.action}-${cmd.key}-${idx}`} className="rounded border border-sky-500/10 bg-black/40 p-2">
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`inline-flex px-1 py-0.5 rounded text-[8px] font-black tracking-tighter uppercase ${命令样式映射[cmd.action]}`}>{命令标签映射[cmd.action]}</span>
-                                                        <span className="font-mono text-[11px] text-sky-100/90 font-bold">{cmd.key}</span>
-                                                    </div>
-                                                </div>
-                                                <pre className="rounded bg-black/60 border border-white/5 p-2 text-[10px] leading-relaxed text-sky-100/70 whitespace-pre-wrap break-words italic">{生成简约值文本(cmd?.value)}</pre>
                                             </div>
                                         ))}
                                     </div>
