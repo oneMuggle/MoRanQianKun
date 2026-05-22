@@ -1,7 +1,7 @@
 # NSFW 玩法增强方案 — 可玩性/深度/多样性三期路线图
 
 > 创建日期：2026-05-22
-> 状态：实施中 — Phase 1 ✅ | Phase 2 ✅ | Phase 3 ✅ | Phase 4 ✅
+> 状态：实施中 — Phase 1 ✅ | Phase 2 ✅ | Phase 3 ✅ | Phase 4 ✅ | Phase 5 ✅ | Phase 6 ✅ | Phase 7 ✅ | Phase 8 ✅ | Phase 9 ✅ | Phase 10 ✅
 
 ## 一、现状诊断
 
@@ -251,7 +251,7 @@
 **目标**：建立统一的 NSFW 资源经济系统，连接各子系统。
 
 ##### 5.1 NSFW 资源类型
-- **文件**: `models/nsfwCore/resources.ts`
+- [x] **文件**: `models/nsfwCore/resources.ts` ✅
 - **内容**:
   - `精力值()`: 所有 NSFW 行为消耗精力，自然恢复，可通过休息/道具加速
   - `声誉值()`: 跨子系统的公共声誉，受暴露/泄露/谣言影响
@@ -262,7 +262,7 @@
 - **风险**: 中 — 需要与现有数值系统对齐
 
 ##### 5.2 NSFW 商店/道具
-- **文件**: `models/nsfwCore/shopSystem.ts`
+- [x] **文件**: `models/nsfwCore/shopSystem.ts` ✅
 - **内容**:
   - `道具商店()`: 消耗亲密度代币购买道具（增加信任度/降低风险/提升情绪）
   - `场景解锁()`: 消耗代币解锁新场景/新玩法
@@ -273,7 +273,7 @@
 - **风险**: 低
 
 ##### 5.3 精力管理系统
-- **文件**: `hooks/useGame/nsfw/energyManagement.ts`
+- [x] **文件**: `hooks/useGame/nsfw/energyManagement.ts` ✅
 - **内容**:
   - `精力消耗计算()`: 不同 NSFW 行为的精力消耗
   - `精力恢复机制()`: 自然恢复/休息/道具/特殊事件
@@ -283,7 +283,7 @@
 - **风险**: 低
 
 ##### 5.4 经济 UI
-- **文件**: `components/features/NSFW/ResourceDashboard.tsx`（新建）
+- [x] **文件**: `components/features/NSFW/ResourceDashboard.tsx` ✅
 - **内容**:
   - 精力/声誉/代币/风险预算实时显示
   - 商店入口和快捷购买
@@ -298,7 +298,7 @@
 **目标**：让玩家能够主动利用跨子系统联动。
 
 ##### 6.1 跨子系统事件链
-- **文件**: `models/nsfwCore/crossSystemChains.ts`
+- [x] **文件**: `models/nsfwCore/crossSystemChains.ts` ✅
 - **内容**:
   - `事件链定义()`: 定义跨子系统的事件链（如 Campus → Exposure → Rumor → BDSM）
   - `链触发条件()`: 满足特定条件自动触发事件链
@@ -309,7 +309,7 @@
 - **风险**: 中
 
 ##### 6.2 多角色 NSFW 管理
-- **文件**: `models/nsfwCore/multiCharacterNSFW.ts`
+- [x] **文件**: `models/nsfwCore/multiCharacterNSFW.ts` ✅
 - **内容**:
   - `多角色关系网()`: 同时与多个 NPC 的 NSFW 关系管理
   - `嫉妒/冲突系统()`: 多角色间的嫉妒和冲突触发
@@ -320,7 +320,7 @@
 - **风险**: 中
 
 ##### 6.3 场景组合玩法
-- **文件**: `models/nsfwCore/sceneCombination.ts`
+- [x] **文件**: `models/nsfwCore/sceneCombination.ts` ✅
 - **内容**:
   - `场景组合()`: 不同子系统场景可以组合（如 酒吧 + 暴露 = 酒吧暴露场景）
   - `组合风险计算()`: 组合场景的风险不是简单叠加，而是有协同效应
@@ -331,7 +331,7 @@
 - **风险**: 中
 
 ##### 6.4 协同 UI
-- **文件**: `components/features/NSFW/CrossSystemPanel.tsx`（新建）
+- [x] **文件**: `components/features/NSFW/CrossSystemPanel.tsx`（新建）✅
 - **内容**:
   - 活跃事件链列表和进度
   - 多角色关系网可视化
@@ -347,7 +347,7 @@
 **目标**：后果不再是被动惩罚，而是有主动解决路径。
 
 ##### 7.1 后果应对系统
-- **文件**: `models/nsfwCore/consequenceResolution.ts`
+- [x] **文件**: `models/nsfwCore/consequenceResolution.ts` ✅
 - **内容**:
   - `后果类型扩展()`: 在现有后果基础上增加可解决的后果类型
   - `应对策略()`: 每种后果有多个应对策略（如谣言：辟谣/收买/转移/利用）
@@ -358,7 +358,7 @@
 - **风险**: 低
 
 ##### 7.2 法律/道德系统
-- **文件**: `models/nsfwCore/legalEthicalSystem.ts`
+- [x] **文件**: `models/nsfwCore/legalEthicalSystem.ts` ✅
 - **内容**:
   - `法律风险追踪()`: 某些行为有法律风险（如网约车下药、写真泄露）
   - `道德评判()`: NPC 社群的道德评判影响声誉
@@ -369,7 +369,7 @@
 - **风险**: 中 — 需要谨慎设计避免过于沉重
 
 ##### 7.3 后果解决 UI
-- **文件**: `components/features/NSFW/ConsequenceManager.tsx`（新建）
+- [x] **文件**: `components/features/NSFW/ConsequenceManager.tsx`（新建）✅
 - **内容**:
   - 活跃后果列表和严重程度
   - 应对策略选择和成功率预览
@@ -389,7 +389,7 @@
 **目标**：将多人玩法从桌游扩展到其他子系统。
 
 ##### 8.1 多人写真
-- **文件**: `models/photographyNSFW/multiModelShoot.ts`
+- [x] **文件**: `models/photographyNSFW/multiModelShoot.ts` ✅
 - **内容**:
   - `多人拍摄模式()`: 2-3 名模特同时拍摄
   - `模特间互动()`: 模特间的默契/竞争/嫉妒影响拍摄效果
@@ -399,7 +399,7 @@
 - **风险**: 中
 
 ##### 8.2 多人暴露
-- **文件**: `models/exposureNSFW/groupExposure.ts`
+- [x] **文件**: `models/exposureNSFW/groupExposure.ts` ✅
 - **内容**:
   - `群体暴露场景()`: 多名 NPC 同时处于暴露风险中
   - `群体动态()`: NPC 间互相影响（有人大胆有人保守）
@@ -409,7 +409,7 @@
 - **风险**: 低
 
 ##### 8.3 派对/聚会场景
-- **文件**: `models/contemporary/partyScenarios.ts`
+- [x] **文件**: `models/contemporary/partyScenarios.ts` ✅
 - **内容**:
   - `派对类型()`: 家庭派对/公司聚会/同学聚餐/主题派对
   - `多 NPC 互动()`: 派对中同时与多名 NPC 互动
@@ -426,7 +426,7 @@
 **目标**：增加长期目标感和多周目动力。
 
 ##### 9.1 NSFW 成就树
-- **文件**: `models/nsfwCore/achievementTree.ts`
+- [x] **文件**: `models/nsfwCore/achievementTree.ts` ✅
 - **内容**:
   - `成就分类()`: 探索类/关系类/风险类/技巧类/多角色类
   - `成就解锁树()`: 成就之间有前置依赖，形成解锁树
@@ -437,7 +437,7 @@
 - **风险**: 低
 
 ##### 9.2 周目继承系统
-- **文件**: `models/nsfwCore/newGamePlus.ts`
+- [x] **文件**: `models/nsfwCore/newGamePlus.ts` ✅
 - **内容**:
   - `继承内容()`: 部分性癖知识/技巧/成就可继承到新的一周目
   - `继承代价()`: 继承内容需要消耗代币解锁
@@ -447,7 +447,7 @@
 - **风险**: 低
 
 ##### 9.3 挑战性模式
-- **文件**: `models/nsfwCore/challengeModes.ts`
+- [x] **文件**: `models/nsfwCore/challengeModes.ts` ✅
 - **内容**:
   - `挑战模式()`: 纯爱路线（不能有任何越界）/极限挑战（最高风险）/速通（最短时间内达成目标）
   - `挑战奖励()`: 完成挑战获得特殊成就/代币/场景
@@ -463,7 +463,7 @@
 **目标**：增加文化差异带来的玩法多样性。
 
 ##### 10.1 文化变体系统
-- **文件**: `models/nsfwCore/culturalVariants.ts`
+- [x] **文件**: `models/nsfwCore/culturalVariants.ts` ✅
 - **内容**:
   - `文化背景()`: 中国古风/日本和风/现代都市/西方中世纪
   - `文化规则()`: 不同文化有不同的道德标准/风险计算/可用场景

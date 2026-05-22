@@ -51,6 +51,19 @@ export {
   泄露后果最小化,
 } from './leakResponse';
 
+// ==================== Phase 8: 多人场景 ====================
+
+export type {
+  模特拍摄状态, 多人拍摄会话, 模特间事件, 拍摄回合结果,
+} from './multiModelShoot';
+
+export {
+  创建多人拍摄会话,
+  计算群体动态,
+  执行拍摄回合,
+  结算多人拍摄,
+} from './multiModelShoot';
+
 export type {
   模特核心状态, 摄影师核心状态,
   拍摄项目状态, 泄露事件状态,
