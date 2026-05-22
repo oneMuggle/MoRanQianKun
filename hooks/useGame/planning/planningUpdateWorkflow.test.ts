@@ -10,6 +10,11 @@ vi.mock('../../../utils/apiConfig', () => ({
     获取规划分析接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
+vi.mock('../../../utils/stateHelpers', () => ({
+    applyStateCommand: vi.fn((_char, _env, _social, _world, _battle, _story, _storyPlan, _heroinePlan, _fandomStoryPlan, _fandomHeroinePlan, _sect, _tasks, _agreements, _key, _value, _action) => ({
+        char: _char, env: _env, social: _social, world: _world, battle: _battle, story: _story, storyPlan: _storyPlan, heroinePlan: _heroinePlan, fandomStoryPlan: _fandomStoryPlan, fandomHeroinePlan: _fandomHeroinePlan, sect: _sect, tasks: _tasks, agreements: _agreements,
+    })),
+}));
 vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => ({
         启用修炼体系: true,

@@ -5,7 +5,7 @@ import {
     主角角色锚点标识
 } from '../image/imagePresetWorkflow';
 
-vi.mock('./npcContext', () => ({
+vi.mock('../npc/npcContext', () => ({
     提取NPC生图基础数据: vi.fn((npc: any) => ({
         姓名: npc.姓名,
         性别: npc.性别,
@@ -19,7 +19,7 @@ vi.mock('./npcContext', () => ({
     }))
 }));
 
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取主剧情接口配置: vi.fn((config: any) => config?.configs?.[0] || {}),
     获取生图词组转化器接口配置: vi.fn(() => null),
     接口配置是否可用: vi.fn(() => true),

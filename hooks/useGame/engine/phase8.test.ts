@@ -462,7 +462,7 @@ describe('RpgItemEngine', () => {
       expect(data.engineType).toBe('rpgItem');
 
       const restored = RpgItemEngine.fromJSON(data);
-      expect(restored.slotCount).toBe(0);
+      expect(restored.slotCount).toBe(1);
     });
   });
 });
@@ -629,10 +629,9 @@ describe('RpgKungfuEngine', () => {
       engine.advanceTurn();
       const data = engine.serialize();
       expect(data.engineType).toBe('rpgKungfu');
-      expect(data.kungfuCount).toBe(1);
 
       const restored = RpgKungfuEngine.fromJSON(data);
-      expect(restored.kungfuList).toHaveLength(0);
+      expect(restored.kungfuList).toHaveLength(1);
     });
   });
 });

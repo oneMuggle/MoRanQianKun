@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 创建手动NPC工作流 } from './manualNpcWorkflow';
 
-vi.mock('./npcImageStateWorkflow', () => ({
+vi.mock('../image/npcImageStateWorkflow', () => ({
     生成NPC生图记录ID: vi.fn(() => 'img_record_123'),
 }));
 

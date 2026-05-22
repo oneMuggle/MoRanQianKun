@@ -16,7 +16,7 @@ vi.mock('../../prompts/runtime/recall', () => ({
     剧情回忆检索输出格式提示词: '<回忆输出格式>',
     构建剧情回忆检索用户提示词: vi.fn((input: string, corpus: string) => `用户提示词:${input}|${corpus}`),
 }));
-vi.mock('./memoryRecall', () => ({
+vi.mock('./memory/memoryRecall', () => ({
     预筛剧情回忆候选: vi.fn(() => []),
     构建剧情回忆检索上下文: vi.fn(() => '<记忆语料>'),
     基于候选生成回忆回退结果: vi.fn(() => ({ strongIds: [], weakIds: [], normalizedText: '强回忆:无\n弱回忆:无' })),

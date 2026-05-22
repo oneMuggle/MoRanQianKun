@@ -365,7 +365,7 @@ describe('创建会话生命周期工作流', () => {
     });
 
     describe('handleGenerateWorld', () => {
-        it('merges li-wuxia/li-zhiguai settings from saved settings', async () => {
+        it('syncs nsfw场景类型 and does not override li-wuxia/zhiguai (derived by 规范化游戏设置)', async () => {
             mock读取设置.mockResolvedValue({ 启用里武侠模式: true, 启用里志怪模式: false });
             const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
@@ -373,13 +373,15 @@ describe('创建会话生命周期工作流', () => {
             const deps = makeDeps({ gameConfig: { 启用修炼体系: true } });
             const { handleGenerateWorld } = 创建会话生命周期工作流(deps);
             await handleGenerateWorld(
-                { worldSeed: 'test' } as any,
+                { worldSeed: 'test', nsfw场景类型: 'explicit' } as any,
                 { 姓名: '李四' } as any,
                 undefined,
                 'all'
             );
+            // li-wuxia/zhiguai are no longer merged from saved settings
+            // only nsfw场景类型 is synced from worldConfig
             expect(deps.setGameConfig).toHaveBeenCalledWith(
-                expect.objectContaining({ 启用里武侠模式: true, 启用里志怪模式: false })
+                expect.objectContaining({ nsfw场景类型: 'explicit' })
             );
         });
 

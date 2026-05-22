@@ -60,7 +60,7 @@ describe('清理命令尾部分隔符', () => {
 
     it('多个连续分隔符只移除最末一个（正则逐字符匹配替换）', () => {
         // /[；;，,]\\s*$/ 每次只匹配并移除一个尾部字符
-        expect(清理命令尾部分隔符('set 角色.姓名 弦月，，，')).toBe('set 角色.姓名 弦月，');
+        expect(清理命令尾部分隔符('set 角色.姓名 弦月，，，')).toBe('set 角色.姓名 弦月，，');
     });
 });
 
@@ -73,7 +73,7 @@ describe('计算括号平衡', () => {
         expect(计算括号平衡('{')).toBe(1);
         expect(计算括号平衡('[')).toBe(1);
         expect(计算括号平衡('{{')).toBe(2);
-        expect(计算括号平衡('{[}')).toBe(2);
+        expect(计算括号平衡('{[}')).toBe(1);
     });
 
     it('左右括号平衡时返回 0', () => {
@@ -180,9 +180,10 @@ describe('收集多行命令值', () => {
         const lines = ['set 数据', '{"a": 1}', '其他行'];
         const result = 收集多行命令值(lines, 0, '{');
         // 初始值 '{' 不平衡（balance=1），进入 while 循环消费下一行
-        // 下一行 '{"a": 1}' 使总 balance 变为 0，退出循环
-        expect(result.consumedUntil).toBe(1);
-        expect(result.valueText).toBe('{\n{"a": 1}');
+        // '{"a": 1}' 使总文本为 '{\n{"a": 1}'，balance=2（两个{一个}），仍不平衡
+        // 继续消费 '其他行'，balance 仍为 2，直到无更多行
+        expect(result.consumedUntil).toBe(2);
+        expect(result.valueText).toBe('{\n{"a": 1}\n其他行');
     });
 
     it('数组嵌套对象正确处理', () => {

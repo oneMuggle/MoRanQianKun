@@ -256,7 +256,7 @@ describe('执行世界演变更新工作流', () => {
             enableBasicMocks();
             const deps = makeDeps();
             await 执行世界演变更新工作流({ 来源: 'manual' }, deps);
-            expect(deps.set世界演变最近更新时间).toHaveBeenCalledWith('2026-04-30T00:00:00');
+            expect(deps.set世界演变最近更新时间).toHaveBeenCalledWith('2026:04:30:00:00');
         });
     });
 

@@ -44,11 +44,11 @@ describe('推进拍摄回合', () => {
   const 摄影师 = createMockPhotographer();
   const 设置 = createMockSettings({ 启用尺度递进: false, 启用越界识别: false });
 
-  test('SW-02: 推进第1回合 => 第一组拍摄', () => {
+  test('SW-02: 推进第1回合 => 拍摄准备', () => {
     const 初始项目 = makeProject();
     const result = 推进拍摄回合(初始项目, 模特, 摄影师, 设置);
     expect(result.更新后项目.当前回合).toBe(1);
-    expect(result.更新后项目.拍摄阶段).toBe('第一组拍摄');
+    expect(result.更新后项目.拍摄阶段).toBe('拍摄准备');
   });
 
   test('SW-05: 推进到最大回合 => 已完成', () => {

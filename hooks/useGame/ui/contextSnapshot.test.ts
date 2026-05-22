@@ -11,25 +11,28 @@ vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((v: any) => v || {})
 }));
 
-vi.mock('./memoryUtils', () => ({
+vi.mock('../memory/memoryUtils', () => ({
     规范化记忆系统: vi.fn((v: any) => v || { 回忆档案: [] }),
     规范化记忆配置: vi.fn((v: any) => v || {})
 }));
 
-vi.mock('./mainStoryRequest', () => ({
+vi.mock('../mainStoryRequest', () => ({
     构建主剧情请求参数: vi.fn(() => ({
         messageEntries: [
             { id: 'system', title: '系统提示词', category: 'system', role: 'system' as const, content: '你是武侠世界的AI' },
             { id: 'history', title: '历史记录', category: 'history', role: 'user' as const, content: '你好' }
-        ]
+        ],
+        builtContext: {
+            contextPieces: { 字数要求提示词: '', 输出协议提示词: '', COT提示词: '', 行动选项提示词: '', 其他提示词: '' }
+        }
     }))
 }));
 
-vi.mock('./memoryRecall', () => ({
+vi.mock('../memory/memoryRecall', () => ({
     构建剧情回忆检索上下文: vi.fn(() => '回忆上下文')
 }));
 
-vi.mock('./promptRuntime', () => ({
+vi.mock('../promptRuntime', () => ({
     构建COT伪装提示词: vi.fn(() => 'COT伪装')
 }));
 

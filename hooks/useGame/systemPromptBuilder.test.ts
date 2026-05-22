@@ -1,12 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 构建系统提示词 } from './systemPromptBuilder';
 
-vi.mock('./memoryUtils', () => ({
+vi.mock('./memory/memoryUtils', () => ({
     规范化记忆配置: vi.fn((c: any) => c || { 即时消息上传条数N: 10, 短期记忆阈值: 30, 中期记忆阈值: 10, 长期记忆阈值: 5 }),
     规范化记忆系统: vi.fn((m: any) => m),
-    格式化短期记忆展示文本: vi.fn((item: any) => item?.content || 'short memory'),
+    格式化短期记忆展示文本: vi.fn((rawText: string) => {
+        const t = typeof rawText === 'string' ? rawText : rawText?.content || '';
+        return t || 'short memory';
+    }),
 }));
-vi.mock('./npcContext', () => ({
+vi.mock('./npc/npcContext', () => ({
     构建NPC上下文: vi.fn(() => ({ 在场数据块: '【在场NPC】\n无', 离场数据块: '【离场NPC】\n无' })),
 }));
 vi.mock('./timeUtils', () => ({

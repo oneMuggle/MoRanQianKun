@@ -8,17 +8,17 @@ import {
     过滤规划补丁命令,
 } from './planningReasonCollector';
 
-vi.mock('./timeUtils', () => ({
+vi.mock('../time/timeUtils', () => ({
     环境时间转标准串: vi.fn((env: any) => env ? `${env.年}-${String(env.月).padStart(2, '0')}-${String(env.日).padStart(2, '0')}T00:00:00` : ''),
     normalizeCanonicalGameTime: vi.fn((t: string) => t || ''),
 }));
-vi.mock('./responseTextHelpers', () => ({
+vi.mock('../response/responseTextHelpers', () => ({
     游戏时间转排序值: vi.fn((t: string) => {
         if (!t) return null;
         return new Date(t).getTime();
     }),
 }));
-vi.mock('./storyState', () => ({
+vi.mock('../storyState', () => ({
     规范化剧情规划状态: vi.fn((p: any) => p || { 待触发事件: [], 当前章任务: [] }),
     规范化女主剧情规划状态: vi.fn((p: any) => p || null),
     规范化剧情状态: vi.fn((p: any) => p || { 当前章节: {} }),

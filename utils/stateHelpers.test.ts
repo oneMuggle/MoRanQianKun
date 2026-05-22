@@ -24,7 +24,18 @@ function baseState(): Record<string, any> {
         sect: {},
         tasks: [],
         agreements: [],
+        campus: undefined,
     };
+}
+
+function callApplyStateCommand(state: Record<string, any>, key: string, value: any, action: 'set' | 'add' | 'sub' | 'push' | 'delete'): any {
+    return applyStateCommand(
+        state.char, state.env, state.social, state.world, state.battle,
+        state.story, state.storyPlan, state.heroinePlan,
+        state.fandomStoryPlan, state.fandomHeroinePlan,
+        state.sect, state.tasks, state.agreements, state.campus || {},
+        key, value, action
+    );
 }
 
 describe('normalizeStateCommandKey — direct paths', () => {
@@ -106,38 +117,20 @@ describe('normalizeStateCommandKey — relative field inference', () => {
 describe('applyStateCommand — set action', () => {
     it('sets a top-level character field', () => {
         const state = baseState();
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色.姓名', '新名字', 'set'
-        );
+        const result = callApplyStateCommand(state, '角色.姓名', '新名字', 'set');
         expect(result.char.姓名).toBe('新名字');
         expect(result.env.天气).toBe('晴'); // unchanged
     });
 
     it('replaces entire root object', () => {
         const state = baseState();
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '环境', { 天气: '雨' } as any, 'set'
-        );
+        const result = callApplyStateCommand(state, '环境', { 天气: '雨' } as any, 'set');
         expect(result.env).toEqual({ 天气: '雨' });
     });
 
     it('creates nested structure from undefined', () => {
         const state = baseState();
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色.新字段.深层', 'value', 'set'
-        );
+        const result = callApplyStateCommand(state, '角色.新字段.深层', 'value', 'set');
         expect((result.char as any).新字段.深层).toBe('value');
     });
 });
@@ -145,39 +138,21 @@ describe('applyStateCommand — set action', () => {
 describe('applyStateCommand — push action', () => {
     it('pushes to an array field', () => {
         const state = { ...baseState(), social: [{ 名称: 'NPC1' } as any] };
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '社交', { 名称: 'NPC2' }, 'push'
-        );
+        const result = callApplyStateCommand(state, '社交', { 名称: 'NPC2' }, 'push');
         expect(result.social).toHaveLength(2);
         expect(result.social[1].名称).toBe('NPC2');
     });
 
     it('initializes array if undefined and pushes', () => {
         const state = baseState();
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '任务列表', { 名称: 'task1' }, 'push'
-        );
+        const result = callApplyStateCommand(state, '任务列表', { 名称: 'task1' }, 'push');
         expect(result.tasks).toHaveLength(1);
         expect((result.tasks[0] as any).名称).toBe('task1');
     });
 
     it('pushes to nested array field', () => {
         const state = baseState();
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '世界.活跃NPC列表', { 名称: 'NPC' }, 'push'
-        );
+        const result = callApplyStateCommand(state, '世界.活跃NPC列表', { 名称: 'NPC' }, 'push');
         expect((result.world as any).活跃NPC列表).toHaveLength(1);
     });
 });
@@ -185,25 +160,13 @@ describe('applyStateCommand — push action', () => {
 describe('applyStateCommand — add/sub actions', () => {
     it('adds numeric values', () => {
         const state = { ...baseState(), char: { ...emptyChar, 经验: 100 } as any };
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色.经验', 50, 'add'
-        );
+        const result = callApplyStateCommand(state, '角色.经验', 50, 'add');
         expect(result.char.经验).toBe(150);
     });
 
     it('subtracts numeric values', () => {
         const state = { ...baseState(), char: { ...emptyChar, 经验: 100 } as any };
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色.经验', 30, 'sub'
-        );
+        const result = callApplyStateCommand(state, '角色.经验', 30, 'sub');
         expect(result.char.经验).toBe(70);
     });
 });
@@ -211,25 +174,13 @@ describe('applyStateCommand — add/sub actions', () => {
 describe('applyStateCommand — delete action', () => {
     it('deletes a property', () => {
         const state = { ...baseState(), char: { ...emptyChar, 临时字段: 'delete me' } };
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色.临时字段', undefined, 'delete'
-        );
+        const result = callApplyStateCommand(state, '角色.临时字段', undefined, 'delete');
         expect((result.char as any).临时字段).toBeUndefined();
     });
 
     it('removes array element by index', () => {
         const state = { ...baseState(), tasks: [{ 名称: 'task1' }, { 名称: 'task2' }] };
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '任务列表[0]', undefined, 'delete'
-        );
+        const result = callApplyStateCommand(state, '任务列表[0]', undefined, 'delete');
         expect(result.tasks).toHaveLength(1);
         expect((result.tasks[0] as any).名称).toBe('task2');
     });
@@ -238,13 +189,7 @@ describe('applyStateCommand — delete action', () => {
 describe('applyStateCommand — merge behavior', () => {
     it('deep merges objects on set', () => {
         const state = { ...baseState(), char: { ...emptyChar, 等级: 5, 经验: 100 } };
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色', { 经验: 200 }, 'set'
-        );
+        const result = callApplyStateCommand(state, '角色', { 经验: 200 }, 'set');
         expect(result.char.等级).toBe(5); // preserved
         expect(result.char.经验).toBe(200); // overwritten
     });
@@ -256,13 +201,7 @@ describe('applyStateCommand — immutability', () => {
         const originalCharName = state.char.姓名;
         const originalEnvWeather = state.env.天气;
 
-        applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色.姓名', '新名字', 'set'
-        );
+        callApplyStateCommand(state, '角色.姓名', '新名字', 'set');
 
         expect(state.char.姓名).toBe(originalCharName);
         expect(state.env.天气).toBe(originalEnvWeather);
@@ -270,22 +209,10 @@ describe('applyStateCommand — immutability', () => {
 
     it('returns independent copies', () => {
         const state = baseState();
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色.姓名', '新名字', 'set'
-        );
+        const result = callApplyStateCommand(state, '角色.姓名', '新名字', 'set');
         (result.char as any).姓名 = '再次修改';
         // Should not affect another call's result
-        const result2 = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            '角色', {}, 'set'
-        );
+        const result2 = callApplyStateCommand(state, '角色', {}, 'set');
         expect(result2.char.姓名).toBe('测试角色');
     });
 });
@@ -293,13 +220,7 @@ describe('applyStateCommand — immutability', () => {
 describe('applyStateCommand — unrecognized keys', () => {
     it('returns unchanged state for unknown paths', () => {
         const state = baseState();
-        const result = applyStateCommand(
-            state.char, state.env, state.social, state.world, state.battle,
-            state.story, state.storyPlan, state.heroinePlan,
-            state.fandomStoryPlan, state.fandomHeroinePlan,
-            state.sect, state.tasks, state.agreements,
-            'unknownPath', 'value', 'set'
-        );
+        const result = callApplyStateCommand(state, 'unknownPath', 'value', 'set');
         expect(result.char.姓名).toBe('测试角色');
     });
 });

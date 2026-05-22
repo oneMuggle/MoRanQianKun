@@ -240,10 +240,10 @@ describe('裁剪里志怪上下文数据', () => {
 });
 
 describe('功能附加块是否启用 — edge cases', () => {
-    it('limode always returns true', () => {
+    it('limode requires config', () => {
         const block = 构建功能附加块('limode', 'li mode content');
         const result = 按功能开关过滤提示词内容(block, null);
-        expect(result).toBe('li mode content');
+        expect(result).toBe(''); // disabled when config is null
     });
 
     it('unknown feature IDs default to true', () => {

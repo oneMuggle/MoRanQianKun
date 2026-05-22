@@ -39,6 +39,7 @@ vi.mock('../../../prompts/runtime/worldSetup', () => ({
 vi.mock('../../../prompts/runtime/worldGenerationCot', () => ({
     世界观生成COT提示词: '<世界COT>',
     世界观生成COT伪装历史消息提示词: '<世界COT伪装>',
+    构建世界观生成COT提示词: vi.fn(() => '<世界COT>'),
 }));
 vi.mock('../../../prompts/runtime/fandom', () => ({
     构建同人运行时提示词包: vi.fn(() => ({
@@ -55,6 +56,7 @@ vi.mock('../../../prompts/core/realm', () => ({
 vi.mock('../../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((c: string) => c),
     构建修炼体系附加块: vi.fn(() => ''),
+    构建NSFW附加块: vi.fn(() => ''),
 }));
 
 const mock生成世界数据 = vi.mocked(textAIService.generateWorldData);

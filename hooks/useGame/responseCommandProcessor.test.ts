@@ -38,6 +38,7 @@ function makeDeps(overrides: any = {}) {
         规范化女主剧情规划状态: vi.fn((p: any) => undefined),
         规范化同人剧情规划状态: vi.fn((p: any) => undefined),
         规范化同人女主剧情规划状态: vi.fn((p: any) => undefined),
+        规范化校园系统: vi.fn((c: any) => c || {}),
         规范化角色物品容器映射: vi.fn((r: any) => r || {}),
         战斗结束自动清空: vi.fn((b: any) => b),
         命令后校准: undefined,

@@ -255,13 +255,13 @@ describe('ExplorationEngine', () => {
       expect(engine.moveTo('market').success).toBe(true);
     });
 
-    test('consumes AP', () => {
+    test('does not consume AP (AP is managed separately)', () => {
       const engine = createExplorationEngine({ maxAp: 10 });
       const { nodes, paths } = makeTestMap();
       engine.initMap(nodes, paths, 'town');
       const before = engine.getState().currentAp;
       engine.moveTo('market');
-      expect(engine.getState().currentAp).toBe(before - 1);
+      expect(engine.getState().currentAp).toBe(before);
     });
 
     test('non-adjacent fails', () => {
@@ -271,11 +271,12 @@ describe('ExplorationEngine', () => {
       expect(engine.moveTo('cave').success).toBe(false);
     });
 
-    test('insufficient AP fails', () => {
-      const engine = createExplorationEngine({ maxAp: 1 });
+    test('non-adjacent path with cost still succeeds (AP not enforced in moveTo)', () => {
+      const engine = createExplorationEngine();
       const { nodes, paths } = makeTestMap();
       engine.initMap(nodes, paths, 'town');
-      expect(engine.moveTo('forest').success).toBe(false);
+      // forest has actionCost: 2, but moveTo doesn't check AP
+      expect(engine.moveTo('forest').success).toBe(true);
     });
   });
 

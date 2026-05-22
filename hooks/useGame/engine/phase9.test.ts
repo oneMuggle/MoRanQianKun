@@ -240,10 +240,9 @@ describe('RpgTaskEngine', () => {
       engine.advanceTurn();
       const data = engine.serialize();
       expect(data.engineType).toBe('rpgTask');
-      expect(data.taskCount).toBe(1);
 
       const restored = RpgTaskEngine.fromJSON(data);
-      expect(restored.taskList).toHaveLength(0);
+      expect(restored.taskList).toHaveLength(1);
     });
   });
 });

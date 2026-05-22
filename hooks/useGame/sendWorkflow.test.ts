@@ -5,7 +5,7 @@ import * as apiConfig from '../../utils/apiConfig';
 import * as gameSettings from '../../utils/gameSettings';
 
 vi.mock('../../services/ai/text', () => ({
-    generateStoryResponse: vi.fn(),
+    generateStoryResponseWithFailover: vi.fn(),
     StoryResponseParseError: class StoryResponseParseError extends Error { name = 'StoryResponseParseError'; },
 }));
 vi.mock('../../utils/apiConfig', () => ({
@@ -65,7 +65,7 @@ vi.mock('../../services/novel-decomposition/novelDecompositionCalibration', () =
     同步剧情小说分解时间校准: vi.fn((p: any) => Promise.resolve(p.previousStory)),
 }));
 
-const mockGenerateStoryResponse = vi.mocked(textAIService.generateStoryResponse);
+const mock生成故事响应 = vi.mocked(textAIService.generateStoryResponseWithFailover);
 const mock获取主剧情接口配置 = vi.mocked(apiConfig.获取主剧情接口配置);
 const mock获取世界演变接口配置 = vi.mocked(apiConfig.获取世界演变接口配置);
 const mock接口配置是否可用 = vi.mocked(apiConfig.接口配置是否可用);
@@ -175,7 +175,7 @@ function enableApiMocks(aiResponseOverride?: any) {
     mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
     mock接口配置是否可用.mockReturnValue(true);
     mock获取世界演变接口配置.mockReturnValue(undefined);
-    mockGenerateStoryResponse.mockResolvedValue(aiResponseOverride || mockAIResponse());
+    mock生成故事响应.mockResolvedValue(aiResponseOverride || mockAIResponse());
 }
 
 describe('执行主剧情发送工作流', () => {
@@ -263,7 +263,7 @@ describe('执行主剧情发送工作流', () => {
             mock获取世界演变接口配置.mockReturnValue(undefined);
 
             const abortError = new DOMException('aborted', 'AbortError');
-            mockGenerateStoryResponse.mockRejectedValue(abortError);
+            mock生成故事响应.mockRejectedValue(abortError);
 
             const snapshot = { 玩家输入: 'test', 游戏时间: 'now', 回档前状态: {} as any, 回档前持久态: {} as any, 回档前历史: [] };
             const deps = makeDeps({
@@ -282,7 +282,7 @@ describe('执行主剧情发送工作流', () => {
             mock获取世界演变接口配置.mockReturnValue(undefined);
 
             const abortError = new DOMException('aborted', 'AbortError');
-            mockGenerateStoryResponse.mockRejectedValue(abortError);
+            mock生成故事响应.mockRejectedValue(abortError);
 
             const deps = makeDeps({
                 弹出重Roll快照: vi.fn(() => undefined),
@@ -302,7 +302,7 @@ describe('执行主剧情发送工作流', () => {
             mock规范化游戏设置.mockReturnValue({});
 
             const ParseError = textAIService.StoryResponseParseError;
-            mockGenerateStoryResponse.mockRejectedValue(new ParseError('bad parse'));
+            mock生成故事响应.mockRejectedValue(new ParseError('bad parse'));
 
             const deps = makeDeps({
                 游戏设置启用自动重试: vi.fn(() => false),
@@ -320,7 +320,7 @@ describe('执行主剧情发送工作流', () => {
             mock规范化游戏设置.mockReturnValue({ 启用自动重试: true });
 
             const ParseError = textAIService.StoryResponseParseError;
-            mockGenerateStoryResponse.mockRejectedValue(new ParseError('bad parse'));
+            mock生成故事响应.mockRejectedValue(new ParseError('bad parse'));
 
             const deps = makeDeps({
                 游戏设置启用自动重试: vi.fn(() => true),
@@ -337,7 +337,7 @@ describe('执行主剧情发送工作流', () => {
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
             mock获取世界演变接口配置.mockReturnValue(undefined);
-            mockGenerateStoryResponse.mockRejectedValue(new Error('network error'));
+            mock生成故事响应.mockRejectedValue(new Error('network error'));
 
             const deps = makeDeps();
             const result = await 执行主剧情发送工作流('player action', false, makeState(), deps);

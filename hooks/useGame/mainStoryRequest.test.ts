@@ -47,7 +47,7 @@ vi.mock('../../utils/builtinPrompts', () => ({
 vi.mock('../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((c: string) => c),
 }));
-vi.mock('./historyUtils', () => ({
+vi.mock('./time/historyUtils', () => ({
     formatHistoryToScript: vi.fn(() => '<剧本>'),
 }));
 
