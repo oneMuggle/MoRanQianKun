@@ -373,7 +373,7 @@ export const 构建NPC上下文 = (
             初夜描述: typeof npc?.初夜描述 === 'string' ? npc.初夜描述 : undefined,
             亲密度等级: typeof npc?.亲密度等级 === 'number' ? npc.亲密度等级 : undefined,
             里象心法: npc?.里象心法 ? 清理空字段({ ...npc.里象心法 }) : undefined,
-            当前服装状态: npc?.当前服装状态 ? 清理空字段({ ...npc.当前服装状态 }) : undefined,
+            服饰档案: npc?.服饰档案 ? 清理空字段({ ...npc.服饰档案 }) : undefined,
             NSFW行为特征: npc?.NSFW行为特征 ? 清理空字段({ ...npc.NSFW行为特征 }) : undefined
         });
     };

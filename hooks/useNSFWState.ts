@@ -61,20 +61,12 @@ function 计算风险等级(修饰?: 场景修饰系数 | null): { level: number
   return { level: 1, text: '安全', color: 'text-green-400' };
 }
 
-function 获取服装文本(服装层次?: 服装层次结构, 当前服装?: NPC结构['当前服装状态']): string | null {
+function 获取服装文本(服装层次?: 服装层次结构): string | null {
   if (服装层次?.层次.length) {
     const 损坏 = 服装层次.层次.filter(l => l.损坏程度 !== '完好');
     if (损坏.length) return `服装异常：${损坏.map(d => `${d.名称}(${d.损坏程度})`).join('、')}`;
     const 污渍数 = 服装层次.层次.filter(l => l.污渍).length;
     if (污渍数) return `${污渍数}件衣物有污渍`;
-  }
-  if (当前服装) {
-    const 异常: string[] = [];
-    if (当前服装.上衣状态 === '半敞') 异常.push('上衣半敞');
-    if (当前服装.下装状态 === '半敞') 异常.push('下装半敞');
-    if (当前服装.内衣状态 !== '穿着') 异常.push('内衣异常');
-    if (当前服装.内裤状态 !== '穿着') 异常.push('内裤异常');
-    return 异常.length ? 异常.join('、') : null;
   }
   return null;
 }
@@ -150,7 +142,7 @@ export function useNSFWVisualState(
     }
 
     const 风险等级 = 计算风险等级(场景修饰);
-    const 服装状态文本 = 获取服装文本(服装层次, npc.当前服装状态);
+    const 服装状态文本 = 获取服装文本(服装层次);
     const 心理状态摘要 = 获取心理摘要(心理状态 ?? undefined);
     const 事后情绪摘要 = 获取事后摘要(护理);
     const 孕产阶段文本 = 获取孕产文本(孕产);

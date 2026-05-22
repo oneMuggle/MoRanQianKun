@@ -897,14 +897,12 @@ const SocialModal: React.FC<Props> = ({
                                                                                         const 数据 = currentNPC.服饰档案?.[部位];
                                                                                         if (!数据) return null;
 
-                                                                                        // 获取服装状态
-                                                                                        const 服装状态 = currentNPC.当前服装状态;
-                                                                                        let 状态值: string | undefined;
-                                                                                        if (部位 === '上衣') 状态值 = 服装状态?.上衣状态;
-                                                                                        else if (部位 === '下着') 状态值 = 服装状态?.下装状态;
-                                                                                        else if (部位 === '内衣') 状态值 = 服装状态?.内衣状态;
-                                                                                        else if (部位 === '内裤') 状态值 = 服装状态?.内裤状态;
-                                                                                        else if (部位 === '袜子') 状态值 = 服装状态?.袜饰状态;
+                                                                                        // 从服装层次获取状态
+                                                                                        const 层次 = currentNPC.完整演化状态?.服装层次?.层次;
+                                                                                        const 层次条目 = 层次?.find(e => e.部位 === 部位 && e.损坏程度 !== '移除');
+                                                                                        const 损坏程度 = 层次条目?.损坏程度;
+                                                                                        const 状态映射: Record<string, string> = { '完好': '穿着', '褶皱': '半敞', '凌乱': '半敞', '破损': '半敞', '撕裂': '半敞' };
+                                                                                        const 状态值 = 损坏程度 ? 状态映射[损坏程度] : undefined;
 
                                                                                         // 状态对应的视觉样式
                                                                                         const 状态样式: Record<string, { color: string; icon: string }> = {
@@ -1033,7 +1031,7 @@ const SocialModal: React.FC<Props> = ({
                                                     )}
 
                                                     {/* 服装状态面板 */}
-                                                    {currentNPC && (currentNPC.完整演化状态?.服装层次 || currentNPC.当前服装状态) && (
+                                                    {currentNPC && currentNPC.完整演化状态?.服装层次 && (
                                                         <div className="mb-4">
                                                             <ClothingStatePanel npc={currentNPC} />
                                                         </div>

@@ -1,6 +1,8 @@
 import type { TavernCommand } from '../../types';
 import { applyStateCommand, normalizeStateCommandKey } from '../../utils/stateHelpers';
 import { 同步剧情小说分解时间校准 } from '../../services/novel-decomposition/novelDecompositionCalibration';
+import type { NPC结构 } from '../../models/social';
+import { 同步服饰档案到层次 } from '../../models/npcNSFWEnhancement/clothingLayers';
 
 export type 运行时变量分区类型 =
     | '角色'
@@ -174,6 +176,13 @@ export const 创建运行时变量工作流 = (deps: 运行时变量工作流依
             }
             case '社交': {
                 const nextValue = deps.规范化社交列表(Array.isArray(value) ? value : [], { 合并同名: false });
+                // 全量更新社交列表时，同步所有有服饰档案的 NPC 服装层次
+                const 环境时间 = deps.环境时间转标准串(当前状态.环境) || '';
+                for (const npc of nextValue) {
+                    if (npc && (npc as NPC结构).服饰档案) {
+                        同步服饰档案到层次(npc as NPC结构, 环境时间);
+                    }
+                }
                 deps.设置社交(nextValue);
                 void deps.performAutoSave({ social: nextValue, history: 历史记录, force: true });
                 return;
@@ -270,6 +279,11 @@ export const 创建运行时变量工作流 = (deps: 运行时变量工作流依
             void deps.performAutoSave({ memory: nextMemory, history: 历史记录, force: true });
             return;
         }
+
+        // 检测是否为服饰相关命令，记录受影响的 NPC 索引
+        const 服饰命令匹配 = normalizedKey.match(/社交\[(\d+)\]\.服饰档案/i);
+        const 受影响的NPC索引 = 服饰命令匹配 ? parseInt(服饰命令匹配[1], 10) : -1;
+
         const result = applyStateCommand(
             当前状态.角色,
             当前状态.环境,
@@ -284,10 +298,21 @@ export const 创建运行时变量工作流 = (deps: 运行时变量工作流依
             当前状态.玩家门派,
             当前状态.任务列表,
             当前状态.约定列表,
+            {} as any, // 校园系统
             command.key,
             command.value,
             command.action
         );
+
+        // 服饰命令应用后，同步到服装层次系统
+        if (受影响的NPC索引 >= 0 && Array.isArray(result.social)) {
+            const 环境时间 = deps.环境时间转标准串(result.env || 当前状态.环境) || '';
+            const 受影响NPC = result.social[受影响的NPC索引] as NPC结构 | undefined;
+            if (受影响NPC && 受影响NPC.服饰档案) {
+                同步服饰档案到层次(受影响NPC, 环境时间);
+            }
+        }
+
         const nextChar = deps.规范化角色物品容器映射(result.char);
         const nextEnv = deps.规范化环境信息(result.env);
         const nextSocial = deps.规范化社交列表(result.social, { 合并同名: false });

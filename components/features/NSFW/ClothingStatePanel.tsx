@@ -28,16 +28,15 @@ function 获取损坏进度(程度: string): number {
 export function ClothingStatePanel({ npc, compact }: ClothingStatePanelProps) {
   const 演化 = npc.完整演化状态;
   const 服装层次 = 演化?.服装层次 as 服装层次结构 | undefined;
-  const 当前服装 = npc.当前服装状态;
 
-  if (!服装层次?.层次.length && !当前服装) {
+  if (!服装层次?.层次.length) {
     return null;
   }
 
   return (
     <div className={`space-y-1 ${compact ? 'text-xs' : 'text-sm'}`}>
       <div className="text-gray-400 font-medium mb-2">服装状态</div>
-      {服装层次?.层次.map((layer, i) => (
+      {服装层次.层次.map((layer, i) => (
         <div key={i} className="flex items-center justify-between py-1 border-b border-gray-800">
           <span className="text-gray-300">{layer.名称}</span>
           <div className="flex items-center gap-2">
@@ -48,42 +47,6 @@ export function ClothingStatePanel({ npc, compact }: ClothingStatePanelProps) {
           </div>
         </div>
       ))}
-      {当前服装 && !服装层次?.层次.length && (
-        <>
-          {当前服装.上衣状态 && 当前服装.上衣状态 !== '穿着' && (
-            <div className="flex justify-between py-1">
-              <span className="text-gray-400">上衣</span>
-              <span className={当前服装.上衣状态 === '移除' ? 'text-red-400' : 'text-yellow-400'}>
-                {当前服装.上衣状态}
-              </span>
-            </div>
-          )}
-          {当前服装.下装状态 && 当前服装.下装状态 !== '穿着' && (
-            <div className="flex justify-between py-1">
-              <span className="text-gray-400">下装</span>
-              <span className={当前服装.下装状态 === '移除' ? 'text-red-400' : 'text-yellow-400'}>
-                {当前服装.下装状态}
-              </span>
-            </div>
-          )}
-          {当前服装.内衣状态 && 当前服装.内衣状态 !== '穿着' && (
-            <div className="flex justify-between py-1">
-              <span className="text-gray-400">内衣</span>
-              <span className={当前服装.内衣状态 === '移除' ? 'text-red-400' : 'text-orange-400'}>
-                {当前服装.内衣状态}
-              </span>
-            </div>
-          )}
-          {当前服装.内裤状态 && 当前服装.内裤状态 !== '穿着' && (
-            <div className="flex justify-between py-1">
-              <span className="text-gray-400">内裤</span>
-              <span className={当前服装.内裤状态 === '移除' ? 'text-red-400' : 'text-orange-400'}>
-                {当前服装.内裤状态}
-              </span>
-            </div>
-          )}
-        </>
-      )}
     </div>
   );
 }

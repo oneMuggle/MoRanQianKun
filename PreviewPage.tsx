@@ -4,8 +4,8 @@
  */
 
 import { useState } from 'react';
-import type { NPC结构, 服装状态结构 } from './models/social';
-import type { 敏感点档案 } from './models/npcNSFWEnhancement/types';
+import type { NPC结构 } from './models/social';
+import type { 完整演化状态, 敏感点档案 } from './models/npcNSFWEnhancement/types';
 import { SensitivePointMeridianMap } from './components/features/Social/SensitivePointMeridianMap';
 import { ClothingLayerMap } from './components/features/Social/ClothingLayerMap';
 
@@ -33,13 +33,24 @@ const mockNPC: NPC结构 = {
     内衣: { 名称: '鸳鸯肚兜', 描述: '红色鸳鸯戏水肚兜' },
     配饰: { 名称: '玉佩', 描述: '温润的翡翠玉佩' },
   },
-  当前服装状态: {
-    上衣状态: '半敞',
-    下装状态: '穿着',
-    内衣状态: '褪下',
-    内裤状态: '穿着',
-    袜饰状态: '穿着',
-  } as 服装状态结构,
+  完整演化状态: {
+    服装层次: {
+      层次: [
+        { 部位: '外套', 名称: '月白披风', 损坏程度: '完好', 污渍: false, 移除顺序: 1 },
+        { 部位: '上衣', 名称: '水绿襦裙', 损坏程度: '褶皱', 污渍: false, 移除顺序: 3 },
+        { 部位: '下着', 名称: '留仙百褶裙', 损坏程度: '完好', 污渍: false, 移除顺序: 4 },
+        { 部位: '袜子', 名称: '云纹罗袜', 损坏程度: '完好', 污渍: false, 移除顺序: 5 },
+        { 部位: '鞋子', 名称: '绣鞋', 损坏程度: '完好', 污渍: false, 移除顺序: 2 },
+        { 部位: '内衣', 名称: '鸳鸯肚兜', 损坏程度: '凌乱', 污渍: false, 移除顺序: 6 },
+        { 部位: '配饰', 名称: '玉佩', 损坏程度: '完好', 污渍: false, 移除顺序: 2 },
+      ],
+      变更日志: [],
+      最后变更时间: '',
+    },
+    演化日志: [],
+    事件计数器: { NSFW互动次数: 0 },
+    最后演化时间: '',
+  } as 完整演化状态,
   敏感点档案: {
     主要敏感点: [
       { 区域: '头颈区', 名称: '耳垂', 敏感度: 5, 时代名称: '耳珠', 反应描述: '被轻咬或轻吹时全身微颤，呼吸节奏被打乱', 发现状态: '已开发', 描写提示词: '耳尖泛红,轻颤,呼吸急促', 开发程度: '深度开发' },
