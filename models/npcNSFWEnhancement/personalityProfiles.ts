@@ -358,16 +358,25 @@ export function 匹配人格档案(
 ): 表里人格档案 | null {
   if (!npc核心性格 && !npc身份) return null;
 
-  const 搜索文本 = `${npc核心性格 || ''} ${npc身份 || ''}`;
+  const 搜索文本 = `${npc核心性格 || ''} ${npc身份 || ''}`.toLowerCase();
   const 人格库 = eraId ? 获取对应人格库(eraId) : Object.values(全部人格档案).flat();
 
+  // 优先：精确匹配人格名称
   for (const 人格 of 人格库) {
-    const 标签匹配 = 人格.身份标签.some(tag => 搜索文本.includes(tag));
-    if (标签匹配) return 人格;
-    if (搜索文本.includes(人格.名称)) return 人格;
+    if (搜索文本.includes(人格.名称.toLowerCase())) return 人格;
   }
 
-  return 人格库.length > 0 ? 人格库[0] : null;
+  // 次优先：双向标签匹配（标签出现在搜索文本中，或搜索文本出现在标签中）
+  for (const 人格 of 人格库) {
+    const 标签匹配 = 人格.身份标签.some(tag => {
+      const tagLower = tag.toLowerCase();
+      return 搜索文本.includes(tagLower) || tagLower.includes(搜索文本);
+    });
+    if (标签匹配) return 人格;
+  }
+
+  // 不匹配时返回null，而非fallback到第一个
+  return null;
 }
 
 function 获取对应人格库(eraId: string): 表里人格档案[] {

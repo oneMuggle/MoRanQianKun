@@ -1111,6 +1111,132 @@ const MobileSocial: React.FC<Props> = ({
                                                 );
                                             })()}
 
+                                            {/* 表里人格档案 */}
+                                            {currentNPC.人格档案 && (() => {
+                                                const 人格 = currentNPC.人格档案;
+                                                const 当前人格 = currentNPC.当前人格状态 || '表';
+                                                const 人格演化 = 演化数据?.人格演化;
+                                                const 最终表 = 人格演化?.当前表人格 || 人格.表;
+                                                const 最终里 = 人格演化?.当前里人格 || 人格.里;
+                                                const 翻转数 = 人格演化?.人格翻转历史?.length || 0;
+                                                return (
+                                                    <div className="bg-gradient-to-br from-purple-950/10 to-black/60 border border-purple-900/30 rounded-lg p-3.5 mb-4 relative overflow-hidden group">
+                                                        <div className="absolute -top-6 -right-6 w-20 h-20 bg-purple-600/5 rounded-full filter blur-xl pointer-events-none"></div>
+                                                        <div className="flex items-center justify-between mb-2.5 relative z-10">
+                                                            <h5 className="text-[11px] text-purple-400/90 font-bold uppercase tracking-[0.2em] flex items-center gap-1.5">
+                                                                <span className="w-1 h-3 bg-purple-500/70 rounded-full"></span>
+                                                                表里人格
+                                                            </h5>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`text-[9px] px-1.5 py-0.5 rounded border font-mono tracking-wider ${当前人格 === '里' ? 'border-purple-500/50 text-purple-300 bg-purple-500/10' : 当前人格 === '半觉醒' ? 'border-yellow-500/50 text-yellow-300 bg-yellow-500/10' : 'border-gray-700 text-gray-400 bg-black/40'}`}>
+                                                                    {当前人格 === '里' ? '里' : 当前人格 === '半觉醒' ? '半觉醒' : '表'}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => set演化面板展开(演化面板展开 === 'persona' ? null : 'persona')}
+                                                                    className="text-[9px] text-purple-400/60 active:text-purple-400"
+                                                                >
+                                                                    {演化面板展开 === 'persona' ? '收起' : '展开'}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 紧凑卡片 */}
+                                                        <div className="grid grid-cols-2 gap-2 relative z-10">
+                                                            <div className="bg-black/40 border border-purple-900/20 rounded p-2">
+                                                                <div className="text-[8px] text-gray-500 uppercase tracking-widest mb-1">表 · {人格.名称}</div>
+                                                                <div className="text-[10px] text-gray-300 leading-relaxed line-clamp-2">{最终表.性格描述}</div>
+                                                            </div>
+                                                            <div className="bg-black/40 border border-purple-900/20 rounded p-2">
+                                                                <div className="text-[8px] text-gray-500 uppercase tracking-widest mb-1">里 · 暗面</div>
+                                                                <div className="text-[10px] text-gray-300 leading-relaxed line-clamp-2">{最终里.性格描述}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 展开详情 */}
+                                                        {演化面板展开 === 'persona' && (
+                                                            <div className="mt-3 pt-3 border-t border-purple-900/20 space-y-3 relative z-10 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                                                                <div>
+                                                                    <div className="text-[9px] text-purple-400/70 font-semibold mb-1">表人格</div>
+                                                                    <div className="bg-black/30 rounded p-2 space-y-1 text-[9px]">
+                                                                        <div><span className="text-gray-500">性格:</span> <span className="text-gray-300">{最终表.性格描述}</span></div>
+                                                                        <div><span className="text-gray-500">行为:</span> <span className="text-gray-300">{最终表.行为特征.join('、')}</span></div>
+                                                                        <div><span className="text-gray-500">对话:</span> <span className="text-gray-300">{最终表.对话风格}</span></div>
+                                                                        <div><span className="text-gray-500">服饰:</span> <span className="text-gray-300">{最终表.服饰偏好}</span></div>
+                                                                        <div><span className="text-gray-500">面具:</span> <span className="text-gray-300">{最终表.社交面具}</span></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-[9px] text-purple-400/70 font-semibold mb-1">里人格</div>
+                                                                    <div className="bg-black/30 rounded p-2 space-y-1 text-[9px]">
+                                                                        <div><span className="text-gray-500">性格:</span> <span className="text-gray-300">{最终里.性格描述}</span></div>
+                                                                        <div><span className="text-gray-500">行为:</span> <span className="text-gray-300">{最终里.行为特征.join('、')}</span></div>
+                                                                        <div><span className="text-gray-500">对话:</span> <span className="text-gray-300">{最终里.对话风格}</span></div>
+                                                                        {最终里.欲望驱动 && 最终里.欲望驱动.length > 0 && (
+                                                                            <div><span className="text-gray-500">欲望:</span> <span className="text-gray-300">{最终里.欲望驱动.join('、')}</span></div>
+                                                                        )}
+                                                                        {最终里.反差触发器 && (
+                                                                            <div><span className="text-gray-500">触发器:</span> <span className="text-purple-300/70">{最终里.反差触发器}</span></div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                {人格.关联偏好 && 人格.关联偏好.length > 0 && (
+                                                                    <div>
+                                                                        <div className="text-[9px] text-purple-400/70 font-semibold mb-1">关联偏好</div>
+                                                                        <div className="space-y-1">
+                                                                            {人格.关联偏好.map((pref, idx) => (
+                                                                                <div key={idx} className="bg-black/30 rounded p-1.5 flex items-center justify-between text-[9px]">
+                                                                                    <div><span className="text-purple-300/80">{pref.类别}</span><span className="text-gray-500 ml-1">· {pref.子类型}</span></div>
+                                                                                    <span className="text-yellow-500/80">{'★'.repeat(pref.强度)}{'☆'.repeat(5 - pref.强度)}</span>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {人格.关联敏感点 && 人格.关联敏感点.length > 0 && (
+                                                                    <div>
+                                                                        <div className="text-[9px] text-purple-400/70 font-semibold mb-1">关联敏感点</div>
+                                                                        <div className="space-y-1">
+                                                                            {人格.关联敏感点.map((pt, idx) => (
+                                                                                <div key={idx} className="bg-black/30 rounded p-1.5 text-[9px]">
+                                                                                    <div className="flex items-center justify-between">
+                                                                                        <span className="text-pink-400/70">{pt.区域} · {pt.名称}</span>
+                                                                                        <span className="text-yellow-500/80">{'★'.repeat(pt.敏感度)}{'☆'.repeat(5 - pt.敏感度)}</span>
+                                                                                    </div>
+                                                                                    <div className="text-gray-500 mt-0.5">{pt.反应描述}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {人格.推荐场景 && 人格.推荐场景.length > 0 && (
+                                                                    <div>
+                                                                        <div className="text-[9px] text-purple-400/70 font-semibold mb-1">推荐场景</div>
+                                                                        <div className="flex flex-wrap gap-1">
+                                                                            {人格.推荐场景.map((scene, idx) => (
+                                                                                <span key={idx} className="text-[8px] bg-purple-950/30 border border-purple-900/30 text-purple-300/70 px-1 py-0.5 rounded">{scene}</span>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {翻转数 > 0 && 人格演化?.人格翻转历史 && (
+                                                                    <div>
+                                                                        <div className="text-[9px] text-purple-400/70 font-semibold mb-1">翻转历史</div>
+                                                                        <div className="space-y-1">
+                                                                            {人格演化.人格翻转历史.slice(-3).reverse().map((log, idx) => (
+                                                                                <div key={idx} className="bg-black/30 rounded p-1.5 text-[9px]">
+                                                                                    <div className="text-gray-500 font-mono">{log.时间}</div>
+                                                                                    <div className="text-purple-300/80 font-semibold">[{log.翻转类型}] {log.触发事件}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+
                                             {/* Womb & Pregnancy Records */}
                                             <div className="bg-gradient-to-br from-pink-950/20 to-black/80 border border-pink-900/30 rounded-lg p-3.5 relative overflow-hidden group">
                                                 <div className="absolute -top-6 -right-6 w-20 h-20 bg-pink-600/5 rounded-full filter blur-xl pointer-events-none"></div>
