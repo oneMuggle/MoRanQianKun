@@ -201,7 +201,10 @@ export const 执行响应命令处理 = (
                                         解锁场景: [],
                                     };
                                 }
-                                if (变化.好感度 !== undefined) npc.关系数据.好感度 = Math.max(0, Math.min(100, npc.关系数据.好感度 + 变化.好感度));
+                                if (变化.好感度 !== undefined) {
+                                    npc.关系数据.好感度 = Math.max(0, Math.min(100, npc.关系数据.好感度 + 变化.好感度));
+                                    npc.好感度 = npc.关系数据.好感度;
+                                }
                                 if (变化.亲密度 !== undefined) npc.关系数据.亲密度 = Math.max(0, Math.min(100, npc.关系数据.亲密度 + 变化.亲密度));
                                 if (变化.信任度 !== undefined) npc.关系数据.信任度 = Math.max(0, Math.min(100, npc.关系数据.信任度 + 变化.信任度));
                                 if (变化.感情值 !== undefined) npc.关系数据.感情值 = Math.max(0, Math.min(100, npc.关系数据.感情值 + 变化.感情值));

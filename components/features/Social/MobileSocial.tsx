@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NPC结构, 服饰部位分类, 道具部位分类 } from '../../../models/social';
+import { 计算亲密度等级 } from '../../../models/intimacy';
 import type { 香闺秘档部位类型 } from '../../../models/imageGeneration';
 import type { 关系网络数据 } from '../../../models/relationship';
 import { 构建NPC记忆展示结果 } from '../../../hooks/useGame/memory/npcMemorySummary';
@@ -232,7 +233,7 @@ const MobileSocial: React.FC<Props> = ({
         if (!currentNPC || !nsfwEnabled) return null;
         const 演化 = currentNPC.完整演化状态;
         const bars: Array<{ label: string; value: number; max: number; color: string; tooltip?: string }> = [];
-        bars.push({ label: '亲密度', value: currentNPC.亲密度等级 ?? 0, max: 100, color: 'from-pink-500 to-rose-500' });
+        bars.push({ label: '亲密度', value: 计算亲密度等级(currentNPC.好感度 ?? 0), max: 100, color: 'from-pink-500 to-rose-500' });
         if (演化?.心理防线) {
             const 防线 = 演化.心理防线;
             bars.push({
@@ -924,11 +925,11 @@ const MobileSocial: React.FC<Props> = ({
                                                         <div className="text-violet-400 font-serif font-bold text-xs tracking-widest">NSFW 状态</div>
                                                         <IntimacyMeter
                                                             stage={(() => {
-                                                                const v = currentNPC.亲密度等级 ?? 0;
+                                                                const v = 计算亲密度等级(currentNPC.好感度 ?? 0);
                                                                 const s = ['陌生人', '初识', '泛泛之交', '朋友', '暧昧', '恋人', '亲密', '挚爱', '灵魂伴侣', '血脉相连', '极致羁绊'] as const;
                                                                 return s[Math.min(Math.floor(v / 10), s.length - 1)];
                                                             })()}
-                                                            value={currentNPC.亲密度等级 ?? 0}
+                                                            value={计算亲密度等级(currentNPC.好感度 ?? 0)}
                                                             size="sm"
                                                         />
                                                     </div>
