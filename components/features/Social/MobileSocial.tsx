@@ -1362,26 +1362,50 @@ const MobileSocial: React.FC<Props> = ({
                                                             })()}
                                                         </div>
 
-                                                        {演化面板展开 === 'defense' && 演化数据?.心理防线 && (
-                                                            <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10 max-h-40 overflow-y-auto">
-                                                                <div className="flex items-center justify-between">
-                                                                    <span className="text-[9px] text-violet-400/70">心理防线详情</span>
-                                                                    <button onClick={() => set演化面板展开(null)} className="text-[9px] text-gray-500 active:text-gray-300">收起</button>
-                                                                </div>
-                                                                {(演化数据.心理防线.变化日志 || []).slice(-5).reverse().map((log, idx) => (
-                                                                    <div key={idx} className="bg-black/30 rounded p-2 text-[9px]">
-                                                                        <div className="text-gray-500 font-mono mb-0.5">{log.时间}</div>
-                                                                        <div className="text-violet-200/80">
-                                                                            <span className={获取防线颜色(log.旧等级)}>{log.旧等级}</span>
-                                                                            {' → '}
-                                                                            <span className={获取防线颜色(log.新等级)}>{log.新等级}</span>
-                                                                            {' '}({log.旧防线值}→{Math.round(log.新防线值)})
-                                                                        </div>
-                                                                        <div className="text-gray-600 mt-0.5">{log.触发原因}</div>
+                                                        {演化面板展开 === 'defense' && 演化数据?.心理防线 && (() => {
+                                                            const 防线 = 演化数据.心理防线;
+                                                            return (
+                                                                <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10 max-h-40 overflow-y-auto">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="text-[9px] text-violet-400/70">心理防线详情</span>
+                                                                        <button onClick={() => set演化面板展开(null)} className="text-[9px] text-gray-500 active:text-gray-300">收起</button>
                                                                     </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
+                                                                    <div className="bg-black/30 rounded p-2 space-y-1">
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-[9px] text-gray-500">当前等级</span>
+                                                                            <span className={`text-[10px] font-serif ${获取防线颜色(防线.当前等级)}`}>{防线.当前等级}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-[9px] text-gray-500">防线值</span>
+                                                                            <span className="text-[10px] text-gray-300">{Math.round(防线.防线值)} / 100</span>
+                                                                        </div>
+                                                                        <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                                                            <div className={`h-full rounded-full ${获取防线进度条颜色(防线.防线值)}`} style={{ width: `${Math.max(0, Math.min(100, 防线.防线值))}%` }}></div>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-[9px] text-gray-500">历史最低</span>
+                                                                            <span className="text-[10px] text-gray-400">{Math.round(防线.历史最低值)}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-[9px] text-gray-500">恢复速率</span>
+                                                                            <span className="text-[10px] text-gray-400">{防线.恢复速率}/回合</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    {(演化数据.心理防线.变化日志 || []).slice(-5).reverse().map((log, idx) => (
+                                                                        <div key={idx} className="bg-black/30 rounded p-2 text-[9px]">
+                                                                            <div className="text-gray-500 font-mono mb-0.5">{log.时间}</div>
+                                                                            <div className="text-violet-200/80">
+                                                                                <span className={获取防线颜色(log.旧等级)}>{log.旧等级}</span>
+                                                                                {' → '}
+                                                                                <span className={获取防线颜色(log.新等级)}>{log.新等级}</span>
+                                                                                {' '}({log.旧防线值}→{Math.round(log.新防线值)})
+                                                                            </div>
+                                                                            <div className="text-gray-600 mt-0.5">{log.触发原因}</div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            );
+                                                        })()}
 
                                                         {演化面板展开 === 'drift' && 演化数据?.偏好漂移 && (
                                                             <div className="mt-3 pt-3 border-t border-violet-900/20 space-y-2 relative z-10 max-h-40 overflow-y-auto">
