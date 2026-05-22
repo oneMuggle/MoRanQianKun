@@ -155,6 +155,51 @@ export {
   安全词示例,
 };
 
+// ==================== Phase 4: 玩法增强导出 ====================
+
+export type {
+  天气状况,
+  户外活动上下文,
+  活动创建结果,
+  同伴互动结果,
+  运动强度结果,
+} from '../../hooks/useGame/outdoorNSFWEngine';
+
+export {
+  创建户外活动,
+  计算运动强度,
+  计算户外暴露风险,
+  同伴互动,
+} from '../../hooks/useGame/outdoorNSFWEngine';
+
+export type {
+  运动伤害类型,
+  伤害联动结果,
+  户外泄露结果,
+  社交媒体传播结果,
+} from './outdoorConsequences';
+
+export {
+  计算运动伤害,
+  户外泄露判定,
+  社交媒体传播模拟,
+} from './outdoorConsequences';
+
+export type {
+  运动场景,
+  运动装备,
+  场景互动结果,
+  装备应用结果,
+} from './sportScenarios';
+
+export {
+  获取运动场景,
+  获取可用场景,
+  执行场景互动,
+  应用装备,
+  获取可用装备,
+} from './sportScenarios';
+
 // ==================== 场景定义 ====================
 export interface 场景定义 {
   场景名称: string;

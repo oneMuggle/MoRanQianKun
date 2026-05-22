@@ -388,6 +388,9 @@ export interface 完整演化状态 {
   服装层次?: 服装层次结构;
   后果系统?: import('./consequences/types').后果系统状态;
   跨模块联动?: import('./linker/types').跨模块联动状态;
+  性癖发现?: import('./discovery/fetishDiscovery').性癖发现状态;
+  敏感点探索?: import('./discovery/sensitivePointDiscovery').敏感点探索状态;
+  人格演化触发?: import('./discovery/personalityTrigger').人格演化触发状态;
 }
 
 // ==================== 扩展 NPCNSFW画像 ====================

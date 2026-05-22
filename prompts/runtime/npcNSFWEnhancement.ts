@@ -8,6 +8,9 @@ import { 生成NSFW画像, 应启用增强档案 } from '../../models/npcNSFWEnh
 import { 生成触发事件列表 } from '../../models/npcNSFWEnhancement/eventMapping';
 import { 计算场景修饰系数, 生成场景修饰摘要 } from '../../models/npcNSFWEnhancement/sceneModifiers';
 import { 生成服装状态文本, 是否暴露 } from '../../models/npcNSFWEnhancement/clothingLayers';
+import { 生成探索进度摘要 } from '../../models/npcNSFWEnhancement/discovery/fetishDiscovery';
+import { 生成敏感点探索摘要 } from '../../models/npcNSFWEnhancement/discovery/sensitivePointDiscovery';
+import { 生成人格演化摘要 } from '../../models/npcNSFWEnhancement/discovery/personalityTrigger';
 import type { LiModeIntensity } from './eraLiMode';
 
 interface NSFW注入选项 {
@@ -83,6 +86,22 @@ export function 构建NPCNSFW注入(
   if (npc.完整演化状态?.人格演化?.人格翻转历史?.length) {
     const 最近翻转 = npc.完整演化状态.人格演化.人格翻转历史.slice(-1)[0];
     组件.push(`人格演化：曾发生"${最近翻转.翻转类型}"（${最近翻转.时间}），人格特质已发生变化。`);
+  }
+
+  // --- 新增：探索进度 ---
+  const 性癖探索摘要 = 生成探索进度摘要(npc);
+  if (性癖探索摘要 !== '尚未开始性癖探索') {
+    组件.push(`性癖探索：${性癖探索摘要}`);
+  }
+
+  const 敏感点探索摘要 = 生成敏感点探索摘要(npc);
+  if (敏感点探索摘要 !== '尚未开始敏感点探索') {
+    组件.push(`敏感点探索：${敏感点探索摘要}`);
+  }
+
+  const 人格演化摘要 = 生成人格演化摘要(npc);
+  if (人格演化摘要 !== '人格尚未发生演化') {
+    组件.push(人格演化摘要);
   }
 
   // --- 新增：孕产状态 ---

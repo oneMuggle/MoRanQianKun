@@ -13,6 +13,44 @@ export type {
 
 export { 默认写真玩法配置 } from './types';
 
+// ==================== Phase 3: 玩法增强 ====================
+
+export type {
+  回合决策, 情绪调节方式, 拍摄技巧,
+  回合结果, 技巧解锁状态,
+} from './shootDecisionSystem';
+
+export {
+  拍摄回合决策,
+  模特情绪管理,
+  信任度博弈评估,
+  拍摄技巧解锁,
+  计算回合收益,
+} from './shootDecisionSystem';
+
+export type {
+  后期风格, 修图决策,
+  作品评级结果, 后期处理结果,
+} from './postProcessing';
+
+export {
+  选择后期风格,
+  修图决策 as 执行修图决策,
+  作品评级,
+  执行后期处理,
+} from './postProcessing';
+
+export type {
+  应急响应,
+  泄露检测结果, 应急响应结果,
+} from './leakResponse';
+
+export {
+  泄露检测,
+  执行应急响应,
+  泄露后果最小化,
+} from './leakResponse';
+
 export type {
   模特核心状态, 摄影师核心状态,
   拍摄项目状态, 泄露事件状态,

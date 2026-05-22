@@ -39,9 +39,37 @@ export {
 
 // --- 新增子系统导出 ---
 export {
+  初始化性癖发现, 试探交互, 深度探索, 设置探索策略,
+  生成探索进度摘要, 获取可探索性癖列表,
+  性癖解锁树,
+} from './discovery/fetishDiscovery';
+export type {
+  试探类型, 探索策略, 发现结果类型, 发现结果,
+  试探上下文, 性癖解锁节点, 性癖发现状态, 探索历史日志,
+} from './discovery/fetishDiscovery';
+
+export {
+  初始化敏感点探索, 探索敏感点, 组合技巧,
+  获取已发现技巧, 生成敏感点探索摘要,
+} from './discovery/sensitivePointDiscovery';
+export type {
+  探索方式, 探索反馈, 敏感点技巧, 探索结果,
+  敏感点探索状态, 敏感点探索日志,
+} from './discovery/sensitivePointDiscovery';
+
+export {
   初始化心理防线, 更新心理防线, 应用防线恢复,
   检查人格翻转, 执行人格翻转, 防线值到等级, 等级到防线值范围,
 } from './personalityEvolution';
+
+export {
+  初始化人格触发, 检查触发条件, 触发表里人格切换,
+  获取欲望觉醒进度, 获取人格演化路径, 生成人格演化摘要,
+} from './discovery/personalityTrigger';
+export type {
+  触发目标, 触发条件配置, 人格演化步骤,
+  人格演化触发状态,
+} from './discovery/personalityTrigger';
 
 export {
   初始化偏好漂移, 记录漂移事件, 计算偏好漂移,
