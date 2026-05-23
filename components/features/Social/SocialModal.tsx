@@ -16,6 +16,9 @@ import { NSFWStatusBar } from '../NSFW/NSFWStatusBar';
 import { ClothingStatePanel } from '../NSFW/ClothingStatePanel';
 import { IntimacyMeter } from '../NSFW/IntimacyMeter';
 import { RiskWarning } from '../NSFW/RiskWarning';
+import { EmotionPanel } from '../NSFW/EmotionPanel';
+import { BondTree } from '../NSFW/BondTree';
+import { SocialNetworkView } from '../NSFW/SocialNetworkView';
 
 interface Props {
     socialList: NPC结构[];
@@ -1034,6 +1037,39 @@ const SocialModal: React.FC<Props> = ({
                                                     {currentNPC && currentNPC.完整演化状态?.服装层次 && (
                                                         <div className="mb-4">
                                                             <ClothingStatePanel npc={currentNPC} />
+                                                        </div>
+                                                    )}
+
+                                                    {/* 情绪面板 */}
+                                                    {currentNPC && (currentNPC as any).NSFW扩展?.情绪状态 && (
+                                                        <div className="mb-4 bg-black/40 border border-blue-900/30 rounded-lg p-4">
+                                                            <h4 className="text-blue-400 font-serif font-bold text-sm tracking-widest flex items-center gap-2 mb-3">
+                                                                <span className="w-1.5 h-3 bg-blue-500/70 rounded-full"></span>
+                                                                情绪状态
+                                                            </h4>
+                                                            <EmotionPanel 情绪={(currentNPC as any).NSFW扩展.情绪状态} size="sm" />
+                                                        </div>
+                                                    )}
+
+                                                    {/* 羁绊树 */}
+                                                    {currentNPC && (currentNPC as any).NSFW扩展?.羁绊树 && (
+                                                        <div className="mb-4 bg-black/40 border border-pink-900/30 rounded-lg p-4">
+                                                            <h4 className="text-pink-400 font-serif font-bold text-sm tracking-widest flex items-center gap-2 mb-3">
+                                                                <span className="w-1.5 h-3 bg-pink-500/70 rounded-full"></span>
+                                                                情感羁绊
+                                                            </h4>
+                                                            <BondTree 羁绊树={(currentNPC as any).NSFW扩展.羁绊树} size="sm" />
+                                                        </div>
+                                                    )}
+
+                                                    {/* 社交网络 */}
+                                                    {currentNPC && (currentNPC as any).NSFW扩展?.社交网络 && (
+                                                        <div className="mb-4 bg-black/40 border border-green-900/30 rounded-lg p-4">
+                                                            <h4 className="text-green-400 font-serif font-bold text-sm tracking-widest flex items-center gap-2 mb-3">
+                                                                <span className="w-1.5 h-3 bg-green-500/70 rounded-full"></span>
+                                                                社交网络
+                                                            </h4>
+                                                            <SocialNetworkView 社交网络={(currentNPC as any).NSFW扩展.社交网络} size="sm" />
                                                         </div>
                                                     )}
 

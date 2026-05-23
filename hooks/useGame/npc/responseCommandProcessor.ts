@@ -19,8 +19,13 @@ import type { 性癖触发事件 } from '../../../models/npcNSFWEnhancement/even
 import { 记录性癖触发事件, 批量应用性癖衰减 } from '../../../models/npcNSFWEnhancement/evolutionEngine';
 import { 推进妊娠进程 } from '../../../models/npcNSFWEnhancement/pregnancyEngine';
 import { 评估护理质量, 记录事后情绪 } from '../../../models/npcNSFWEnhancement/aftercareSystem';
+import { 创建初始情绪, 计算下一回合情绪, 计算心情阶段 } from '../../../models/npcNSFWEnhancement/emotionSystem';
+import { 创建初始羁绊树, 达成里程碑 } from '../../../models/npcNSFWEnhancement/bondTree';
+import { 添加NSFW记忆, 创建初始记忆库 } from '../../../models/npcNSFWEnhancement/nsfwMemory';
+import { 添加后果, 创建初始后果系统 } from '../../../models/npcNSFWEnhancement/unifiedConsequences';
 
 const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 export type 响应命令处理状态 = {
     角色: 角色数据结构;
@@ -347,6 +352,148 @@ export const 执行响应命令处理 = (
                   }
                   socialBuffer = [...socialBuffer];
                   socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <情绪变化> XML 标签，应用情绪状态更新
+            const 情绪变化匹配 = rawContent.match(/<情绪变化>\s*([\s\S]*?)\s*<\/情绪变化>/g);
+            if (情绪变化匹配 && 情绪变化匹配.length > 0) {
+              for (const 匹配项 of 情绪变化匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?情绪变化>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    心情变化: number;
+                    触发类型: '场景' | '对话' | '记忆' | '环境' | 'NSFW互动' | '社交事件';
+                    触发源: string;
+                  };
+                  if (!解析结果.npc姓名) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  const 当前情绪 = (npc as any).NSFW扩展?.情绪状态 || 创建初始情绪(npc.人格类型);
+                  const 新情绪 = 计算下一回合情绪({
+                    当前情绪,
+                    人格标签: npc.人格类型,
+                  });
+                  // 应用AI指定的心情变化
+                  新情绪.心情值 = clamp(新情绪.心情值 + 解析结果.心情变化, 0, 100);
+                  新情绪.心情阶段 = 计算心情阶段(新情绪.心情值);
+                  (npc as any).NSFW扩展 = {
+                    ...(npc as any).NSFW扩展 || {},
+                    情绪状态: 新情绪,
+                  };
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <羁绊进展> XML 标签，应用羁绊里程碑
+            const 羁绊进展匹配 = rawContent.match(/<羁绊进展>\s*([\s\S]*?)\s*<\/羁绊进展>/g);
+            if (羁绊进展匹配 && 羁绊进展匹配.length > 0) {
+              for (const 匹配项 of 羁绊进展匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?羁绊进展>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    里程碑Id: string;
+                    备注?: string;
+                  };
+                  if (!解析结果.npc姓名 || !解析结果.里程碑Id) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  const 当前羁绊树 = npc.NSFW扩展?.羁绊树 || 创建初始羁绊树();
+                  npc.NSFW扩展 = {
+                    ...(npc.NSFW扩展 || {}),
+                    羁绊树: 达成里程碑(当前羁绊树, 解析结果.里程碑Id, 解析结果.备注 || ''),
+                  };
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <NSFW记忆> XML 标签，添加NSFW记忆条目
+            const NSFW记忆匹配 = rawContent.match(/<NSFW记忆>\s*([\s\S]*?)\s*<\/NSFW记忆>/g);
+            if (NSFW记忆匹配 && NSFW记忆匹配.length > 0) {
+              const 游戏时间 = envBuffer?.时间 ?? '';
+              for (const 匹配项 of NSFW记忆匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?NSFW记忆>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    类别: '首次体验' | '突破事件' | '情感高潮' | '特殊场景' | '道具使用' | '角色扮演' | '多人互动' | '事后温馨';
+                    内容: string;
+                    情感极性: '正面' | '负面' | '中性' | '复杂';
+                    触发关键词?: string[];
+                    重要度?: number;
+                  };
+                  if (!解析结果.npc姓名 || !解析结果.类别 || !解析结果.内容) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  const 当前记忆 = (npc as any).NSFW扩展?.NSFW记忆 || 创建初始记忆库();
+                  (npc as any).NSFW扩展 = {
+                    ...(npc as any).NSFW扩展 || {},
+                    NSFW记忆: 添加NSFW记忆(当前记忆, {
+                      类别: 解析结果.类别,
+                      标题: 解析结果.类别,
+                      描述: 解析结果.内容,
+                      发生时间: 游戏时间,
+                      关联NPC: [解析结果.npc姓名],
+                      重要度: 解析结果.重要度 ?? 3,
+                      情感色彩: 解析结果.情感极性,
+                      回忆触发词: 解析结果.触发关键词 || [],
+                    }),
+                  };
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <系统后果> XML 标签，添加系统后果
+            const 系统后果匹配 = rawContent.match(/<系统后果>\s*([\s\S]*?)\s*<\/系统后果>/g);
+            if (系统后果匹配 && 系统后果匹配.length > 0) {
+              for (const 匹配项 of 系统后果匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?系统后果>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    类型: '短期情绪' | '中期关系' | '长期人格' | '声誉影响' | '行为模式';
+                    描述: string;
+                    来源事件?: string;
+                    影响值: number;
+                    持续时间: number;
+                    严重度: '轻微' | '中等' | '严重' | '极端';
+                  };
+                  if (!解析结果.类型 || !解析结果.描述) continue;
+
+                  const 当前后果 = (campusBuffer as any).NSFW后果 || 创建初始后果系统();
+                  (campusBuffer as any).NSFW后果 = 添加后果(当前后果, {
+                    类型: 解析结果.类型,
+                    严重度: 解析结果.严重度,
+                    描述: 解析结果.描述,
+                    来源事件: 解析结果.来源事件 || 'AI叙事触发',
+                    影响值: 解析结果.影响值,
+                    持续时间: 解析结果.持续时间,
+                  });
                 } catch {
                   // JSON 解析失败，忽略本条
                 }

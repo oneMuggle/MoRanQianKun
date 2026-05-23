@@ -7,6 +7,9 @@ import { 计算亲密度等级 } from '../../../models/intimacy';
 import { 构建NPC表里切换注入, 构建里模式阶段注入 } from '../../../prompts/runtime/eraLiMode';
 import type { LiModeStage } from '../../../models/eraTheme/types';
 import { 构建NPCNSFW注入 } from '../../../prompts/runtime/npcNSFWEnhancement';
+import { 获取记忆摘要, 创建初始记忆库 } from '../../../models/npcNSFWEnhancement/nsfwMemory';
+import { 获取主导结局, 创建初始羁绊树 } from '../../../models/npcNSFWEnhancement/bondTree';
+import { 创建初始情绪 } from '../../../models/npcNSFWEnhancement/emotionSystem';
 
 type 生图基础数据选项 = {
     cultivationSystemEnabled?: boolean;
@@ -596,6 +599,46 @@ export const 构建NPC上下文 = (
         const 里模式阶段注入 = 构建里模式阶段注入(eraId, stage, liModeEnabled);
         const nsfwEnabled = options?.启用NSFW模式 ?? false;
         const NSFW增强注入 = 构建NPCNSFW注入(npc, eraId, nsfwEnabled);
+
+        // 新增：NSFW深化系统状态注入
+        const NSFW深化状态 = (() => {
+          if (!nsfwEnabled) return undefined;
+          const 扩展 = (npc as any).NSFW扩展;
+          if (!扩展) return undefined;
+
+          const 组件: string[] = [];
+
+          // 情绪状态
+          const 情绪 = 扩展.情绪状态 || 创建初始情绪(npc.人格类型);
+          组件.push(`【情绪】${情绪.心情阶段}（${情绪.心情值}/100）`);
+
+          // 羁绊状态
+          const 羁绊 = 扩展.羁绊树 || 创建初始羁绊树();
+          const 主导结局 = 获取主导结局(羁绊);
+          组件.push(`【羁绊】值${羁绊.羁绊值}/100，倾向「${主导结局}」，里程碑${羁绊.已达成里程碑.length}个`);
+
+          // NSFW记忆摘要
+          const 记忆库 = 扩展.NSFW记忆 || 创建初始记忆库();
+          const 记忆摘要 = 获取记忆摘要(记忆库, npc.姓名);
+          if (记忆摘要) 组件.push(记忆摘要);
+
+          // 嫉妒状态
+          if (扩展.嫉妒状态 && 扩展.嫉妒状态.强度 > 0) {
+            组件.push(`【嫉妒】强度${扩展.嫉妒状态.强度}/100，表现：${扩展.嫉妒状态.表现形式}`);
+          }
+
+          // 社交关系
+          if (Array.isArray(扩展.社交关系) && 扩展.社交关系.length > 0) {
+            const 关系摘要 = 扩展.社交关系
+              .slice(0, 3)
+              .map((r: any) => `${r.目标姓名}(${r.关系类型}·${r.关系强度})`)
+              .join('、');
+            if (关系摘要) 组件.push(`【关系】${关系摘要}`);
+          }
+
+          return 组件.length > 0 ? 组件.join('\n') : undefined;
+        })();
+
         return {
             索引: 基础数据.索引,
             id: 基础数据.id,
@@ -617,7 +660,8 @@ export const 构建NPC上下文 = (
             记忆: 记忆展示.记忆,
             ...(里模式注入 ? { 里模式注入 } : {}),
             ...(里模式阶段注入 ? { 里模式阶段注入 } : {}),
-            ...(NSFW增强注入 ? { NSFW增强注入 } : {})
+            ...(NSFW增强注入 ? { NSFW增强注入 } : {}),
+            ...(NSFW深化状态 ? { NSFW深化状态 } : {})
         };
     };
 
