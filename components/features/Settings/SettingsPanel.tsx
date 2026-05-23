@@ -233,7 +233,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                                 <div className="p-4 border-t border-gray-800/50 space-y-3 bg-black/20">
                                     {!isHome && onReturnToHome && (
                                         <button
-                                            onClick={onReturnToHome}
+                                            onClick={() => { onReturnToHome(); onClose(); }}
                                             className="w-full py-3 border border-red-900/50 text-red-500 hover:bg-red-900/10 hover:text-red-400 hover:border-red-500 text-xs tracking-[0.2em] transition-all flex items-center justify-center gap-2 group"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 group-hover:-translate-x-1 transition-transform">
@@ -258,7 +258,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                                         <div className="flex items-center gap-2">
                                             {!isHome && onReturnToHome && (
                                                 <button
-                                                    onClick={onReturnToHome}
+                                                    onClick={() => { onReturnToHome(); onClose(); }}
                                                     className="px-2 py-1 text-[10px] border border-red-900/60 text-red-400 rounded min-h-[44px]"
                                                 >
                                                     返回
@@ -322,7 +322,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         <div className="flex items-center gap-2">
                             {!isHome && onReturnToHome && (
                                 <button
-                                    onClick={onReturnToHome}
+                                    onClick={() => { onReturnToHome(); onClose(); }}
                                     className="px-2.5 py-1 text-[10px] rounded border border-red-900/60 text-red-400 bg-red-900/10 min-h-[44px]"
                                 >
                                     返回
