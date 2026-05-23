@@ -23,6 +23,8 @@ import { 创建初始情绪, 计算下一回合情绪, 计算心情阶段 } from
 import { 创建初始羁绊树, 达成里程碑 } from '../../../models/npcNSFWEnhancement/bondTree';
 import { 添加NSFW记忆, 创建初始记忆库 } from '../../../models/npcNSFWEnhancement/nsfwMemory';
 import { 添加后果, 创建初始后果系统 } from '../../../models/npcNSFWEnhancement/unifiedConsequences';
+import { 移除服装层, 记录服装损坏, 添加污渍, 重新穿着 } from '../../../models/npcNSFWEnhancement/clothingLayers';
+import type { 服饰部位分类 } from '../../../models/social';
 
 const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
@@ -494,6 +496,61 @@ export const 执行响应命令处理 = (
                     影响值: 解析结果.影响值,
                     持续时间: 解析结果.持续时间,
                   });
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <服装变化> XML 标签，应用服装状态更新
+            const 服装变化匹配 = rawContent.match(/<服装变化>\s*([\s\S]*?)\s*<\/服装变化>/g);
+            if (服装变化匹配 && 服装变化匹配.length > 0) {
+              const 游戏时间 = envBuffer?.时间 ?? '';
+              for (const 匹配项 of 服装变化匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?服装变化>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    变更列表: Array<{
+                      部位: 服饰部位分类;
+                      变更类型: '更换' | '移除' | '破损' | '污渍' | '重新穿着';
+                      旧状态?: string;
+                      新状态?: string;
+                      原因?: string;
+                    }>;
+                  };
+                  if (!解析结果.npc姓名 || !Array.isArray(解析结果.变更列表)) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  const 原因 = 解析结果.变更列表[0]?.原因 || 'AI叙事触发';
+
+                  for (const 变更 of 解析结果.变更列表) {
+                    if (!变更.部位 || !变更.变更类型) continue;
+
+                    switch (变更.变更类型) {
+                      case '移除':
+                        移除服装层(npc, 变更.部位, 游戏时间, 原因);
+                        break;
+                      case '破损':
+                        记录服装损坏(npc, 变更.部位, '破损', 游戏时间, 原因);
+                        break;
+                      case '污渍':
+                        添加污渍(npc, 变更.部位, 游戏时间, 原因);
+                        break;
+                      case '重新穿着':
+                      case '更换':
+                        if (变更.新状态) {
+                          重新穿着(npc, 变更.部位, 变更.新状态, 游戏时间, 原因);
+                        }
+                        break;
+                    }
+                  }
+
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
                 } catch {
                   // JSON 解析失败，忽略本条
                 }
