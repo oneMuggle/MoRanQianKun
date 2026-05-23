@@ -33,6 +33,8 @@ export type NPC记忆总结任务结构 = {
     预留原始条数: number;
 };
 
+export type 后台记忆总结状态类型 = 'idle' | 'running' | 'done' | 'error';
+
 export const 创建记忆总结处理器 = (deps: {
     待处理记忆总结任务: 记忆压缩任务结构 | null;
     set待处理记忆总结任务: (v: 记忆压缩任务结构 | null) => void;
@@ -50,6 +52,14 @@ export const 创建记忆总结处理器 = (deps: {
     setNPC记忆总结草稿: (v: string) => void;
     NPC记忆总结错误: string;
     setNPC记忆总结错误: (v: string) => void;
+    后台记忆总结状态: 后台记忆总结状态类型;
+    set后台记忆总结状态: (v: 后台记忆总结状态类型) => void;
+    后台记忆总结草稿: string;
+    set后台记忆总结草稿: (v: string) => void;
+    后台记忆总结错误: string;
+    set后台记忆总结错误: (v: string) => void;
+    后台记忆总结任务: 记忆压缩任务结构 | null;
+    set后台记忆总结任务: (v: 记忆压缩任务结构 | null) => void;
     社交: NPC结构[];
     设置社交: (v: NPC结构[]) => void;
     记忆系统: 记忆系统结构;
@@ -157,6 +167,65 @@ export const 创建记忆总结处理器 = (deps: {
         deps.set记忆总结错误('');
     };
 
+    const 清空后台记忆总结流程 = () => {
+        deps.set后台记忆总结状态('idle');
+        deps.set后台记忆总结草稿('');
+        deps.set后台记忆总结错误('');
+        deps.set后台记忆总结任务(null);
+    };
+
+    const 执行后台记忆总结 = async (task: 记忆压缩任务结构): Promise<void> => {
+        const summaryApi = 获取记忆总结接口配置(deps.apiConfig);
+        if (!接口配置是否可用(summaryApi)) {
+            deps.set后台记忆总结错误('未配置可用接口，无法执行记忆总结。');
+            deps.set后台记忆总结状态('error');
+            deps.set后台记忆总结任务(task);
+            return;
+        }
+        deps.set后台记忆总结状态('running');
+        deps.set后台记忆总结草稿('');
+        deps.set后台记忆总结错误('');
+        deps.set后台记忆总结任务(task);
+        try {
+            const raw = await textAIService.generateMemoryRecall(
+                task.提示词模板,
+                构建记忆总结用户提示词(task),
+                summaryApi
+            );
+            deps.set后台记忆总结草稿(清理记忆总结输出(raw));
+            deps.set后台记忆总结状态('done');
+        } catch (error: unknown) {
+            deps.set后台记忆总结草稿('');
+            deps.set后台记忆总结错误((error as any)?.detail ?? (error as any)?.message ?? '记忆总结失败。');
+            deps.set后台记忆总结状态('error');
+        }
+    };
+
+    const handleApplyBackgroundMemorySummary = () => {
+        if (!deps.后台记忆总结任务) return;
+        const nextMemory = 应用记忆压缩结果(
+            规范化记忆系统(deps.记忆系统),
+            deps.后台记忆总结任务,
+            deps.后台记忆总结草稿
+        );
+        deps.设置记忆系统(nextMemory);
+        void deps.performAutoSave({ memory: nextMemory });
+        清空后台记忆总结流程();
+    };
+
+    const handleDismissBackgroundNotification = () => {
+        清空后台记忆总结流程();
+    };
+
+    const handleViewBackgroundSummary = () => {
+        if (!deps.后台记忆总结任务) return;
+        deps.set待处理记忆总结任务(deps.后台记忆总结任务);
+        deps.set记忆总结草稿(deps.后台记忆总结草稿);
+        deps.set记忆总结错误(deps.后台记忆总结错误);
+        deps.set记忆总结阶段(deps.后台记忆总结草稿 || deps.后台记忆总结错误 ? 'review' : 'idle');
+        清空后台记忆总结流程();
+    };
+
     const 刷新记忆总结任务 = (
         memoryData: 记忆系统结构,
         options?: { 静默?: boolean }
@@ -167,6 +236,7 @@ export const 创建记忆总结处理器 = (deps: {
         );
         if (!nextTask) {
             清空记忆总结流程();
+            清空后台记忆总结流程();
             return;
         }
         const sameTask = deps.待处理记忆总结任务?.id === nextTask.id;
@@ -178,6 +248,15 @@ export const 创建记忆总结处理器 = (deps: {
             deps.set记忆总结草稿('');
             deps.set记忆总结错误('');
         }
+
+        // 后台自动总结：不弹窗，直接后台执行
+        const 启用后台 = deps.memoryConfig?.启用后台自动总结 !== false;
+        if (启用后台 && !options?.静默) {
+            deps.set记忆总结阶段('idle');
+            void 执行后台记忆总结(nextTask);
+            return;
+        }
+
         if (!options?.静默) {
             deps.set记忆总结阶段('remind');
         }
@@ -460,6 +539,11 @@ export const 创建记忆总结处理器 = (deps: {
         刷新NPC记忆总结队列,
         应用并同步社交列表,
         清空记忆总结流程,
+        清空后台记忆总结流程,
+        执行后台记忆总结,
+        handleApplyBackgroundMemorySummary,
+        handleDismissBackgroundNotification,
+        handleViewBackgroundSummary,
         刷新记忆总结任务,
         应用并同步记忆系统,
         handleStartNpcMemorySummary,

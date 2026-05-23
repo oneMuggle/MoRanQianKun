@@ -13,6 +13,8 @@ import type { 设备刷新任务 } from '../device/deviceRefreshMonitor';
 import type { NPC生图任务记录, 场景生图任务记录, 世界书结构, 世界书预设组结构, 内置提示词条目结构, 场景图片档案, 时代信息结构 } from '../../../types';
 import type { 记忆压缩任务结构 } from '../memory/memoryUtils';
 import type { NPC记忆总结任务结构, 记忆总结阶段类型 } from '../memory/memorySummaryHandlers';
+
+type 后台记忆总结状态类型 = 'idle' | 'running' | 'done' | 'error';
 import type { WorldGenConfig } from '../../../models/system';
 import type { 角色数据结构 } from '../../../models/character';
 import type { OpeningConfig } from '../../../models/system';
@@ -317,6 +319,10 @@ interface MemorySliceState {
     NPC记忆总结阶段: 记忆总结阶段类型;
     NPC记忆总结草稿: string;
     NPC记忆总结错误: string;
+    后台记忆总结状态: 后台记忆总结状态类型;
+    后台记忆总结草稿: string;
+    后台记忆总结错误: string;
+    后台记忆总结任务: 记忆压缩任务结构 | null;
 }
 
 interface MemorySliceActions {
@@ -328,6 +334,10 @@ interface MemorySliceActions {
     setNPC记忆总结阶段: (updater: 记忆总结阶段类型 | ((prev: 记忆总结阶段类型) => 记忆总结阶段类型)) => void;
     setNPC记忆总结草稿: (updater: string | ((prev: string) => string)) => void;
     setNPC记忆总结错误: (updater: string | ((prev: string) => string)) => void;
+    set后台记忆总结状态: (updater: 后台记忆总结状态类型 | ((prev: 后台记忆总结状态类型) => 后台记忆总结状态类型)) => void;
+    set后台记忆总结草稿: (updater: string | ((prev: string) => string)) => void;
+    set后台记忆总结错误: (updater: string | ((prev: string) => string)) => void;
+    set后台记忆总结任务: (updater: 记忆压缩任务结构 | null | ((prev: 记忆压缩任务结构 | null) => 记忆压缩任务结构 | null)) => void;
 }
 
 interface MemorySlice extends MemorySliceState, MemorySliceActions {}
@@ -341,6 +351,10 @@ const createMemorySlice: ZustandSlice<MemorySlice> = (set) => ({
     NPC记忆总结阶段: 'idle',
     NPC记忆总结草稿: '',
     NPC记忆总结错误: '',
+    后台记忆总结状态: 'idle',
+    后台记忆总结草稿: '',
+    后台记忆总结错误: '',
+    后台记忆总结任务: null,
     set待处理记忆总结任务: (updater) => set((state) => ({
         待处理记忆总结任务: typeof updater === 'function' ? (updater as (prev: 记忆压缩任务结构 | null) => 记忆压缩任务结构 | null)(state.待处理记忆总结任务) : updater
     })),
@@ -364,6 +378,18 @@ const createMemorySlice: ZustandSlice<MemorySlice> = (set) => ({
     })),
     setNPC记忆总结错误: (updater) => set((state) => ({
         NPC记忆总结错误: typeof updater === 'function' ? (updater as (prev: string) => string)(state.NPC记忆总结错误) : updater
+    })),
+    set后台记忆总结状态: (updater) => set((state) => ({
+        后台记忆总结状态: typeof updater === 'function' ? (updater as (prev: 后台记忆总结状态类型) => 后台记忆总结状态类型)(state.后台记忆总结状态) : updater
+    })),
+    set后台记忆总结草稿: (updater) => set((state) => ({
+        后台记忆总结草稿: typeof updater === 'function' ? (updater as (prev: string) => string)(state.后台记忆总结草稿) : updater
+    })),
+    set后台记忆总结错误: (updater) => set((state) => ({
+        后台记忆总结错误: typeof updater === 'function' ? (updater as (prev: string) => string)(state.后台记忆总结错误) : updater
+    })),
+    set后台记忆总结任务: (updater) => set((state) => ({
+        后台记忆总结任务: typeof updater === 'function' ? (updater as (prev: 记忆压缩任务结构 | null) => 记忆压缩任务结构 | null)(state.后台记忆总结任务) : updater
     })),
 });
 

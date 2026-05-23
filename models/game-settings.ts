@@ -323,6 +323,7 @@ export interface 记忆配置结构 {
     短期转中期提示词: string;
     中期转长期提示词: string;
     NPC记忆总结提示词: string;
+    启用后台自动总结?: boolean;
 }
 
 export interface 记忆系统结构 {

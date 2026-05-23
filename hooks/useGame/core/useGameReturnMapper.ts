@@ -18,6 +18,10 @@ interface ReturnMapperDeps {
     记忆总结阶段: string;
     记忆总结草稿: string | null;
     记忆总结错误: string | null;
+    后台记忆总结状态: string;
+    后台记忆总结草稿: string | null;
+    后台记忆总结错误: string | null;
+    后台记忆总结任务: any;
     待处理NPC记忆总结队列: any[];
     NPC记忆总结阶段: string;
     NPC记忆总结草稿: string | null;
@@ -258,6 +262,9 @@ interface ReturnMapperDeps {
     handleUpdateNpcMemorySummaryDraft: any;
     handleQueueManualNpcMemorySummary: any;
     handleApplyNpcMemorySummary: any;
+    handleApplyBackgroundMemorySummary: any;
+    handleDismissBackgroundNotification: any;
+    handleViewBackgroundSummary: any;
     saveArtistPreset: any;
     deleteArtistPreset: any;
     saveModelConverterPreset: any;
@@ -343,6 +350,10 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             npcMemorySummaryDraft: deps.NPC记忆总结草稿,
             npcMemorySummaryError: deps.NPC记忆总结错误,
             npcMemorySummaryQueueLength: deps.待处理NPC记忆总结队列.length,
+            backgroundMemorySummaryStatus: deps.后台记忆总结状态,
+            backgroundMemorySummaryDraft: deps.后台记忆总结草稿,
+            backgroundMemorySummaryError: deps.后台记忆总结错误,
+            backgroundMemorySummaryTask: deps.后台记忆总结任务,
             imageGenerationQueue: deps.NPC生图任务队列,
             sceneImageArchive: deps.场景图片档案,
             sceneImageQueue: deps.场景生图任务队列,
@@ -490,6 +501,9 @@ export function 构建useGame返回值(deps: ReturnMapperDeps) {
             handleUpdateNpcMemorySummaryDraft: deps.handleUpdateNpcMemorySummaryDraft,
             handleQueueManualNpcMemorySummary: deps.handleQueueManualNpcMemorySummary,
             handleApplyNpcMemorySummary: deps.handleApplyNpcMemorySummary,
+            handleApplyBackgroundMemorySummary: deps.handleApplyBackgroundMemorySummary,
+            handleDismissBackgroundNotification: deps.handleDismissBackgroundNotification,
+            handleViewBackgroundSummary: deps.handleViewBackgroundSummary,
             saveArtistPreset: deps.saveArtistPreset,
             deleteArtistPreset: deps.deleteArtistPreset,
             saveModelConverterPreset: deps.saveModelConverterPreset,

@@ -1697,9 +1697,10 @@ export interface 记忆配置结构 {
     重要角色关键记忆条数N: number; // 默认 20
     NPC记忆总结阈值: number; // 默认 20（NPC 记忆总结分段阈值）
     即时消息上传条数N: number; // 默认 10（按回合计数，用于即时 -> 短期滑动与 Script 上下文窗口）
-    短期转中期提示词: string; 
+    短期转中期提示词: string;
     中期转长期提示词: string;
     NPC记忆总结提示词: string;
+    启用后台自动总结?: boolean;
 }
 
 export interface 记忆系统结构 {

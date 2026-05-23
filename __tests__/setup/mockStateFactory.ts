@@ -62,6 +62,8 @@ export function createMockPhotographer(overrides?: Partial<摄影师核心状态
 export function createMockShootProject(overrides?: Partial<拍摄项目状态>): 拍摄项目状态 {
   return {
     id: 'shoot_test_001',
+    项目ID: 'shoot_test_001',
+    项目名称: '测试拍摄项目',
     模特Id: 'model_test_001',
     摄影师Id: 'photographer_test_001',
     约定写真类型: '商业写真',
@@ -76,6 +78,7 @@ export function createMockShootProject(overrides?: Partial<拍摄项目状态>):
     当前回合: 0,
     最大回合: 5,
     拍摄阶段: '未开始',
+    阶段明细: [],
     尺度变更历史: [],
     越界行为记录: [],
     泄露风险评分: 0,

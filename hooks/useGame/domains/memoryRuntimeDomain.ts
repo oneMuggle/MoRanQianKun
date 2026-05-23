@@ -37,6 +37,14 @@ export interface MemoryRuntimeDomainInput {
     setNPC记忆总结草稿: any;
     NPC记忆总结错误: any;
     setNPC记忆总结错误: any;
+    后台记忆总结状态: any;
+    set后台记忆总结状态: any;
+    后台记忆总结草稿: any;
+    set后台记忆总结草稿: any;
+    后台记忆总结错误: any;
+    set后台记忆总结错误: any;
+    后台记忆总结任务: any;
+    set后台记忆总结任务: any;
     社交: any;
     设置社交: any;
     记忆系统: any;
@@ -65,6 +73,10 @@ export function createMemoryRuntimeDomain(input: MemoryRuntimeDomainInput) {
         NPC记忆总结阶段, setNPC记忆总结阶段,
         NPC记忆总结草稿, setNPC记忆总结草稿,
         NPC记忆总结错误, setNPC记忆总结错误,
+        后台记忆总结状态, set后台记忆总结状态,
+        后台记忆总结草稿, set后台记忆总结草稿,
+        后台记忆总结错误, set后台记忆总结错误,
+        后台记忆总结任务, set后台记忆总结任务,
         社交, 设置社交, 记忆系统, 设置记忆系统,
         memoryConfig, 历史记录, performAutoSaveRef,
         创建记忆总结处理器, 规范化社交列表,
@@ -110,6 +122,14 @@ export function createMemoryRuntimeDomain(input: MemoryRuntimeDomainInput) {
         setNPC记忆总结草稿,
         NPC记忆总结错误,
         setNPC记忆总结错误,
+        后台记忆总结状态,
+        set后台记忆总结状态,
+        后台记忆总结草稿,
+        set后台记忆总结草稿,
+        后台记忆总结错误,
+        set后台记忆总结错误,
+        后台记忆总结任务,
+        set后台记忆总结任务,
         社交,
         设置社交,
         记忆系统,
@@ -122,7 +142,7 @@ export function createMemoryRuntimeDomain(input: MemoryRuntimeDomainInput) {
         onAutoQueueComplete: input.onAutoQueueComplete,
     });
 
-    const { handleStartMemorySummary, handleCancelMemorySummary, handleBackToMemorySummaryRemind, handleUpdateMemorySummaryDraft, handleStartManualMemorySummary, handleApplyMemorySummary, 刷新NPC记忆总结队列, 应用并同步记忆系统, handleStartNpcMemorySummary, handleCancelNpcMemorySummary, handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft, handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary, 自动处理NPC记忆队列 } = 记忆总结处理器;
+    const { handleStartMemorySummary, handleCancelMemorySummary, handleBackToMemorySummaryRemind, handleUpdateMemorySummaryDraft, handleStartManualMemorySummary, handleApplyMemorySummary, 刷新NPC记忆总结队列, 应用并同步记忆系统, handleStartNpcMemorySummary, handleCancelNpcMemorySummary, handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft, handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary, 自动处理NPC记忆队列, handleApplyBackgroundMemorySummary, handleDismissBackgroundNotification, handleViewBackgroundSummary, 执行后台记忆总结, 清空后台记忆总结流程 } = 记忆总结处理器;
 
     return {
         序列化变量校准命令, 清空变量生成上下文缓存, 记录变量生成上下文,
@@ -135,5 +155,10 @@ export function createMemoryRuntimeDomain(input: MemoryRuntimeDomainInput) {
         handleBackToNpcMemorySummaryRemind, handleUpdateNpcMemorySummaryDraft,
         handleQueueManualNpcMemorySummary, handleApplyNpcMemorySummary,
         自动处理NPC记忆队列,
+        handleApplyBackgroundMemorySummary,
+        handleDismissBackgroundNotification,
+        handleViewBackgroundSummary,
+        执行后台记忆总结,
+        清空后台记忆总结流程,
     };
 }

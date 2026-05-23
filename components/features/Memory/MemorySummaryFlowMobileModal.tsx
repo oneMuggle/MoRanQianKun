@@ -84,6 +84,13 @@ const MemorySummaryFlowMobileModal: React.FC<Props> = ({
                             <div className="w-10 h-10 border-2 border-wuxia-gold/40 border-t-wuxia-gold rounded-full animate-spin" />
                             <div className="text-sm text-gray-300">正在生成记忆总结，请稍候...</div>
                             <div className="text-[11px] text-gray-500">完成后将进入确认与修改阶段</div>
+                            <button
+                                type="button"
+                                onClick={onCancel}
+                                className="mt-2 px-3 py-1.5 text-[11px] rounded border border-gray-700 text-gray-400 hover:text-white"
+                            >
+                                在后台继续
+                            </button>
                         </div>
                     )}
 

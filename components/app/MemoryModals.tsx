@@ -13,6 +13,7 @@ import {
     NpcMemorySummaryFlowModal,
     NpcMemorySummaryFlowMobileModal,
 } from '../features/lazyComponents';
+import BackgroundSummaryBanner from '../features/Memory/BackgroundSummaryBanner';
 
 // ============================================================================
 // 类型
@@ -37,6 +38,16 @@ export function MemoryModals({
 }: MemoryModalsProps) {
     return (
         <>
+            {gameView && (
+                <BackgroundSummaryBanner
+                    status={((meta as any).backgroundMemorySummaryStatus || 'idle') as 'idle' | 'running' | 'done' | 'error'}
+                    error={(meta as any).backgroundMemorySummaryError || ''}
+                    onView={(actions as any).handleViewBackgroundSummary}
+                    onDismiss={(actions as any).handleDismissBackgroundNotification}
+                    onApply={(actions as any).handleApplyBackgroundMemorySummary}
+                />
+            )}
+
             {gameView && (meta as any).memorySummaryOpen && (
                 <懒加载边界>
                     {isMobile ? (
