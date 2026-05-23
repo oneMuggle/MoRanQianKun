@@ -41,7 +41,7 @@ export function 防线值到等级(防线值: number): 心理防线等级 {
 }
 
 export function 等级到防线值范围(等级: 心理防线等级): { min: number; max: number } {
-  return 等级防线值范围[等级];
+  return 等级防线值范围[等级] ?? 等级防线值范围['传统'];
 }
 
 // ==================== 初始化 ====================
