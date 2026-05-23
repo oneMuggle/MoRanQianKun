@@ -781,6 +781,16 @@ export function 匹配人格档案(
     if (标签匹配) return 人格;
   }
 
+  // 第三优先：分词后标签匹配（搜索文本按词拆分，与标签逐词比对）
+  const 搜索词 = 搜索文本.split(/[\s,，、；;：:.。！!？?]+/).filter(Boolean);
+  for (const 人格 of 人格库) {
+    const 标签匹配 = 人格.身份标签.some(tag => {
+      const tagLower = tag.toLowerCase();
+      return 搜索词.some(词 => tagLower.includes(词) || 词.includes(tagLower));
+    });
+    if (标签匹配) return 人格;
+  }
+
   // 不匹配时返回null，而非fallback到第一个
   return null;
 }
@@ -790,6 +800,10 @@ function 获取对应人格库(eraId: string): 表里人格档案[] {
   if (eraId.includes('rural')) return 里乡土人格档案;
   if (eraId.includes('republic') || eraId.includes('谍战')) return 里谍战人格档案;
   if (eraId.includes('campus')) return 里校园人格档案;
+  // 兜底：只含 'contemporary' 但没有更具体子类型时，默认使用都市人格
+  if (eraId.includes('contemporary')) return 里都市人格档案;
+  // 废土/生化/核灾等末日题材使用乡土人格（更贴近生存主题）
+  if (eraId.includes('post_apocalyptic') || eraId.includes('zombie') || eraId.includes('biohazard') || eraId.includes('nuclear')) return 里乡土人格档案;
   return Object.values(全部人格档案).flat();
 }
 

@@ -396,8 +396,8 @@ export const 执行读取存档 = async (
     deps.设置角色(deps.规范化角色物品容器映射(save.角色数据));
     const 加载环境 = deps.规范化环境信息(save.环境信息 || deps.创建开场空白环境());
     // 旧存档兼容：年号字段缺失时按时代背景回退默认值
+    const saveEraId = (save as any).时代配置ID || (save.世界 as any)?.时代配置ID;
     if (!加载环境.年号) {
-        const saveEraId = (save as any).时代配置ID || (save.世界 as any)?.时代配置ID;
         const eraBg = saveEraId ? 获取时代背景(saveEraId) : null;
         if (eraBg === '古代' || eraBg === '近代') 加载环境.年号 = '天授';
         else if (eraBg === '现代') 加载环境.年号 = '公元';
@@ -405,7 +405,7 @@ export const 执行读取存档 = async (
         else if (eraBg === '自定义') 加载环境.年号 = '纪年';
     }
     deps.设置环境(加载环境);
-    deps.设置社交(deps.规范化社交列表(save.社交 || []));
+    deps.设置社交(deps.规范化社交列表(save.社交 || [], { eraId: saveEraId }));
     deps.设置世界(deps.规范化世界状态(save.世界 || deps.创建开场空白世界()));
     deps.设置战斗(deps.规范化战斗状态(save.战斗 || deps.创建开场空白战斗()));
     deps.设置玩家门派(save.玩家门派 || deps.创建空门派状态());

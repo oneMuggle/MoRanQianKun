@@ -60,6 +60,7 @@ interface FeatureFlagsDeps {
     规范化角色物品容器映射: (raw?: any) => 角色数据结构;
     规范化环境信息: (envLike?: any) => 环境信息结构;
     深拷贝: <T>(data: T) => T;
+    currentEra: string;
 }
 
 export function useFeatureFlags(deps: FeatureFlagsDeps) {
@@ -113,10 +114,10 @@ export function useFeatureFlags(deps: FeatureFlagsDeps) {
     const 规范化同人剧情规划状态 = useCallback((raw?: any): 同人剧情规划结构 | undefined => 基础规范化同人剧情规划状态(raw), []);
     const 规范化同人女主剧情规划状态 = useCallback((raw?: any): 同人女主剧情规划结构 | undefined => 基础规范化同人女主剧情规划状态(raw), []);
 
-    const 规范化社交列表安全 = useCallback((raw?: any[], options?: { 合并同名?: boolean }) => {
+    const 规范化社交列表安全 = useCallback((raw?: any[], options?: { 合并同名?: boolean; eraId?: string | null }) => {
         const list = Array.isArray(raw) ? raw : [];
-        return 规范化社交列表(list, options);
-    }, []);
+        return 规范化社交列表(list, { ...options, eraId: options?.eraId ?? deps.currentEra });
+    }, [deps.currentEra]);
 
     const 应用开场基态 = useCallback((openingBase: {
         角色: any;
@@ -137,7 +138,7 @@ export function useFeatureFlags(deps: FeatureFlagsDeps) {
         deps.设置角色(deps.规范化角色物品容器映射(openingBase.角色));
         deps.设置环境(deps.规范化环境信息(openingBase.环境));
         deps.设置游戏初始时间(openingBase.游戏初始时间 || '');
-        deps.设置社交(规范化社交列表(openingBase.社交));
+        deps.设置社交(规范化社交列表安全(openingBase.社交));
         deps.设置世界(openingBase.世界);
         deps.设置战斗(openingBase.战斗);
         deps.设置玩家门派(openingBase.玩家门派);

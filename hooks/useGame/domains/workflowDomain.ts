@@ -125,7 +125,7 @@ export function createWorkflowDomain(input: WorkflowDomainInput) {
         设置剧情规划, 设置女主剧情规划, 设置同人剧情规划, 设置同人女主剧情规划,
         应用并同步记忆系统, 设置历史记录, 设置校规系统, 设置催眠系统,
         清空变量生成上下文缓存, setWorldEvents, 规范化剧情状态,
-        规范化角色物品容器映射, 规范化环境信息, 深拷贝,
+        规范化角色物品容器映射, 规范化环境信息, 深拷贝, currentEra,
     });
     const {
         世界演变功能已开启: worldEvolutionEnabled,

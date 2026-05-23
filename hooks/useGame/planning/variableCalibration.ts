@@ -31,7 +31,7 @@ export type 变量校准状态 = {
 
 type 变量校准依赖 = {
     规范化环境信息: (envLike?: any) => 环境信息结构;
-    规范化社交列表: (raw?: any[], options?: { 合并同名?: boolean }) => any[];
+    规范化社交列表: (raw?: any[], options?: { 合并同名?: boolean; eraId?: string | null }) => any[];
     规范化世界状态: (raw?: any) => 世界数据结构;
     规范化战斗状态: (raw?: any) => 战斗状态结构;
     规范化门派状态: (raw?: any) => 详细门派结构;

@@ -58,7 +58,7 @@ export const 创建记忆总结处理器 = (deps: {
     apiConfig: 接口设置结构;
     历史记录: any[];
     performAutoSave: (...args: any[]) => void;
-    规范化社交列表: (list: any[], options?: { 合并同名?: boolean }) => any[];
+    规范化社交列表: (list: any[], options?: { 合并同名?: boolean; eraId?: string | null }) => any[];
     onAutoQueueComplete?: (result: { 成功: string[]; 失败: { 名称: string; 原因: string }[] }) => void;
 }) => {
     const 构建NPC记忆总结任务 = (
