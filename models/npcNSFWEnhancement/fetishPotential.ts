@@ -10,6 +10,7 @@ import type {
   性癖大类,
   完整演化状态,
   性癖变化日志,
+  潜能觉醒阶段,
 } from './types';
 import type { 性癖触发事件 } from './eventMapping';
 import { 获取事件映射 } from './eventMapping';
@@ -108,6 +109,60 @@ export function 更新潜能累积(
   }
 
   return null;
+}
+
+// ==================== 渐进觉醒阶段 ====================
+
+/**
+ * 根据累积进度计算当前觉醒阶段
+ */
+export function 计算觉醒阶段(潜能: 性癖潜能值): 潜能觉醒阶段 {
+  if (潜能.已觉醒) return '已觉醒';
+
+  const 进度 = 潜能.当前累积 / 潜能.觉醒阈值;
+  const 潜能系数 = 潜能.潜能值 / 10;
+
+  // 综合进度 = 累积进度 * 潜能系数
+  const 综合进度 = 进度 * 潜能系数;
+
+  if (综合进度 >= 0.9) return '即将觉醒';
+  if (综合进度 >= 0.6) return '显露';
+  if (综合进度 >= 0.3) return '萌芽';
+  return '沉睡';
+}
+
+/**
+ * 生成潜能暗示提示词（注入到 AI 提示词中）
+ * 根据觉醒阶段给 AI 不同的叙事指引
+ */
+export function 生成潜能暗示(潜能: 性癖潜能值): string | null {
+  if (潜能.已觉醒) return null;
+
+  const 阶段 = 计算觉醒阶段(潜能);
+  const 进度 = Math.round((潜能.当前累积 / 潜能.觉醒阈值) * 100);
+
+  switch (阶段) {
+    case '即将觉醒':
+      return `【潜能暗示】${潜能.子类型}方向已接近觉醒边缘（累积${进度}%），在适当的情境下可能突然展现这一倾向。`;
+    case '显露':
+      return `【潜能暗示】${潜能.子类型}方向已有明显萌芽（累积${进度}%），在相关情境中可能偶尔流露出微妙的兴趣。`;
+    case '萌芽':
+      return `【潜能暗示】${潜能.子类型}方向有极微弱的潜在倾向（累积${进度}%），尚不明显。`;
+    default:
+      return null;
+  }
+}
+
+/**
+ * 批量生成潜能暗示（用于 prompt 注入）
+ */
+export function 生成潜能暗示列表(潜能池: 性癖潜能值[]): string[] {
+  const 暗示: string[] = [];
+  for (const 潜能 of 潜能池) {
+    const 文本 = 生成潜能暗示(潜能);
+    if (文本) 暗示.push(文本);
+  }
+  return 暗示.slice(0, 3);  // 最多注入3条暗示
 }
 
 /**

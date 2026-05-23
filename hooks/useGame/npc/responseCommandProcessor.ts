@@ -25,6 +25,10 @@ import { 添加NSFW记忆, 创建初始记忆库 } from '../../../models/npcNSFW
 import { 添加后果, 创建初始后果系统 } from '../../../models/npcNSFWEnhancement/unifiedConsequences';
 import { 移除服装层, 记录服装损坏, 添加污渍, 重新穿着 } from '../../../models/npcNSFWEnhancement/clothingLayers';
 import type { 服饰部位分类 } from '../../../models/social';
+import { 添加情景记忆, 快速创建情景记忆, 情境标签组, 创建情景记忆库 } from '../../../models/npcNSFWEnhancement/episodicMemory';
+import { 生成流言 } from '../../../models/npcNSFWEnhancement/gossipEngine';
+import { 记录护理影响, 创建初始护理累积 } from '../../../models/npcNSFWEnhancement/aftercareEvolution';
+import { 推进前戏阶段, 创建初始节奏状态 } from '../../../models/npcNSFWEnhancement/foreplayStages';
 
 const 深拷贝 = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
@@ -549,6 +553,263 @@ export const 执行响应命令处理 = (
                     }
                   }
 
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <自主行为> XML 标签，记录NPC主动发起的行为
+            const 自主行为匹配 = rawContent.match(/<自主行为>\s*([\s\S]*?)\s*<\/自主行为>/g);
+            if (自主行为匹配 && 自主行为匹配.length > 0) {
+              for (const 匹配项 of 自主行为匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?自主行为>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    行为类型: string;
+                    描述: string;
+                    优先级?: number;
+                  };
+                  if (!解析结果.npc姓名) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  (npc as any).NSFW扩展 = {
+                    ...(npc as any).NSFW扩展 || {},
+                    最近自主行为: {
+                      类型: 解析结果.行为类型,
+                      描述: 解析结果.描述,
+                      优先级: 解析结果.优先级 ?? 50,
+                      时间: 游戏时间,
+                    },
+                  };
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <情感维度变化> XML 标签，更新复合情感维度
+            const 情感维度变化匹配 = rawContent.match(/<情感维度变化>\s*([\s\S]*?)\s*<\/情感维度变化>/g);
+            if (情感维度变化匹配 && 情感维度变化匹配.length > 0) {
+              for (const 匹配项 of 情感维度变化匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?情感维度变化>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    情感维度?: Record<string, number>;
+                    主导情感?: string;
+                  };
+                  if (!解析结果.npc姓名) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  const 现有情感 = (npc as any).NSFW扩展?.复合情感;
+                  if (解析结果.情感维度 && 现有情感?.情感维度) {
+                    const 新情感维度 = { ...现有情感.情感维度 };
+                    for (const [维度, 值] of Object.entries(解析结果.情感维度)) {
+                      if (新情感维度[维度] !== undefined) {
+                        新情感维度[维度] = clamp(值, 0, 100);
+                      }
+                    }
+                    (npc as any).NSFW扩展 = {
+                      ...(npc as any).NSFW扩展 || {},
+                      复合情感: {
+                        ...现有情感,
+                        情感维度: 新情感维度,
+                        主导情感: 解析结果.主导情感 || 现有情感.主导情感,
+                        最后更新时间: new Date().toISOString(),
+                      },
+                    };
+                    socialBuffer = [...socialBuffer];
+                    socialBuffer[idx] = npc;
+                  }
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <节奏推进> XML 标签，更新前戏/互动节奏状态
+            const 节奏推进匹配 = rawContent.match(/<节奏推进>\s*([\s\S]*?)\s*<\/节奏推进>/g);
+            if (节奏推进匹配 && 节奏推进匹配.length > 0) {
+              for (const 匹配项 of 节奏推进匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?节奏推进>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    当前阶段?: string;
+                    阶段满意度?: number;
+                    节奏评价?: string;
+                    互动类型?: string;
+                  };
+                  if (!解析结果.npc姓名) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  const 演化状态 = (npc as any).完整演化状态;
+                  if (!演化状态) continue;
+
+                  // 确保节奏状态已初始化
+                  if (!演化状态.节奏状态) {
+                    演化状态.节奏状态 = 创建初始节奏状态();
+                  }
+
+                  // 如果有互动类型，使用推进逻辑；否则直接应用AI报告的值
+                  if (解析结果.互动类型) {
+                    const 情感维度 = 演化状态.复合情感?.情感维度;
+                    演化状态.节奏状态 = 推进前戏阶段(
+                      演化状态.节奏状态,
+                      解析结果.互动类型,
+                      npc.亲密度等级 ?? 0,
+                      情感维度
+                    );
+                  } else {
+                    // 直接应用AI报告的值（向后兼容）
+                    演化状态.节奏状态 = {
+                      当前阶段: 解析结果.当前阶段 || 演化状态.节奏状态.当前阶段,
+                      阶段满意度: 解析结果.阶段满意度 ?? 演化状态.节奏状态.阶段满意度,
+                      节奏评价: 解析结果.节奏评价 || 演化状态.节奏状态.节奏评价,
+                      阶段持续时间: (演化状态.节奏状态.阶段持续时间 ?? 0) + 1,
+                      最后更新时间: new Date().toISOString(),
+                    };
+                  }
+
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <情景记忆> XML 标签，添加情景记忆
+            const 情景记忆匹配 = rawContent.match(/<情景记忆>\s*([\s\S]*?)\s*<\/情景记忆>/g);
+            if (情景记忆匹配 && 情景记忆匹配.length > 0) {
+              for (const 匹配项 of 情景记忆匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?情景记忆>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    标题: string;
+                    简述: string;
+                    详细: string;
+                    情境?: { 时间?: string; 地点?: string; 氛围?: string; 关系?: string; 行为?: string };
+                    情感?: { 类型: string; 强度: number; 持久度: number }[];
+                    重要度?: number;
+                  };
+                  if (!解析结果.npc姓名 || !解析结果.标题) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  if (!npc.完整演化状态) npc.完整演化状态 = {} as any;
+                  if (!npc.完整演化状态.情景记忆) {
+                    npc.完整演化状态.情景记忆 = 创建情景记忆库();
+                  }
+
+                  const 情境标签: Partial<情境标签组> = {
+                    时间: 解析结果.情境?.时间 ? [解析结果.情境.时间 as any] : [],
+                    地点: 解析结果.情境?.地点 ? [解析结果.情境.地点 as any] : [],
+                    氛围: 解析结果.情境?.氛围 ? [解析结果.情境.氛围 as any] : [],
+                    关系: 解析结果.情境?.关系 ? [解析结果.情境.关系 as any] : [],
+                    行为: 解析结果.情境?.行为 ? [解析结果.情境.行为 as any] : [],
+                  };
+
+                  const 新记忆 = 快速创建情景记忆(
+                    解析结果.标题,
+                    解析结果.简述,
+                    解析结果.详细,
+                    情境标签,
+                    解析结果.情感 ?? [],
+                    解析结果.重要度 ?? 5
+                  );
+
+                  npc.完整演化状态.情景记忆 = 添加情景记忆(npc.完整演化状态.情景记忆, 新记忆);
+                  socialBuffer = [...socialBuffer];
+                  socialBuffer[idx] = npc;
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <流言传播> XML 标签，添加到社交网络
+            const 流言传播匹配 = rawContent.match(/<流言传播>\s*([\s\S]*?)\s*<\/流言传播>/g);
+            if (流言传播匹配 && 流言传播匹配.length > 0) {
+              for (const 匹配项 of 流言传播匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?流言传播>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    内容: string;
+                    目标NPC: string;
+                    严重度?: number;
+                    在场NPC?: string[];
+                  };
+                  if (!解析结果.内容 || !解析结果.目标NPC) continue;
+
+                  const 目标Idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.目标NPC);
+                  if (目标Idx < 0) continue;
+
+                  const 目标NPC = { ...socialBuffer[目标Idx] };
+                  const 网络 = (目标NPC as any).NSFW扩展?.社交网络;
+                  if (网络) {
+                    const 事件 = {
+                      事件类型: '流言',
+                      事件描述: 解析结果.内容,
+                      地点: '',
+                      在场NPC: 解析结果.在场NPC ?? [],
+                      时间: 游戏时间 ?? new Date().toISOString(),
+                      严重程度: 解析结果.严重度 ?? 2,
+                    };
+                    const 新流言 = 生成流言(事件, 网络, 1);
+                    网络.流言列表 = [...网络.流言列表, ...新流言];
+                    socialBuffer = [...socialBuffer];
+                    socialBuffer[目标Idx] = 目标NPC;
+                  }
+                } catch {
+                  // JSON 解析失败，忽略本条
+                }
+              }
+            }
+
+            // 解析 <护理记录> XML 标签，更新护理累积
+            const 护理记录匹配 = rawContent.match(/<护理记录>\s*([\s\S]*?)\s*<\/护理记录>/g);
+            if (护理记录匹配 && 护理记录匹配.length > 0) {
+              for (const 匹配项 of 护理记录匹配) {
+                try {
+                  const json = 匹配项.replace(/<\/?护理记录>/g, '').trim();
+                  const 解析结果 = JSON.parse(json) as {
+                    npc姓名: string;
+                    护理质量: '无视' | '敷衍' | '温柔' | '用心';
+                  };
+                  if (!解析结果.npc姓名 || !解析结果.护理质量) continue;
+
+                  const idx = socialBuffer.findIndex((n: any) => n.姓名 === 解析结果.npc姓名);
+                  if (idx < 0) continue;
+
+                  const npc = { ...socialBuffer[idx] };
+                  if (!npc.完整演化状态) npc.完整演化状态 = {} as any;
+                  if (!npc.完整演化状态.护理累积) {
+                    npc.完整演化状态.护理累积 = 创建初始护理累积();
+                  }
+                  npc.完整演化状态.护理累积 = 记录护理影响(
+                    npc.完整演化状态.护理累积,
+                    解析结果.护理质量,
+                    游戏时间 ?? new Date().toISOString()
+                  );
                   socialBuffer = [...socialBuffer];
                   socialBuffer[idx] = npc;
                 } catch {

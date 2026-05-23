@@ -200,11 +200,14 @@ export interface 防线变化日志 {
 
 // ==================== 性癖潜能/觉醒系统 ====================
 
+export type 潜能觉醒阶段 = '沉睡' | '萌芽' | '萌芽' | '显露' | '即将觉醒' | '已觉醒';
+
 export interface 性癖潜能值 {
   类别: 性癖大类;
   子类型: string;
   潜能值: number;         // 0-10, 隐藏潜能, 越高越容易觉醒
   已觉醒: boolean;
+  觉醒阶段?: 潜能觉醒阶段; // 渐进觉醒阶段
   觉醒条件: string[];     // 需要触发的具体事件类型
   觉醒阈值: number;       // 达到多少累积次数后觉醒
   当前累积: number;       // 当前已累积的次数
@@ -372,6 +375,60 @@ export interface 服装变更日志 {
 
 // ==================== 统一演化状态 ====================
 
+// Phase 1 新增：复合情感状态
+export type 情感维度 = '爱慕' | '嫉妒' | '不安' | '兴奋' | '内疚';
+
+export interface 情感冲突条目 {
+  维度A: 情感维度;
+  维度B: 情感维度;
+  冲突强度: number;
+  行为表现: string;
+}
+
+export interface 复合情感状态 {
+  基础心情: number;
+  情感维度: Record<情感维度, number>;
+  主导情感: 情感维度;
+  情感冲突: 情感冲突条目[];
+  最后更新时间: string;
+}
+
+// Phase 1 新增：内在动机状态
+export type 欲望维度 = '被认可' | '刺激感' | '安全感' | '归属感' | '支配感' | '自由感';
+
+export interface 欲望状态 {
+  维度: 欲望维度;
+  当前满足度: number;
+  衰减速率: number;
+  优先级系数: number;
+  最近满足时间?: string;
+}
+
+export interface NPC内在动机 {
+  欲望状态: Record<欲望维度, 欲望状态>;
+  当前主导欲望: 欲望维度;
+  短期目标: Array<{
+    目标描述: string;
+    驱动欲望: 欲望维度;
+    优先级: number;
+    时间窗口: string;
+    行为倾向: string[];
+  }>;
+  最后更新时间: string;
+}
+
+// Phase 1 新增：节奏状态
+export type 前戏阶段 = '氛围营造' | '身体接触' | '深度前戏' | '推进边缘' | '核心互动';
+export type 节奏评价 = '过快' | '适中' | '过慢' | '完美';
+
+export interface 互动节奏状态 {
+  当前阶段: 前戏阶段;
+  阶段持续时间: number;
+  阶段满意度: number;
+  节奏评价: 节奏评价;
+  最后更新时间: string;
+}
+
 export interface 完整演化状态 {
   // 原有字段
   演化日志: 性癖变化日志[];
@@ -391,6 +448,18 @@ export interface 完整演化状态 {
   性癖发现?: import('./discovery/fetishDiscovery').性癖发现状态;
   敏感点探索?: import('./discovery/sensitivePointDiscovery').敏感点探索状态;
   人格演化触发?: import('./discovery/personalityTrigger').人格演化触发状态;
+  // Phase 1 新增
+  复合情感?: 复合情感状态;
+  内在动机?: NPC内在动机;
+  节奏状态?: 互动节奏状态;
+  // Phase 2 新增
+  情景记忆?: import('./episodicMemory').情景记忆库;
+  // Phase 3 新增
+  护理累积?: import('./aftercareEvolution').护理累积记录;
+  创伤列表?: import('./aftercareEvolution').创伤条目[];
+  性格微调?: import('./aftercareEvolution').性格微调条目[];
+  // Phase 5 新增
+  日常行为?: import('./dailyPattern').日常行为状态;
 }
 
 // ==================== 扩展 NPCNSFW画像 ====================

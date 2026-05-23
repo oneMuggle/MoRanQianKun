@@ -7,6 +7,11 @@ import { 计算亲密度等级 } from '../../../models/intimacy';
 import { 构建NPC表里切换注入, 构建里模式阶段注入 } from '../../../prompts/runtime/eraLiMode';
 import type { LiModeStage } from '../../../models/eraTheme/types';
 import { 构建NPCNSFW注入 } from '../../../prompts/runtime/npcNSFWEnhancement';
+import { 构建动态叙事约束 } from '../../../prompts/runtime/dynamicNarrative';
+import { 构建事后对话提示 } from '../../../prompts/runtime/aftercareDialogue';
+import type { 情绪状态 } from '../../../models/npcNSFWEnhancement/emotionSystem';
+import type { 情感羁绊树 } from '../../../models/npcNSFWEnhancement/bondTree';
+import type { 护理质量 } from '../../../models/npcNSFWEnhancement/aftercareEvolution';
 import { 获取记忆摘要, 创建初始记忆库 } from '../../../models/npcNSFWEnhancement/nsfwMemory';
 import { 获取主导结局, 创建初始羁绊树 } from '../../../models/npcNSFWEnhancement/bondTree';
 import { 创建初始情绪 } from '../../../models/npcNSFWEnhancement/emotionSystem';
@@ -145,6 +150,15 @@ export const 构建NPC上下文 = (
         启用子纪元里模式?: Record<string, boolean>;
         子纪元里模式阶段?: Record<string, LiModeStage>;
         启用NSFW模式?: boolean;
+        叙事上下文?: {
+            当前情绪?: 情绪状态;
+            羁绊树?: 情感羁绊树;
+            嫉妒强度?: number;
+            嫉妒表现形式?: string;
+            最近护理质量?: 护理质量;
+            互动类型?: '温柔' | '正常' | '粗暴' | '特殊';
+            是否首次NSFW?: boolean;
+        };
     }
 ): {
     在场数据块: string;
@@ -600,6 +614,39 @@ export const 构建NPC上下文 = (
         const nsfwEnabled = options?.启用NSFW模式 ?? false;
         const NSFW增强注入 = 构建NPCNSFW注入(npc, eraId, nsfwEnabled);
 
+        // 动态叙事约束注入
+        const 叙事上下文 = options?.叙事上下文;
+        let 动态叙事注入: string | null = null;
+        if (nsfwEnabled && 叙事上下文) {
+            const 亲密度等级 = typeof npc.亲密度等级 === 'number' ? npc.亲密度等级 : 0;
+            const 心理防线 = typeof npc.心理防线 === 'number' ? npc.心理防线 : 80;
+            const 好感度 = typeof npc.好感度 === 'number' ? npc.好感度 : 0;
+            动态叙事注入 = 构建动态叙事约束({
+                当前情绪: 叙事上下文.当前情绪,
+                羁绊树: 叙事上下文.羁绊树,
+                亲密度等级,
+                心理防线,
+                好感度,
+                人格标签: npc.人格类型 ?? npc.核心性格特征,
+                嫉妒状态: 叙事上下文.嫉妒强度
+                    ? { 强度: 叙事上下文.嫉妒强度, 表现形式: 叙事上下文.嫉妒表现形式 ?? '冷淡回应' }
+                    : undefined,
+            });
+        }
+
+        // 事后对话注入
+        let 事后对话注入: string | null = null;
+        if (nsfwEnabled && 叙事上下文 && (叙事上下文.最近护理质量 || 叙事上下文.互动类型 || 叙事上下文.是否首次NSFW)) {
+            事后对话注入 = 构建事后对话提示({
+                羁绊树: 叙事上下文.羁绊树,
+                当前情绪: 叙事上下文.当前情绪,
+                护理质量: 叙事上下文.最近护理质量,
+                互动类型: 叙事上下文.互动类型,
+                人格标签: npc.人格类型 ?? npc.核心性格特征,
+                是否首次: 叙事上下文.是否首次NSFW,
+            });
+        }
+
         // 新增：NSFW深化系统状态注入
         const NSFW深化状态 = (() => {
           if (!nsfwEnabled) return undefined;
@@ -616,6 +663,35 @@ export const 构建NPC上下文 = (
           const 羁绊 = 扩展.羁绊树 || 创建初始羁绊树();
           const 主导结局 = 获取主导结局(羁绊);
           组件.push(`【羁绊】值${羁绊.羁绊值}/100，倾向「${主导结局}」，里程碑${羁绊.已达成里程碑.length}个`);
+
+          // Phase 1 新增：复合情感状态
+          const 演化状态 = npc.完整演化状态;
+          if (演化状态?.复合情感) {
+            const 复合 = 演化状态.复合情感;
+            const 情感摘要 = Object.entries(复合.情感维度 || {})
+              .filter(([, v]) => (v as number) > 20)
+              .map(([k, v]) => `${k}${Math.round(v as number)}`)
+              .join('、');
+            if (情感摘要) {
+              组件.push(`【复合情感】${情感摘要}，主导：${复合.主导情感}`);
+            }
+          }
+
+          // Phase 1 新增：内在动机
+          if (演化状态?.内在动机) {
+            const 动机 = 演化状态.内在动机;
+            const 最未满足 = Object.values(动机.欲望状态)
+              .sort((a, b) => a.当前满足度 - b.当前满足度)[0];
+            if (最未满足 && 最未满足.当前满足度 < 60) {
+              组件.push(`【内在动机】${最未满足.维度}未满足（${Math.round(最未满足.当前满足度)}%）`);
+            }
+          }
+
+          // Phase 1 新增：互动节奏
+          if (演化状态?.节奏状态) {
+            const 节奏 = 演化状态.节奏状态;
+            组件.push(`【互动节奏】阶段：${节奏.当前阶段}，满意度：${节奏.阶段满意度}%`);
+          }
 
           // NSFW记忆摘要
           const 记忆库 = 扩展.NSFW记忆 || 创建初始记忆库();
@@ -661,6 +737,8 @@ export const 构建NPC上下文 = (
             ...(里模式注入 ? { 里模式注入 } : {}),
             ...(里模式阶段注入 ? { 里模式阶段注入 } : {}),
             ...(NSFW增强注入 ? { NSFW增强注入 } : {}),
+            ...(动态叙事注入 ? { 动态叙事注入 } : {}),
+            ...(事后对话注入 ? { 事后对话注入 } : {}),
             ...(NSFW深化状态 ? { NSFW深化状态 } : {})
         };
     };

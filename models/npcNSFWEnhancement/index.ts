@@ -78,7 +78,11 @@ export {
 
 export {
   初始化潜能池, 更新潜能累积, 觉醒潜能,
+  计算觉醒阶段, 生成潜能暗示, 生成潜能暗示列表,
 } from './fetishPotential';
+export type {
+  潜能觉醒阶段,
+} from './types';
 
 export {
   初始化敏感点演化, 更新敏感点开发, 事件敏感点映射,
@@ -164,3 +168,59 @@ export {
   全部联动规则, 初始化跨模块状态, 处理联动事件,
   执行到期联动, 获取待执行联动, 生成联动摘要,
 } from './linker';
+
+// --- Phase 2: 情景记忆 ---
+export {
+  创建情景记忆库, 添加情景记忆, 情境匹配检索,
+  衰减情景记忆,
+  强化记忆 as 强化情景记忆,
+  生成情景记忆摘要,
+  快速创建情景记忆,
+} from './episodicMemory';
+export type {
+  情境标签组, 情感烙印, 情景记忆条目, 情景记忆库,
+} from './episodicMemory';
+
+// --- Phase 3: Gossip + 事后演化 ---
+export {
+  生成流言, 传播流言, 应用流言影响, 衰减流言,
+  生成流言摘要,
+} from './gossipEngine';
+export type {
+  流言类别, NSFW事件, 态度变化,
+} from './gossipEngine';
+
+export {
+  记录护理影响, 检查创伤触发, 计算性格微调,
+  治愈创伤, 创建初始护理累积, 生成护理摘要,
+} from './aftercareEvolution';
+export type {
+  护理质量, 护理累积记录, 创伤条目, 性格微调条目,
+} from './aftercareEvolution';
+
+// --- Phase 4: 前戏阶段 ---
+export {
+  创建初始节奏状态, 评估互动, 推进前戏阶段,
+  评估阶段满意度, 强制变更阶段, 生成前戏阶段提示,
+} from './foreplayStages';
+export type {
+  互动评分,
+} from './foreplayStages';
+
+// --- Phase 5: 日常行为模式 ---
+export {
+  创建初始日常状态, 选择日常行为, 记录日常行为,
+  生成日常行为提示, 获取今日行为Ids,
+} from './dailyPattern';
+export type {
+  日常行为类别, 日常行为模板, 日常行为状态,
+  日常行为记录, 日常行为倾向,
+} from './dailyPattern';
+
+// --- Phase 4: 动态禁忌 ---
+export {
+  计算动态禁忌, 更新禁忌列表, 生成禁忌摘要, 预测禁忌软化,
+} from './dynamicTaboos';
+export type {
+  动态禁忌,
+} from './dynamicTaboos';

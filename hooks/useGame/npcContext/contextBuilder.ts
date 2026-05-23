@@ -7,6 +7,11 @@ import { 计算亲密度等级 } from '../../../models/intimacy';
 import { 构建NPC表里切换注入, 构建里模式阶段注入 } from '../../../prompts/runtime/eraLiMode';
 import type { LiModeStage } from '../../../models/eraTheme/types';
 import { 构建NPCNSFW注入 } from '../../../prompts/runtime/npcNSFWEnhancement';
+import { 构建动态叙事约束 } from '../../../prompts/runtime/dynamicNarrative';
+import { 构建事后对话提示 } from '../../../prompts/runtime/aftercareDialogue';
+import type { 情绪状态 } from '../../../models/npcNSFWEnhancement/emotionSystem';
+import type { 情感羁绊树 } from '../../../models/npcNSFWEnhancement/bondTree';
+import type { 护理质量 } from '../../../models/npcNSFWEnhancement/aftercareEvolution';
 
 export type NPC上下文构建选项 = {
     worldPrompt?: string;
@@ -17,6 +22,16 @@ export type NPC上下文构建选项 = {
     启用子纪元里模式?: Record<string, boolean>;
     子纪元里模式阶段?: Record<string, LiModeStage>;
     启用NSFW模式?: boolean;
+    // 动态叙事与事后对话
+    叙事上下文?: {
+        当前情绪?: 情绪状态;
+        羁绊树?: 情感羁绊树;
+        嫉妒强度?: number;
+        嫉妒表现形式?: string;
+        最近护理质量?: 护理质量;
+        互动类型?: '温柔' | '正常' | '粗暴' | '特殊';
+        是否首次NSFW?: boolean;
+    };
 };
 
 export const 构建NPC上下文 = (
@@ -459,6 +474,40 @@ export const 构建NPC上下文 = (
         const 里模式阶段注入 = 构建里模式阶段注入(eraId, stage, liModeEnabled);
         const nsfwEnabled = options?.启用NSFW模式 ?? false;
         const NSFW增强注入 = 构建NPCNSFW注入(npc, eraId, nsfwEnabled);
+
+        // 动态叙事约束注入
+        const 叙事上下文 = options?.叙事上下文;
+        let 动态叙事注入: string | null = null;
+        if (nsfwEnabled && 叙事上下文) {
+            const 亲密度等级 = typeof npc.亲密度等级 === 'number' ? npc.亲密度等级 : 0;
+            const 心理防线 = typeof npc.心理防线 === 'number' ? npc.心理防线 : 80;
+            const 好感度 = typeof npc.好感度 === 'number' ? npc.好感度 : 0;
+            动态叙事注入 = 构建动态叙事约束({
+                当前情绪: 叙事上下文.当前情绪,
+                羁绊树: 叙事上下文.羁绊树,
+                亲密度等级,
+                心理防线,
+                好感度,
+                人格标签: npc.人格类型 ?? npc.核心性格特征,
+                嫉妒状态: 叙事上下文.嫉妒强度
+                    ? { 强度: 叙事上下文.嫉妒强度, 表现形式: 叙事上下文.嫉妒表现形式 ?? '冷淡回应' }
+                    : undefined,
+            });
+        }
+
+        // 事后对话注入（仅在 NSFW 模式且有护理/互动上下文时）
+        let 事后对话注入: string | null = null;
+        if (nsfwEnabled && 叙事上下文 && (叙事上下文.最近护理质量 || 叙事上下文.互动类型 || 叙事上下文.是否首次NSFW)) {
+            事后对话注入 = 构建事后对话提示({
+                羁绊树: 叙事上下文.羁绊树,
+                当前情绪: 叙事上下文.当前情绪,
+                护理质量: 叙事上下文.最近护理质量,
+                互动类型: 叙事上下文.互动类型,
+                人格标签: npc.人格类型 ?? npc.核心性格特征,
+                是否首次: 叙事上下文.是否首次NSFW,
+            });
+        }
+
         return {
             索引: 基础数据.索引,
             id: 基础数据.id,
@@ -480,7 +529,9 @@ export const 构建NPC上下文 = (
             记忆: 记忆展示.记忆,
             ...(里模式注入 ? { 里模式注入 } : {}),
             ...(里模式阶段注入 ? { 里模式阶段注入 } : {}),
-            ...(NSFW增强注入 ? { NSFW增强注入 } : {})
+            ...(NSFW增强注入 ? { NSFW增强注入 } : {}),
+            ...(动态叙事注入 ? { 动态叙事注入 } : {}),
+            ...(事后对话注入 ? { 事后对话注入 } : {}),
         };
     };
 

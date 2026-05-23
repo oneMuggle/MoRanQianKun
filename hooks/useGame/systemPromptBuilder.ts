@@ -27,6 +27,8 @@ import {
 } from './promptRuntime';
 import { 构建AI角色声明提示词 } from '../../prompts/runtime/roleIdentity';
 import { 构建在场NPC_NSWF卡片组 } from '../../prompts/runtime/nsfwCard';
+import { 执行NSFW回合预处理 } from './nsfw/phase1Integration';
+import type { NPC主动行为上下文 } from './npc/npcAutonomy';
 import {
     构建字数要求提示词,
     构建免责声明输出要求提示词,
@@ -1683,6 +1685,45 @@ export const 构建系统提示词 = ({
         };
     });
 
+    // NSFW回合预处理：初始化深化状态 + 计算自主行为
+    const nsfwPreprocess注入 = normalizedGameConfig.启用NSFW模式 ?? false
+        ? (() => {
+            const 在场列表: NPC主动行为上下文[] = (socialData || [])
+                .filter((n: any) => n.是否在场)
+                .map((n: any) => ({
+                    npcId: n.id ?? '',
+                    姓名: n.姓名,
+                    好感度: n.好感度 ?? 0,
+                    亲密度等级: n.亲密度等级 ?? 0,
+                    心情值: n.心情值 ?? 50,
+                    心理防线: n.心理防线 ?? 50,
+                    人格标签: n.核心性格特征,
+                    内在动机: n.完整演化状态?.内在动机,
+                }));
+
+            // 对所有NPC执行状态初始化 + 自主行为计算
+            const 提示词组: string[] = [];
+            for (const npc of socialData || []) {
+                const 结果 = 执行NSFW回合预处理(npc, 在场列表, undefined, npc.亲密度等级 ?? 0);
+                if (结果.提示词注入) {
+                    提示词组.push(结果.提示词注入);
+                }
+            }
+            return 提示词组.join('\n');
+          })()
+        : '';
+
+    // 提取叙事上下文（用于动态叙事约束和事后对话）
+    const 当前社交 = socialData?.[0] || null;
+    const 叙事上下文 = normalizedGameConfig.启用NSFW模式 ? {
+        当前情绪: 当前社交?.情绪状态 ?? undefined,
+        羁绊树: 当前社交?.情感羁绊树 ?? undefined,
+        嫉妒强度: typeof 当前社交?.嫉妒状态?.嫉妒强度 === 'number' ? 当前社交.嫉妒状态.嫉妒强度 : undefined,
+        嫉妒表现形式: 当前社交?.嫉妒状态?.表现形式 ?? undefined,
+        最近护理质量: 当前社交?.完整演化状态?.事后护理?.护理质量 ?? undefined,
+        是否首次NSFW: !(当前社交?.完整演化状态?.演化日志?.length > 0),
+    } : undefined;
+
     const npcContext = 构建NPC上下文(socialData || [], memoryConfig, {
         worldPrompt,
         realmPrompt,
@@ -1691,7 +1732,8 @@ export const 构建系统提示词 = ({
         eraId: options?.eraId,
         启用子纪元里模式: normalizedGameConfig.启用子纪元里模式,
         子纪元里模式阶段: normalizedGameConfig.子纪元里模式阶段,
-        启用NSFW模式: normalizedGameConfig.启用NSFW模式 ?? false
+        启用NSFW模式: normalizedGameConfig.启用NSFW模式 ?? false,
+        叙事上下文,
     });
     const contextMapAndBuilding = 构建地图建筑状态文本(statePayload);
     const promptHeader = [
@@ -1753,6 +1795,7 @@ export const 构建系统提示词 = ({
             contextStoryPlan,
             contextNPCData,
             nsfwCardBlock,
+            nsfwPreprocess注入,
             contextHeroinePlan,
             contextWorldState,
             contextEnvironmentState,

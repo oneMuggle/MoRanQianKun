@@ -1047,7 +1047,13 @@ const SocialModal: React.FC<Props> = ({
                                                                 <span className="w-1.5 h-3 bg-blue-500/70 rounded-full"></span>
                                                                 情绪状态
                                                             </h4>
-                                                            <EmotionPanel 情绪={(currentNPC as any).NSFW扩展.情绪状态} size="sm" />
+                                                            <EmotionPanel
+                                                                情绪={(currentNPC as any).NSFW扩展.情绪状态}
+                                                                复合情感={(currentNPC as any).完整演化状态?.复合情感}
+                                                                节奏状态={(currentNPC as any).完整演化状态?.节奏状态}
+                                                                日常行为={(currentNPC as any).完整演化状态?.日常行为}
+                                                                size="sm"
+                                                            />
                                                         </div>
                                                     )}
 

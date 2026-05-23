@@ -11,6 +11,11 @@ import { 生成服装状态文本, 是否暴露 } from '../../models/npcNSFWEnha
 import { 生成探索进度摘要 } from '../../models/npcNSFWEnhancement/discovery/fetishDiscovery';
 import { 生成敏感点探索摘要 } from '../../models/npcNSFWEnhancement/discovery/sensitivePointDiscovery';
 import { 生成人格演化摘要 } from '../../models/npcNSFWEnhancement/discovery/personalityTrigger';
+import { 生成情景记忆摘要, 情境标签组 } from '../../models/npcNSFWEnhancement/episodicMemory';
+import { 生成前戏阶段提示 } from '../../models/npcNSFWEnhancement/foreplayStages';
+import { 生成日常行为提示 } from '../../models/npcNSFWEnhancement/dailyPattern';
+import { 计算动态禁忌, 生成禁忌摘要 } from '../../models/npcNSFWEnhancement/dynamicTaboos';
+import { 生成潜能暗示列表 } from '../../models/npcNSFWEnhancement/fetishPotential';
 import type { LiModeIntensity } from './eraLiMode';
 
 interface NSFW注入选项 {
@@ -69,8 +74,15 @@ export function 构建NPCNSFW注入(
     }
   }
 
-  if (画像.性癖.绝对禁忌.length > 0) {
-    组件.push(`绝对禁忌：${画像.性癖.绝对禁忌.join('、')}`);
+  // --- 动态禁忌 ---
+  const 动态禁忌 = 计算动态禁忌(
+    画像.性癖,
+    画像.心理防线?.防线值 ?? 80,
+    (npc as any).亲密度等级 ? ((npc as any).亲密度等级 / 6 * 100) : 0,
+    画像.性癖.核心偏好.map(p => p.子类型)
+  );
+  if (动态禁忌.当前禁忌.length > 0 || 动态禁忌.软化禁忌.length > 0) {
+    组件.push(生成禁忌摘要(动态禁忌));
   }
 
   if (画像.性癖.隐藏偏好.length > 0) {
@@ -92,6 +104,15 @@ export function 构建NPCNSFW注入(
   const 性癖探索摘要 = 生成探索进度摘要(npc);
   if (性癖探索摘要 !== '尚未开始性癖探索') {
     组件.push(`性癖探索：${性癖探索摘要}`);
+  }
+
+  // --- Phase 5 新增：潜能暗示 ---
+  const 潜能池 = npc.完整演化状态?.潜能池;
+  if (潜能池 && 潜能池.length > 0) {
+    const 暗示列表 = 生成潜能暗示列表(潜能池);
+    for (const 暗示 of 暗示列表) {
+      组件.push(暗示);
+    }
   }
 
   const 敏感点探索摘要 = 生成敏感点探索摘要(npc);
@@ -235,6 +256,143 @@ export function 构建NPCNSFW注入(
     组件.push('叙事指引：将这些联动效果自然融入叙事。');
   }
 
+  // --- Phase 1 新增：自主行为倾向 ---
+  const 演化状态 = npc.完整演化状态;
+  if (演化状态?.内在动机) {
+    const 主导欲望 = 演化状态.内在动机.当前主导欲望;
+    const 满足度 = 演化状态.内在动机.欲望状态[主导欲望]?.当前满足度 ?? 50;
+    if (满足度 < 50) {
+      组件.push('');
+      组件.push(`【内在动机】当前主导欲望：${主导欲望}（满足度${Math.round(满足度)}%）`);
+      if (满足度 < 30) {
+        组件.push('注意：该欲望极度不满足，NPC可能主动采取行动来满足这一欲望。');
+      } else if (满足度 < 50) {
+        组件.push('注意：该欲望未满足，NPC可能表现出相关行为倾向。');
+      }
+    }
+  }
+
+  // --- Phase 1 新增：复合情感状态 ---
+  const 复合情感 = 演化状态?.复合情感;
+  if (复合情感) {
+    const 主导 = 复合情感.主导情感;
+    const 主导值 = 复合情感.情感维度?.[主导] ?? 0;
+    组件.push('');
+    组件.push(`【复合情感】主导情感：${主导}（${Math.round(主导值)}%）`);
+    if (复合情感.情感冲突?.length) {
+      const 冲突描述 = 复合情感.情感冲突.map(c => `${c.维度A}与${c.维度B}冲突（${c.冲突强度}%）→ ${c.行为表现}`).join('；');
+      组件.push(`情感冲突：${冲突描述}`);
+      组件.push('注意：请在叙事中体现这种情感矛盾。');
+    }
+  }
+
+  // --- Phase 1/4 新增：节奏状态 + 前戏阶段 ---
+  const 节奏状态数据 = 演化状态?.节奏状态;
+  if (节奏状态数据) {
+    组件.push('');
+    组件.push(生成前戏阶段提示(节奏状态数据));
+  }
+
+  // --- Phase 2 新增：情景记忆 ---
+  if (演化状态?.情景记忆 && 演化状态.情景记忆.记忆列表.length > 0) {
+    // 根据当前环境推断情境标签
+    const 当前情境: Partial<情境标签组> = {};
+    if (环境 && 游戏时间) {
+      const 小时 = parseInt(游戏时间.split(':')[0] ?? '12', 10);
+      if (小时 >= 5 && 小时 < 8) 当前情境.时间 = ['清晨'];
+      else if (小时 >= 8 && 小时 < 12) 当前情境.时间 = ['午后'];
+      else if (小时 >= 17 && 小时 < 19) 当前情境.时间 = ['黄昏'];
+      else if (小时 >= 19 && 小时 < 22) 当前情境.时间 = ['夜晚'];
+      else if (小时 >= 22 || 小时 < 2) 当前情境.时间 = ['深夜'];
+      else 当前情境.时间 = ['午夜'];
+
+      const 地点文本 = `${环境.具体地点 || ''}${环境.大地点 || ''}`.toLowerCase();
+      if (地点文本.includes('房间') || 地点文本.includes('室内') || 地点文本.includes('屋') || 地点文本.includes('阁') || 地点文本.includes('殿')) {
+        当前情境.地点 = ['室内', '私密'];
+      } else if (地点文本.includes('花园') || 地点文本.includes('森林') || 地点文本.includes('自然') || 地点文本.includes('山') || 地点文本.includes('林') || 地点文本.includes('湖') || 地点文本.includes('温泉')) {
+        当前情境.地点 = ['自然', '室外'];
+      } else if (地点文本.includes('街道') || 地点文本.includes('市场') || 地点文本.includes('酒') || 地点文本.includes('茶馆') || 地点文本.includes('城')) {
+        当前情境.地点 = ['公共', '建筑'];
+      }
+    }
+    const 记忆摘要 = 生成情景记忆摘要(演化状态.情景记忆, 当前情境);
+    if (记忆摘要 !== '无相关情景记忆') {
+      组件.push('');
+      组件.push(`【情景记忆】${记忆摘要}`);
+      组件.push('注意：请在叙事中自然呼应这些记忆，体现NPC对共同经历的回忆。');
+    }
+  }
+
+  // --- Phase 1 新增：最近自主行为 ---
+  const 最近自主行为 = (npc as any).NSFW扩展?.最近自主行为;
+  if (最近自主行为 && 最近自主行为.时间) {
+    组件.push('');
+    组件.push(`【自主行为】${npc.姓名}最近主动${最近自主行为.类型}：${最近自主行为.描述}`);
+    组件.push('注意：请在叙事中承接这一自主行为的后续发展。');
+  }
+
+  // --- Phase 5 新增：日常行为模式 ---
+  const 日常状态 = 演化状态?.日常行为;
+  if (日常状态 && 日常状态.今日行为.length > 0) {
+    const 日常提示 = 生成日常行为提示(日常状态);
+    if (日常提示) {
+      组件.push('');
+      组件.push(日常提示);
+    }
+  }
+
+  // --- Phase 1 新增：AI 报告模板 ---
+  组件.push('');
+  组件.push('【自主行为报告】');
+  组件.push('当该NPC在本回合主动发起行为（邀约/试探/情绪表达/嫉妒表现/NSFW暗示/关心问候/记忆触发）时，在响应末尾输出：');
+  组件.push('<自主行为>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "行为类型": "{主动邀约|试探行为|情绪表达|嫉妒表现|NSFW暗示|关心问候|记忆触发}", "描述": "{具体行为描述}", "优先级": 0-100}`);
+  组件.push('</自主行为>');
+  组件.push('注意：仅在NPC确实主动发起了有意义的行为时才输出。');
+
+  组件.push('');
+  组件.push('【情感维度变化报告】');
+  组件.push('当该NPC的情感维度发生显著变化时（变化幅度>10），在响应末尾输出：');
+  组件.push('<情感维度变化>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "情感维度": {"爱慕": 0-100, "嫉妒": 0-100, "不安": 0-100, "兴奋": 0-100, "内疚": 0-100}, "主导情感": "{爱慕|嫉妒|不安|兴奋|内疚}"}`);
+  组件.push('</情感维度变化>');
+  组件.push('注意：仅在情感维度发生显著变化时才输出。');
+
+  组件.push('');
+  组件.push('【节奏推进报告】');
+  组件.push('当亲密互动进入新阶段或阶段满意度变化时，在响应末尾输出：');
+  组件.push('<节奏推进>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "当前阶段": "{氛围营造|身体接触|深度前戏|推进边缘|核心互动}", "阶段满意度": 0-100, "节奏评价": "{过快|适中|过慢|完美}"}`);
+  组件.push('</节奏推进>');
+  组件.push('注意：仅在节奏阶段发生变化时才输出。');
+
+  // --- Phase 2 新增：情景记忆报告模板 ---
+  组件.push('');
+  组件.push('【情景记忆报告】');
+  组件.push('当发生值得铭记的重要事件时（首次体验/关系突破/情感高潮/特殊场景），在响应末尾输出：');
+  组件.push('<情景记忆>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "标题": "{简短标题}", "简述": "{一句话概括}", "详细": "{具体经过描述}", "情境": {"时间": "{夜晚|午后等}", "地点": "{室内|室外|自然等}", "氛围": "{温馨|暧昧|紧张等}", "关系": "{亲密|熟悉等}", "行为": "{亲密行为|突破界限等}"}, "情感": [{"类型": "{依恋|羞耻|兴奋等}", "强度": 0-100, "持久度": 0-100}], "重要度": 1-10}`);
+  组件.push('</情景记忆>');
+  组件.push('注意：仅在确实发生了重要事件时才输出，普通互动不要输出。');
+
+  // --- Phase 3 新增：流言传播报告模板 ---
+  组件.push('');
+  组件.push('【流言传播报告】');
+  组件.push('当NSFW事件可能引发流言传播时（公共场合/多人互动/被目击），在响应末尾输出：');
+  组件.push('<流言传播>');
+  组件.push(`{"内容": "{流言内容}", "目标NPC": "{被议论的NPC姓名}", "严重度": 1-5, "在场NPC": ["{知情者ID}"]}`);
+  组件.push('</流言传播>');
+  组件.push('注意：仅在有明确传播风险时才输出。');
+
+  // --- Phase 3 新增：护理记录报告模板 ---
+  组件.push('');
+  组件.push('【护理记录报告】');
+  组件.push('当NSFW场景结束后玩家进行了事后护理时，在响应末尾输出：');
+  组件.push('<护理记录>');
+  组件.push(`{"npc姓名": "${npc.姓名}", "护理质量": "{无视|敷衍|温柔|用心}"}`);
+  组件.push('</护理记录>');
+  组件.push('注意：仅在NSFW场景结束后的护理行为时输出。');
+
   return 组件.join('\n');
 }
 
@@ -266,4 +424,102 @@ export function 构建NPCNSFW精简注入(
   }
 
   return parts.join(' | ');
+}
+
+// ==================== Phase 2: Token 智能裁剪 ====================
+
+interface NPC相关性评分 {
+  npc: NPC结构;
+  得分: number;
+  原因: string[];
+}
+
+function 计算NPC相关性评分(npc: NPC结构): NPC相关性评分 {
+  const 原因: string[] = [];
+  let 得分 = 0;
+
+  // 好感度权重 (0-30分)
+  const 好感度 = (npc as any).好感度 ?? 0;
+  得分 += Math.min(30, 好感度 * 0.3);
+  if (好感度 > 50) 原因.push(`高好感度(${好感度})`);
+
+  // 亲密度权重 (0-25分)
+  const 亲密度 = (npc as any).亲密度等级 ?? 0;
+  得分 += Math.min(25, 亲密度 * 8);
+  if (亲密度 >= 3) 原因.push(`高亲密度(${亲密度})`);
+
+  // NSFW深化状态活跃度 (0-20分)
+  const 演化 = (npc as any).完整演化状态;
+  if (演化?.复合情感) {
+    const 情感值 = Object.values(演化.复合情感.情感维度 || {}) as number[];
+    const 情感强度 = 情感值.length > 0 ? 情感值.reduce((s, v) => s + v, 0) / 情感值.length : 0;
+    if (情感强度 > 30) { 得分 += 10; 原因.push('情感活跃'); }
+  }
+  if (演化?.内在动机) {
+    const 欲望值 = Object.values(演化.内在动机.欲望状态 || {}) as Array<{ 当前满足度?: number }>;
+    const 最未满足 = 欲望值.length > 0
+      ? 欲望值.reduce((min, d) => Math.min(min, d.当前满足度 ?? 50), 100)
+      : 50;
+    if (最未满足 < 40) { 得分 += 10; 原因.push('欲望未满足'); }
+  }
+  if (演化?.情景记忆?.记忆列表?.length) {
+    const 活跃记忆 = 演化.情景记忆.记忆列表.filter((m: any) => m.当前强度 > 50).length;
+    得分 += Math.min(10, 活跃记忆 * 3);
+    if (活跃记忆 > 0) 原因.push(`${活跃记忆}条活跃记忆`);
+  }
+
+  // 在场状态 (0-15分)
+  if ((npc as any).是否在场) { 得分 += 15; 原因.push('在场'); }
+
+  // 人格状态 (0-10分)
+  if ((npc as any).当前人格状态 === '里') { 得分 += 10; 原因.push('里人格激活'); }
+  else if ((npc as any).当前人格状态 === '半觉醒') { 得分 += 5; 原因.push('半觉醒'); }
+
+  return { npc, 得分: Math.round(得分), 原因 };
+}
+
+export interface 智能裁剪选项 {
+  最大完整注入数?: number;     // 默认 3
+  完整注入Token预算?: number;  // 默认不限制
+  当前在场NPC数?: number;      // 用于日志
+}
+
+/**
+ * 智能裁剪：对多 NPC 按相关性排序，Top N 注入完整画像，其余注入精简版
+ */
+export function 批量构建NSFW智能注入(
+  npc列表: NPC结构[],
+  eraId: string | null | undefined,
+  nsfwEnabled: boolean = true,
+  选项?: 智能裁剪选项
+): string {
+  if (!nsfwEnabled) return '';
+
+  const { 最大完整注入数 = 3 } = 选项 ?? {};
+  const 评分列表 = npc列表
+    .filter(n => 应启用增强档案(n))
+    .map(n => 计算NPC相关性评分(n))
+    .sort((a, b) => b.得分 - a.得分);
+
+  const 完整注入NPC = 评分列表.slice(0, 最大完整注入数);
+  const 精简注入NPC = 评分列表.slice(最大完整注入数);
+
+  const 组件: string[] = [];
+
+  // 完整注入
+  for (const { npc, 原因 } of 完整注入NPC) {
+    const 注入 = 构建NPCNSFW注入(npc, eraId, true);
+    if (注入) 组件.push(注入);
+  }
+
+  // 精简注入
+  if (精简注入NPC.length > 0) {
+    组件.push('【其他在场NPC — 精简画像】');
+    for (const { npc, 得分, 原因 } of 精简注入NPC) {
+      const 注入 = 构建NPCNSFW精简注入(npc, eraId, true);
+      if (注入) 组件.push(`- ${注入}（相关性${得分}分，${原因.join('、')}）`);
+    }
+  }
+
+  return 组件.join('\n\n');
 }
