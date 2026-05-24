@@ -62,7 +62,7 @@ export const 创建回档快照系统 = (deps: {
     规范化女主剧情规划状态: (data?: any) => any;
     规范化同人剧情规划状态: (data?: any) => any;
     规范化同人女主剧情规划状态: (data?: any) => any;
-    应用并同步记忆系统: (memory: 记忆系统结构) => 记忆系统结构;
+    应用并同步记忆系统: (memory: 记忆系统结构, options?: { 静默总结提示?: boolean }) => void;
     设置历史记录: (v: any[]) => void;
     应用视觉设置到状态: (v: Partial<视觉设置结构> | null | undefined) => void;
     应用场景图片档案到状态: (v: 场景图片档案 | null | undefined) => void;
@@ -89,10 +89,13 @@ export const 创建回档快照系统 = (deps: {
 
     const 回档到快照 = (
         snapshot: 回合快照结构,
-        options?: { 保留图片状态?: boolean }
+        options?: { 保留图片状态?: boolean; 静默记忆总结?: boolean }
     ) => {
         deps.设置历史记录(deps.深拷贝(snapshot.回档前历史));
-        deps.应用并同步记忆系统(deps.深拷贝(snapshot.回档前状态.记忆系统));
+        deps.应用并同步记忆系统(
+            deps.深拷贝(snapshot.回档前状态.记忆系统),
+            { 静默总结提示: options?.静默记忆总结 === true }
+        );
         if (options?.保留图片状态 !== true) {
             deps.应用视觉设置到状态(deps.深拷贝(snapshot.回档前持久态?.视觉设置 || {}));
             deps.应用场景图片档案到状态(deps.深拷贝(snapshot.回档前持久态?.场景图片档案 || {}));

@@ -49,7 +49,7 @@ type 历史回合工作流依赖 = {
     场景图片档案Ref: { current: any };
     scrollRef: { current: any };
     获取最新快照: () => 回合快照结构 | null;
-    回档到快照: (snapshot: 回合快照结构, options?: { 保留图片状态?: boolean }) => void;
+    回档到快照: (snapshot: 回合快照结构, options?: { 保留图片状态?: boolean; 静默记忆总结?: boolean }) => void;
     弹出重Roll快照: () => 回合快照结构 | null;
     删除最近自动存档并重置状态: () => Promise<void>;
     深拷贝: <T>(value: T) => T;
@@ -80,6 +80,7 @@ type 历史回合工作流依赖 = {
         parsedResponse: GameResponse;
     }) => Promise<GameResponse>;
     应用并同步记忆系统: (memory: 记忆系统结构, options?: { 静默总结提示?: boolean }) => void;
+    清空后台记忆总结流程: () => void;
     performAutoSave: (snapshot?: any) => Promise<void>;
     设置剧情: (value: 剧情系统结构) => void;
     设置历史记录: (value: 聊天记录结构[]) => void;
@@ -400,7 +401,8 @@ export const 创建历史回合工作流 = (deps: 历史回合工作流依赖) =
         const snapshot = deps.弹出重Roll快照();
         if (!snapshot) return null;
         await deps.删除最近自动存档并重置状态();
-        deps.回档到快照(snapshot);
+        deps.回档到快照(snapshot, { 静默记忆总结: true });
+        deps.清空后台记忆总结流程();
         return snapshot.玩家输入;
     };
 
