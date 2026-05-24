@@ -69,30 +69,35 @@ AI回复 → 写入记忆 → 应用并同步记忆系统 → 刷新记忆总结
 ### 实施步骤
 
 #### 步骤 1：新增配置项和状态定义
-- [ ] `models/game-settings.ts`：在 `记忆配置结构` 中添加 `启用后台自动总结?: boolean`
-- [ ] `hooks/useGame/subsystems/zustandStore.ts`：添加 `后台记忆总结状态`、`后台记忆总结草稿`、`后台记忆总结错误` 状态字段
+- [x] `models/game-settings.ts`：在 `记忆配置结构` 中添加 `启用后台自动总结?: boolean`
+- [x] `models/system.ts`：同上（主定义）
+- [x] `hooks/useGame/subsystems/zustandStore.ts`：添加 `后台记忆总结状态`、`后台记忆总结草稿`、`后台记忆总结错误`、`后台记忆总结任务` 状态字段
 
 #### 步骤 2：修改 `memorySummaryHandlers.ts`
-- [ ] 新增 `handleBackgroundMemorySummary` 方法 — 后台异步执行总结
-- [ ] 修改 `刷新记忆总结任务` — 根据 `启用后台自动总结` 配置决定是否静默
-- [ ] 新增 `handleApplyBackgroundMemorySummary` — 应用后台总结结果
-- [ ] 新增 `handleDismissBackgroundNotification` — 关闭通知
+- [x] 新增 `执行后台记忆总结` 方法 — 后台异步执行总结
+- [x] 修改 `刷新记忆总结任务` — 根据 `启用后台自动总结` 配置决定是否静默
+- [x] 新增 `handleApplyBackgroundMemorySummary` — 应用后台总结结果
+- [x] 新增 `handleDismissBackgroundNotification` — 关闭通知
+- [x] 新增 `handleViewBackgroundSummary` — 查看后台总结（跳转到 review 弹窗）
+- [x] 新增 `清空后台记忆总结流程` — 清空后台状态
 
 #### 步骤 3：暴露状态到 meta/actions
-- [ ] `hooks/useGame/core/useGameReturnMapper.ts`：添加 `backgroundMemorySummaryStatus` 等 meta
-- [ ] `hooks/useGame/memory/memorySummaryHandlers.ts`：return 新增方法
+- [x] `hooks/useGame/core/useGameReturnMapper.ts`：添加 `backgroundMemorySummaryStatus` 等 meta
+- [x] `hooks/useGame/memory/memorySummaryHandlers.ts`：return 新增方法
 
 #### 步骤 4：创建后台总结通知组件
-- [ ] 新建 `components/features/Memory/BackgroundSummaryNotification.tsx` — 顶部通知条
-- [ ] 集成到 `components/app/MemoryModals.tsx`
+- [x] 新建 `components/features/Memory/BackgroundSummaryBanner.tsx` — 顶部通知条
+- [x] 集成到 `components/app/MemoryModals.tsx`
 
 #### 步骤 5：修改弹窗 UI
-- [ ] `MemorySummaryFlowModal.tsx`：processing 阶段允许关闭（改为"在后台继续"）
-- [ ] `MemorySummaryFlowMobileModal.tsx`：同上
+- [x] `MemorySummaryFlowModal.tsx`：processing 阶段允许关闭（改为"在后台继续"）
+- [x] `MemorySummaryFlowMobileModal.tsx`：同上
 
-#### 步骤 6：连接自动触发点
-- [ ] `responseProcessingPhase.ts`：确认自动触发时传入正确的静默选项
-- [ ] 确保默认行为为后台执行
+#### 步骤 6：连接自动触发点 + 输入锁定
+- [x] `hooks/useGame/domains/memoryRuntimeDomain.ts`：传递新的 deps 和方法
+- [x] `hooks/useGame.ts`：连接所有新状态和方法
+- [x] `components/features/Chat/InputArea.tsx`：添加 `backgroundSummaryLocking` 属性
+- [x] `components/app/GameView.tsx`：传递 `backgroundSummaryLocking` 到 InputArea
 
 ## 风险评估与依赖
 

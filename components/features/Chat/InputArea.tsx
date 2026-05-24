@@ -105,6 +105,7 @@ const InputArea: React.FC<Props> = ({
     requestConfirm,
     loading,
     variableGenerationRunning = false,
+    backgroundSummaryLocking = false,
     canReroll = true,
     canQuickRestart = false,
     options = [],
@@ -403,7 +404,7 @@ const InputArea: React.FC<Props> = ({
         .map(normalizeOptionText)
         .filter(item => item.length > 0);
 
-    const busy = loading || isPreparing;
+    const busy = loading || isPreparing || backgroundSummaryLocking;
     const effectiveWorldEvolutionProgress = worldEvolutionProgress || openingWorldEvolutionProgress;
     const effectivePlanningProgress = planningProgress || openingPlanningProgress;
     const effectiveVariableGenerationProgress = variableGenerationProgress || openingVariableGenerationProgress;

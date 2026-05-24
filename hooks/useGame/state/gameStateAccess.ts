@@ -202,6 +202,14 @@ export interface GameStateAccess {
     setNPC记忆总结草稿: GameStoreSlice['setNPC记忆总结草稿'];
     NPC记忆总结错误: GameStoreSlice['NPC记忆总结错误'];
     setNPC记忆总结错误: GameStoreSlice['setNPC记忆总结错误'];
+    后台记忆总结状态: GameStoreSlice['后台记忆总结状态'];
+    set后台记忆总结状态: GameStoreSlice['set后台记忆总结状态'];
+    后台记忆总结草稿: GameStoreSlice['后台记忆总结草稿'];
+    set后台记忆总结草稿: GameStoreSlice['set后台记忆总结草稿'];
+    后台记忆总结错误: GameStoreSlice['后台记忆总结错误'];
+    set后台记忆总结错误: GameStoreSlice['set后台记忆总结错误'];
+    后台记忆总结任务: GameStoreSlice['后台记忆总结任务'];
+    set后台记忆总结任务: GameStoreSlice['set后台记忆总结任务'];
 
     // Variable Slice
     变量生成中: GameStoreSlice['变量生成中'];
@@ -499,6 +507,14 @@ export function createGameStateAccess(
         setNPC记忆总结草稿: store.setNPC记忆总结草稿,
         NPC记忆总结错误: store.NPC记忆总结错误,
         setNPC记忆总结错误: store.setNPC记忆总结错误,
+        后台记忆总结状态: store.后台记忆总结状态,
+        set后台记忆总结状态: store.set后台记忆总结状态,
+        后台记忆总结草稿: store.后台记忆总结草稿,
+        set后台记忆总结草稿: store.set后台记忆总结草稿,
+        后台记忆总结错误: store.后台记忆总结错误,
+        set后台记忆总结错误: store.set后台记忆总结错误,
+        后台记忆总结任务: store.后台记忆总结任务,
+        set后台记忆总结任务: store.set后台记忆总结任务,
 
         // Variable Slice
         变量生成中: store.变量生成中,

@@ -469,6 +469,7 @@ export function GameView({
                                         requestConfirm={requestConfirm}
                                         loading={state.loading}
                                         variableGenerationRunning={(meta as any).variableGenerationRunning}
+                                        backgroundSummaryLocking={(meta as any).backgroundMemorySummaryStatus === 'running'}
                                         canReroll={(meta as any).canRerollLatest}
                                         canQuickRestart={(meta as any).canQuickRestart}
                                         openingWorldEvolutionProgress={(meta as any).openingWorldEvolutionProgress}

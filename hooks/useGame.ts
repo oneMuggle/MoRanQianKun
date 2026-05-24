@@ -134,6 +134,10 @@ const 加载场景生图工作流 = () => import('./useGame/image/sceneImageWork
 
 
 export const useGame = () => {
+    // 订阅通知列表变化，确保 Zustand 更新能触发重渲染（变量本身不直接使用）
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _notificationList = useGameStore(s => s.右下角提示列表);
+
     // --- 统一状态访问 + Ref 注册表（阶段 1 重构） ---
     const gameState = useGameState();
     const stateAccess = createGameStateAccess(gameState, useGameStore.getState());
