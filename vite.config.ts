@@ -159,28 +159,13 @@ export default defineConfig(({ mode }) => {
               return 'vendor';
             }
  
-            if (normalizedId.includes('/prompts/core/')) {
-              return 'prompts-core';
-            }
-
-            if (normalizedId.includes('/prompts/shared/')) {
-              return 'prompts-shared';
-            }
-
-            if (normalizedId.endsWith('/utils/promptFeatureToggles.ts')) {
-              return 'prompts-shared-utils';
-            }
- 
-            if (normalizedId.includes('/prompts/runtime/')) {
-              return 'prompts-runtime';
-            }
- 
-            if (normalizedId.includes('/prompts/stats/')) {
-              return 'prompts-stats';
-            }
- 
-            if (normalizedId.includes('/prompts/')) {
-              return 'prompts-misc';
+            // prompts 模块存在循环依赖: stats → runtime → types → models → hooks/useGame
+            // 将它们合并到同一个 chunk 中，避免跨 chunk 的 ESM TDZ 错误
+            if (
+              normalizedId.includes('/prompts/') ||
+              normalizedId.endsWith('/utils/promptFeatureToggles.ts')
+            ) {
+              return 'prompts-bundle';
             }
  
             if (normalizedId.includes('/components/features/Social/ImageManagerModal')) {
