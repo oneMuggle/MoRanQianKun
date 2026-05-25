@@ -41,7 +41,7 @@ const PhoneStatusBar: React.FC<PhoneStatusBarProps> = ({
 
       {/* 中间：设备名称 */}
       <span className="text-[10px] opacity-60 truncate max-w-[120px] text-center">
-        墨色江湖
+        墨染乾坤
       </span>
 
       {/* 右侧：信号 + 电量 */}

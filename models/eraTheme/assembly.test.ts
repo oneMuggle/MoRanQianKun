@@ -15,7 +15,7 @@ const depth1Nodes = allEraNodes.filter((n) => n.depth === 1);
 
 describe('eraTree', () => {
     it('has a name', () => {
-        expect(eraTree.name).toBe('墨色江湖·时代体系');
+        expect(eraTree.name).toBe('墨染乾坤·时代体系');
     });
 
     it('has child epochs', () => {

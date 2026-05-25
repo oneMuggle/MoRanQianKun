@@ -1,6 +1,6 @@
 # 部署文档
 
-本文档详细介绍 `墨色江湖：无尽武林` 项目的部署方案，包括本地开发部署和生产环境部署。
+本文档详细介绍 `墨染乾坤：万象纪元` 项目的部署方案，包括本地开发部署和生产环境部署。
 
 ## 目录
 
@@ -230,7 +230,7 @@ wrangler secret put GITHUB_CLIENT_SECRET
 
 | 字段 | 值 |
 |------|-----|
-| Application name | 墨色江湖 |
+| Application name | 墨染乾坤 |
 | Homepage URL | 你的游戏部署地址 |
 | Application description | 武侠互动叙事游戏 |
 | Authorization callback URL | `https://<你的API域名>/api/auth/github/callback` |

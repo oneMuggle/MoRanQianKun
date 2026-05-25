@@ -5,7 +5,7 @@ schema: spec-driven
 # ========================================
 context: |
   # 项目概述
-  墨色江湖：无尽武林 - 武侠互动叙事游戏，前端为主（含 Cloudflare Pages Functions）
+  墨染乾坤：万象纪元 - 多纪元互动叙事游戏，前端为主（含 Cloudflare Pages Functions）
   
   # 技术栈
   - React 19 + TypeScript + Vite 6

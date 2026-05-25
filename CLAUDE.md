@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**墨色江湖：无尽武林** is a browser-first interactive fiction / text RPG application with wuxia (martial arts) themes. It features AI-driven story generation, character/NPC management, image asset workflows, world-building systems, and local-first data persistence via IndexedDB.
+**墨染乾坤：万象纪元** is a browser-first interactive fiction / text RPG application with multi-era narrative spanning 7 epochs from primordial civilizations to post-human consciousness. It features AI-driven story generation, character/NPC management, image asset workflows, world-building systems, era-specific UI themes, and local-first data persistence via IndexedDB.
 
 ## Development Commands
 

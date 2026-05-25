@@ -55,7 +55,7 @@ const SettingsApp: React.FC<AppProps> = ({ eraId, mode, onBack }) => {
 
                 {/* 关于 */}
                 <div className="mt-6 text-center text-xs text-gray-600">
-                    <p>墨色江湖 v1.0.0</p>
+                    <p>墨染乾坤 v1.0.0</p>
                     <p className="mt-1">里模式: {eraNode?.inherited.liMode?.name ?? '未启用'}</p>
                 </div>
             </div>

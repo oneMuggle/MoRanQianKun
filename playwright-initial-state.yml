@@ -4,8 +4,8 @@
     - text: 云存档登录
   - button "全屏" [ref=e9] [cursor=pointer]
   - generic [ref=e10]:
-    - heading "墨色江湖" [level=1] [ref=e12] [cursor=pointer]
-    - heading "无尽武林" [level=2] [ref=e15]
+    - heading "墨染乾坤" [level=1] [ref=e12] [cursor=pointer]
+    - heading "万象纪元" [level=2] [ref=e15]
   - generic [ref=e17]:
     - button "踏入江湖" [ref=e18] [cursor=pointer]:
       - generic [ref=e20]: 踏入江湖

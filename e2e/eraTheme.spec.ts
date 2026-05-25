@@ -178,7 +178,7 @@ test.describe('里模式开关', () => {
 test.describe('首页与导航', () => {
     test('P7 — 应用正常加载，首页可见', async ({ page }) => {
         await page.goto('http://localhost:3000');
-        await expect(page).toHaveTitle(/墨色江湖/, { timeout: 10000 });
+        await expect(page).toHaveTitle(/墨染乾坤/, { timeout: 10000 });
         await expect(page.getByRole('button', { name: '踏入江湖' })).toBeVisible();
     });
 });

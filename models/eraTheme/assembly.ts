@@ -12,7 +12,7 @@ import { postHumanEpoch } from './epoch-post-human';
 // ============================================================
 
 export const eraTree: EraTree = {
-    name: '墨色江湖·时代体系',
+    name: '墨染乾坤·时代体系',
     children: [
         primordialEpoch,
         ancientEpoch,
