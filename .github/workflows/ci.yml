@@ -23,10 +23,19 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm ci
+
+      - name: Verify vitest is installed
+        run: |
+          if [ ! -f "./node_modules/.bin/vitest" ]; then
+            echo "vitest not found after npm ci, falling back to npm install"
+            rm -rf node_modules
+            npm install
+          fi
+          test -f "./node_modules/.bin/vitest" || (echo "vitest still not installed" && exit 1)
 
       - name: Run Vitest
-        run: ./node_modules/.bin/vitest --run --reporter=verbose
+        run: npx vitest --run --reporter=verbose
 
       - name: Upload test results
         if: failure()
@@ -52,13 +61,22 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm ci
+
+      - name: Verify dependencies installed
+        run: |
+          if [ ! -f "./node_modules/.bin/playwright" ]; then
+            echo "playwright not found after npm ci, falling back to npm install"
+            rm -rf node_modules
+            npm install
+          fi
+          test -f "./node_modules/.bin/playwright" || (echo "playwright still not installed" && exit 1)
 
       - name: Install Playwright browsers
-        run: ./node_modules/.bin/playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: ./node_modules/.bin/playwright test --reporter=line
+        run: npx playwright test --reporter=line
 
       - name: Upload Playwright report
         if: failure()
