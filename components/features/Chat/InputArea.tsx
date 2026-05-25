@@ -93,6 +93,7 @@ interface Props {
     openingWorldEvolutionProgress?: WorldEvolutionProgress | null;
     openingPlanningProgress?: PlanningProgress | null;
     openingVariableGenerationProgress?: VariableGenerationProgress | null;
+    backgroundSummaryLocking?: boolean;
 }
 
 const InputArea: React.FC<Props> = ({
@@ -265,7 +266,6 @@ const InputArea: React.FC<Props> = ({
 
     const handleStop = () => {
         onStop();
-        setContent(lastSentContent);
     };
 
     const 追加行动选项到输入 = (current: string, option: string): string => {

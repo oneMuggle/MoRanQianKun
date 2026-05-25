@@ -978,14 +978,8 @@ export const 执行主剧情发送工作流 = async (
 
     } catch (error: any) {
         if (error.name === 'AbortError') {
-            const snapshot = deps.弹出重Roll快照();
-            if (snapshot) {
-                deps.回档到快照(snapshot);
-            } else {
-                deps.设置历史记录(historyBeforeSend);
-                deps.应用并同步记忆系统(normalizedMemBeforeSend);
-            }
-            console.log('Request aborted by user');
+            deps.设置历史记录(historyBeforeSend);
+            deps.应用并同步记忆系统(normalizedMemBeforeSend, { 静默总结提示: true });
             return { cancelled: true };
         }
 
