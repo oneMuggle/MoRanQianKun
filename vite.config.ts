@@ -159,13 +159,15 @@ export default defineConfig(({ mode }) => {
               return 'vendor';
             }
  
-            // prompts 模块存在循环依赖: stats → runtime → types → models → hooks/useGame
-            // 将它们合并到同一个 chunk 中，避免跨 chunk 的 ESM TDZ 错误
+            // prompts 和 models 与 hooks/useGame 存在双向依赖
+            // 将它们全部纳入 game-runtime 避免跨 chunk 的 ESM TDZ 错误
+            // 依赖链: prompts → models → hooks/useGame → prompts
             if (
               normalizedId.includes('/prompts/') ||
+              normalizedId.includes('/models/') ||
               normalizedId.endsWith('/utils/promptFeatureToggles.ts')
             ) {
-              return 'prompts-bundle';
+              return 'game-runtime';
             }
  
             if (normalizedId.includes('/components/features/Social/ImageManagerModal')) {
