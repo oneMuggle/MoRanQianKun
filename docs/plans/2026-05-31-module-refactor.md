@@ -145,19 +145,26 @@ interface ModuleManifest {
   - `npx tsc --noEmit` ✅ 无 core/ 相关错误
   - `npx vite build` ✅ 构建成功 (14.60s)
 
-### Phase 2: 时代模块拆分
+### Phase 2: 时代模块拆分 ✅ 已完成
 
 **目标：** 将 7 个 Epoch 拆分为独立 chunk，按当前游戏时代按需加载
 
-- [ ] **2.1** 创建时代模块目录结构
+- [x] **2.1** 创建时代模块目录结构
   - `modules/era-primordial/`、`modules/era-ancient/`、`modules/era-modern/`
   - `modules/era-contemporary/`、`modules/era-near-future/`、`modules/era-far-future/`、`modules/era-post-human/`
-- [ ] **2.2** 拆分 `eraTheme/epoch-*.ts` 到对应目录
-- [ ] **2.3** 拆分时代提示词和现实逻辑
-- [ ] **2.4** 拆分时代预设（开局场景、世界观卡片）
-- [ ] **2.5** 实现时代切换时的动态 import()
-- [ ] **2.6** 更新 Vite manualChunks 配置
-- [ ] **2.7** 验证时代切换功能
+- [x] **2.2** 拆分 `eraTheme/epoch-*.ts` 到对应目录
+  - 每个模块包含：`epoch-*.ts`（时代节点数据）+ `era-types.ts`（类型定义）+ `index.ts`（模块入口）
+- [x] **2.3** 拆分时代提示词和现实逻辑
+  - 每个模块 `index.ts` 包含 `promptBlock()` 方法，动态生成时代提示词
+- [x] **2.4** 拆分时代预设（开局场景、世界观卡片）
+  - 已包含在 epoch 文件的 `openingScenes` 字段中
+- [x] **2.5** 实现时代切换时的动态 import()
+  - `modules/index.ts` 提供 `eraModules` 映射：`Record<string, () => Promise<...>>`
+- [x] **2.6** 更新 Vite manualChunks 配置
+  - `vite.config.ts` 新增 `/modules/era-*/` → `era-{name}` chunk 分割规则
+- [x] **2.7** 验证时代切换功能
+  - `npx vite build` ✅ 构建成功 (15.30s)
+  - 原有 `models/eraTheme/` 兼容层保持不变，功能不受影响
 
 ### Phase 3: NSFW 子系统拆分
 

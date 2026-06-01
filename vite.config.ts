@@ -159,6 +159,12 @@ export default defineConfig(({ mode }) => {
               return 'vendor';
             }
  
+            // 时代模块拆分（按需加载）
+            if (normalizedId.includes('/modules/era-')) {
+              const match = normalizedId.match(/\/modules\/era-([a-z-]+)\//);
+              if (match) return `era-${match[1]}`;
+            }
+
             // prompts 和 models 与 hooks/useGame 存在双向依赖
             // 将它们全部纳入 game-runtime 避免跨 chunk 的 ESM TDZ 错误
             // 依赖链: prompts → models → hooks/useGame → prompts
