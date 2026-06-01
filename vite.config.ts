@@ -165,6 +165,18 @@ export default defineConfig(({ mode }) => {
               if (match) return `era-${match[1]}`;
             }
 
+            // NSFW 模块拆分（按需加载）
+            if (normalizedId.includes('/modules/nsfw-')) {
+              const match = normalizedId.match(/\/modules\/nsfw-([a-z-]+)\//);
+              if (match) return `nsfw-${match[1]}`;
+            }
+
+            // 业务域模块拆分（按需加载）
+            if (normalizedId.includes('/modules/biz-')) {
+              const match = normalizedId.match(/\/modules\/biz-([a-z-]+)\//);
+              if (match) return `biz-${match[1]}`;
+            }
+
             // prompts 和 models 与 hooks/useGame 存在双向依赖
             // 将它们全部纳入 game-runtime 避免跨 chunk 的 ESM TDZ 错误
             // 依赖链: prompts → models → hooks/useGame → prompts

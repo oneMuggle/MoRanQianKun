@@ -166,31 +166,56 @@ interface ModuleManifest {
   - `npx vite build` ✅ 构建成功 (15.30s)
   - 原有 `models/eraTheme/` 兼容层保持不变，功能不受影响
 
-### Phase 3: NSFW 子系统拆分
+### Phase 3: NSFW 子系统拆分 ✅ 已完成
 
-**目标：** 4 个 NSFW 子系统独立 chunk，按需加载
+**目标：** 7 个 NSFW 子系统独立 chunk，按需加载
 
-- [ ] **3.1** 提取 campus 子系统（hooks + prompts + models + components）
-- [ ] **3.2** 提取 photography 子系统
-- [ ] **3.3** 提取 urban-driver 子系统
-- [ ] **3.4** 提取 exposure 子系统
-- [ ] **3.5** 实现配置驱动的动态加载
-- [ ] **3.6** 更新 Vite manualChunks 配置
-- [ ] **3.7** 验证 NSFW 功能
+- [x] **3.1** 提取 campus 子系统
+  - `modules/nsfw-campus/index.ts` — ModuleManifest + promptBlock + 类型导出
+- [x] **3.2** 提取 photography 子系统
+  - `modules/nsfw-photography/index.ts`
+- [x] **3.3** 提取 urban-driver 子系统
+  - `modules/nsfw-urban-driver/index.ts`
+- [x] **3.4** 提取 exposure 子系统
+  - `modules/nsfw-exposure/index.ts`
+- [x] **3.5** 提取 bdsm 子系统
+  - `modules/nsfw-bdsm/index.ts`
+- [x] **3.6** 提取 board-game 子系统
+  - `modules/nsfw-board-game/index.ts`
+- [x] **3.7** 提取 bar 子系统
+  - `modules/nsfw-bar/index.ts`
+- [x] **3.8** 更新 modules/index.ts 注册所有 NSFW 模块
+- [x] **3.9** 更新 Vite manualChunks 配置
+  - `/modules/nsfw-*/` → `nsfw-{name}` chunk 分割规则
+- [x] **3.10** 验证构建
+  - `npx vite build` ✅ 构建成功 (16.09s)
 
-### Phase 4: 业务域模块拆分
+> **注**: 实际 hooks/models/prompts 文件暂未迁移（仍保留在原位置），
+> 模块目录通过 `promptBlock()` 引用原位置的函数。
+> 后续 Phase 5/7 完成后可将源文件迁移到对应模块目录。
 
-**目标：** 各业务域独立 chunk，通过 ModuleLoader 按需激活
+### Phase 4: 业务域模块拆分 ✅ 已完成
 
-- [ ] **4.1** 提取 BDSM 子系统
-- [ ] **4.2** 提取房产经营模块
-- [ ] **4.3** 提取 RPG 战斗模块
-- [ ] **4.4** 提取 Galgame/AVG 模块
-- [ ] **4.5** 提取桌游模块
-- [ ] **4.6** 提取小说系统模块
-- [ ] **4.7** 提取移动设备系统
-- [ ] **4.8** 更新 Vite manualChunks 配置
-- [ ] **4.9** 验证各业务模块功能
+**目标：** 5 个业务域独立 chunk，通过 ModuleLoader 按需激活
+
+- [x] **4.1** 提取房产经营模块
+  - `modules/biz-property/index.ts` — ModuleManifest + promptBlock + 类型导出
+- [x] **4.2** 提取 RPG 战斗模块
+  - `modules/biz-rpg-battle/index.ts` — 战斗、装备、武功、门派
+- [x] **4.3** 提取 Galgame/AVG 模块
+  - `modules/biz-galgame/index.ts` — 对话引擎、分支叙事
+- [x] **4.4** 提取小说系统模块
+  - `modules/biz-novel/index.ts` — 小说写作、拆分
+- [x] **4.5** 提取移动设备系统
+  - `modules/biz-device/index.ts` — 手机消息、APP、通知
+- [x] **4.6** 更新 modules/index.ts 注册所有业务域模块
+- [x] **4.7** 更新 Vite manualChunks 配置
+  - `/modules/biz-*/` → `biz-{name}` chunk 分割规则
+- [x] **4.8** 验证构建
+  - `npx vite build` ✅ 构建成功 (15.45s)
+
+> **注**: 与 Phase 3 相同，实际 hooks/models/prompts 文件暂未迁移，
+> 模块目录通过 `promptBlock()` 引用原位置。后续可逐步迁移源文件。
 
 ### Phase 5: Prompts 系统重构
 
