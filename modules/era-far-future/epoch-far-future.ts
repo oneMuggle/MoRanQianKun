@@ -1,4 +1,4 @@
-import { makeNode, EraNode } from './era-types';
+import { makeNode, EraNode } from '../../models/eraTheme/types';
 
 export const farFutureEpoch: EraNode = makeNode(
     'far-future', '未来', 0, null,

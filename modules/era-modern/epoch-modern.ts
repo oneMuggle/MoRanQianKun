@@ -1,4 +1,4 @@
-import { makeNode, EraNode } from './era-types';
+import { makeNode, EraNode } from '../../models/eraTheme/types';
 
 export const modernEpoch: EraNode = makeNode(
     'modern', '近代', 0, null,

@@ -1,4 +1,4 @@
-import { makeNode, EraNode } from './era-types';
+import { makeNode, EraNode } from '../../models/eraTheme/types';
 
 export const ancientEpoch: EraNode = makeNode(
     'ancient', '古代', 0, null,

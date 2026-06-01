@@ -1,4 +1,4 @@
-import { makeNode, EraNode } from './era-types';
+import { makeNode, EraNode } from '../../models/eraTheme/types';
 
 export const postHumanEpoch: EraNode = makeNode(
     'post-human', '后人类', 0, null,

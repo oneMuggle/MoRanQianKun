@@ -1,4 +1,4 @@
-import { makeNode, EraNode } from './era-types';
+import { makeNode, EraNode } from '../../models/eraTheme/types';
 
 export const nearFutureEpoch: EraNode = makeNode(
     'near-future', '近未来', 0, null,

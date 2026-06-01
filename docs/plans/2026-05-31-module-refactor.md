@@ -1,7 +1,7 @@
 # 模块化拆分方案：骨架 + 插件化模块架构
 
 > 创建时间: 2026-05-31
-> 状态: Phase 1-7 全部完成
+> 状态: 新架构已激活运行（旧代码完全兼容）
 > 目标: 将项目拆分为通用骨架和独立模块，实现按需加载、减少初始包体积
 
 ---
@@ -320,3 +320,42 @@ manualChunks(id) {
 | 未使用代码加载 | 大量时代/NSFW/业务代码 | 按需加载，减少 60%+ |
 | 模块独立性 | 强耦合 | 可独立开发、测试、替换 |
 | 代码可维护性 | 大文件多、耦合深 | 职责清晰、边界明确 |
+
+---
+
+## 八、新架构激活状态
+
+### 已激活（运行时使用新架构）
+
+| 组件 | 状态 | 说明 |
+|------|------|------|
+| `App.tsx` → `core/module-registry` | ✅ 已切换 | ModalRenderer、useModalManager 从 core/ 导入 |
+| `ModuleLoader` 初始化 | ✅ 已激活 | App 启动时注入 ModuleContext，注册核心提示词 |
+| 时代模块动态加载 | ✅ 已激活 | `eraModules[state.currentEra]()` 动态 import |
+| NSFW 模块按需加载 | ✅ 已激活 | 根据 `启用校园NSFW深化系统` 动态激活 |
+| 业务域模块按需加载 | ✅ 已激活 | 根据 `启用修炼体系` 动态激活 biz-rpg-battle |
+| `hooks/useGameState` → `core/db` | ✅ 已切换 | dbService 从 core/db 导入 |
+| `prompts/index.ts` → `core-prompts` | ✅ 已切换 | 默认提示词使用核心提示词 |
+| 时代 chunk 分割 | ✅ 已验证 | `era-modern` (48KB)、`era-ancient` (88KB)、`era-contemporary` (108KB) 独立生成 |
+
+### 待优化（功能正常但可改进）
+
+| 组件 | 状态 | 后续工作 |
+|------|------|----------|
+| `legacyRegistrations.ts` | ⚙️ 运行中 | 逐个模块迁移到 componentFactory 模式 |
+| `systemPromptBuilder.ts` | ⚙️ 运行中 | 集成 PromptRegistry 动态组装 |
+| `utils/moduleRegistry/` | ⚙️ 兼容层 | App.tsx 已不引用，但其他文件可能仍在使用 |
+| `services/dbService.ts` | ⚙️ 运行中 | core/db 通过 re-export 引用，未来可迁移实际代码 |
+
+### 构建验证结果
+
+```
+✓ built in 18.19s
+era-modern         48.52 kB │ gzip: 18.07 kB
+era-ancient        88.30 kB │ gzip: 31.05 kB
+era-contemporary  108.58 kB │ gzip: 38.57 kB
+game-runtime    2,853.99 kB │ gzip: 868.11 kB
+vendor          3,616.03 kB │ gzip: 1,701.81 kB
+```
+
+时代模块已独立成 chunk，不再捆绑到 game-runtime！

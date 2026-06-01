@@ -34,5 +34,6 @@ export const manifest: ModuleManifest = {
 };
 
 // 导出供外部使用的类型和常量
-export { 默认校园NSFW设置, 规范化校园NSFW设置 } from '../../models/campusNSFW';
+export { 默认校园NSFW设置 } from '../../models/campusNSFW';
+export { 规范化校园NSFW设置 } from '../../models/campusNSFW/normalization';
 export type { 校园NSFW设置, 露出偏好等级, 权力倾向, SM场景类型 } from '../../models/campusNSFW';

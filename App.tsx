@@ -10,8 +10,10 @@ import { useAppEffects } from './components/app/useAppEffects';
 import { GameView } from './components/app/GameView';
 import { ModalLayer } from './components/app/ModalLayer';
 import { MemoryModals } from './components/app/MemoryModals';
-import { ModalRenderer, useModalManager } from './utils/moduleRegistry';
-import './utils/moduleRegistry/bootstrap'; // 激活所有模块注册
+import { ModalRenderer, useModalManager } from './core/module-registry';
+import './core/module-registry/bootstrap'; // 激活所有模块注册
+import { getModuleLoader, PromptRegistry } from './core/engine';
+import { 核心提示词 } from './prompts/core-prompts';
 import FPSDisplay from './components/features/Performance/FPSDisplay';
 import PerformanceDashboard from './components/features/Performance/PerformanceDashboard';
 
@@ -20,6 +22,75 @@ const App: React.FC = () => {
     const { isMobile } = useResponsive();
     const { requestConfirm, ConfirmModal } = useConfirmSystem();
     const modalManager = useModalManager();
+
+    // --- 新架构：模块加载器初始化 ---
+    React.useEffect(() => {
+        const loader = getModuleLoader();
+
+        // 注册核心提示词到 PromptRegistry
+        const promptTexts = 核心提示词.map(p => p.内容).filter(Boolean);
+        PromptRegistry.registerCoreMany(promptTexts);
+
+        // 注入运行时上下文
+        loader.setContext({
+            getState: () => state,
+            getMeta: () => meta,
+            set: (key, value) => { /* 由 useGame 统一管理 */ },
+            action: (name, ...args) => (actions as any)[name]?.(...args),
+            modalManager: {
+                open: (id, payload) => window.dispatchEvent(new CustomEvent('modal:open', { detail: { id, payload } })),
+                close: (id) => modalManager.close(id),
+                replace: (closeId, openId, payload) => window.dispatchEvent(new CustomEvent('modal:replace', { detail: { closeId, openId, payload } })),
+                closeAll: () => window.dispatchEvent(new CustomEvent('modal:closeAll')),
+                toggle: (id) => window.dispatchEvent(new CustomEvent('modal:toggle', { detail: { id } })),
+                isOpen: (id) => modalManager.isOpen(id),
+                openModals: modalManager.openModals,
+            },
+            subscribe: () => () => {}, // 后续接入
+            emitEvent: (event, payload) => loader.emitEvent(event, payload),
+            onEvent: (event, callback) => loader.onEvent(event, callback),
+            isMobile: () => isMobile,
+        });
+
+        // 预加载核心时代模块（古代时代作为默认）
+        if (state.currentEra) {
+            void (async () => {
+                const { eraModules } = await import('./modules');
+                const mod = eraModules[state.currentEra];
+                if (mod) {
+                    const { manifest } = await mod();
+                    loader.register(manifest);
+                    await loader.activate(manifest.id);
+                }
+            })();
+        }
+
+        // 根据 gameConfig 激活 NSFW 模块
+        if (state.gameConfig?.启用校园NSFW深化系统) {
+            void (async () => {
+                const { nsfwModules } = await import('./modules');
+                const mod = nsfwModules['nsfw-campus'];
+                if (mod) {
+                    const { manifest } = await mod();
+                    loader.register(manifest);
+                    await loader.activate(manifest.id);
+                }
+            })();
+        }
+
+        // 根据 gameConfig 激活业务域模块
+        if (state.gameConfig?.启用修炼体系) {
+            void (async () => {
+                const { businessModules } = await import('./modules');
+                const mod = businessModules['biz-rpg-battle'];
+                if (mod) {
+                    const { manifest } = await mod();
+                    loader.register(manifest);
+                    await loader.activate(manifest.id);
+                }
+            })();
+        }
+    }, []); // 仅初始化一次
 
     // --- 性能面板快捷键 Ctrl+Shift+P ---
     const [showPerfDashboard, setShowPerfDashboard] = React.useState(false);

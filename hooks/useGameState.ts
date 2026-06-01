@@ -37,7 +37,7 @@ import type { 校园系统数据 } from '../models/campusPhone';
 import type { 关系网络数据 } from '../models/relationship';
 import type { 房产系统状态, 房产数据结构 } from '../models/property/types';
 import { 创建空房产状态, 创建初始房产 } from './useGame/storyState';
-import * as dbService from '../services/dbService';
+import * as dbService from '../core/db';
 import { THEMES, 应用主题到根元素, 应用时代主题到根元素 } from '../styles/themes';
 import { 获取时代主题方案 } from '../models/system';
 import { 设置时代UI文案 } from '../utils/eraUIText';
