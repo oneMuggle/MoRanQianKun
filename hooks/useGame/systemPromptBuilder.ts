@@ -50,10 +50,17 @@ import { 计算气运属性修正 } from '../../data/qiyun';
 import { 构建女主剧情规划协议 } from '../../prompts/core/heroinePlan';
 import { 构建女主规划专项提示词 } from '../../prompts/core/heroinePlanCot';
 import { 核心_境界体系 } from '../../prompts/core/realm';
-import { 构建时代主题注入, 构建时代文风注入 } from '../../prompts/runtime/eraTheme';
-import { 获取时代现实提示词ByEraId } from '../../prompts/core/eraRealism';
-import { 构建子纪元里模式注入, 子纪元里模式是否已注入, 构建里模式NPC原型注入, 构建里模式阶段注入 } from '../../prompts/runtime/eraLiMode';
-// 条件使用的提示词模块（通过预加载层导入）
+// 桥接层：通过 PromptRegistry 调用，支持模块覆盖
+import {
+  构建时代主题注入,
+  构建时代文风注入,
+  获取时代现实提示词ByEraId,
+  构建子纪元里模式注入,
+  子纪元里模式是否已注入,
+  构建里模式NPC原型注入,
+  构建里模式阶段注入,
+} from './systemPromptBuilder/promptBridge';
+// 条件使用的提示词模块（通过预加载层导入，也从桥接层调用）
 import { 构建里武侠世界提示词, 构建里志怪世界提示词, 构建志怪世界提示词, 构建行动选项运行时指令, 构建校规注入提示词, 构建催眠注入提示词, 构建设备通讯摘要, 构建BDSM论坛叙事约束, 构建桌游NSFW完整叙事约束 } from './systemPromptBuilder/promptBuilders';
 import type { LiModeStage } from '../../models/eraTheme/types';
 import { ConstraintBuilder } from './narrative/constraintBuilder';

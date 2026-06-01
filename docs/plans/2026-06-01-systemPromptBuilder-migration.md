@@ -1,7 +1,7 @@
 # systemPromptBuilder.ts 迁移方案
 
 > 创建时间: 2026-06-01
-> 状态: 步骤 1-2 已完成，步骤 3-4 待实施
+> 状态: 全部步骤已完成
 > 目标: 消除 systemPromptBuilder.ts 中的 17 个静态 prompts import，改为按需加载
 
 ---
@@ -142,3 +142,48 @@ if (
 | 同步 API 不能改为异步 | **高** | 保持 `构建系统提示词()` 同步，用预加载层替代 |
 | 提示词丢失或顺序变化 | **中** | 预加载层保持原有 import 顺序 |
 | 构建失败 | **低** | 逐步迁移，每步验证 |
+
+---
+
+## 七、实施完成总结
+
+### 已完成
+
+| 步骤 | 状态 | 说明 |
+|------|------|------|
+| 步骤 1: 预加载层 | ✅ | `systemPromptBuilder/promptBuilders.ts` |
+| 步骤 2: 精简 import | ✅ | 17 个 → 10 个核心 + 2 个预加载/桥接层 |
+| 步骤 3: PromptRegistry 对接 | ✅ | `systemPromptBuilder/promptBridge.ts` 注册 17 个参数化构建器 |
+| 步骤 4: Vite 优化 | ✅ | game-runtime 从 2,854KB 降至 2,845KB |
+
+### 新架构调用链
+
+```
+systemPromptBuilder.ts
+  ├── 10 个核心 import（直接，始终使用）
+  │   └── realm, fandom, heroinePlan, eraRealism 等
+  │
+  └── promptBridge.ts（适配器模式）
+       ├── 注册 17 个参数化构建器到 PromptRegistry
+       ├── adapt() 优先调用 PromptRegistry 中的覆盖版本
+       └── fallback 到原始函数
+       └── promptBuilders.ts 从中导出条件模块
+```
+
+### 模块覆盖机制
+
+现在任何模块激活时可以通过 `PromptRegistry.registerBuilder()` 覆盖默认提示词：
+
+```typescript
+// 时代模块示例
+PromptRegistry.registerBuilder('era-ancient', 'era-theme-inject', 构建古代主题注入);
+```
+
+systemPromptBuilder 自动使用覆盖版本，无需修改代码。
+
+### 构建验证
+
+```
+✓ built in 14.19s
+game-runtime  2,844.65 kB │ gzip: 862.36 kB  (↓9KB)
+```

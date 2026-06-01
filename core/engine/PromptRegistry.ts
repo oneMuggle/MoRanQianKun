@@ -4,9 +4,15 @@
  * 将提示词系统从静态数组改为动态注册机制：
  * - 核心提示词始终加载
  * - 模块通过 register() 动态注册提示词块
+ * - 模块通过 registerBuilder() 注册参数化提示词构建函数
+ * - systemPromptBuilder 通过 call() 调用参数化提示词
  * - 通过 unregister() 卸载模块提示词
  * - build() 时按优先级组装完整提示词
  */
+
+/** 参数化提示词构建器 */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PromptBuilder = (...args: any[]) => string;
 
 /** 提示词注册项 */
 interface PromptEntry {
@@ -20,9 +26,19 @@ interface PromptEntry {
   disposed: boolean;
 }
 
+/** 参数化提示词注册 */
+interface ParameterizedEntry {
+  moduleId: string;
+  /** 命名标识，如 'era-theme', 'era-style' */
+  name: string;
+  /** 构建函数 */
+  builder: PromptBuilder;
+}
+
 export class PromptRegistry {
   private static _corePrompts: string[] = [];
   private static _entries: PromptEntry[] = [];
+  private static _parameterized = new Map<string, ParameterizedEntry>();
   private static _buildCache: string | null = null;
   private static _dirty = true;
 
@@ -74,6 +90,41 @@ export class PromptRegistry {
       this._dirty = true;
       this._entries = this._entries.filter(e => !e.disposed);
     }
+    for (const [name, entry] of this._parameterized) {
+      if (entry.moduleId === moduleId) {
+        this._parameterized.delete(name);
+      }
+    }
+  }
+
+  // ==================== 参数化提示词 ====================
+
+  /** 注册参数化提示词构建函数 */
+  static registerBuilder(moduleId: string, name: string, builder: PromptBuilder): void {
+    this._parameterized.set(name, { moduleId, name, builder });
+  }
+
+  /** 按名称获取参数化构建函数 */
+  static getBuilder(name: string): PromptBuilder | undefined {
+    return this._parameterized.get(name)?.builder;
+  }
+
+  /** 调用参数化提示词（同步） */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static call(name: string, ...args: any[]): string {
+    const builder = this.getBuilder(name);
+    if (!builder) return '';
+    return builder(...args);
+  }
+
+  /** 检查是否已注册参数化提示词 */
+  static hasBuilder(name: string): boolean {
+    return this._parameterized.has(name);
+  }
+
+  /** 获取已注册的参数化提示词名称列表 */
+  static getBuilderNames(): string[] {
+    return Array.from(this._parameterized.keys());
   }
 
   /** 获取已注册的模块 ID 列表 */
@@ -148,6 +199,7 @@ export class PromptRegistry {
   static reset(): void {
     this._corePrompts = [];
     this._entries = [];
+    this._parameterized.clear();
     this._buildCache = null;
     this._dirty = true;
   }
@@ -167,5 +219,13 @@ export class PromptRegistry {
         blockLength: typeof e.block === 'string' ? e.block.length : '(lazy)',
         isAsync: typeof e.block === 'function',
       }));
+  }
+
+  /** 获取参数化提示词摘要 */
+  static getBuildersSummary(): Array<{ moduleId: string; name: string }> {
+    return Array.from(this._parameterized.values()).map(e => ({
+      moduleId: e.moduleId,
+      name: e.name,
+    }));
   }
 }
