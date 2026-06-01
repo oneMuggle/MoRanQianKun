@@ -248,7 +248,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         if (selectedBackground.名称) {
             自动填充天赋气运(selectedBackground);
         }
-    }, [selectedBackground.名称]);
+    }, [selectedBackground, 自动填充天赋气运]);
 
     const 处理能力类型变更 = (新能力类型: typeof worldConfig.能力类型) => {
         let 新武力等级 = worldConfig.武力等级;

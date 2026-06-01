@@ -33,12 +33,23 @@ interface ModalRendererProps {
  * 从 ModalConfig 获取懒加载组件
  * 支持：desktopComponent/mobileComponent（legacy）或 desktopComponentFactory/mobileComponentFactory（Phase 7）
  */
-function getLazyComponent(modal: ModalConfig, isMobile: boolean): React.LazyExoticComponent<React.ComponentType<any>> | null {
+
+// 缓存 React.lazy() 结果，避免每次渲染都创建新的 lazy 组件导致闪烁
+const _lazyCache = new Map<string, React.LazyExoticComponent<React.ComponentType<any>>>();
+
+function getLazyComponent(modal: ModalConfig, isMobile: boolean, moduleId: string): React.LazyExoticComponent<React.ComponentType<any>> | null {
+  const cacheKey = `${moduleId}:${isMobile ? 'm' : 'd'}`;
   if (isMobile && modal.mobileComponentFactory) {
-    return React.lazy(modal.mobileComponentFactory);
+    if (!_lazyCache.has(cacheKey)) {
+      _lazyCache.set(cacheKey, React.lazy(modal.mobileComponentFactory));
+    }
+    return _lazyCache.get(cacheKey)!;
   }
   if (modal.desktopComponentFactory) {
-    return React.lazy(modal.desktopComponentFactory);
+    if (!_lazyCache.has(cacheKey)) {
+      _lazyCache.set(cacheKey, React.lazy(modal.desktopComponentFactory));
+    }
+    return _lazyCache.get(cacheKey)!;
   }
   if (isMobile && modal.mobileComponent) {
     return modal.mobileComponent;
@@ -77,7 +88,7 @@ export function ModalRenderer({
         }
         if (!isOpenViaMap && !isOpenViaState) return null;
 
-        const Component = getLazyComponent(module.modal, isMobile);
+        const Component = getLazyComponent(module.modal, isMobile, module.id);
         if (!Component) return null;
 
         const modalManager = {

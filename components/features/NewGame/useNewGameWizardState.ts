@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as dbService from '../../../services/dbService';
 import { 读取小说拆分数据集列表 } from '../../../services/novel-decomposition/novelDecompositionStore';
 import { randomQiyun, 气运数据, 气运数据列表 } from '../../../data/qiyun';
@@ -826,15 +826,13 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
     };
 
     /** 根据当前背景自动填充天赋和气运（仅填充空位） */
-    const 自动填充天赋气运 = (background: 背景结构) => {
+    const 自动填充天赋气运 = useCallback((background: 背景结构) => {
         if (!自动填充开启) return;
         const rec = 获取背景推荐(background.名称, worldConfig.nsfw场景类型);
         if (!rec || rec.天赋.length === 0 && rec.气运.length === 0) return;
-        // 查找推荐的天赋（过滤后）
         const recTalents = rec.天赋
             .map(name => 全部天赋选项.find(t => t.名称 === name))
             .filter((t): t is typeof 全部天赋选项[number] => Boolean(t));
-        // 只填充空位
         const currentTalentNames = new Set(selectedTalents.map(t => t.名称));
         const toAddTalents = recTalents.filter(t => !currentTalentNames.has(t.名称));
         const maxSlots = 3;
@@ -842,7 +840,6 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         if (slotsLeft > 0 && toAddTalents.length > 0) {
             setSelectedTalents([...selectedTalents, ...toAddTalents.slice(0, slotsLeft)]);
         }
-        // 查找推荐的气运（过滤后）
         const recQiyun = rec.气运
             .map(name => 全部气运选项.find(q => q.名称 === name))
             .filter((q): q is typeof 全部气运选项[number] => Boolean(q));
@@ -852,7 +849,7 @@ export function useNewGameWizardState({ onComplete, onCancel, loading, currentEr
         if (qiyunSlotsLeft > 0 && toAddQiyun.length > 0) {
             setSelectedQiyun([...selectedQiyun, ...toAddQiyun.slice(0, qiyunSlotsLeft)]);
         }
-    };
+    }, [自动填充开启, worldConfig.nsfw场景类型, 全部天赋选项, selectedTalents, 全部气运选项, selectedQiyun]);
 
     const addCustomTalent = async () => {
         const normalized = 标准化天赋(customTalent);
