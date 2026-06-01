@@ -259,8 +259,10 @@ interface ModuleManifest {
 - [x] **7.4** 验证构建
   - `npx vite build` ✅ 构建成功 (16.37s)
 
-> **注**: legacyRegistrations.ts 的静态 import 暂未移除（功能正常运行中）。
-> 后续可逐个模块迁移到 componentFactory 模式，移除静态引用。
+> **注**: legacyRegistrations.ts 已完全迁移到 componentFactory 模式！
+> - 78+ 组件静态 import 全部消除 ✅
+> - 46 个 desktopComponentFactory + 34 个 mobileComponentFactory
+> - Vite 现在可以 tree-shake 未使用的弹窗组件
 
 ---
 

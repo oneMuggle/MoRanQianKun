@@ -1,97 +1,22 @@
 /**
- * 遗留弹窗批量注册
+ * 遗留弹窗批量注册 — Phase 7: componentFactory 模式
  *
- * 将 lazyComponents.tsx 中所有现有弹窗注册到 UIFeatureRegistry。
- * 这些注册项在 Phase 3 迁移完成后将被逐步移除。
+ * 所有组件使用 desktopComponentFactory / mobileComponentFactory 动态 import，
+ * 消除静态引用，让 Vite 能够 tree-shake。
  */
 
 import { UIFeatureRegistry } from './registry';
 import { desktopTabs, mobileTabs } from '../../components/features/Settings/tabDefinitions';
 import { 获取时代主题方案, 全部时代配置 } from '../../models/system';
-import {
-  CharacterModal,
-  MobileCharacter,
-  NewGameWizard,
-  MobileNewGameWizard,
-  SettingsPanel,
-  InventoryModal,
-  MobileInventoryModal,
-  EquipmentModal,
-  MobileEquipmentModal,
-  BattleModal,
-  MobileBattleModal,
-  SocialModal,
-  MobileSocial,
-  ImageManagerModal,
-  MobileImageManagerModal,
-  CampusDesireDashboard,
-  PhotographyDashboard,
-  MobilePhotographyDashboard,
-  BDSMRelationshipModal,
-  BDSMContractModal,
-  BDSMSafetyModal,
-  MobileCampusDesireApp,
-  UrbanDriverDashboard,
-  MobileUrbanDriverApp,
-  ExposureDashboard,
-  MobileExposureDashboard,
-  NsfwControlCenter,
-  WorldbookManagerModal,
-  MobileWorldbookManagerModal,
-  TeamModal,
-  MobileTeamModal,
-  KungfuModal,
-  MobileKungfuModal,
-  WorldModal,
-  MobileWorldModal,
-  MapModal,
-  MobileMapModal,
-  SectModal,
-  MobileSect,
-  TaskModal,
-  MobileTask,
-  AgreementModal,
-  MobileAgreementModal,
-  StoryModal,
-  MobileStory,
-  HeroinePlanModal,
-  MobileHeroinePlanModal,
-  MemoryModal,
-  MobileMemory,
-  MemorySummaryFlowModal,
-  MemorySummaryFlowMobileModal,
-  NpcMemorySummaryFlowModal,
-  NpcMemorySummaryFlowMobileModal,
-  SaveLoadModal,
-  MobileSaveLoadModal,
-  MobileMusicPlayer,
-  NovelDecompositionWorkbenchModal,
-  MobileNovelDecompositionWorkbenchModal,
-  NovelWritingWorkbenchModal,
-  MobileNovelWritingWorkbenchModal,
-  MobileDeviceModal,
-  BoardGameDashboard,
-  BoardGameModal,
-  MobileBoardGameDashboard,
-  MobileBoardGameModal,
-  CGGalleryModal,
-  MobileCGGalleryModal,
-  RelationGraphView,
-  MapExplorerModal,
-  MobileMapExplorerModal,
-  RpgBattleIntegration,
-  RpgEquipmentIntegration,
-  RpgKungfuIntegration,
-  RpgTaskIntegration,
-  BarNSFWPanel,
-  MobileBarNSFWPanel,
-} from '../../components/features/lazyComponents';
+
+// 不再静态导入组件！使用 componentFactory 模式。
+// 所有组件通过 desktopComponentFactory / mobileComponentFactory 动态加载。
 
 // ============================================================================
 // 核心模块
 // ============================================================================
 
-// Character — 已迁移到新系统（完整 propsFactory）
+// Character
 UIFeatureRegistry.register({
   id: 'character',
   name: '角色面板',
@@ -101,8 +26,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: CharacterModal,
-    mobileComponent: MobileCharacter,
+    desktopComponentFactory: () => import('../../components/features/Character/CharacterModal'),
+    mobileComponentFactory: () => import('../../components/features/Character/MobileCharacter'),
     visibility: 'always',
     stateKey: 'showCharacter',
     gameViewOnly: true,
@@ -129,7 +54,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Inventory — 已迁移到新系统（完整 propsFactory）
+// Inventory
 UIFeatureRegistry.register({
   id: 'inventory',
   name: '背包',
@@ -139,8 +64,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: InventoryModal,
-    mobileComponent: MobileInventoryModal,
+    desktopComponentFactory: () => import('../../components/features/Inventory/InventoryModal'),
+    mobileComponentFactory: () => import('../../components/features/Inventory/MobileInventoryModal'),
     visibility: 'always',
     stateKey: 'showInventory',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -153,7 +78,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Equipment — 已迁移到新系统（完整 propsFactory）
+// Equipment
 UIFeatureRegistry.register({
   id: 'equipment',
   name: '装备',
@@ -163,8 +88,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: EquipmentModal,
-    mobileComponent: MobileEquipmentModal,
+    desktopComponentFactory: () => import('../../components/features/Equipment/EquipmentModal'),
+    mobileComponentFactory: () => import('../../components/features/Equipment/MobileEquipmentModal'),
     visibility: 'always',
     stateKey: 'showEquipment',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -177,7 +102,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Battle — 已迁移到新系统（完整 propsFactory）
+// Battle
 UIFeatureRegistry.register({
   id: 'battle',
   name: '战斗',
@@ -187,8 +112,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: BattleModal,
-    mobileComponent: MobileBattleModal,
+    desktopComponentFactory: () => import('../../components/features/Battle/BattleModal'),
+    mobileComponentFactory: () => import('../../components/features/Battle/MobileBattleModal'),
     visibility: 'always',
     stateKey: 'showBattle',
     gameViewOnly: true,
@@ -204,7 +129,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Social — 已迁移到新系统（完整 propsFactory）
+// Social
 UIFeatureRegistry.register({
   id: 'social',
   name: '社交',
@@ -214,8 +139,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: SocialModal,
-    mobileComponent: MobileSocial,
+    desktopComponentFactory: () => import('../../components/features/Social/SocialModal'),
+    mobileComponentFactory: () => import('../../components/features/Social/MobileSocial'),
     visibility: 'always',
     stateKey: 'showSocial',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -237,7 +162,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Team — 已迁移到新系统（完整 propsFactory）
+// Team
 UIFeatureRegistry.register({
   id: 'team',
   name: '队伍',
@@ -247,8 +172,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: TeamModal,
-    mobileComponent: MobileTeamModal,
+    desktopComponentFactory: () => import('../../components/features/Team/TeamModal'),
+    mobileComponentFactory: () => import('../../components/features/Team/MobileTeamModal'),
     visibility: 'always',
     stateKey: 'showTeam',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -262,7 +187,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Kungfu — 已迁移到新系统（完整 propsFactory，需启用修炼体系）
+// Kungfu
 UIFeatureRegistry.register({
   id: 'kungfu',
   name: '武功',
@@ -272,8 +197,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: KungfuModal,
-    mobileComponent: MobileKungfuModal,
+    desktopComponentFactory: () => import('../../components/features/Kungfu/KungfuModal'),
+    mobileComponentFactory: () => import('../../components/features/Kungfu/MobileKungfuModal'),
     visibility: 'config-dependent',
     gameViewOnly: true,
     configKey: '启用修炼体系',
@@ -288,7 +213,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// SaveLoad — 已迁移到新系统（完整 propsFactory）
+// SaveLoad
 UIFeatureRegistry.register({
   id: 'saveLoad',
   name: '存档/读档',
@@ -298,8 +223,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: SaveLoadModal,
-    mobileComponent: MobileSaveLoadModal,
+    desktopComponentFactory: () => import('../../components/features/SaveLoad/SaveLoadModal'),
+    mobileComponentFactory: () => import('../../components/features/SaveLoad/MobileSaveLoadModal'),
     visibility: 'always',
     stateKey: 'showSaveLoad',
     propsFactory: ({ state, actions, modalManager, requestConfirm }) => {
@@ -322,7 +247,7 @@ UIFeatureRegistry.register({
 // 世界与地图
 // ============================================================================
 
-// World — 已迁移到新系统（完整 propsFactory）
+// World
 UIFeatureRegistry.register({
   id: 'world',
   name: '世界',
@@ -332,8 +257,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: WorldModal,
-    mobileComponent: MobileWorldModal,
+    desktopComponentFactory: () => import('../../components/features/World/WorldModal'),
+    mobileComponentFactory: () => import('../../components/features/World/MobileWorldModal'),
     visibility: 'always',
     stateKey: 'showWorld',
     propsFactory: ({ state, meta, actions, setters, modalManager }) => ({
@@ -342,7 +267,6 @@ UIFeatureRegistry.register({
       worldEvolutionUpdating: (meta as any).worldEvolutionUpdating,
       worldEvolutionStatus: (meta as any).worldEvolutionStatus,
       worldEvolutionLastUpdatedAt: (meta as any).worldEvolutionLastUpdatedAt,
-      worldEvolutionLastSummary: (meta as any).worldEvolutionLastSummary,
       worldEvolutionLastRawText: (meta as any).worldEvolutionLastRawText,
       onForceUpdate: (actions as any).handleForceWorldEvolutionUpdate,
       onClose: () => {
@@ -353,7 +277,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Map — 已迁移到新系统（完整 propsFactory）
+// Map
 UIFeatureRegistry.register({
   id: 'map',
   name: '地图',
@@ -363,8 +287,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: MapModal,
-    mobileComponent: MobileMapModal,
+    desktopComponentFactory: () => import('../../components/features/Map/MapModal'),
+    mobileComponentFactory: () => import('../../components/features/Map/MobileMapModal'),
     visibility: 'always',
     stateKey: 'showMap',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -382,7 +306,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Sect — 已迁移到新系统（完整 propsFactory）
+// Sect
 UIFeatureRegistry.register({
   id: 'sect',
   name: '门派',
@@ -392,8 +316,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: SectModal,
-    mobileComponent: MobileSect,
+    desktopComponentFactory: () => import('../../components/features/Sect/SectModal'),
+    mobileComponentFactory: () => import('../../components/features/Sect/MobileSect'),
     visibility: 'always',
     stateKey: 'showSect',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -409,7 +333,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Task — 已迁移到新系统（完整 propsFactory）
+// Task
 UIFeatureRegistry.register({
   id: 'task',
   name: '任务',
@@ -419,8 +343,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: TaskModal,
-    mobileComponent: MobileTask,
+    desktopComponentFactory: () => import('../../components/features/Task/TaskModal'),
+    mobileComponentFactory: () => import('../../components/features/Task/MobileTask'),
     visibility: 'always',
     stateKey: 'showTask',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -436,7 +360,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Agreement — 已迁移到新系统（完整 propsFactory）
+// Agreement
 UIFeatureRegistry.register({
   id: 'agreement',
   name: '约定',
@@ -446,8 +370,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: AgreementModal,
-    mobileComponent: MobileAgreementModal,
+    desktopComponentFactory: () => import('../../components/features/Agreement/AgreementModal'),
+    mobileComponentFactory: () => import('../../components/features/Agreement/MobileAgreementModal'),
     visibility: 'always',
     stateKey: 'showAgreement',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -465,7 +389,7 @@ UIFeatureRegistry.register({
 // 叙事与记忆
 // ============================================================================
 
-// Story — 已迁移到新系统（完整 propsFactory）
+// Story
 UIFeatureRegistry.register({
   id: 'story',
   name: '剧情',
@@ -475,8 +399,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: StoryModal,
-    mobileComponent: MobileStory,
+    desktopComponentFactory: () => import('../../components/features/Story/StoryModal'),
+    mobileComponentFactory: () => import('../../components/features/Story/MobileStory'),
     visibility: 'always',
     stateKey: 'showStory',
     propsFactory: ({ state, setters, modalManager }) => {
@@ -494,7 +418,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// HeroinePlan — 已迁移到新系统（完整 propsFactory，需启用女主剧情规划）
+// HeroinePlan
 UIFeatureRegistry.register({
   id: 'heroinePlan',
   name: '女主剧情规划',
@@ -504,8 +428,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: HeroinePlanModal,
-    mobileComponent: MobileHeroinePlanModal,
+    desktopComponentFactory: () => import('../../components/features/Story/HeroinePlanModal'),
+    mobileComponentFactory: () => import('../../components/features/Story/MobileHeroinePlanModal'),
     visibility: 'config-dependent',
     configKey: '启用女主剧情规划',
     configValue: true,
@@ -523,7 +447,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Memory — 已迁移到新系统（完整 propsFactory）
+// Memory
 UIFeatureRegistry.register({
   id: 'memory',
   name: '记忆',
@@ -533,8 +457,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: MemoryModal,
-    mobileComponent: MobileMemory,
+    desktopComponentFactory: () => import('../../components/features/Memory/MemoryModal'),
+    mobileComponentFactory: () => import('../../components/features/Memory/MobileMemory'),
     visibility: 'always',
     stateKey: 'showMemory',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -548,7 +472,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// MemorySummaryFlow — 已迁移到新系统
+// MemorySummaryFlow
 UIFeatureRegistry.register({
   id: 'memorySummaryFlow',
   name: '记忆总结',
@@ -558,8 +482,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: MemorySummaryFlowModal,
-    mobileComponent: MemorySummaryFlowMobileModal,
+    desktopComponentFactory: () => import('../../components/features/Memory/MemorySummaryFlowModal'),
+    mobileComponentFactory: () => import('../../components/features/Memory/MemorySummaryFlowMobileModal'),
     visibility: 'always',
     propsFactory: ({ modalManager }) => ({
       onClose: () => modalManager.close('memorySummaryFlow'),
@@ -567,7 +491,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// NpcMemorySummaryFlow — 已迁移到新系统
+// NpcMemorySummaryFlow
 UIFeatureRegistry.register({
   id: 'npcMemorySummaryFlow',
   name: 'NPC记忆总结',
@@ -577,8 +501,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: NpcMemorySummaryFlowModal,
-    mobileComponent: NpcMemorySummaryFlowMobileModal,
+    desktopComponentFactory: () => import('../../components/features/Memory/NpcMemorySummaryFlowModal'),
+    mobileComponentFactory: () => import('../../components/features/Memory/NpcMemorySummaryFlowMobileModal'),
     visibility: 'always',
     propsFactory: ({ modalManager }) => ({
       onClose: () => modalManager.close('npcMemorySummaryFlow'),
@@ -590,7 +514,7 @@ UIFeatureRegistry.register({
 // 工具与设置
 // ============================================================================
 
-// Settings — 已迁移到新系统（完整 propsFactory）
+// Settings
 UIFeatureRegistry.register({
   id: 'settings',
   name: '设置',
@@ -600,7 +524,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: SettingsPanel,
+    desktopComponentFactory: () => import('../../components/features/Settings/SettingsPanel'),
     visibility: 'always',
     stateKey: 'showSettings',
     propsFactory: ({ state, meta, setters, actions, modalManager, isMobile, requestConfirm, extraProps }) => {
@@ -656,7 +580,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// ImageManager — 已迁移到新系统（完整 propsFactory）
+// ImageManager
 UIFeatureRegistry.register({
   id: 'imageManager',
   name: '图片管理',
@@ -666,8 +590,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: ImageManagerModal,
-    mobileComponent: MobileImageManagerModal,
+    desktopComponentFactory: () => import('../../components/features/Social/ImageManagerModal'),
+    mobileComponentFactory: () => import('../../components/features/Social/mobile/MobileImageManagerModal'),
     visibility: 'always',
     stateKey: 'showImageManager',
     propsFactory: ({ state, meta, actions, setters, modalManager }) => ({
@@ -729,7 +653,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Worldbook Manager — 已迁移到新系统（完整 propsFactory）
+// Worldbook Manager
 UIFeatureRegistry.register({
   id: 'worldbookManager',
   name: '世界书',
@@ -739,8 +663,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: WorldbookManagerModal,
-    mobileComponent: MobileWorldbookManagerModal,
+    desktopComponentFactory: () => import('../../components/features/Worldbook/WorldbookManagerModal'),
+    mobileComponentFactory: () => import('../../components/features/Worldbook/MobileWorldbookManagerModal'),
     visibility: 'always',
     propsFactory: ({ meta, actions, modalManager, requestConfirm }) => ({
       builtinPromptEntries: meta.builtinPromptEntries,
@@ -755,7 +679,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Novel Decomposition Workbench — 已迁移到新系统（完整 propsFactory）
+// Novel Decomposition Workbench
 UIFeatureRegistry.register({
   id: 'novelDecompositionWorkbench',
   name: '小说拆解工作台',
@@ -765,8 +689,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: NovelDecompositionWorkbenchModal,
-    mobileComponent: MobileNovelDecompositionWorkbenchModal,
+    desktopComponentFactory: () => import('../../components/features/NovelDecomposition/NovelDecompositionWorkbenchModal'),
+    mobileComponentFactory: () => import('../../components/features/NovelDecomposition/MobileNovelDecompositionWorkbenchModal'),
     visibility: 'always',
     stateKey: 'showNovelDecompositionWorkbench',
     propsFactory: ({ state, actions, modalManager, requestConfirm }) => ({
@@ -780,7 +704,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Novel Writing Workbench — 已迁移到新系统（完整 propsFactory）
+// Novel Writing Workbench
 UIFeatureRegistry.register({
   id: 'novelWritingWorkbench',
   name: '小说写作工作台',
@@ -790,8 +714,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: NovelWritingWorkbenchModal,
-    mobileComponent: MobileNovelWritingWorkbenchModal,
+    desktopComponentFactory: () => import('../../components/features/NovelWriting/NovelWritingWorkbenchModal'),
+    mobileComponentFactory: () => import('../../components/features/NovelWriting/MobileNovelWritingWorkbenchModal'),
     visibility: 'always',
     propsFactory: ({ actions, modalManager }) => ({
       open: true,
@@ -805,7 +729,7 @@ UIFeatureRegistry.register({
 // 娱乐
 // ============================================================================
 
-// CG Gallery — 已迁移到新系统（完整 propsFactory）
+// CG Gallery
 UIFeatureRegistry.register({
   id: 'cgGallery',
   name: 'CG 画廊',
@@ -815,8 +739,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: CGGalleryModal,
-    mobileComponent: MobileCGGalleryModal,
+    desktopComponentFactory: () => import('../../components/features/Galgame/CGGalleryModal'),
+    mobileComponentFactory: () => import('../../components/features/Galgame/MobileCGGalleryModal'),
     visibility: 'always',
     stateKey: 'showCGGallery',
     propsFactory: ({ setters, modalManager }) => ({
@@ -828,7 +752,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Relation Graph (AVG/Galgame) — 新增关系网络可视化
+// Relation Graph
 UIFeatureRegistry.register({
   id: 'relationGraph',
   name: '关系图谱',
@@ -838,14 +762,13 @@ UIFeatureRegistry.register({
   version: '1.0.0',
   dependencies: [],
   modal: {
-    desktopComponent: RelationGraphView,
+    desktopComponentFactory: () => import('../../components/features/Galgame/RelationGraphView'),
     visibility: 'always',
     stateKey: 'showRelationGraph',
     propsFactory: ({ state, modalManager }) => ({
       npcRelations: (state as any).avgState?.npcRelations ?? [],
       playerName: (state.角色 as any)?.姓名 ?? '主角',
       onNpcSelect: (npcId: string) => {
-        // 选中 NPC 后可跳转到社交面板详情
         if (npcId) {
           modalManager.open('social', { selectedNpcId: npcId });
         }
@@ -854,7 +777,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Music — 已迁移到新系统
+// Music
 UIFeatureRegistry.register({
   id: 'music',
   name: '音乐',
@@ -864,7 +787,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: MobileMusicPlayer,
+    desktopComponentFactory: () => import('../../components/features/Music/mobile/MobileMusicPlayer'),
     visibility: 'always',
     stateKey: 'showMobileMusic',
     propsFactory: ({ setters, modalManager }) => ({
@@ -878,7 +801,7 @@ UIFeatureRegistry.register({
 // 探索
 // ============================================================================
 
-// Map Explorer — 已迁移到新系统（完整 propsFactory）
+// Map Explorer
 UIFeatureRegistry.register({
   id: 'mapExplorer',
   name: '地图探索',
@@ -888,8 +811,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: MapExplorerModal,
-    mobileComponent: MobileMapExplorerModal,
+    desktopComponentFactory: () => import('../../components/features/Exploration/MapExplorerModal'),
+    mobileComponentFactory: () => import('../../components/features/Exploration/MobileMapExplorerModal'),
     visibility: 'always',
     stateKey: 'showMapExplorer',
     propsFactory: ({ state, actions, modalManager }) => {
@@ -913,7 +836,7 @@ UIFeatureRegistry.register({
 // NSFW 模块
 // ============================================================================
 
-// CampusDesire — 已迁移到新系统（完整 propsFactory）
+// CampusDesire
 UIFeatureRegistry.register({
   id: 'campusDesire',
   name: '校园欲望',
@@ -925,8 +848,8 @@ UIFeatureRegistry.register({
   dependencies: ['campusNSFW'],
   storyModuleId: 'campusNSFW',
   modal: {
-    desktopComponent: CampusDesireDashboard,
-    mobileComponent: MobileCampusDesireApp,
+    desktopComponentFactory: () => import('../../components/features/CampusDesireDashboard'),
+    mobileComponentFactory: () => import('../../components/features/MobileCampusDesireApp'),
     visibility: 'config-dependent',
     configKey: '启用校园NSFW深化系统',
     configValue: true,
@@ -966,7 +889,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// Photography — 已迁移到新系统（完整 propsFactory）
+// Photography
 UIFeatureRegistry.register({
   id: 'photography',
   name: '写真',
@@ -977,8 +900,8 @@ UIFeatureRegistry.register({
   eraId: 'contemporary',
   dependencies: [],
   modal: {
-    desktopComponent: PhotographyDashboard,
-    mobileComponent: MobilePhotographyDashboard,
+    desktopComponentFactory: () => import('../../components/features/PhotographyDashboard'),
+    mobileComponentFactory: () => import('../../components/features/MobilePhotographyDashboard'),
     visibility: 'config-dependent',
     configKey: '启用写真NSFW系统',
     configValue: true,
@@ -1001,7 +924,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// UrbanDriver — 已迁移到新系统（完整 propsFactory）
+// UrbanDriver
 UIFeatureRegistry.register({
   id: 'urbanDriver',
   name: '网约车',
@@ -1012,8 +935,8 @@ UIFeatureRegistry.register({
   eraId: 'contemporary',
   dependencies: [],
   modal: {
-    desktopComponent: UrbanDriverDashboard,
-    mobileComponent: MobileUrbanDriverApp,
+    desktopComponentFactory: () => import('../../components/features/UrbanDriverDashboard'),
+    mobileComponentFactory: () => import('../../components/features/MobileUrbanDriverApp'),
     visibility: 'config-dependent',
     configKey: '启用都市网约车NSFW系统',
     configValue: true,
@@ -1025,7 +948,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// ExposureDashboard — 已迁移到新系统（完整 propsFactory）
+// ExposureDashboard
 UIFeatureRegistry.register({
   id: 'exposureDashboard',
   name: '露出',
@@ -1037,8 +960,8 @@ UIFeatureRegistry.register({
   dependencies: ['exposureNSFW'],
   storyModuleId: 'exposureNSFW',
   modal: {
-    desktopComponent: ExposureDashboard,
-    mobileComponent: MobileExposureDashboard,
+    desktopComponentFactory: () => import('../../components/features/ExposureDashboard'),
+    mobileComponentFactory: () => import('../../components/features/MobileExposureDashboard'),
     visibility: 'config-dependent',
     configKey: '启用露出系统',
     configValue: true,
@@ -1069,7 +992,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// NsfwCenter — 已迁移到新系统（完整 propsFactory）
+// NsfwCenter
 UIFeatureRegistry.register({
   id: 'nsfwCenter',
   name: 'NSFW 控制台',
@@ -1079,7 +1002,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: NsfwControlCenter,
+    desktopComponentFactory: () => import('../../components/features/NSFWCenter/NsfwControlCenter'),
     visibility: 'config-dependent',
     configKey: '启用NSFW模式',
     configValue: true,
@@ -1095,11 +1018,10 @@ UIFeatureRegistry.register({
           urbanDriverNSFW: 'urbanDriver',
           exposureNSFW: 'exposureDashboard',
           boardGameNSFW: 'boardGameDashboard',
-          bdsmNSFW: 'campusDesire', // BDSM 没有独立仪表盘，打开校园欲望（内含BDSM子弹窗）
+          bdsmNSFW: 'campusDesire',
         };
         const target = dashboardMap[moduleId];
         if (!target) return;
-        // 统一使用事件系统，确保 close 和 open 都走同一条路径
         window.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'nsfwCenter' } }));
         window.dispatchEvent(new CustomEvent('modal:open', { detail: { id: target } }));
       },
@@ -1107,7 +1029,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// BarNSFW — 酒吧 NSFW 面板
+// BarNSFW
 UIFeatureRegistry.register({
   id: 'barNSFW',
   name: '酒吧面板',
@@ -1117,8 +1039,8 @@ UIFeatureRegistry.register({
   version: '1.0.0',
   dependencies: [],
   modal: {
-    desktopComponent: BarNSFWPanel,
-    mobileComponent: MobileBarNSFWPanel,
+    desktopComponentFactory: () => import('../../components/features/BarNSFW/BarPanel'),
+    mobileComponentFactory: () => import('../../components/features/BarNSFW/MobileBarPanel'),
     visibility: 'config-dependent',
     configKey: '酒吧NSFW设置',
     configValue: true,
@@ -1149,7 +1071,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// BoardGameDashboard — 已迁移到新系统（完整 propsFactory）
+// BoardGameDashboard
 UIFeatureRegistry.register({
   id: 'boardGameDashboard',
   name: '桌游面板',
@@ -1159,8 +1081,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: BoardGameDashboard,
-    mobileComponent: MobileBoardGameDashboard,
+    desktopComponentFactory: () => import('../../components/features/BoardGame/BoardGameDashboard'),
+    mobileComponentFactory: () => import('../../components/features/BoardGame/MobileBoardGameDashboard'),
     visibility: 'always',
     stateKey: 'showBoardGameDashboard',
     propsFactory: ({ state, setters, modalManager }) => {
@@ -1180,7 +1102,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// BoardGame — 已迁移到新系统（完整 propsFactory）
+// BoardGame
 UIFeatureRegistry.register({
   id: 'boardGame',
   name: '桌游',
@@ -1190,8 +1112,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: BoardGameModal,
-    mobileComponent: MobileBoardGameModal,
+    desktopComponentFactory: () => import('../../components/features/BoardGame/BoardGameModal'),
+    mobileComponentFactory: () => import('../../components/features/BoardGame/MobileBoardGameModal'),
     visibility: 'always',
     stateKey: 'showBoardGame',
     propsFactory: ({ state, setters, modalManager }) => {
@@ -1209,7 +1131,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// BDSMRelationship — 已迁移到新系统（完整 propsFactory）
+// BDSMRelationship
 UIFeatureRegistry.register({
   id: 'bdsmRelationship',
   name: 'BDSM 关系',
@@ -1219,7 +1141,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: BDSMRelationshipModal,
+    desktopComponentFactory: () => import('../../components/features/BDSMRelationshipModal'),
     visibility: 'always',
     propsFactory: ({ state, actions, setters, modalManager }) => {
       const 欲望系统 = ((state as any).校园系统?.欲望系统) || {};
@@ -1251,7 +1173,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// BDSMContract — 已迁移到新系统（完整 propsFactory）
+// BDSMContract
 UIFeatureRegistry.register({
   id: 'bdsmContract',
   name: 'BDSM 契约',
@@ -1261,7 +1183,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: BDSMContractModal,
+    desktopComponentFactory: () => import('../../components/features/BDSMContractModal'),
     visibility: 'always',
     propsFactory: ({ state, actions, setters, modalManager }) => {
       const 欲望系统 = ((state as any).校园系统?.欲望系统) || {};
@@ -1287,7 +1209,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// BDSMSafety — 已迁移到新系统（完整 propsFactory）
+// BDSMSafety
 UIFeatureRegistry.register({
   id: 'bdsmSafety',
   name: 'BDSM 安全',
@@ -1297,7 +1219,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: BDSMSafetyModal,
+    desktopComponentFactory: () => import('../../components/features/BDSMSafetyModal'),
     visibility: 'always',
     propsFactory: ({ state, setters, modalManager }) => {
       const 校园系统 = (state as any).校园系统 || {};
@@ -1334,7 +1256,7 @@ UIFeatureRegistry.register({
 // 设备
 // ============================================================================
 
-// MobileDevice — 已迁移到新系统（完整 propsFactory）
+// MobileDevice
 UIFeatureRegistry.register({
   id: 'mobileDevice',
   name: '手机',
@@ -1345,13 +1267,13 @@ UIFeatureRegistry.register({
   eraId: 'contemporary',
   dependencies: [],
   modal: {
-    desktopComponent: MobileDeviceModal,
+    desktopComponentFactory: () => import('../../components/features/MobileDevice/MobileDeviceModal'),
     visibility: 'always',
     stateKey: 'showMobileDevice',
     gameViewOnly: true,
     propsFactory: ({ state, meta, setters, actions, modalManager }) => {
       const deviceState = (meta as any).deviceState;
-      if (!deviceState?.isOpen) return null; // 未打开时不渲染
+      if (!deviceState?.isOpen) return null;
 
       return {
         eraId: (state.currentEra as string) || 'contemporary_urban',
@@ -1550,7 +1472,7 @@ UIFeatureRegistry.register({
 });
 
 // ============================================================================
-// New Game (特殊：仅在 new_game 视图显示，由 App.tsx 直接渲染)
+// New Game (由 App.tsx 直接渲染)
 // ============================================================================
 
 UIFeatureRegistry.register({
@@ -1562,9 +1484,9 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: NewGameWizard,
-    mobileComponent: MobileNewGameWizard,
-    visibility: 'hidden', // 由 App.tsx 直接渲染，不通过 ModalRenderer
+    desktopComponentFactory: () => import('../../components/features/NewGame/NewGameWizard'),
+    mobileComponentFactory: () => import('../../components/features/NewGame/mobile/MobileNewGameWizard'),
+    visibility: 'hidden',
     propsFactory: () => ({}),
   },
 });
@@ -1573,7 +1495,7 @@ UIFeatureRegistry.register({
 // RPG 模式集成
 // ============================================================================
 
-// RPG 战斗 — 通过 openModals Map 控制渲染
+// RPG Battle
 UIFeatureRegistry.register({
   id: 'rpgBattle',
   name: 'RPG 战斗',
@@ -1583,7 +1505,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: RpgBattleIntegration,
+    desktopComponentFactory: () => import('../../components/features/Battle/RpgBattleIntegration').then(m => ({ default: m.RpgBattleIntegration })),
     visibility: 'always',
     gameViewOnly: true,
     propsFactory: ({ state, modalManager }) => ({
@@ -1594,7 +1516,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// RPG 装备 — 3 槽位装备面板（武器/防具/饰品）
+// RPG Equipment
 UIFeatureRegistry.register({
   id: 'rpgEquipment',
   name: 'RPG 装备',
@@ -1604,7 +1526,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: RpgEquipmentIntegration,
+    desktopComponentFactory: () => import('../../components/features/Equipment/RpgEquipmentIntegration').then(m => ({ default: m.RpgEquipmentIntegration })),
     visibility: 'always',
     propsFactory: ({ state, modalManager }) => ({
       character: state.角色,
@@ -1613,7 +1535,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// RPG 功法 — 功法激活/停用面板
+// RPG Kungfu
 UIFeatureRegistry.register({
   id: 'rpgKungfu',
   name: 'RPG 功法',
@@ -1623,7 +1545,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: RpgKungfuIntegration,
+    desktopComponentFactory: () => import('../../components/features/Kungfu/RpgKungfuIntegration').then(m => ({ default: m.RpgKungfuIntegration })),
     visibility: 'always',
     gameViewOnly: true,
     propsFactory: ({ state, modalManager }) => ({
@@ -1633,7 +1555,7 @@ UIFeatureRegistry.register({
   },
 });
 
-// RPG 任务 — 任务追踪面板
+// RPG Task
 UIFeatureRegistry.register({
   id: 'rpgTask',
   name: 'RPG 任务',
@@ -1643,7 +1565,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponent: RpgTaskIntegration,
+    desktopComponentFactory: () => import('../../components/features/Task/RpgTaskIntegration').then(m => ({ default: m.RpgTaskIntegration })),
     visibility: 'always',
     propsFactory: ({ state, actions, modalManager }) => ({
       tasks: state.任务列表,
