@@ -44,10 +44,16 @@ export interface ModalPropsContext {
 export interface ModalConfig {
   /** 懒加载的弹窗组件（桌面版） */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  desktopComponent: React.LazyExoticComponent<React.ComponentType<any>>;
+  desktopComponent?: React.LazyExoticComponent<React.ComponentType<any>>;
   /** 懒加载的弹窗组件（移动版） */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mobileComponent?: React.LazyExoticComponent<React.ComponentType<any>>;
+  /** 懒加载工厂（动态 import，Phase 7 新增，与 desktopComponent 二选一） */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  desktopComponentFactory?: () => Promise<{ default: React.ComponentType<any> }>;
+  /** 懒加载工厂（移动版，Phase 7 新增） */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mobileComponentFactory?: () => Promise<{ default: React.ComponentType<any> }>;
   /** 可见性控制 */
   visibility: ModuleVisibility;
   /** 依赖的 gameConfig 键（visibility=config-dependent 时生效） */
@@ -56,9 +62,9 @@ export interface ModalConfig {
   configValue?: unknown;
   /** 是否仅在 game view 中渲染 */
   gameViewOnly?: boolean;
-  /** 对应 state 中的布尔键名，用于兼容旧系统（如 setShowInventory → state.showInventory） */
+  /** 对应 state 中的布尔键名，用于兼容旧系统 */
   stateKey?: string;
-  /** Props 工厂函数：从 state/setters/actions 构造组件 props */
+  /** Props 工厂函数 */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   propsFactory: (ctx: ModalPropsContext) => Record<string, any>;
 }
