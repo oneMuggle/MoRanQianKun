@@ -74,13 +74,17 @@ test.describe('手动存档', () => {
     test('L1 — 打开存档面板', async ({ page }) => {
         // 先创建游戏
         await createNewGame(page);
-        // createNewGame 依赖向导流程与 AI 故事生成（需较长时间）；
-        // 等待游戏主界面出现（含"江湖"或"故事"等游戏 UI 关键文本），
-        // 避免向导未完成就进入存档检查导致 flaky 失败
+        // createNewGame 依赖向导流程与 AI 故事生成。
+        // 等待游戏主界面独有元素出现——"NSFW 管理中心"按钮
+        // （aria-label="NSFW 管理中心"，位于 GameView 顶部右侧），
+        // 这个按钮**不会**出现在"创建新角色"向导里，可作为可靠的
+        // "已进入游戏"判据（向导里没有"NSFW"或"性能监控"）。
         try {
-            await expect(page.getByText(/江湖|故事|聊天/).first()).toBeVisible({ timeout: 20000 });
+            await expect(page.getByRole('button', { name: 'NSFW 管理中心' })).toBeVisible({ timeout: 30000 });
         } catch {
-            test.skip(true, 'createNewGame 超时：向导未完成或 AI 故事生成失败，跳过此用例');
+            // CI 环境无 API key，AI 故事生成失败，停在向导。
+            // 标记为 fixme 而非 fail，避免阻塞 CI。
+            test.fixme(true, 'createNewGame 未进入游戏主界面（CI 无 API key，AI 故事生成失败）');
             return;
         }
         await page.waitForTimeout(1000);

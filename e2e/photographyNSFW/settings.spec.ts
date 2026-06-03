@@ -141,9 +141,12 @@ test.describe('写真 NSFW 设置 E2E', () => {
         await startNewGameAndEnterGame(page);
         await openSettingsAndNavigateToPhotographyNSFW(page);
 
-        // 验证写真NSFW设置内容可见（检查页面包含该文本，不严格要求可见性）
+        // 写真 NSFW 模块的 module.name 为"写真约拍NSFW"（无空格），
+        // 渲染在 NsfwModuleCard 卡片头部。点"配置"按钮后弹窗内
+        // NsfwSectionHeader 才会显示"写真约拍 NSFW"（有空格）。
+        // 此处直接验证模块卡片可见：
         const bodyText = await page.locator('body').innerText();
-        expect(bodyText).toContain('写真约拍 NSFW');
+        expect(bodyText).toContain('写真约拍NSFW');
     });
 
     test('PHOTO-02: 启用/禁用写真NSFW系统开关', async ({ page }) => {
