@@ -116,14 +116,11 @@ async function openSettingsAndNavigateToPhotographyNSFW(page: Page) {
     const nsfwEntry = page.getByRole('button', { name: 'NSFW 管理中心' }).first();
     await expect(nsfwEntry).toBeVisible({ timeout: 10000 });
     await nsfwEntry.click({ force: true });
-    await page.waitForTimeout(1000);
 
-    // NSFW 管理中心以 NsfwControlCenter 渲染：包含模块列表。
-    // 模块卡片显示 module.name = '写真约拍NSFW'（无空格）——
-    // "写真约拍 NSFW"（有空格）只在点"配置"按钮后的
-    // NsfwModuleSettingsModal 内部 NsfwSectionHeader 中出现。
-    // 此处只验证模块卡片存在，不点击配置按钮（避免 10s 等待超时）。
-    await page.waitForTimeout(500);
+    // 等待模块网格渲染完成——NsfwModuleCard 显示 module.name
+    // = '写真约拍NSFW'（无空格）。React + lazy 加载可能需要数秒。
+    // 用 getByText 显式等待该元素出现（最多 15s），确保测试稳定。
+    await expect(page.getByText('写真约拍NSFW').first()).toBeVisible({ timeout: 15000 });
 }
 
 test.describe('写真 NSFW 设置 E2E', () => {
