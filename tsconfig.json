@@ -25,5 +25,17 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "scripts",
+    "e2e",
+    "android",
+    "r2-worker",
+    "functions",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }

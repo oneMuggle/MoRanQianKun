@@ -186,6 +186,8 @@ docs/plans/
 
 **目标**：在不打乱开发节奏的前提下，让 `tsc --noEmit` 能暴露更多历史问题。
 
+**状态**：⚠️ 暂停推进（2026-06-03）— 全局 strict 暴露 628 个错误，**重排到 Phase 3 之后**
+
 #### 2.1 渐进策略
 **严禁**一次性开启 `strict: true`，会一次性暴露数百个错误。
 
@@ -225,11 +227,21 @@ docs/plans/
 
 **验收**：所有 utils/、data/、models/domain/ 子目录的 `tsc --noEmit` 零错误；全局 `tsc --noEmit` 错误数下降 ≥ 30%。
 
+**实际结果（2026-06-03）**：
+- ❌ utils/ 子目录 strict 化试错失败（子 tsconfig 被父配置吞掉 include）
+- ⚠️ 全局 tsc 错误 628 个（排除 scripts/ 后），**远超预估**
+- ✅ 修复 2 个真实错误（worldEvolution 缺 import、campusPhone 联合类型冲突）
+- ✅ 添加 scripts/ e2e/ android/ 等 6 个目录到 tsconfig exclude
+- ✅ 创建 `tsconfig.strict.json` + `docs/technical/02b-typescript-strict-strategy.md`
+- 📋 **重排策略**：Phase 3 拆分大文件后再 strict（影响范围可控）
+
 ---
 
 ### Phase 3：超大型文件拆分（5 天）
 
 **目标**：将 5 个超大型文件（>900 行）拆分为 < 400 行的聚焦模块。
+
+**状态**：⚠️ 部分完成（2026-06-03）— 完成 P3-6（era 重复清理 6502 行），其他大文件拆分留到后续
 
 #### 3.1 `models/system.ts`（1822 行）— 最优先
 
@@ -286,20 +298,28 @@ core/db/
 - 未来"业务域扩展"放 `modules/era-*/extensions/`
 
 #### 3.7 任务清单
-| ID | 文件 | 目标 |
-|---|---|---|
-| P3-1 | `models/system.ts` | < 400 行 |
-| P3-2 | `models/eraDevice.ts` | < 400 行 |
-| P3-3 | `services/dbService.ts` | < 400 行（保留转发壳） |
-| P3-4 | `utils/worldbook.ts` | < 400 行 |
-| P3-5 | `models/era-config.ts` | < 400 行 |
-| P3-6 | eraTheme 重复合并 | 单一真相源 |
+| ID | 文件 | 目标 | 状态 |
+|---|---|---|---|
+| P3-1 | `models/system.ts` | < 400 行 | ⚠ 调研完成，99 export / 69 importers，完整拆分需 1-2 天 |
+| P3-2 | `models/eraDevice.ts` | < 400 行 | ⏳ 后续 |
+| P3-3 | `services/dbService.ts` | < 400 行（保留转发壳） | ⏳ 后续 |
+| P3-4 | `utils/worldbook.ts` | < 400 行 | ⏳ 后续 |
+| P3-5 | `models/era-config.ts` | < 400 行 | ⏳ 后续 |
+| P3-6 | eraTheme 重复合并 | 单一真相源 | ✅ 删除 modules/era-* 14 文件 6502 行，tsc 错误持平 |
+
+**实际进展（2026-06-03）**：
+- ✅ P3-1：完成 `models/system.ts` 99 个 export 的清点与分类（7 大主题）
+- ✅ P3-6：调研发现 `modules/era-*/` 重复源 + 整个 `modules/` 目录 0 引用方
+- ✅ 写 `docs/technical/02c-modules-unused-scaffolding.md` 列出 A/B/C 三个方案待用户选
+- ⏳ 完整大文件拆分留到后续阶段
 
 ---
 
 ### Phase 4：循环依赖与 import 架构（4 天）
 
 **目标**：消除 `prompts ↔ models ↔ hooks/useGame` 循环依赖。
+
+**状态**：⚠️ 部分完成（2026-06-03）— 已解 2/16 循环（BDSM + boardGame），剩余 14 个列入待办
 
 #### 4.1 当前症状
 `vite.config.ts` 已通过把三个目录都打到 `game-runtime` chunk 兜底（避免运行时 TDZ），但**结构上仍是循环依赖**，是架构债。
@@ -328,12 +348,19 @@ core/db/
 即使解耦成功，仍保留 `game-runtime` chunk 命名作为性能优化（合并首屏关键代码），但去除"为避免 TDZ 合并"的注释。
 
 #### 4.4 任务清单
-| ID | 任务 |
-|---|---|
-| P4-1 | 跑 `madge --circular` 列出全部循环链 |
-| P4-2 | 提取反向引用常量到 `utils/` |
-| P4-3 | 引入 `prompts/core/contracts.ts` 接口层 |
-| P4-4 | 验证 0 循环，构建成功 |
+| ID | 任务 | 状态 |
+|---|---|---|
+| P4-1 | 跑 `madge --circular` 列出全部循环链 | ✅ 16 个识别 |
+| P4-2 | 提取反向引用常量到 `utils/` | ⚠ 部分：BDSM + boardGame 已解（移到 normalization.ts） |
+| P4-3 | 引入 `prompts/core/contracts.ts` 接口层 | ⏳ 推迟到 Phase 4 续期 |
+| P4-4 | 验证 0 循环，构建成功 | ⚠ 当前 14 循环，Vite 构建已通过 |
+
+**实际结果（2026-06-03）**：
+- 16 → 14 循环（-2：BDSM 环、boardGame 环）
+- 模式：从 `index.ts` 把"被 normalization 引用"的接口/常量移到 `normalization.ts` 内部
+- 环 D（npcNSFWEnhancement 9 条子环）工程量大，留作单独 Phase
+- 环 H（sendWorkflow）是 madge 误报（`import type` 不引发 TDZ），不需要处理
+- 完整记录见 `docs/technical/02d-circular-deps-decoupling.md`
 
 ---
 

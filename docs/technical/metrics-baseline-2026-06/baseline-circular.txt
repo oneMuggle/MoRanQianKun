@@ -1,24 +1,22 @@
-# baseline collected at 2026-06-03T01:03:44.869Z
+# baseline collected at 2026-06-03T03:11:50.436Z
 # command: pnpm exec madge --circular --extensions ts,tsx --warning .
 
-Processed 1504 files (19.1s) (74 warnings)
+Processed 1489 files (11.2s) (74 warnings)
 
 1) types.ts > models/character.ts
-2) models/bdsmNSFW/index.ts > models/bdsmNSFW/normalization.ts
-3) models/game-settings.ts > models/era-config.ts
-4) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/dailyPattern.ts
-5) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/fetishDiscovery.ts
-6) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/fetishDiscovery.ts
-7) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/personalityTrigger.ts
-8) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/personalityTrigger.ts
-9) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts > models/npcNSFWEnhancement/sensitiveZones.ts
-10) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts
-11) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts
-12) models/social.ts > models/npcNSFWEnhancement/types.ts
-13) models/boardGameNSFW/index.ts > models/boardGameNSFW/normalization.ts
-14) prompts/runtime/eraLiMode.ts > prompts/runtime/npcNSFWEnhancement.ts
-15) services/ai/image/imageTasks.ts > services/ai/image/backends.ts > services/ai/image/persistence.ts
-16) hooks/useGame/sendWorkflow/index.ts > hooks/useGame/sendWorkflow/responseProcessingPhase.ts
+2) models/game-settings.ts > models/era-config.ts
+3) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/dailyPattern.ts
+4) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/fetishDiscovery.ts
+5) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/fetishDiscovery.ts
+6) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/personalityTrigger.ts
+7) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/personalityTrigger.ts
+8) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts > models/npcNSFWEnhancement/sensitiveZones.ts
+9) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts
+10) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts
+11) models/social.ts > models/npcNSFWEnhancement/types.ts
+12) prompts/runtime/eraLiMode.ts > prompts/runtime/npcNSFWEnhancement.ts
+13) services/ai/image/imageTasks.ts > services/ai/image/backends.ts > services/ai/image/persistence.ts
+14) hooks/useGame/sendWorkflow/index.ts > hooks/useGame/sendWorkflow/responseProcessingPhase.ts
 
 ✖ Skipped 74 files
 
@@ -100,5 +98,5 @@ js-tiktoken/ranks/o200k_base
 
 --- STDERR ---
 - Finding files
-✖ Found 16 circular dependencies!
+✖ Found 14 circular dependencies!
 

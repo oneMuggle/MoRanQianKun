@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "noImplicitOverride": true
+  },
+  "include": [
+    "utils/apiConfig.ts",
+    "utils/apiConfigConstants.ts",
+    "utils/apiConfigNormalization.ts",
+    "utils/apiDiagnostics.ts",
+    "utils/apiFailover.ts",
+    "utils/builtinPrompts.ts",
+    "utils/jsonRepair.ts",
+    "utils/promptFeatureToggles.ts",
+    "utils/modelCategorizer.ts",
+    "utils/stateHelpers.ts",
+    "utils/tokenEstimate.ts",
+    "utils/visualSettings.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}

@@ -1,7 +1,7 @@
-# baseline collected at 2026-06-03T01:06:11.927Z
+# baseline collected at 2026-06-03T03:12:21.262Z
 # command: pnpm exec knip --no-progress
 
-Unused files (422)
+Unused files (421)
 components/features/BDSMTaskModal.tsx                                          
 components/features/DailyTown/MobileRegionPanel.tsx                            
 components/features/DailyTown/RegionPanel.tsx                                  
@@ -374,7 +374,6 @@ models/planning/storyPlan.ts
 models/planning/storySlots.ts                                                  
 models/property/facilityPresets.ts                                             
 models/property/tenantPresets.ts                                               
-modules/era-primordial/era-types.ts                                            
 PreviewPage.tsx                                                                
 prompts/core/ancientRealism.ts                                                 
 prompts/core/story.ts                                                          
@@ -873,7 +872,7 @@ BDSM连续拒绝阈值                                                    models
 获取BDSM时代场景                                                    models/bdsmNSFW/index.ts:46:10                            
 通用BDSM场景                                                      models/bdsmNSFW/index.ts:46:22                            
 BDSM时代场景库                                                     models/bdsmNSFW/index.ts:46:32                            
-创建空关系网络                                                       models/bdsmNSFW/index.ts:90:10                            
+创建空关系网络                                                       models/bdsmNSFW/index.ts:64:10                            
 创建空关系网络                                             function  models/bdsmNSFW/network.ts:27:17                          
 BDSM时代场景库                                                     models/bdsmNSFW/scenarios.ts:23:14                        
 获取BDSM时代场景                                          function  models/bdsmNSFW/scenarios.ts:35:17                        
@@ -1569,9 +1568,9 @@ NSFW_APP_CATEGORIES                                           models/nsfwApps.ts
 后果叙事模板                                                        models/urbanDriverNSFW/index.ts:40:3                      
 预设乘客列表                                                        models/urbanDriverNSFW/scenarios.ts:39:14                 
 深夜时段                                                          models/urbanDriverNSFW/scenarios.ts:103:14                
-ERA_IDS                                                       modules/index.ts:44:14                                    
-NSFW_MODULE_IDS                                               modules/index.ts:47:14                                    
-BUSINESS_MODULE_IDS                                           modules/index.ts:50:14                                    
+ERA_IDS                                                       modules/index.ts:41:14                                    
+NSFW_MODULE_IDS                                               modules/index.ts:44:14                                    
+BUSINESS_MODULE_IDS                                           modules/index.ts:47:14                                    
 核心_境界体系                                                       prompts/core-prompts.ts:94:10                             
 核心_古代现实基本逻辑                                                   prompts/core-prompts.ts:94:19                             
 构建主剧情COT内容                                                    prompts/core/cot.ts:5:14                                  
@@ -2037,9 +2036,9 @@ BDSM影响记录                                                type       model
 BDSM论坛设置                                                type       models/bdsmNSFW/index.ts:37:3                        
 BDSM时代场景类型                                              type       models/bdsmNSFW/index.ts:44:15                       
 BDSM时代场景                                                type       models/bdsmNSFW/index.ts:44:27                       
-BDSM关系边类型                                               type       models/bdsmNSFW/index.ts:85:3                        
-BDSM关系边                                                 type       models/bdsmNSFW/index.ts:86:3                        
-关系网络数据                                                  type       models/bdsmNSFW/index.ts:87:3                        
+BDSM关系边类型                                               type       models/bdsmNSFW/index.ts:59:3                        
+BDSM关系边                                                 type       models/bdsmNSFW/index.ts:60:3                        
+关系网络数据                                                  type       models/bdsmNSFW/index.ts:61:3                        
 BDSM时代场景类型                                              type       models/bdsmNSFW/scenarios.ts:6:13                    
 BDSM时代场景                                                interface  models/bdsmNSFW/scenarios.ts:12:18                   
 多人局配置                                                   interface  models/boardGameNSFW/core.ts:133:18                  
@@ -2931,4 +2930,4 @@ SensitivePointMeridianMap|default      components/features/Social/SensitivePoint
 
 --- STDERR ---
 Configuration hints (1)
-. (root)    .  Create knip.json configuration file, and add entry and/or refine project files (422 unused files)
+. (root)    .  Create knip.json configuration file, and add entry and/or refine project files (421 unused files)

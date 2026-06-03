@@ -1,23 +1,23 @@
-# baseline collected at 2026-06-03T01:06:19.388Z
+# baseline collected at 2026-06-03T03:12:26.668Z
 # command: pnpm exec vitest run
 
 
  RUN  v4.1.5 /home/fz/project/MoRanJiangHu
 
- ❯ hooks/useGame/memory/memorySummaryHandlers.test.ts (13 tests | 1 failed) 47ms
-       × 刷新记忆总结任务 clears when no task needed 12ms
- ❯ hooks/useGame/time/historyTurnWorkflow.test.ts (20 tests | 1 failed) 73ms
-       × returns player input on success 11ms
- ❯ hooks/useGame/ui/rollbackSnapshot.test.ts (11 tests | 1 failed) 70ms
-       × restores history and memory 31ms
- ❯ hooks/useGame/sendWorkflow.test.ts (23 tests | 1 failed) 909ms
-       × returns cancelled and restores from snapshot on AbortError 21ms
+ ❯ hooks/useGame/ui/rollbackSnapshot.test.ts (11 tests | 1 failed) 39ms
+       × restores history and memory 14ms
+ ❯ hooks/useGame/time/historyTurnWorkflow.test.ts (20 tests | 1 failed) 58ms
+       × returns player input on success 10ms
+ ❯ hooks/useGame/memory/memorySummaryHandlers.test.ts (13 tests | 1 failed) 51ms
+       × 刷新记忆总结任务 clears when no task needed 22ms
+ ❯ hooks/useGame/sendWorkflow.test.ts (23 tests | 1 failed) 365ms
+       × returns cancelled and restores from snapshot on AbortError 28ms
 
  Test Files  4 failed | 92 passed (96)
       Tests  4 failed | 2134 passed (2138)
      Errors  2 errors
-   Start at  09:06:20
-   Duration  65.72s (transform 25.18s, setup 0ms, import 37.65s, tests 75.41s, environment 269.79s)
+   Start at  11:12:27
+   Duration  67.92s (transform 13.69s, setup 0ms, import 22.27s, tests 72.47s, environment 168.27s)
 
 
 --- STDERR ---

@@ -160,18 +160,21 @@ export default defineConfig(({ mode }) => {
             }
  
             // 时代模块拆分（按需加载）
+            // 2026-06-03：modules/era-* 已删除（重复 models/eraTheme/*），保留配置以防未来恢复
             if (normalizedId.includes('/modules/era-')) {
               const match = normalizedId.match(/\/modules\/era-([a-z-]+)\//);
               if (match) return `era-${match[1]}`;
             }
 
             // NSFW 模块拆分（按需加载）
+            // 2026-06-03：nsfw-* 仍存在但 0 引用方（与 era 同性质），配置暂时保留
             if (normalizedId.includes('/modules/nsfw-')) {
               const match = normalizedId.match(/\/modules\/nsfw-([a-z-]+)\//);
               if (match) return `nsfw-${match[1]}`;
             }
 
             // 业务域模块拆分（按需加载）
+            // 2026-06-03：biz-* 仍存在但 0 引用方，配置暂时保留
             if (normalizedId.includes('/modules/biz-')) {
               const match = normalizedId.match(/\/modules\/biz-([a-z-]+)\//);
               if (match) return `biz-${match[1]}`;

@@ -9,6 +9,9 @@
 |------|------|------|
 | 01 | [architecture-overview](./01-architecture-overview.md) | 项目总览、技术栈、目录约定、构建工具链 |
 | 02 | [state-modularization](./02-state-modularization.md) | useGame 架构、zustandStore、子模块拆分（来自 2026-05-31 重构） |
+| 02b | [typescript-strict-strategy](./02b-typescript-strict-strategy.md) | TS 严格度渐进策略、试错记录、CI 接入（Phase 2 暂停后方案） |
+| 02c | [modules-unused-scaffolding](./02c-modules-unused-scaffolding.md) | modules/ 目录调研：20 个子目录 0 引用方，B 方案已删 era 重复 6502 行 |
+| 02d | [circular-deps-decoupling](./02d-circular-deps-decoupling.md) | 循环依赖解耦记录：16 → 14（BDSM + boardGame 已解），剩余 14 个待后续 |
 | 03 | [prompt-architecture](./03-prompt-architecture.md) | 提示词分层、运行时构建、systemPromptBuilder 迁移（来自 2026-06-01） |
 | 04 | [ai-pipeline](./04-ai-pipeline.md) | AI 客户端、多 provider 抽象、图像/文本/流式 |
 | 05 | [persistence](./05-persistence.md) | IndexedDB、dbService、GitHub Sync、存档迁移 |

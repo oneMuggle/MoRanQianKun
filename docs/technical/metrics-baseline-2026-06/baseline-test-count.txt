@@ -1,4 +1,4 @@
-# baseline collected at 2026-06-03T01:07:26.683Z
+# baseline collected at 2026-06-03T03:13:35.636Z
 # command: manual glob + it/test counter
 
 test files: 96
