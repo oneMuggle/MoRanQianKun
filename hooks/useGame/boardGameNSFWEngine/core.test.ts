@@ -4,7 +4,7 @@
  * 覆盖 executePlayerAction 各操作类型的结算结果。
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { executePlayerAction } from './core';
 
 describe('executePlayerAction', () => {
@@ -13,6 +13,17 @@ describe('executePlayerAction', () => {
     当前回合: 3,
     总回合数: 12,
   };
+
+  // 引擎内多处使用 Math.random()（tensionDelta、骰子、成功率等），
+  // 会导致边界断言（如 toBeLessThan(10)）在 CI 上 flake。
+  // 测试期间把 Math.random 锁定为 0（最小值），让所有概率路径确定。
+  let randomSpy: ReturnType<typeof vi.spyOn> | undefined;
+  beforeEach(() => {
+    randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0);
+  });
+  afterEach(() => {
+    randomSpy?.mockRestore();
+  });
 
   it('掷骰操作应返回有效结果', () => {
     for (let i = 0; i < 20; i++) {
