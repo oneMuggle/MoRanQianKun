@@ -109,22 +109,22 @@ async function startNewGameAndEnterGame(page: Page) {
 }
 
 async function openSettingsAndNavigateToPhotographyNSFW(page: Page) {
-    // 先关闭可能已打开的设置面板
-    const closeBtn = page.getByText('关闭设置');
-    if (await closeBtn.isVisible({ timeout: 3000 })) {
-        await closeBtn.click({ force: true });
-        await page.waitForTimeout(1000);
-    }
-
-    // 打开设置面板
-    await page.getByText('江湖设置').click({ force: true });
+    // 写真 NSFW 设置位于 NsfwControlCenter（NSFW 管理中心），
+    // 入口在 GameView 顶部右上角的小"NSFW"按钮（aria-label="NSFW 管理中心"）。
+    // 之前此测试错误地假设在主设置面板（"江湖设置"）里，但主设置面板
+    // 并不包含写真 NSFW 标签——它是 NSFW 管理中心下的一个子模块。
+    const nsfwEntry = page.getByRole('button', { name: 'NSFW 管理中心' }).first();
+    await expect(nsfwEntry).toBeVisible({ timeout: 10000 });
+    await nsfwEntry.click({ force: true });
     await page.waitForTimeout(1000);
 
-    // 等待设置面板可见（设置面板使用 fixed inset-0 overlay，不是 dialog role）
-    await expect(page.getByText('关闭设置')).toBeVisible({ timeout: 10000 });
-
-    // 点击写真NSFW标签（force: true 绕过 Playwright 的滚动/稳定性检查）
-    await page.locator('button').filter({ hasText: '写真 NSFW' }).first().click({ force: true });
+    // NSFW 管理中心以 NsfwControlCenter 渲染：包含模块列表
+    // 写真 NSFW 在模块名称"写真约拍 NSFW"中显示（dashboardLabel="写真仪表盘"，
+    // 模块设置面板标题="写真约拍 NSFW"）。
+    const moduleTitle = page.getByText('写真约拍 NSFW').first();
+    await expect(moduleTitle).toBeVisible({ timeout: 10000 });
+    // 进入该模块设置
+    await moduleTitle.click({ force: true });
     await page.waitForTimeout(500);
 }
 

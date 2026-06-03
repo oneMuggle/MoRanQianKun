@@ -257,7 +257,10 @@ describe('执行主剧情发送工作流', () => {
     });
 
     describe('abort handling', () => {
-        it('returns cancelled and restores from snapshot on AbortError', async () => {
+        it('returns cancelled and restores history + memory on AbortError (no snapshot roll)', async () => {
+            // 实现策略：AbortError 走快速恢复路径（恢复 history + memory），
+            // 不消耗 snapshot 栈，因为 AbortError 通常是用户主动中断，
+            // 下一轮可能直接重试。重 Roll 快照留给非 AbortError 的真实错误。
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
             mock获取世界演变接口配置.mockReturnValue(undefined);
@@ -269,11 +272,20 @@ describe('执行主剧情发送工作流', () => {
             const deps = makeDeps({
                 弹出重Roll快照: vi.fn(() => snapshot),
                 回档到快照: vi.fn(),
+                设置历史记录: vi.fn(),
+                应用并同步记忆系统: vi.fn(),
             });
             const result = await 执行主剧情发送工作流('player action', false, makeState(), deps);
             expect(result.cancelled).toBe(true);
-            expect(deps.弹出重Roll快照).toHaveBeenCalled();
-            expect(deps.回档到快照).toHaveBeenCalledWith(snapshot);
+            // AbortError 走快速恢复：不消耗 snapshot、不回档
+            expect(deps.弹出重Roll快照).not.toHaveBeenCalled();
+            expect(deps.回档到快照).not.toHaveBeenCalled();
+            // 但要恢复 history 和 memory
+            expect(deps.设置历史记录).toHaveBeenCalled();
+            expect(deps.应用并同步记忆系统).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({ 静默总结提示: true })
+            );
         });
 
         it('falls back to restore history + memory when no snapshot available', async () => {

@@ -70,6 +70,8 @@ function makeDeps(overrides: any = {}) {
         parseStoryRawText: vi.fn((raw: string) => ({ logs: [], tavern_commands: [], rawText: raw })),
         执行正文润色: vi.fn(() => Promise.resolve({ applied: true, response: { logs: [], tavern_commands: [] } })),
         规范化游戏设置: vi.fn((c: any) => ({ 启用修炼体系: true, 剧情风格: '一般', ...c })),
+        // NSFW 重构后新增：regenerate 时清空后台记忆总结
+        清空后台记忆总结流程: vi.fn(),
         processResponseCommands: vi.fn(() => ({
             角色: { 姓名: '李四' },
             环境: { 年: 2026 },

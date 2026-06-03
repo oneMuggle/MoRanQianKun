@@ -135,7 +135,11 @@ describe('创建回档快照系统', () => {
             const snapshot = makeSnapshot();
             回档到快照(snapshot);
             expect(deps.设置历史记录).toHaveBeenCalledWith(snapshot.回档前历史);
-            expect(deps.应用并同步记忆系统).toHaveBeenCalledWith(snapshot.回档前状态.记忆系统);
+            // 回档时记忆系统同步必须显式传 { 静默总结提示: false }，避免在回档路径上弹出提示
+            expect(deps.应用并同步记忆系统).toHaveBeenCalledWith(
+                snapshot.回档前状态.记忆系统,
+                { 静默总结提示: false }
+            );
         });
 
         it('applies visual and image state by default', () => {
