@@ -44,12 +44,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          # 显式指定只安装构建 APK 必需的包，避免默认安装 Android Emulator
-          # （emulator 在 GitHub runner 上偶发下载失败："Error on ZipFile unknown archive"）
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
+          # 显式指定只安装构建 APK 必需的包（避免默认装 Android Emulator，
+          # emulator 在 GitHub runner 上 zip 偶发损坏）。
+          # 用单行逗号分隔的数组格式，避免多行 block scalar 解析问题。
+          packages: 'platform-tools,platforms;android-34,build-tools;34.0.0'
 
       - name: Accept Android Licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
