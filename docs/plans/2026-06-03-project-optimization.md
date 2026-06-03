@@ -241,7 +241,7 @@ docs/plans/
 
 **目标**：将 5 个超大型文件（>900 行）拆分为 < 400 行的聚焦模块。
 
-**状态**：⚠️ 部分完成（2026-06-03）— 完成 P3-6（era 重复清理 6502 行），其他大文件拆分留到后续
+**状态**：⚠️ 部分完成（2026-06-03）— 完成 P3-1（system.ts 拆 1/2）和 P3-3（dbService 拆 1/4），其他深耦合文件待后续重构 helper
 
 #### 3.1 `models/system.ts`（1822 行）— 最优先
 
@@ -300,18 +300,22 @@ core/db/
 #### 3.7 任务清单
 | ID | 文件 | 目标 | 状态 |
 |---|---|---|---|
-| P3-1 | `models/system.ts` | < 400 行 | ⚠ 调研完成，99 export / 69 importers，完整拆分需 1-2 天 |
+| P3-1 | `models/system.ts` | < 400 行 | ✅ 1822→1015 行，eraPresets.ts (807 行) 已拆 |
 | P3-2 | `models/eraDevice.ts` | < 400 行 | ⏳ 后续 |
-| P3-3 | `services/dbService.ts` | < 400 行（保留转发壳） | ⏳ 后续 |
-| P3-4 | `utils/worldbook.ts` | < 400 行 | ⏳ 后续 |
+| P3-3 | `services/dbService.ts` | < 400 行（保留转发壳） | ✅ 1396→1289 + 3 子文件 (175 行) |
+| P3-4 | `utils/worldbook.ts` | < 400 行 | ⚠ 试错失败：383 行 builtinPresets 依赖 5+ helper，需先重构 |
 | P3-5 | `models/era-config.ts` | < 400 行 | ⏳ 后续 |
 | P3-6 | eraTheme 重复合并 | 单一真相源 | ✅ 删除 modules/era-* 14 文件 6502 行，tsc 错误持平 |
 
 **实际进展（2026-06-03）**：
-- ✅ P3-1：完成 `models/system.ts` 99 个 export 的清点与分类（7 大主题）
-- ✅ P3-6：调研发现 `modules/era-*/` 重复源 + 整个 `modules/` 目录 0 引用方
-- ✅ 写 `docs/technical/02c-modules-unused-scaffolding.md` 列出 A/B/C 三个方案待用户选
-- ⏳ 完整大文件拆分留到后续阶段
+- ✅ P3-1：1822→1015 行（eraPresets.ts 807 行已拆）
+- ✅ P3-3：1396→1289 + 3 子文件（deviceMessages/schema/initialization）
+- ✅ P3-6：删 14 文件 6502 行
+- ⚠ P3-4：试错发现 helper 深耦合（创建内置预设条目、构建剧情风格助手提示词 等）
+- ⚠ 剩余 3 个大文件都面临"helper 重构先行"问题
+- 📋 建议：单独 Phase 集中重构大文件 helper 路径，再分批拆
+
+---
 
 ---
 
