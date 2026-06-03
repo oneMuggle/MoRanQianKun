@@ -4,12 +4,18 @@ import React, { useState } from 'react';
 import { 获取NSFW模块列表, type NsfwModuleUI } from './moduleRegistry';
 import { NsfwModuleCard } from './NsfwModuleCard';
 import { NsfwModuleSettingsModal } from './NsfwModuleSettingsModal';
+import { ResourceDashboard } from '../NSFW/ResourceDashboard';
+import type { NSFW资源状态, 玩家库存 } from '../../../models/nsfwCore';
 
 interface Props {
   gameConfig: Record<string, unknown>;
   onSaveGame: (config: Record<string, unknown>) => void;
   onClose: () => void;
   onOpenDashboard?: (moduleId: string) => void;
+  nsfw资源状态?: NSFW资源状态;
+  nsfw库存?: 玩家库存;
+  on资源变化?: (新状态: NSFW资源状态) => void;
+  on库存变化?: (新库存: 玩家库存) => void;
 }
 
 export const NsfwControlCenter: React.FC<Props> = ({
@@ -17,9 +23,14 @@ export const NsfwControlCenter: React.FC<Props> = ({
   onSaveGame,
   onClose,
   onOpenDashboard,
+  nsfw资源状态,
+  nsfw库存,
+  on资源变化,
+  on库存变化,
 }) => {
   const nsfwModules = 获取NSFW模块列表();
   const [configuringModule, setConfiguringModule] = useState<NsfwModuleUI | null>(null);
+  const [showResources, setShowResources] = useState(false);
 
   const updateMasterToggle = (module: NsfwModuleUI, enabled: boolean) => {
     onSaveGame({ ...gameConfig, [module.masterToggleKey]: enabled });
@@ -56,6 +67,17 @@ export const NsfwControlCenter: React.FC<Props> = ({
             <div className="flex items-center gap-3">
               <button
                 type="button"
+                onClick={() => setShowResources(v => !v)}
+                className={`py-2 px-4 rounded-lg text-xs font-serif tracking-[0.1em] border transition-colors ${
+                  showResources
+                    ? 'border-wuxia-gold bg-wuxia-gold/20 text-wuxia-gold'
+                    : 'border-wuxia-gold/30 text-wuxia-gold/80 hover:bg-wuxia-gold/10'
+                }`}
+              >
+                💰 资源仪表盘
+              </button>
+              <button
+                type="button"
                 onClick={() => {
                   nsfwModules.forEach(m => {
                     if (gameConfig[m.masterToggleKey] !== true) {
@@ -81,22 +103,31 @@ export const NsfwControlCenter: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* 模块网格 */}
+        {/* 模块网格 或 资源仪表盘 */}
         <div className="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {nsfwModules.map(mod => (
-              <NsfwModuleCard
-                key={mod.id}
-                module={mod}
-                masterEnabled={gameConfig[mod.masterToggleKey] === true}
-                onMasterToggle={(v) => updateMasterToggle(mod, v)}
-                onConfigure={() => setConfiguringModule(mod)}
-                onOpenDashboard={onOpenDashboard ? () => onOpenDashboard(mod.id) : undefined}
-              />
-            ))}
-          </div>
+          {showResources && nsfw资源状态 && nsfw库存 ? (
+            <ResourceDashboard
+              资源状态={nsfw资源状态}
+              库存={nsfw库存}
+              on资源变化={on资源变化 ?? (() => {})}
+              on库存变化={on库存变化 ?? (() => {})}
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {nsfwModules.map(mod => (
+                <NsfwModuleCard
+                  key={mod.id}
+                  module={mod}
+                  masterEnabled={gameConfig[mod.masterToggleKey] === true}
+                  onMasterToggle={(v) => updateMasterToggle(mod, v)}
+                  onConfigure={() => setConfiguringModule(mod)}
+                  onOpenDashboard={onOpenDashboard ? () => onOpenDashboard(mod.id) : undefined}
+                />
+              ))}
+            </div>
+          )}
 
-          {nsfwModules.length === 0 && (
+          {!showResources && nsfwModules.length === 0 && (
             <div className="text-center text-gray-600 text-sm py-16 font-serif">
               当前时代没有 NSFW 模块
             </div>

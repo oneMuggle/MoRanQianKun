@@ -1011,6 +1011,10 @@ UIFeatureRegistry.register({
       onSaveGame: (config: unknown) => (actions as any).saveGameSettings(config),
       onClose: () => {        modalManager.close('nsfwCenter');
       },
+      nsfw资源状态: state.nsfw资源状态,
+      nsfw库存: state.nsfw库存,
+      on资源变化: (新状态: unknown) => (setters as any).设置NSFW资源状态(新状态),
+      on库存变化: (新库存: unknown) => (setters as any).设置NSFW库存(新库存),
       onOpenDashboard: (moduleId: string) => {
         const dashboardMap: Record<string, string> = {
           campusNSFW: 'campusDesire',

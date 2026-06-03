@@ -36,6 +36,12 @@ import { 初始设备状态, type DeviceState, type MobileApp } from './useGame/
 import type { 校园系统数据 } from '../models/campusPhone';
 import type { 关系网络数据 } from '../models/relationship';
 import type { 房产系统状态, 房产数据结构 } from '../models/property/types';
+import type { NSFW资源状态 } from '../models/nsfwCore/resources';
+import { 初始化NSFW资源 } from '../models/nsfwCore/resources';
+import type { 玩家库存 } from '../models/nsfwCore/shopSystem';
+import { 初始化库存 } from '../models/nsfwCore/shopSystem';
+import type { 成就进度 } from '../models/nsfwCore/achievementTree';
+import { 初始化成就进度 } from '../models/nsfwCore/achievementTree';
 import { 创建空房产状态, 创建初始房产 } from './useGame/storyState';
 import * as dbService from '../core/db';
 import { THEMES, 应用主题到根元素, 应用时代主题到根元素 } from '../styles/themes';
@@ -235,6 +241,11 @@ export const useGameState = () => {
 
     // Urban Driver NSFW System Data
     const [都市网约车系统, 设置都市网约车系统] = useState<unknown>({});
+
+    // NSFW Resource Economy State
+    const [nsfw资源状态, 设置NSFW资源状态] = useState<NSFW资源状态>(() => 初始化NSFW资源());
+    const [nsfw库存, 设置NSFW库存] = useState<玩家库存>(() => 初始化库存());
+    const [nsfw成就进度, 设置NSFW成就进度] = useState<成就进度>(() => 初始化成就进度());
 
     // Property SLG System
     const [房产系统, 设置房产系统] = useState<房产系统状态>(() => 创建空房产状态());
@@ -485,6 +496,11 @@ export const useGameState = () => {
         // NSFW Systems
         写真系统, 设置写真系统,
         都市网约车系统, 设置都市网约车系统,
+
+        // NSFW Resource Economy
+        nsfw资源状态, 设置NSFW资源状态,
+        nsfw库存, 设置NSFW库存,
+        nsfw成就进度, 设置NSFW成就进度,
 
         // Property SLG System
         房产系统, 设置房产系统,
