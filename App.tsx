@@ -16,6 +16,8 @@ import { getModuleLoader, PromptRegistry } from './core/engine';
 import { 核心提示词 } from './prompts/core-prompts';
 import FPSDisplay from './components/features/Performance/FPSDisplay';
 import PerformanceDashboard from './components/features/Performance/PerformanceDashboard';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { ToastManager } from './components/ui/ToastManager';
 
 const App: React.FC = () => {
     const { state, meta, setters, actions } = useGame();
@@ -233,6 +235,7 @@ const App: React.FC = () => {
     } = appEffects;
 
     return (
+        <ErrorBoundary>
         <MusicProvider visualConfig={state.visualConfig} onSaveVisual={actions.saveVisualSettings}>
             <div className="h-screen w-screen overflow-hidden bg-ink-black relative flex flex-col p-3 transition-colors duration-500" style={uiTextStyleVars}>
                 {fontFaceStyleText && <style>{fontFaceStyleText}</style>}
@@ -400,6 +403,8 @@ const App: React.FC = () => {
                 )}
             </div>
         </MusicProvider>
+        <ToastManager />
+        </ErrorBoundary>
     );
 };
 
