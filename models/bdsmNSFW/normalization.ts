@@ -1,9 +1,41 @@
 /**
  * BDSM 独立系统 — 设置规范化
+ *
+ * 2026-06-03：BDSM系统设置 接口与 默认BDSM系统设置 常量从 ./index 移入此处，
+ * 解决 index.ts ↔ normalization.ts 循环依赖。
  */
 
-import type { BDSM系统设置 } from './index';
-import { 默认BDSM系统设置 } from './index';
+// === 系统设置（2026-06-03 从 index.ts 移入）===
+
+export interface BDSM系统设置 {
+  启用BDSM独立系统: boolean;
+  BDSM内容强度: '关闭' | '轻度' | '中度' | '深度';
+  启用BDSM论坛: boolean;
+  启用BDSM调教任务: boolean;
+  启用BDSM契约系统: boolean;
+  启用BDSM见面预约: boolean;
+  启用BDSM关系管线: boolean;
+  启用BDSM多角色关系: boolean;
+  启用BDSM时代场景包: boolean;
+  启用BDSM信誉系统: boolean;
+  启用BDSM安全词历史: boolean;
+  启用BDSM契约模板库: boolean;
+}
+
+export const 默认BDSM系统设置: BDSM系统设置 = {
+  启用BDSM独立系统: false,
+  BDSM内容强度: '轻度',
+  启用BDSM论坛: true,
+  启用BDSM调教任务: true,
+  启用BDSM契约系统: true,
+  启用BDSM见面预约: true,
+  启用BDSM关系管线: true,
+  启用BDSM多角色关系: false,
+  启用BDSM时代场景包: true,
+  启用BDSM信誉系统: false,
+  启用BDSM安全词历史: false,
+  启用BDSM契约模板库: false,
+};
 
 const 读取布尔 = (value: unknown, fallback: boolean): boolean =>
   typeof value === 'boolean' ? value : fallback;

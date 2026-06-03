@@ -46,36 +46,10 @@ export type { BDSM时代场景类型, BDSM时代场景 } from './scenarios';
 export { 获取BDSM时代场景, 通用BDSM场景, BDSM时代场景库 } from './scenarios';
 
 // === 系统设置 ===
-
-export interface BDSM系统设置 {
-  启用BDSM独立系统: boolean;
-  BDSM内容强度: '关闭' | '轻度' | '中度' | '深度';
-  启用BDSM论坛: boolean;
-  启用BDSM调教任务: boolean;
-  启用BDSM契约系统: boolean;
-  启用BDSM见面预约: boolean;
-  启用BDSM关系管线: boolean;
-  启用BDSM多角色关系: boolean;
-  启用BDSM时代场景包: boolean;
-  启用BDSM信誉系统: boolean;
-  启用BDSM安全词历史: boolean;
-  启用BDSM契约模板库: boolean;
-}
-
-export const 默认BDSM系统设置: BDSM系统设置 = {
-  启用BDSM独立系统: false,
-  BDSM内容强度: '轻度',
-  启用BDSM论坛: true,
-  启用BDSM调教任务: true,
-  启用BDSM契约系统: true,
-  启用BDSM见面预约: true,
-  启用BDSM关系管线: true,
-  启用BDSM多角色关系: false,
-  启用BDSM时代场景包: true,
-  启用BDSM信誉系统: false,
-  启用BDSM安全词历史: false,
-  启用BDSM契约模板库: false,
-};
+// 2026-06-03：避免与 normalization.ts 循环依赖，BDSM系统设置 与 默认BDSM系统设置 移入 normalization.ts
+// 这里仅 re-export 以保持向后兼容
+export type { BDSM系统设置 } from './normalization';
+export { 默认BDSM系统设置 } from './normalization';
 
 export { 规范化BDSM系统设置 } from './normalization';
 
