@@ -1,0 +1,159 @@
+# baseline collected at 2026-06-03T01:06:19.388Z
+# command: pnpm exec vitest run
+
+
+ RUN  v4.1.5 /home/fz/project/MoRanJiangHu
+
+ ❯ hooks/useGame/memory/memorySummaryHandlers.test.ts (13 tests | 1 failed) 47ms
+       × 刷新记忆总结任务 clears when no task needed 12ms
+ ❯ hooks/useGame/time/historyTurnWorkflow.test.ts (20 tests | 1 failed) 73ms
+       × returns player input on success 11ms
+ ❯ hooks/useGame/ui/rollbackSnapshot.test.ts (11 tests | 1 failed) 70ms
+       × restores history and memory 31ms
+ ❯ hooks/useGame/sendWorkflow.test.ts (23 tests | 1 failed) 909ms
+       × returns cancelled and restores from snapshot on AbortError 21ms
+
+ Test Files  4 failed | 92 passed (96)
+      Tests  4 failed | 2134 passed (2138)
+     Errors  2 errors
+   Start at  09:06:20
+   Duration  65.72s (transform 25.18s, setup 0ms, import 37.65s, tests 75.41s, environment 269.79s)
+
+
+--- STDERR ---
+Not implemented: Window's alert() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+Not implemented: Window's confirm() method
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  hooks/useGame/sendWorkflow.test.ts > 执行主剧情发送工作流 > abort handling > returns cancelled and restores from snapshot on AbortError
+AssertionError: expected "vi.fn()" to be called at least once
+ ❯ hooks/useGame/sendWorkflow.test.ts:275:36
+    273|             const result = await 执行主剧情发送工作流('player action', false, ma…
+    274|             expect(result.cancelled).toBe(true);
+    275|             expect(deps.弹出重Roll快照).toHaveBeenCalled();
+       |                                    ^
+    276|             expect(deps.回档到快照).toHaveBeenCalledWith(snapshot);
+    277|         });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  hooks/useGame/memory/memorySummaryHandlers.test.ts > memorySummaryHandlers > 刷新任务 > 刷新记忆总结任务 clears when no task needed
+TypeError: deps.set后台记忆总结状态 is not a function
+ ❯ 清空后台记忆总结流程 hooks/useGame/memory/memorySummaryHandlers.ts:171:14
+    169|
+    170|     const 清空后台记忆总结流程 = () => {
+    171|         deps.set后台记忆总结状态('idle');
+       |              ^
+    172|         deps.set后台记忆总结草稿('');
+    173|         deps.set后台记忆总结错误('');
+ ❯ Object.刷新记忆总结任务 hooks/useGame/memory/memorySummaryHandlers.ts:239:13
+ ❯ hooks/useGame/memory/memorySummaryHandlers.test.ts:224:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  hooks/useGame/time/historyTurnWorkflow.test.ts > 创建历史回合工作流 > handleRegenerate > returns player input on success
+TypeError: deps.清空后台记忆总结流程 is not a function
+ ❯ handleRegenerate hooks/useGame/time/historyTurnWorkflow.ts:405:14
+    403|         await deps.删除最近自动存档并重置状态();
+    404|         deps.回档到快照(snapshot, { 静默记忆总结: true });
+    405|         deps.清空后台记忆总结流程();
+       |              ^
+    406|         return snapshot.玩家输入;
+    407|     };
+ ❯ hooks/useGame/time/historyTurnWorkflow.test.ts:243:28
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  hooks/useGame/ui/rollbackSnapshot.test.ts > 创建回档快照系统 > 回档到快照 > restores history and memory
+AssertionError: expected "vi.fn()" to be called with arguments: [ { '即时记忆': [], '短期记忆': [], …(3) } ]
+
+Received:
+
+  1st vi.fn() call:
+
+@@ -4,6 +4,9 @@
+      "即时记忆": [],
+      "回忆档案": [],
+      "短期记忆": [],
+      "长期记忆": [],
+    },
++   {
++     "静默总结提示": false,
++   },
+  ]
+
+
+Number of calls: 1
+
+ ❯ hooks/useGame/ui/rollbackSnapshot.test.ts:138:36
+    136|             回档到快照(snapshot);
+    137|             expect(deps.设置历史记录).toHaveBeenCalledWith(snapshot.回档前历史);
+    138|             expect(deps.应用并同步记忆系统).toHaveBeenCalledWith(snapshot.回档前状态…
+       |                                    ^
+    139|         });
+    140|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 2 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: deps.set后台记忆总结状态 is not a function
+ ❯ 执行后台记忆总结 hooks/useGame/memory/memorySummaryHandlers.ts:185:14
+    183|             return;
+    184|         }
+    185|         deps.set后台记忆总结状态('running');
+       |              ^
+    186|         deps.set后台记忆总结草稿('');
+    187|         deps.set后台记忆总结错误('');
+ ❯ 刷新记忆总结任务 hooks/useGame/memory/memorySummaryHandlers.ts:256:18
+ ❯ 应用并同步记忆系统 hooks/useGame/memory/memorySummaryHandlers.ts:271:9
+ ❯ Object.handleApplyMemorySummary hooks/useGame/memory/memorySummaryHandlers.ts:372:31
+ ❯ hooks/useGame/memory/memorySummaryHandlers.test.ts:169:22
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+ ❯ runWithCancel node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10
+
+This error originated in "hooks/useGame/memory/memorySummaryHandlers.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: deps.set后台记忆总结状态 is not a function
+ ❯ 执行后台记忆总结 hooks/useGame/memory/memorySummaryHandlers.ts:185:14
+    183|             return;
+    184|         }
+    185|         deps.set后台记忆总结状态('running');
+       |              ^
+    186|         deps.set后台记忆总结草稿('');
+    187|         deps.set后台记忆总结错误('');
+ ❯ Object.刷新记忆总结任务 hooks/useGame/memory/memorySummaryHandlers.ts:256:18
+ ❯ hooks/useGame/memory/memorySummaryHandlers.test.ts:215:22
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+ ❯ runWithCancel node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.5/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+
+This error originated in "hooks/useGame/memory/memorySummaryHandlers.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+

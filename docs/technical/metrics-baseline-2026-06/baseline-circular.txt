@@ -1,0 +1,104 @@
+# baseline collected at 2026-06-03T01:03:44.869Z
+# command: pnpm exec madge --circular --extensions ts,tsx --warning .
+
+Processed 1504 files (19.1s) (74 warnings)
+
+1) types.ts > models/character.ts
+2) models/bdsmNSFW/index.ts > models/bdsmNSFW/normalization.ts
+3) models/game-settings.ts > models/era-config.ts
+4) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/dailyPattern.ts
+5) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/fetishDiscovery.ts
+6) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/fetishDiscovery.ts
+7) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/personalityTrigger.ts
+8) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/personalityTrigger.ts
+9) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts > models/npcNSFWEnhancement/sensitiveZones.ts
+10) models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts
+11) models/social.ts > models/npcNSFWEnhancement/types.ts > models/npcNSFWEnhancement/discovery/sensitivePointDiscovery.ts
+12) models/social.ts > models/npcNSFWEnhancement/types.ts
+13) models/boardGameNSFW/index.ts > models/boardGameNSFW/normalization.ts
+14) prompts/runtime/eraLiMode.ts > prompts/runtime/npcNSFWEnhancement.ts
+15) services/ai/image/imageTasks.ts > services/ai/image/backends.ts > services/ai/image/persistence.ts
+16) hooks/useGame/sendWorkflow/index.ts > hooks/useGame/sendWorkflow/responseProcessingPhase.ts
+
+✖ Skipped 74 files
+
+../../models/mobileDevice
+./domain/social
+./game/world
+./game/story
+./domain/character
+../../models/campusNSFW
+../../types
+js-tiktoken/ranks/cl100k_base
+js-tiktoken/ranks/o200k_base
+../../models/domain/character
+../../models/domain/item
+../../models/domain/kungfu
+../../MobileHome
+../../../../models/item
+../../models/domain/social
+@/models/social
+@/models/intimacy
+../hooks/useGame/mobileDeviceWorkflow
+./index
+./categories/zhen-qiyun
+./categories/xianzhi
+./categories/causality
+./categories/heavenly-rules
+./categories/absolute-inv
+./categories/brain-hole
+./categories/law-twist
+./categories/white-free
+./categories/lazy-dim
+./categories/mental-crit
+./categories/hehuan
+@/data/cultivation/lixiang
+../../models/image
+./types
+./scenes
+./systems/交易系统
+./systems/潜规则系统
+./systems/危机系统
+./systems/改装系统
+./systems/社群系统
+./systems/灰色交易系统
+./systems/订单系统
+./systems/骚扰系统
+./systems/安全系统
+./systems/招生系统
+./systems/师生系统
+./systems/解读系统
+./systems/销售系统
+./systems/殡葬系统
+./systems/遗物系统
+./systems/心理系统
+./systems/传播系统
+./systems/危机公关系统
+./systems/心理修复系统
+./systems/咨询系统
+./systems/跟踪系统
+./systems/失败系统
+./systems/贷款系统
+./systems/服务系统
+./systems/隐私系统
+./systems/入会系统
+./systems/派对系统
+./systems/乡村权力系统
+./systems/关系系统
+./systems/置换系统
+./systems/变现系统
+./systems/粉丝运营系统
+./systems/疗愈系统
+./systems/客户系统
+./systems/晋升系统
+./预约场景
+./character
+../../hooks/useGame/variableModelWorkflow
+../../utils/apiConfig
+@vitejs/plugin-react
+
+
+--- STDERR ---
+- Finding files
+✖ Found 16 circular dependencies!
+

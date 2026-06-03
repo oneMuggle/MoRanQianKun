@@ -1,0 +1,5 @@
+# baseline collected at 2026-06-03T01:07:26.683Z
+# command: manual glob + it/test counter
+
+test files: 96
+test cases (it|test): 2126
