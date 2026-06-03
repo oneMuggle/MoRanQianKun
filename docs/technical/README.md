@@ -23,6 +23,7 @@
 | 10 | [build-and-deploy](./10-build-and-deploy.md) | Vite 配置、manualChunks、Cloudflare Pages Functions、GitHub Pages |
 | 11 | [testing-strategy](./11-testing-strategy.md) | 测试体系：utils 100% 覆盖 + 96+ hooks 测试文件 + 2200+ 用例 |
 | 12 | [error-handling](./12-error-handling.md) | 错误处理三层：全局 ErrorBoundary + ToastManager + 业务 try/catch |
+| 13 | [performance](./13-performance.md) | 性能与构建：game-runtime 2.86MB chunk 根因 + 优化路线 |
 | 11 | [memory-system](./11-memory-system.md) | 四段记忆（短期/中期/长期/背景）、记忆检索与总结 |
 | 12 | [novel-decomposition](./12-novel-decomposition.md) | 小说拆解调度、长篇规划注入 |
 | 13 | [planning-systems](./13-planning-systems.md) | 剧情规划、女主规划、同人规划 |
