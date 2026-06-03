@@ -1,56 +1,13 @@
-// 时代配置、时代数据、主题映射定义
-// 从 models/system.ts 拆分而来
+/**
+ * models/era-config/themeMapping.ts
+ *
+ * 时代主题映射 + 三个获取函数（2026-06-03 从 models/era-config.ts 提取，约 70 行）
+ */
 
-import type { ThemePreset } from './theme-visual';
-import type {
-    能力类型,
-    武力等级,
-    WorldGenConfig,
-    OpeningConfig,
-    NSFW场景类型,
-} from './game-settings';
-
-import { 获取时代主题方案, 时代主题方案列表, allEraNodes } from './eraTheme';
-export { 获取时代主题方案, 时代主题方案列表 } from './eraTheme';
-export type { 时代主题方案 } from './eraTheme';
-
-export type 时代背景 = '古代' | '近代' | '现代' | '近未来' | '未来' | '自定义';
-
-export interface 货币模板 {
-    单位列表: string[];
-    默认初始值: Record<string, number>;
-}
-
-export type 体系类型 = '武侠' | '志怪' | '双修';
-
-
-export interface 时代配置 {
-    id: string;
-    名称: string;
-    时代: 时代背景;
-    科技水平描述: string;
-    社会结构描述: string;
-    货币模板: 货币模板;
-    品质等级名称: string[];
-    默认开局场景: string[];
-    文风参考描述: string;
-    核心Prompt变体: string;
-    默认世界版图?: '弹丸之地' | '九州宏大' | '无尽位面';
-    默认组织密度?: '稀少' | '适中' | '林立';
-    默认能力类型?: 能力类型;
-    默认武力等级?: 武力等级;
-    默认王朝占位符?: string;
-    默认天骄占位符?: string;
-    组织密度标签?: string;
-    可用能力类型?: 能力类型[];
-    支持体系?: 体系类型[];
-    世界观预设卡片?: Array<{ name: string; overrides: Partial<WorldGenConfig> }>;
-}
-
-// 2026-06-03：内置/全部时代配置（834 行）已提取到 ./era-config/presets.ts
-import { 内置时代配置, 全部时代配置, LEGACY_TO_NEW } from './era-config/presets';
-export { 内置时代配置, 全部时代配置 } from './era-config/presets';
-
+import type { ThemePreset } from '../theme-visual';
+import type { 时代背景 } from '../era-config';
+import { allEraNodes } from '../eraTheme';
+import { LEGACY_TO_NEW, 全部时代配置 } from './presets';
 
 export interface 时代信息结构 {
     配置ID: string;
