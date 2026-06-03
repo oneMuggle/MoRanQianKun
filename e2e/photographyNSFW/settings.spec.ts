@@ -111,16 +111,15 @@ async function startNewGameAndEnterGame(page: Page) {
 async function openSettingsAndNavigateToPhotographyNSFW(page: Page) {
     // 写真 NSFW 设置位于 NsfwControlCenter（NSFW 管理中心），
     // 入口在 GameView 顶部右上角的小"NSFW"按钮（aria-label="NSFW 管理中心"）。
-    // 之前此测试错误地假设在主设置面板（"江湖设置"）里，但主设置面板
-    // 并不包含写真 NSFW 标签——它是 NSFW 管理中心下的一个子模块。
     const nsfwEntry = page.getByRole('button', { name: 'NSFW 管理中心' }).first();
     await expect(nsfwEntry).toBeVisible({ timeout: 10000 });
     await nsfwEntry.click({ force: true });
 
-    // 等待模块网格渲染完成——NsfwModuleCard 显示 module.name
-    // = '写真约拍NSFW'（无空格）。React + lazy 加载可能需要数秒。
-    // 用 getByText 显式等待该元素出现（最多 15s），确保测试稳定。
-    await expect(page.getByText('写真约拍NSFW').first()).toBeVisible({ timeout: 15000 });
+    // 等待 NsfwControlCenter 真正打开。控制中心打开后，标题 'NSFW 管理中心'
+    // 会出现两次（按钮 aria-label + 弹窗 h2），且头部会有"全部启用"按钮
+    // （NsfwControlCenter.tsx line 90，仅在控制中心弹窗内渲染）。
+    // 用"全部启用"按钮作为控制中心已打开的可靠判据。
+    await expect(page.getByRole('button', { name: '全部启用' })).toBeVisible({ timeout: 15000 });
 }
 
 test.describe('写真 NSFW 设置 E2E', () => {
@@ -136,10 +135,10 @@ test.describe('写真 NSFW 设置 E2E', () => {
         await startNewGameAndEnterGame(page);
         await openSettingsAndNavigateToPhotographyNSFW(page);
 
-        // 写真 NSFW 模块的 module.name 为"写真约拍NSFW"（无空格），
-        // 渲染在 NsfwModuleCard 卡片头部。点"配置"按钮后弹窗内
-        // NsfwSectionHeader 才会显示"写真约拍 NSFW"（有空格）。
-        // 此处直接验证模块卡片可见：
+        // 写真 NSFW 设置位于 NsfwControlCenter（NSFW 管理中心）。
+        // helper 已验证控制中心打开（"全部启用"按钮可见）。
+        // 此处直接断言控制中心内已注册写真 NSFW 模块——
+        // 模块卡片显示 module.name = '写真约拍NSFW'（无空格）。
         const bodyText = await page.locator('body').innerText();
         expect(bodyText).toContain('写真约拍NSFW');
     });
