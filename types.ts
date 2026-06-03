@@ -1,14 +1,15 @@
-export * from './models/character';
+// 2026-06-03 P4-6: character 不再 export * 防止循环，改用显式 type re-export
+export type { 角色装备, 角色金钱, 玩家BUFF结构, 突破条件结构, 角色数据结构, 天赋结构, 背景结构, 气运结构, NSFW等级, 气运属性类型, 气运效果类型 } from './models/character';
 export * from './models/environment';
 export * from './models/system';
 export * from './models/imageGeneration';
 export * from './models/world';
 export * from './models/item';
 export * from './models/social';
-export * from './models/kungfu'; 
-export * from './models/sect'; 
-export * from './models/task'; 
-export * from './models/story'; 
+export * from './models/kungfu';
+export * from './models/sect';
+export * from './models/task';
+export * from './models/story';
 export * from './models/storyPlan';
 export * from './models/heroinePlan';
 export * from './models/fandomPlanning/story';
@@ -91,64 +92,6 @@ export interface 聊天记录结构 {
     autoScrollToTurnIcon?: boolean;
 }
 
-/** NSFW 分级：0=无, 1=轻度(暧昧暗示), 2=中度(委婉描写), 3=重度(明确描写) */
-export type NSFW等级 = 0 | 1 | 2 | 3;
-
-export interface 天赋结构 {
-    名称: string;
-    描述: string;
-    效果: string; // 具体数值或逻辑描述
-    /** 适用性别限制：'男' / '女' / undefined（男女皆可） */
-    适用性别?: '男' | '女';
-    /** NSFW 分级等级，0 或 undefined 表示无 NSFW 内容 */
-    nsfw等级?: NSFW等级;
-    /** 适配的时代背景大类，不填则全时代可见 */
-    时代适配?: string[];
-    /** 适配的具体子纪元 ID，优先级高于时代适配，不填则回退到大类匹配 */
-    子纪元适配?: string[];
-    /** 分类标签，用于 UI 中按类别过滤 */
-    分类?: string;
-}
-
-export interface 背景结构 {
-    名称: string;
-    描述: string;
-    效果: string;
-    /** 适用性别限制：'男' / '女' / undefined（男女皆可） */
-    适用性别?: '男' | '女';
-    /** NSFW 分级等级，0 或 undefined 表示无 NSFW 内容 */
-    nsfw等级?: NSFW等级;
-    /** 适配的时代背景大类，不填则全时代可见 */
-    时代适配?: string[];
-    /** 适配的具体子纪元 ID，优先级高于时代适配，不填则回退到大类匹配 */
-    子纪元适配?: string[];
-    /** 分类标签，用于 UI 中按类别过滤 */
-    分类?: string;
-}
-
-/** 气运属性类型（六维） */
-export type 气运属性类型 = '力量' | '敏捷' | '体质' | '根骨' | '悟性' | '福源';
-
-/** 气运效果类型 */
-export type 气运效果类型 = '属性修正' | '描述效果';
-
-/** 气运结构 */
-export interface 气运结构 {
-    名称: string;
-    类别: string;
-    描述: string;
-    效果: Array<{
-        类型: 气运效果类型;
-        属性?: 气运属性类型;
-        修正值?: number;
-        描述?: string;
-    }>;
-    稀有度?: '传说' | '稀有' | '普通';
-    代价?: string;
-    nsfw等级?: 0 | 1 | 2;
-    能力类型?: '战斗' | '生存' | '社交' | '谋略' | '特殊' | '辅助';
-    适用境界?: [number, number];
-}
 
 // ─── 调试模式类型 ───
 
