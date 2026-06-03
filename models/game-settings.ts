@@ -24,7 +24,15 @@ import { 同人女主剧情规划结构 } from './fandomPlanning/heroinePlan';
 import { 战斗状态结构 } from './battle';
 import type { 视觉设置结构 } from './theme-visual';
 import type { 角色锚点结构 } from './api-config';
-import type { 时代信息结构 } from './era-config';
+import type { 时代背景 } from './era-config';
+
+/* 2026-06-03 P4-7: 从 era-config.ts 移入以解决循环 */
+export interface 时代信息结构 {
+    配置ID: string;
+    名称: string;
+    时代背景: 时代背景;
+}
+
 
 // === 游戏配置类型 ===
 

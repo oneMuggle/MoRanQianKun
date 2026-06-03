@@ -8,6 +8,7 @@ import type {
     WorldGenConfig,
     OpeningConfig,
     NSFW场景类型,
+    时代信息结构,
 } from './game-settings';
 
 import { 获取时代主题方案, 时代主题方案列表, allEraNodes } from './eraTheme';
@@ -52,11 +53,6 @@ import { 内置时代配置, 全部时代配置, LEGACY_TO_NEW } from './era-con
 export { 内置时代配置, 全部时代配置 } from './era-config/presets';
 
 
-export interface 时代信息结构 {
-    配置ID: string;
-    名称: string;
-    时代背景: 时代背景;
-}
 
 export interface 时代主题映射 {
     [eraId: string]: {
