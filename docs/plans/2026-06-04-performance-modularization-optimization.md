@@ -112,7 +112,7 @@
 
 **目标：** 不动业务代码，纯靠 `vite.config.ts` 的 `manualChunks` 把大块拆成多个 ≤ 800 KB 的可独立缓存块。
 
-#### Task 1.1：拆分 vendor 块
+#### Task 1.1：拆分 vendor 块 ✅
 
 **Files:**
 - Modify: `vite.config.ts:78-90`
