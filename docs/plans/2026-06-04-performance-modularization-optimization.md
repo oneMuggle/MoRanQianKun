@@ -90,7 +90,7 @@
 
 **任务：**
 
-- [ ] **0.1 添加 `size-limit` 预算** —— `package.json` 增加：
+- [x] **0.1 添加 `size-limit` 预算** —— `package.json` 增加：
   ```json
   "size-limit": [
     { "name": "entry",       "path": "dist/assets/index-*.js",        "limit": "350 KB" },
