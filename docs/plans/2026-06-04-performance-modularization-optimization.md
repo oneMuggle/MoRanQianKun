@@ -435,7 +435,7 @@ import { chatCompletionRequest, streamChatCompletion } from '../services/ai/text
 
 **目标：** 把 1196 行的 `useGame.ts` 拆为"门面 + 领域切片 + Zustand store"的现代 React 状态架构。
 
-#### Task 3.1：盘点 hooks/useGame/ 130 个文件并按领域分组
+#### Task 3.1：盘点 hooks/useGame/ 130 个文件并按领域分组 ✅ (2026-06-04)
 
 **Files:**
 - Read: `hooks/useGame/`
