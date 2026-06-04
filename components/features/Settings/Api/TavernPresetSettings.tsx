@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { 游戏设置结构, 酒馆预设结构 } from '../../../types';
-import ToggleSwitch from '../../ui/ToggleSwitch';
-import GameButton from '../../ui/GameButton';
-import { parseJsonWithRepair } from '../../../utils/jsonRepair';
-import { 酒馆提示词后处理选项 } from '../../../utils/gameSettings';
-import { 规范化酒馆预设, 获取酒馆预设角色ID列表, 获取酒馆预设顺序 } from '../../../utils/tavernPreset';
+import { 游戏设置结构, 酒馆预设结构 } from '../../../../types';
+import ToggleSwitch from '../../../ui/ToggleSwitch';
+import GameButton from '../../../ui/GameButton';
+import { parseJsonWithRepair } from '../../../../utils/jsonRepair';
+import { 酒馆提示词后处理选项 } from '../../../../utils/gameSettings';
+import { 规范化酒馆预设, 获取酒馆预设角色ID列表, 获取酒馆预设顺序 } from '../../../../utils/tavernPreset';
 
 interface Props {
     settings: 游戏设置结构;

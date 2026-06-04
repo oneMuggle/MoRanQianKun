@@ -3,17 +3,17 @@ import {
     接口设置结构,
     接口供应商类型,
     单接口配置结构
-} from '../../../types';
-import GameButton from '../../ui/GameButton';
-import InlineSelect from '../../ui/InlineSelect';
-import * as textAIService from '../../../services/ai/text';
+} from '../../../../types';
+import GameButton from '../../../ui/GameButton';
+import InlineSelect from '../../../ui/InlineSelect';
+import * as textAIService from '../../../../services/ai/text';
 import {
     创建接口配置模板,
     供应商标签,
     规范化接口设置
-} from '../../../utils/apiConfig';
+} from '../../../../utils/apiConfig';
 import ApiConfigAssistant from './ApiConfigAssistant';
-import type { ConfigWithModels, AssignmentRecommendation } from '../../../services/ai/text/configAssistant';
+import type { ConfigWithModels, AssignmentRecommendation } from '../../../../services/ai/text/configAssistant';
 
 interface Props {
     settings: 接口设置结构;

@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import * as dbService from '../../../services/dbService';
-import { 解析ZIP存档文件 } from '../../../services/saveArchiveService';
-import { parseJsonWithRepair } from '../../../utils/jsonRepair';
-import { 设置分类定义表, 设置键, type 设置分类类型 } from '../../../utils/settingsSchema';
-import GameButton from '../../ui/GameButton';
-import ToggleSwitch from '../../ui/ToggleSwitch';
+import * as dbService from '../../../../services/dbService';
+import { 解析ZIP存档文件 } from '../../../../services/saveArchiveService';
+import { parseJsonWithRepair } from '../../../../utils/jsonRepair';
+import { 设置分类定义表, 设置键, type 设置分类类型 } from '../../../../utils/settingsSchema';
+import GameButton from '../../../ui/GameButton';
+import ToggleSwitch from '../../../ui/ToggleSwitch';
 
 interface Props {
     requestConfirm?: (options: { title?: string; message: string; confirmText?: string; cancelText?: string; danger?: boolean }) => Promise<boolean>;

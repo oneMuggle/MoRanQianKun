@@ -2,8 +2,8 @@
 // 提供酒吧 NSFW 子系统的独立开关和强度控制
 
 import React from 'react';
-import type { 酒吧NSFW设置 } from '../../../models/contemporary/barNSFW/types';
-import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../NSFWCenter/NsfwSettingsForm';
+import type { 酒吧NSFW设置 } from '../../../../models/contemporary/barNSFW/types';
+import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../../NSFWCenter/NsfwSettingsForm';
 
 interface Props {
   settings: 酒吧NSFW设置;

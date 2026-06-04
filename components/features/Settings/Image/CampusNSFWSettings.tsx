@@ -2,8 +2,8 @@
 // 提供所有校园 NSFW 子系统的独立开关和强度控制
 
 import React from 'react';
-import { 校园NSFW设置, 默认校园NSFW设置 } from '../../../models/campusNSFW';
-import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../NSFWCenter/NsfwSettingsForm';
+import { 校园NSFW设置, 默认校园NSFW设置 } from '../../../../models/campusNSFW';
+import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../../NSFWCenter/NsfwSettingsForm';
 
 export type { 校园NSFW设置 };
 export { 默认校园NSFW设置 };

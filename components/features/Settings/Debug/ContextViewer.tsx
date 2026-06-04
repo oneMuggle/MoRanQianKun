@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { 记忆配置结构 } from '../../../types';
-import { countOpenAITextTokens } from '../../../utils/tokenEstimate';
+import { 记忆配置结构 } from '../../../../types';
+import { countOpenAITextTokens } from '../../../../utils/tokenEstimate';
 
 type ContextSection = {
     id: string;

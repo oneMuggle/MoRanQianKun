@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import type { DebugTurnLog } from '../../../types';
-import { useDebugLogger } from '../../../hooks/useDebugLogger';
+import type { DebugTurnLog } from '../../../../types';
+import { useDebugLogger } from '../../../../hooks/useDebugLogger';
 
 interface MobileDebugPanelProps {
     isDebugMode: boolean;

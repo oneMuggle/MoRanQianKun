@@ -2,9 +2,9 @@
 // 提供露出系统的所有开关和强度控制
 
 import React from 'react';
-import type { ExposureNSFW设置 } from '../../../models/exposureNSFW';
-import { 默认ExposureNSFW设置 } from '../../../models/exposureNSFW';
-import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../NSFWCenter/NsfwSettingsForm';
+import type { ExposureNSFW设置 } from '../../../../models/exposureNSFW';
+import { 默认ExposureNSFW设置 } from '../../../../models/exposureNSFW';
+import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../../NSFWCenter/NsfwSettingsForm';
 
 export type { ExposureNSFW设置 };
 export { 默认ExposureNSFW设置 };

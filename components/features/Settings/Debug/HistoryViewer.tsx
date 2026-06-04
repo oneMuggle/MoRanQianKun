@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { 聊天记录结构, 记忆系统结构 } from '../../../types';
-import { 快速导出为Md } from '../../../utils/conversationExport';
-import ConversationExportPanel from '../Chat/ConversationExportPanel';
+import { 聊天记录结构, 记忆系统结构 } from '../../../../types';
+import { 快速导出为Md } from '../../../../utils/conversationExport';
+import ConversationExportPanel from '../../Chat/ConversationExportPanel';
 
 interface Props {
     history?: 聊天记录结构[];

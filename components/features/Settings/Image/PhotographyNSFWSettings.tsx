@@ -2,9 +2,9 @@
 // 提供所有写真 NSFW 子系统的独立开关和强度控制
 
 import React from 'react';
-import type { 写真NSFW设置 } from '../../../models/photographyNSFW';
-import { 默认写真NSFW设置 } from '../../../models/photographyNSFW';
-import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../NSFWCenter/NsfwSettingsForm';
+import type { 写真NSFW设置 } from '../../../../models/photographyNSFW';
+import { 默认写真NSFW设置 } from '../../../../models/photographyNSFW';
+import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../../NSFWCenter/NsfwSettingsForm';
 
 export type { 写真NSFW设置 };
 export { 默认写真NSFW设置 };

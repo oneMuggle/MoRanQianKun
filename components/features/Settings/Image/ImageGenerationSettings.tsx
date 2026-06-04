@@ -11,12 +11,12 @@ import {
     文生图接口配置结构,
     文生图后端类型,
     文生图预设接口路径类型
-} from '../../../types';
-import GameButton from '../../ui/GameButton';
-import ToggleSwitch from '../../ui/ToggleSwitch';
-import InlineSelect from '../../ui/InlineSelect';
-import { 规范化接口设置 } from '../../../utils/apiConfig';
-import { 自动场景横屏尺寸选项, 自动场景竖屏尺寸选项 } from '../../../utils/imageSizeOptions';
+} from '../../../../types';
+import GameButton from '../../../ui/GameButton';
+import ToggleSwitch from '../../../ui/ToggleSwitch';
+import InlineSelect from '../../../ui/InlineSelect';
+import { 规范化接口设置 } from '../../../../utils/apiConfig';
+import { 自动场景横屏尺寸选项, 自动场景竖屏尺寸选项 } from '../../../../utils/imageSizeOptions';
 
 interface Props {
     settings: 接口设置结构;
@@ -705,7 +705,7 @@ const ImageGenerationSettings: React.FC<Props> = ({ settings, onSave }) => {
         setMessage('');
         setTestingConnection(true);
         try {
-            const imageAIService = await import('../../../services/ai/image');
+            const imageAIService = await import('../../../../services/ai/image');
             const result = await imageAIService.testImageConnection({
                 id: config.id,
                 名称: config.名称,

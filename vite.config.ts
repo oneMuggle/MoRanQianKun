@@ -241,6 +241,26 @@ export default defineConfig(({ mode }) => {
               return 'settings-desktop-legacy';
             }
 
+            // 阶段 1.3：拆分 settings-panels 为 api/image/nsfw/debug 四块
+            // 必须在 settings-panels 通用规则之前（更具体的子目录先匹配）
+            if (normalizedId.includes('/components/features/Settings/Api/')) {
+              return 'settings-api';
+            }
+            if (normalizedId.includes('/components/features/Settings/Image/')) {
+              return 'settings-image';
+            }
+            if (normalizedId.includes('/components/features/Settings/NSFW/')) {
+              return 'settings-nsfw';
+            }
+            if (
+              normalizedId.includes('/components/features/Settings/Debug/') ||
+              normalizedId.includes('/components/features/Settings/MobileDebug/') ||
+              normalizedId.includes('/components/features/Settings/ContextViewer/') ||
+              normalizedId.includes('/components/features/Settings/HistoryViewer/')
+            ) {
+              return 'settings-debug';
+            }
+
             if (normalizedId.includes('/components/features/Settings/')) {
               return 'settings-panels';
             }

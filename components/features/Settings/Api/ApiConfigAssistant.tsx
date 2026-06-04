@@ -4,9 +4,9 @@ import {
     type AssistantMessage,
     type ConfigWithModels,
     type AssignmentRecommendation,
-} from '../../../services/ai/text/configAssistant';
-import { 接口设置结构 } from '../../../models/system';
-import { 供应商标签 } from '../../../utils/apiConfig';
+} from '../../../../services/ai/text/configAssistant';
+import { 接口设置结构 } from '../../../../models/system';
+import { 供应商标签 } from '../../../../utils/apiConfig';
 
 interface Props {
     onClose: () => void;

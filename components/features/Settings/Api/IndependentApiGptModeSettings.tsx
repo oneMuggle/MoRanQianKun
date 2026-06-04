@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { 游戏设置结构 } from '../../../types';
-import { 规范化游戏设置 } from '../../../utils/gameSettings';
-import GameButton from '../../ui/GameButton';
-import ToggleSwitch from '../../ui/ToggleSwitch';
+import { 游戏设置结构 } from '../../../../types';
+import { 规范化游戏设置 } from '../../../../utils/gameSettings';
+import GameButton from '../../../ui/GameButton';
+import ToggleSwitch from '../../../ui/ToggleSwitch';
 
 interface Props {
     settings: 游戏设置结构;

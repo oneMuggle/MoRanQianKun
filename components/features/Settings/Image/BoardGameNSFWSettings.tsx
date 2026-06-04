@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import type { 桌游类型 } from '../../../models/boardGameNSFW/core';
+import type { 桌游类型 } from '../../../../models/boardGameNSFW/core';
 
 interface Props {
   settings: Record<string, unknown>;

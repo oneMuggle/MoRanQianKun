@@ -2,9 +2,9 @@
 // 提供所有 BDSM 独立 NSFW 子系统的开关和强度控制
 
 import React from 'react';
-import type { BDSM系统设置 } from '../../../models/bdsmNSFW';
-import { 默认BDSM系统设置 } from '../../../models/bdsmNSFW';
-import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../NSFWCenter/NsfwSettingsForm';
+import type { BDSM系统设置 } from '../../../../models/bdsmNSFW';
+import { 默认BDSM系统设置 } from '../../../../models/bdsmNSFW';
+import { NsfwToggleSwitch, NsfwSelectOption, NsfwSectionHeader } from '../../NSFWCenter/NsfwSettingsForm';
 
 export type { BDSM系统设置 };
 export { 默认BDSM系统设置 };

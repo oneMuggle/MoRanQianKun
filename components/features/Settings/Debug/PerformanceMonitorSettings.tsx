@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { 性能监控配置结构 } from '../../../models/system';
-import GameButton from '../../ui/GameButton';
+import { 性能监控配置结构 } from '../../../../models/system';
+import GameButton from '../../../ui/GameButton';
 
 interface Props {
     settings: 性能监控配置结构;

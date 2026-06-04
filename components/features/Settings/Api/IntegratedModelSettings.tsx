@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { 接口设置结构, 单接口配置结构, 功能模型占位配置结构 } from '../../../types';
-import GameButton from '../../ui/GameButton';
-import ToggleSwitch from '../../ui/ToggleSwitch';
-import InlineSelect from '../../ui/InlineSelect';
-import { 规范化接口设置 } from '../../../utils/apiConfig';
-import { 默认文章优化提示词 } from '../../../prompts/runtime/defaults';
+import { 接口设置结构, 单接口配置结构, 功能模型占位配置结构 } from '../../../../types';
+import GameButton from '../../../ui/GameButton';
+import ToggleSwitch from '../../../ui/ToggleSwitch';
+import InlineSelect from '../../../ui/InlineSelect';
+import { 规范化接口设置 } from '../../../../utils/apiConfig';
+import { 默认文章优化提示词 } from '../../../../prompts/runtime/defaults';
 
 interface Props {
     settings: 接口设置结构;
