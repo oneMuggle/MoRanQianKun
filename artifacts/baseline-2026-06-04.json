@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "collectedAt": "2026-06-04T08:42:54.270Z",
+    "phase": "0.3",
+    "branch": "feature/perf-modular-optimization",
+    "script": "node scripts/collectMetricsBaseline.mjs",
+    "command": "npm run metrics:baseline",
+    "supplementalCommands": [
+      "npm run size",
+      "find . -type f \\( -name '*.ts' -o -name '*.tsx' \\) [excludes]"
+    ]
+  },
+  "bundle": {
+    "source": "size-limit (npm run size)",
+    "entry": {
+      "sizeLimit": "350 kB",
+      "size": "72.03 kB",
+      "loadingTime": "1.5 s on slow 3G",
+      "runningTime": "48 ms on Snapdragon 410"
+    },
+    "vendor": {
+      "sizeLimit": "3.7 MB",
+      "size": "1.27 MB",
+      "loadingTime": "24.9 s on slow 3G",
+      "runningTime": "112 ms on Snapdragon 410"
+    },
+    "gameRuntime": {
+      "sizeLimit": "3 MB",
+      "size": "636.56 kB",
+      "loadingTime": "12.5 s on slow 3G",
+      "runningTime": "81 ms on Snapdragon 410"
+    }
+  },
+  "codeStats": {
+    "tsTsxFileCount": 2916,
+    "tsTsxLineCount": 1020698,
+    "note": "Includes all .ts/.tsx under project root, excluding node_modules/.git/dist/coverage/.tmp"
+  },
+  "circularDependencies": {
+    "tool": "madge",
+    "filesProcessed": 1501,
+    "circularCount": 15,
+    "warnings": 74,
+    "ok": false,
+    "exitCode": 1,
+    "detailsFile": ".tmp/baseline-circular.txt"
+  },
+  "deadExports": {
+    "tool": "ts-prune",
+    "deadExportCount": 5615,
+    "ok": true,
+    "exitCode": 0,
+    "detailsFile": ".tmp/baseline-dead.txt"
+  },
+  "unusedCode": {
+    "tool": "knip",
+    "unusedFiles": 420,
+    "unusedExports": 1415,
+    "unusedExportedTypes": 1032,
+    "unusedDevDependencies": 5,
+    "unusedDevDependenciesList": [
+      "@alloc/quick-lru",
+      "@testing-library/jest-dom",
+      "ast-grep",
+      "depcheck",
+      "tslib"
+    ],
+    "unlistedBinaries": 1,
+    "unlistedBinariesList": [
+      "wrangler (.github/workflows/deploy.yml)"
+    ],
+    "ok": false,
+    "exitCode": 1,
+    "detailsFile": ".tmp/baseline-unused.txt"
+  },
+  "tests": {
+    "tool": "vitest run + manual glob",
+    "testFiles": 96,
+    "testCases": 2137,
+    "vitestResult": {
+      "testFilesPassed": 96,
+      "testsPassed": 2149,
+      "duration": "69.27s"
+    },
+    "ok": true,
+    "exitCode": 0,
+    "detailsFile": ".tmp/baseline-tests.txt"
+  },
+  "summary": {
+    "totalSteps": 5,
+    "okSteps": 3,
+    "failSteps": 2,
+    "failSoftTools": ["madge", "knip"],
+    "notes": "Script uses fail-soft: madge and knip exited non-zero but their raw output is captured for review. Follow-up phases can decide whether to remediate or document the failures."
+  }
+}

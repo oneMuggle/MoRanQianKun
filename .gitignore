@@ -28,7 +28,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Generated reports, temp workspaces, and local analysis outputs
-/artifacts/
+/artifacts/*
+!/artifacts/baseline-*.json
 /.tmp*/
 /clean_diff.txt
 /diff.txt
