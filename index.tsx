@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/tailwind.css';
 import './styles/mobileDevice.css';
-import './modules/contemporary'; // 注册现代纪元故事模块
+// NSFW 模块注册移至 App.tsx 内 useEffect，按 gameConfig 异步激活
 import App from './App';
 
 const rootElement = document.getElementById('root');

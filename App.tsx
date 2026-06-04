@@ -67,18 +67,33 @@ const App: React.FC = () => {
             })();
         }
 
-        // 根据 gameConfig 激活 NSFW 模块
-        if (state.gameConfig?.启用校园NSFW深化系统) {
-            void (async () => {
-                const { nsfwModules } = await import('./modules');
-                const mod = nsfwModules['nsfw-campus'];
-                if (mod) {
-                    const { manifest } = await mod();
+        // 根据 gameConfig 激活 NSFW 模块（按 gameConfig 异步加载，单个失败不影响其它）
+        void (async () => {
+            const cfg: any = state.gameConfig;
+            if (!cfg) return;
+            const { nsfwModules } = await import('./modules');
+            const nsfwFlags: Array<[string, boolean]> = [
+                ['nsfw-campus',       !!cfg.校园NSFW设置?.启用校园NSFW深化系统],
+                ['nsfw-bdsm',         !!cfg.BDSM系统设置?.启用BDSM独立系统],
+                ['nsfw-board-game',   !!cfg.桌游社交NSFW设置?.启用桌游社交NSFW系统],
+                ['nsfw-exposure',     !!cfg.校园NSFW设置?.启用露出系统],
+                ['nsfw-photography',  !!cfg.写真NSFW设置?.启用写真NSFW系统],
+                ['nsfw-urban-driver', !!cfg.都市网约车NSFW设置?.启用都市网约车NSFW系统],
+                ['nsfw-bar',          !!cfg.酒吧NSFW设置?.启用酒吧NSFW系统],
+            ];
+            for (const [id, enabled] of nsfwFlags) {
+                if (!enabled) continue;
+                const loaderFn = nsfwModules[id];
+                if (!loaderFn) continue;
+                try {
+                    const { manifest } = await loaderFn();
                     loader.register(manifest);
                     await loader.activate(manifest.id);
+                } catch (err) {
+                    console.warn(`[NSFW模块] ${id} 激活失败：`, err);
                 }
-            })();
-        }
+            }
+        })();
 
         // 根据 gameConfig 激活业务域模块
         if (state.gameConfig?.启用修炼体系) {
