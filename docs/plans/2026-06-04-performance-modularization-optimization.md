@@ -153,7 +153,7 @@ if (normalizedId.includes('/node_modules/')) {
 
 **Commit：** `perf(build): 拆分 vendor 块为 react/fflate/tiktoken/ai-sdk/misc`
 
-#### Task 1.2：拆分 game-runtime 大块
+#### Task 1.2：拆分 game-runtime 大块 ✅ (2026-06-04)
 
 **Files:**
 - Modify: `vite.config.ts`
@@ -207,6 +207,23 @@ if (normalizedId.includes('/hooks/useGame/') || normalizedId.endsWith('/hooks/us
 **风险：** 当前 `prompts → models → useGame` 存在循环 import，被强制打包到 `game-runtime` 避开了 ESM TDZ。拆分时需要确认边界安全。
 
 **验证：** `npm run build` 后用 `npx vite-bundle-visualizer` 或 dist 大小对比，确保总和没有增加（拆开后总计应略小于 2.85 MB，因为没有重复）。
+
+**实际结果 (2026-06-04)：**
+
+| Chunk | 原始字节 | 原始 KB | 压缩后 (gzip) |
+|---|---|---|---|
+| `prompts-core-*.js` | 189,431 | 185 KB | 66.93 KB |
+| `prompts-runtime-*.js` | 412,009 | 402 KB | 152.17 KB |
+| `models-types-*.js` | 606,805 | 593 KB | 189.55 KB |
+| `ai-clients-*.js` | 199,143 | 194 KB | 62.91 KB |
+| `useGame-runtime-*.js` | 1,359,288 | 1,327 KB | 360.26 KB |
+| **合计** | **2,766,676** | **2,701 KB** | **831.82 KB** |
+
+原 `game-runtime-*.js` 2,862,521 字节 (2,795 KB) → 拆分后合计 2,766,676 字节 (2,701 KB)，比原来减少 95,845 字节 (约 3.3%)，**未出现重复**。
+
+`size-limit` 的 `game-runtime` budget 已更新为 glob `dist/assets/*-runtime-*.js` (3.0 MB 上限)，实测 brotli 387.53 kB ✅
+
+`models-types` 比预期大 (593 KB vs 300 KB)，`useGame-runtime` 仍超过 1.2 MB 目标 (1,327 KB)。原因推测：`models/` 下的子目录 (era-config、bdsmNSFW、boardGameNSFW、campusNSFW、contemporary、dailyTown 等) 都包含 JSON/数据；`useGame/` 子工作流密集 import models + ai-clients + prompts-runtime。下一阶段可考虑：(a) 把 models/ 拆为 `models-domain` + `models-data` 两块；(b) 把 useGame 中静态导入的 prompts 改为动态 import。
 
 **Commit：** `perf(build): 拆分 game-runtime 为 prompts/models/ai-clients/useGame 四块`
 

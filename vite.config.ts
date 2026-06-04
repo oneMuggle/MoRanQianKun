@@ -191,25 +191,44 @@ export default defineConfig(({ mode }) => {
               if (match) return `biz-${match[1]}`;
             }
 
-            // prompts 和 models 与 hooks/useGame 存在双向依赖
-            // 将它们全部纳入 game-runtime 避免跨 chunk 的 ESM TDZ 错误
-            // 依赖链: prompts → models → hooks/useGame → prompts
-            if (
-              normalizedId.includes('/prompts/') ||
-              normalizedId.includes('/models/') ||
-              normalizedId.endsWith('/utils/promptFeatureToggles.ts')
-            ) {
-              return 'game-runtime';
+            // 阶段 1.2：拆分原 game-runtime 为 5 块
+            // 已知风险：prompts → models → useGame → prompts 存在循环 import
+            // 当前通过把所有这些目录都打到单个 chunk 来避开 ESM TDZ
+            // 拆分顺序：prompts-core 优先匹配（避免被 runtime 抢先），再 prompts-runtime，再 models，再 ai-clients，最后 useGame-runtime
+
+            // 1. prompts 核心（变化频率低，可被浏览器长期缓存）
+            if (normalizedId.includes('/prompts/core/') || normalizedId.includes('/prompts/writing/')) {
+              return 'prompts-core';
             }
- 
+            // 2. 运行时提示词（每个 NSFW 子系统不同，体积分散）
+            if (normalizedId.includes('/prompts/runtime/')) {
+              return 'prompts-runtime';
+            }
+            // 3. 模型类型定义独立
+            if (normalizedId.includes('/models/')) {
+              return 'models-types';
+            }
+            // 4. AI 客户端独立
+            if (normalizedId.includes('/services/ai/')) {
+              return 'ai-clients';
+            }
+            // 5. useGame 主入口
+            if (normalizedId.includes('/hooks/useGame/') || normalizedId.endsWith('/hooks/useGame.ts')) {
+              return 'useGame-runtime';
+            }
+            // 兜底：utils/promptFeatureToggles.ts 跟随 prompts-runtime（被 useGame 引用）
+            if (normalizedId.endsWith('/utils/promptFeatureToggles.ts')) {
+              return 'prompts-runtime';
+            }
+
             if (normalizedId.includes('/components/features/Social/ImageManagerModal')) {
               return 'image-manager-desktop';
             }
- 
+
             if (normalizedId.includes('/components/features/Social/mobile/MobileImageManagerModal')) {
               return 'image-manager-mobile';
             }
- 
+
             if (normalizedId.includes('/components/features/Settings/SettingsPanel')) {
               return 'settings-unified-entry';
             }
@@ -221,17 +240,9 @@ export default defineConfig(({ mode }) => {
             if (normalizedId.includes('/components/features/Settings/SettingsModal')) {
               return 'settings-desktop-legacy';
             }
- 
+
             if (normalizedId.includes('/components/features/Settings/')) {
               return 'settings-panels';
-            }
- 
-            if (
-              normalizedId.includes('/services/ai/') ||
-              normalizedId.includes('/hooks/useGame/') ||
-              normalizedId.endsWith('/hooks/useGame.ts')
-            ) {
-              return 'game-runtime';
             }
           }
 }
