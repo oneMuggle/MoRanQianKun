@@ -1,4 +1,4 @@
-import { 计算BDSM帖子总影响, 应用BDSM帖子影响, 计算BDSM流言传播 } from '../bdsmForumEngine';
+import { 计算BDSM帖子总影响, 应用BDSM帖子影响, 计算BDSM流言传播 } from '../nsfw/bdsmForumEngine';
 import type { BDSM论坛帖子 } from '../../../models/campusNSFW/bdsm-forum';
 import type { NPC欲望档案 } from '../../../models/campusNSFW';
 

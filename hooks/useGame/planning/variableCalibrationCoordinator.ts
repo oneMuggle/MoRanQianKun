@@ -9,7 +9,7 @@ import type {
     环境信息结构,
     聊天记录结构,
     角色数据结构
-} from '../../types';
+} from '../../../types';
 import { 创建变量生成队列调度器, type 变量生成队列调度器, type 变量生成进度 } from './variableGenerationQueue';
 
 type 回合快照结构 = {

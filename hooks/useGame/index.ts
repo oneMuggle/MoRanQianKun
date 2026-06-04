@@ -30,14 +30,14 @@ export {
     规范化同人女主剧情规划状态,
     战斗结束自动清空,
     按回合窗口裁剪历史,
-} from './storyState';
-export type { 开场命令基态 } from './storyState';
+} from './core/storyState';
+export type { 开场命令基态 } from './core/storyState';
 export {
     规范化环境信息,
     构建完整地点文本,
     规范化角色物品容器映射,
     规范化社交列表,
-} from './stateTransforms';
+} from './core/stateTransforms';
 
 // 记忆系统
 export {
@@ -64,7 +64,7 @@ export { 执行响应命令处理 } from './npc/responseCommandProcessor';
 export { 按世界演变分流净化响应 } from './response/storyResponseGuards';
 
 // 会话生命周期
-export { 创建会话生命周期工作流 } from './sessionLifecycleWorkflow';
+export { 创建会话生命周期工作流 } from './session/sessionLifecycleWorkflow';
 
 // 上下文快照
 export { 构建上下文快照数据 } from './ui/contextSnapshot';
@@ -110,7 +110,7 @@ export { 创建手动NPC工作流 } from './npc/manualNpcWorkflow';
 export { 创建主角图片工作流 } from './image/playerImageWorkflow';
 
 // 运行时变量
-export { 创建运行时变量工作流 } from './runtimeVariableWorkflow';
+export { 创建运行时变量工作流 } from './planning/runtimeVariableWorkflow';
 
 // 变量校准
 export { 创建变量校准协调器 } from './planning/variableCalibrationCoordinator';
@@ -123,7 +123,7 @@ export { 创建变量生成进度系统 } from './planning/variableGenerationPro
 export { normalizeCanonicalGameTime, 环境时间转标准串, 提取环境月日 } from './time/timeUtils';
 
 // 运行时提示词
-export { 构建COT伪装提示词, 规范化比较文本, 酒馆预设模式可用 } from './promptRuntime';
+export { 构建COT伪装提示词, 规范化比较文本, 酒馆预设模式可用 } from './engine/promptRuntime';
 
 // 通知系统
 export { 创建通知系统 } from './ui/notificationSystem';
@@ -186,16 +186,16 @@ export { useDeviceRefreshMonitor } from './device/deviceRefreshMonitor';
 export type { 设备刷新任务 } from './device/deviceRefreshMonitor';
 
 // BDSM 工作流
-export { 构建见面场景提示词, 解析见面结果, 生成任务摘要 } from './bdsmMeetingWorkflow';
-export type { 见面场景上下文, 日常指令 } from './bdsmMeetingWorkflow';
-export { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './bdsmTaskWorkflow';
-export { 触发任务生成, 触发日常指令刷新 } from './bdsmTaskTrigger';
+export { 构建见面场景提示词, 解析见面结果, 生成任务摘要 } from './nsfw/bdsmMeetingWorkflow';
+export type { 见面场景上下文, 日常指令 } from './nsfw/bdsmMeetingWorkflow';
+export { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './nsfw/bdsmTaskWorkflow';
+export { 触发任务生成, 触发日常指令刷新 } from './nsfw/bdsmTaskTrigger';
 
 // 校园 NSFW
-export { 从NPC创建欲望档案, 创建默认欲望档案 } from './campusNSFWEngine';
+export { 从NPC创建欲望档案, 创建默认欲望档案 } from './nsfw/campusNSFWEngine';
 
 // 房产 SLG 经营系统
-export { 创建空房产状态, 创建初始房产 } from './storyState';
+export { 创建空房产状态, 创建初始房产 } from './core/storyState';
 export {
     计算房产吸引力, 计算舒适度, 计算安全性, 计算房客满意度,
     计算应付租金, 计算维护费用, 计算经验值获取,

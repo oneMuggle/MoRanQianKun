@@ -163,14 +163,14 @@ export type {
   活动创建结果,
   同伴互动结果,
   运动强度结果,
-} from '../../hooks/useGame/outdoorNSFWEngine';
+} from '../../hooks/useGame/nsfw/outdoorNSFWEngine';
 
 export {
   创建户外活动,
   计算运动强度,
   计算户外暴露风险,
   同伴互动,
-} from '../../hooks/useGame/outdoorNSFWEngine';
+} from '../../hooks/useGame/nsfw/outdoorNSFWEngine';
 
 export type {
   运动伤害类型,

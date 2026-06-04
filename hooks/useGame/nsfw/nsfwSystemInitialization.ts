@@ -3,8 +3,8 @@
  * 从 useGame.ts 提取的 5 个 NSFW 系统初始化 useEffect 区块
  */
 import { useEffect } from 'react';
-import { 从NPC创建欲望档案 } from '../campusNSFWEngine';
-import { 创建乘客欲望档案 } from '../urbanDriverNSFWEngine';
+import { 从NPC创建欲望档案 } from './campusNSFWEngine';
+import { 创建乘客欲望档案 } from './urbanDriverNSFWEngine';
 import { 计算露出倾向 } from '../../../models/npcNSFWEnhancement';
 import type { NPC结构 } from '../../../types';
 

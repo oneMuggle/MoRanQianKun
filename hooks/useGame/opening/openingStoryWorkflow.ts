@@ -57,7 +57,7 @@ import {
     构建酒馆预设消息链,
     酒馆预设模式可用,
     type 酒馆上下文结构
-} from '../promptRuntime';
+} from '../engine/promptRuntime';
 import { 提取响应规划文本 } from '../quality/thinkingContext';
 import { 环境时间转标准串 } from '../time/timeUtils';
 import { 规范化记忆系统, 规范化记忆配置, 构建即时记忆条目, 构建短期记忆条目, 写入四段记忆 } from '../memory/memoryUtils';

@@ -6,7 +6,7 @@ import {
     执行战斗行动,
     战斗行动选项,
     战斗行动结果,
-} from '../../../hooks/useGame/combatCalculation';
+} from '../../../hooks/useGame/combat/combatCalculation';
 import { IconSwords, IconShield, IconPotion } from '../../ui/Icons';
 
 interface Props {

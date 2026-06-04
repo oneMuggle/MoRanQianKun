@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { 环境信息结构, 节日结构, 视觉设置结构 } from '../../types';
 import { 构建区域文字样式 } from '../../utils/visualSettings';
 import { normalizeCanonicalGameTime } from '../../hooks/useGame/time/timeUtils';
-import { 格式化时间按时代 } from '../../hooks/useGame/scheduleWorkflow';
+import { 格式化时间按时代 } from '../../hooks/useGame/time/scheduleWorkflow';
 import { 获取时代背景 } from '../../models/system';
 import { useUIText } from '../../hooks/useUIText';
 

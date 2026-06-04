@@ -16,7 +16,7 @@ import { GalgameView } from './GalgameView';
 import { MobileGalgameView } from '../features/Galgame/mobile/MobileGalgameView';
 import { 懒加载边界, MobileMusicPlayer } from '../features/lazyComponents';
 import { useGalgameEngine } from '../../hooks/useGalgameEngine';
-import { getCurrentMode, switchMode } from '../../hooks/useGame/modeManager';
+import { getCurrentMode, switchMode } from '../../hooks/useGame/engine/modeManager';
 
 // ============================================================================
 // 类型

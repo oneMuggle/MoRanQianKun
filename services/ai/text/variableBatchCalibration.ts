@@ -3,9 +3,9 @@
  * 当多个变量生成任务使用相同 API 配置时，可合并为单次请求进行优化
  */
 
-import type { TavernCommand } from '../../types';
-import type { 变量模型校准参数, 变量模型校准结果 } from '../../hooks/useGame/variableModelWorkflow';
-import { 获取变量计算接口配置, 接口配置是否可用 } from '../../utils/apiConfig';
+import type { TavernCommand } from '../../../types';
+import type { 变量模型校准参数, 变量模型校准结果 } from '../../../hooks/useGame/planning/variableModelWorkflow';
+import { 获取变量计算接口配置, 接口配置是否可用 } from '../../../utils/apiConfig';
 
 type 批量校准任务 = {
     taskId: string;

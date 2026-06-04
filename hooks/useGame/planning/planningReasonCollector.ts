@@ -6,7 +6,7 @@ import {
     规范化剧情规划状态,
     规范化女主剧情规划状态,
     规范化剧情状态
-} from '../storyState';
+} from '../core/storyState';
 import { 游戏时间转排序值 } from '../response/responseTextHelpers';
 
 const 当前时间已达到 = (currentTime?: string, targetTime?: string): boolean => {

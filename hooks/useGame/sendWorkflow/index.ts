@@ -23,11 +23,11 @@ import { 获取主剧情接口配置, 接口配置是否可用 } from '../../../
 import { 规范化游戏设置 } from '../../../utils/gameSettings';
 import { 规范化记忆配置, 规范化记忆系统 } from '../memory/memoryUtils';
 
-import { 构建主剧情请求参数, type 主剧情系统上下文 } from '../mainStoryRequest';
+import { 构建主剧情请求参数, type 主剧情系统上下文 } from '../engine/mainStoryRequest';
 import { 环境时间转标准串 } from '../time/timeUtils';
 import { 获取激活小说拆分注入文本 } from '../../../services/novel-decomposition/novelDecompositionInjection';
 import type { 响应命令处理状态 } from '../npc/responseCommandProcessor';
-import type { 自动存档快照结构 } from '../saveCoordinator';
+import type { 自动存档快照结构 } from '../session/saveCoordinator';
 import type { 世界演变触发参数, 世界演变执行结果 } from '../world/worldEvolutionWorkflow';
 
 // ─── 从子模块重新导出类型 ────────────────────────────────────────────────────
@@ -148,10 +148,10 @@ type 主剧情发送当前状态 = {
     时代配置ID?: string;
 };
 
-import { 构建校园NSFW参数, type BDSM状态更新回调 } from '../bdsmStateIntegration';
-import { 计算回合衰减 } from '../campusNSFWEngine';
-import { 构建都市网约车NSFW参数 } from '../urbanDriverNSFWIntegration';
-import { 构建写真NSFW参数 } from '../photographyNSFWIntegration';
+import { 构建校园NSFW参数, type BDSM状态更新回调 } from '../nsfw/bdsmStateIntegration';
+import { 计算回合衰减 } from '../nsfw/campusNSFWEngine';
+import { 构建都市网约车NSFW参数 } from '../nsfw/urbanDriverNSFWIntegration';
+import { 构建写真NSFW参数 } from '../nsfw/photographyNSFWIntegration';
 
 // ─── 主剧情发送依赖 ─────────────────────────────────────────────────────────
 
@@ -922,7 +922,7 @@ export const 执行主剧情发送工作流 = async (
 
                     // ─── Aftercare 检测 ─────────────────────────────────
                     try {
-                        const { 检查Aftercare需求 } = await import('../bdsmTaskTrigger');
+                        const { 检查Aftercare需求 } = await import('../nsfw/bdsmTaskTrigger');
                         const aftercareResult = 检查Aftercare需求({
                             关系状态: bdsM关系,
                             完成任务: undefined,

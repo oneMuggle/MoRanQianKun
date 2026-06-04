@@ -31,7 +31,7 @@ export function 创建私聊发送工作流(deps: PrivateChatDeps) {
         }));
 
         try {
-            const { 执行私聊发送工作流 } = await import('../privateChatWorkflow');
+            const { 执行私聊发送工作流 } = await import('./privateChatWorkflow');
             const result = await 执行私聊发送工作流({
                 npcId,
                 npcName,

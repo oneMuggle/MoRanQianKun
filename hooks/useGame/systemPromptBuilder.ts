@@ -24,7 +24,7 @@ import {
     构建运行时提示词池,
     剥离NoControl关联提示词,
     规范化比较文本,
-} from './promptRuntime';
+} from './engine/promptRuntime';
 import { 构建AI角色声明提示词 } from '../../prompts/runtime/roleIdentity';
 import { 构建在场NPC_NSWF卡片组 } from '../../prompts/runtime/nsfwCard';
 import { 执行NSFW回合预处理 } from './nsfw/phase1Integration';
@@ -35,7 +35,7 @@ import {
     获取输出协议提示词,
     获取行动选项提示词
 } from '../../prompts/runtime/protocolDirectives';
-import { 规范化环境信息 } from './stateTransforms';
+import { 规范化环境信息 } from './core/stateTransforms';
 import {
     规范化剧情状态,
     规范化剧情规划状态,
@@ -44,7 +44,7 @@ import {
     规范化同人女主剧情规划状态,
     规范化世界状态,
     规范化战斗状态
-} from './storyState';
+} from './core/storyState';
 import { 构建同人运行时提示词包, 应用境界体系区块替换 } from '../../prompts/runtime/fandom';
 import { 计算气运属性修正 } from '../../data/qiyun';
 import { 构建女主剧情规划协议 } from '../../prompts/core/heroinePlan';
@@ -64,7 +64,7 @@ import {
 import { 构建里武侠世界提示词, 构建里志怪世界提示词, 构建志怪世界提示词, 构建行动选项运行时指令, 构建校规注入提示词, 构建催眠注入提示词, 构建设备通讯摘要, 构建BDSM论坛叙事约束, 构建桌游NSFW完整叙事约束 } from './systemPromptBuilder/promptBuilders';
 import type { LiModeStage } from '../../models/eraTheme/types';
 import { ConstraintBuilder } from './narrative/constraintBuilder';
-import { 检查到期见面预约, 构建见面注入提示词 } from './bdsmMeetingTrigger';
+import { 检查到期见面预约, 构建见面注入提示词 } from './nsfw/bdsmMeetingTrigger';
 
 export type 运行时提示词状态 = {
     当前启用: boolean;

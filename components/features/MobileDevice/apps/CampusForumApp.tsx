@@ -5,7 +5,7 @@ import type { 论坛帖子 } from '../../../../models/campusPhone';
 import type { BDSM论坛帖子, BDSM帖子分类, 联系对话, 联系状态 } from '../../../../models/campusNSFW/bdsm-forum';
 import type { NPC结构 } from '../../../../models/social';
 import type { 当前可用接口结构 } from '../../../../utils/apiConfig';
-import { 从BDSM帖子创建NPC } from '../../../../hooks/useGame/bdsmForumEngine';
+import { 从BDSM帖子创建NPC } from '../../../../hooks/useGame/nsfw/bdsmForumEngine';
 import BDSMContactModal from './BDSMContactModal';
 
 type ApiConfigLike = 当前可用接口结构 | Record<string, unknown>;
