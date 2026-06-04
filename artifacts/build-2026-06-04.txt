@@ -1,0 +1,171 @@
+
+> 墨染乾坤---万象纪元@0.0.0 build
+> vite build
+
+vite v6.4.1 building for production...
+transforming...
+
+/assets/images/ui/paper-texture.png referenced in /assets/images/ui/paper-texture.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/ui/wuxia-bg-texture.png referenced in /ui/wuxia-bg-texture.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+✓ 921 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/BDSMRelationshipDashboard.tsx is dynamically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/CampusChatApp.tsx but also statically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/MobileHome.tsx, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/BDSMTaskPanel.tsx is dynamically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/CampusChatApp.tsx but also statically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/MobileHome.tsx, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/BDSMContractPanel.tsx is dynamically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/CampusChatApp.tsx but also statically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/MobileHome.tsx, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/BDSMSafetySettings.tsx is dynamically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/CampusChatApp.tsx but also statically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/MobileHome.tsx, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/utils/apiConfig.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/npc/privateChatCoordinator.ts but also statically imported by /home/fz/project/MoRanJiangHu/components/features/Character/CharacterModal.tsx, /home/fz/project/MoRanJiangHu/components/features/Character/MobileCharacter.tsx, /home/fz/project/MoRanJiangHu/components/features/Settings/ApiConfigAssistant.tsx, /home/fz/project/MoRanJiangHu/components/features/Settings/ApiSettings.tsx, /home/fz/project/MoRanJiangHu/components/features/Settings/ImageGenerationSettings.tsx, /home/fz/project/MoRanJiangHu/components/features/Settings/IntegratedModelSettings.tsx, /home/fz/project/MoRanJiangHu/components/features/Settings/NovelDecompositionApiSettings.tsx, /home/fz/project/MoRanJiangHu/components/features/Settings/NovelDecompositionSettings.tsx, /home/fz/project/MoRanJiangHu/components/features/Social/ImageManagerModal.tsx, /home/fz/project/MoRanJiangHu/components/features/Social/mobile/MobileImageManagerModal.tsx, /home/fz/project/MoRanJiangHu/hooks/useGame.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmRelationshipOperations.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/config/settingsPersistenceWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/image/imageGenerationCoordinator.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/image/imagePresetWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/image/npcImageWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/image/npcSecretImageWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/image/sceneImageWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/memory/memorySummaryHandlers.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/opening/bodyPolish.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/opening/openingStoryWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/planning/planningUpdateWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/planning/variableModelWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/recallWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/responseProcessingPhase.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/sessionLifecycleWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/ui/contextSnapshot.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/useDevice.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/useFeatureFlags.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/useSend.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/world/worldEvolutionControl.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/world/worldEvolutionWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/world/worldGenerationWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGameState.ts, /home/fz/project/MoRanJiangHu/hooks/useModalOpeners.ts, /home/fz/project/MoRanJiangHu/services/ai/text/configAssistant.ts, /home/fz/project/MoRanJiangHu/services/dbService/index.ts, /home/fz/project/MoRanJiangHu/services/novel-decomposition/novelDecompositionRuntime.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/services/ai/chatCompletionClient.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmRelationshipOperations.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts but also statically imported by /home/fz/project/MoRanJiangHu/components/features/MobileDevice/apps/BDSMContactModal.tsx, /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmTaskWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/device/deviceAiWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/privateChatWorkflow.ts, /home/fz/project/MoRanJiangHu/services/ai/image/anchorExtractor.ts, /home/fz/project/MoRanJiangHu/services/ai/image/backends.ts, /home/fz/project/MoRanJiangHu/services/ai/image/connectionTests.ts, /home/fz/project/MoRanJiangHu/services/ai/image/promptBuilder.ts, /home/fz/project/MoRanJiangHu/services/ai/text/configAssistant.ts, /home/fz/project/MoRanJiangHu/services/ai/text/novelDecomposition.ts, /home/fz/project/MoRanJiangHu/services/ai/text/storyCoreTasks.ts, /home/fz/project/MoRanJiangHu/services/ai/text/variableCalibrationTask.ts, /home/fz/project/MoRanJiangHu/services/ai/text/worldEvolutionTask.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/hooks/useGame/campusNSFWEngine.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmRelationshipOperations.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmRelationshipOperations.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/nsfw/nsfwSystemInitialization.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/saveLoad/saveLoadWorkflow.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/hooks/useGame/urbanDriverNSFWEngine.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/responseProcessingPhase.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/nsfw/nsfwSystemInitialization.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/prompts/runtime/bdsmTasks.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmRelationshipOperations.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmTaskTrigger.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmTaskWorkflow.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmTaskTrigger.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/bdsmRelationshipOperations.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/independentStages.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts, /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/memoryRecallPhase.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/hooks/useGame/urbanDriverNSFWIntegration.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/responseProcessingPhase.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/hooks/useGame/photographyNSFWIntegration.ts is dynamically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/responseProcessingPhase.ts but also statically imported by /home/fz/project/MoRanJiangHu/hooks/useGame/sendWorkflow/index.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /home/fz/project/MoRanJiangHu/services/ai/image/constants.ts is dynamically imported by /home/fz/project/MoRanJiangHu/services/ai/image/promptBuilder.ts but also statically imported by /home/fz/project/MoRanJiangHu/services/ai/image/backends.ts, /home/fz/project/MoRanJiangHu/services/ai/image/connectionTests.ts, /home/fz/project/MoRanJiangHu/services/ai/image/pngParser.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                                                     1.39 kB │ gzip:     0.71 kB
+dist/assets/index-DfSMBwVa.css                                    301.60 kB │ gzip:    38.99 kB
+dist/assets/biz-galgame-DqbnLycT.js                                 0.33 kB │ gzip:     0.28 kB
+dist/assets/biz-device-BDrXXqpp.js                                  0.33 kB │ gzip:     0.27 kB
+dist/assets/biz-novel-DzuWoi9X.js                                   0.34 kB │ gzip:     0.28 kB
+dist/assets/biz-rpg-battle-BTVz-s1w.js                              0.36 kB │ gzip:     0.31 kB
+dist/assets/biz-property-BrqT6K-Q.js                                0.36 kB │ gzip:     0.30 kB
+dist/assets/nsfw-bar-DqR3yDGA.js                                    0.39 kB │ gzip:     0.35 kB
+dist/assets/nsfw-board-game-Deg6W7-u.js                             0.44 kB │ gzip:     0.37 kB
+dist/assets/nsfw-exposure-CDPu901p.js                               0.45 kB │ gzip:     0.38 kB
+dist/assets/nsfw-bdsm--XyaJG16.js                                   0.45 kB │ gzip:     0.39 kB
+dist/assets/nsfw-urban-driver-Bkbr0j31.js                           0.47 kB │ gzip:     0.41 kB
+dist/assets/nsfw-photography-kX-Zwg40.js                            0.50 kB │ gzip:     0.43 kB
+dist/assets/nsfw-campus-CXpQOh7b.js                                 0.74 kB │ gzip:     0.56 kB
+dist/assets/MobileCGGalleryModal-BLtLNI8Y.js                        0.80 kB │ gzip:     0.51 kB
+dist/assets/MobileNovelDecompositionWorkbenchModal-CkzCCs_k.js      1.01 kB │ gzip:     0.59 kB
+dist/assets/promptTracer-D9Noa1cG.js                                1.05 kB │ gzip:     0.64 kB
+dist/assets/CGGalleryModal-C7yUZPHK.js                              1.21 kB │ gzip:     0.63 kB
+dist/assets/rarityStyles-BK3fXf-i.js                                1.42 kB │ gzip:     0.49 kB
+dist/assets/index-jzp9SZ90.js                                       1.57 kB │ gzip:     0.55 kB
+dist/assets/NovelDecompositionWorkbenchModal-B1xR5TU5.js            1.63 kB │ gzip:     0.90 kB
+dist/assets/StatCard-Boj53eXi.js                                    1.84 kB │ gzip:     0.99 kB
+dist/assets/MobileBoardGameModal-Cue4Okt7.js                        2.36 kB │ gzip:     1.13 kB
+dist/assets/BoardGameModal-BrylAgyK.js                              2.72 kB │ gzip:     1.30 kB
+dist/assets/MobileSaveLoadModal-CKrxztog.js                         2.80 kB │ gzip:     1.31 kB
+dist/assets/MobileNewGameWizard-Db39zgwe.js                         3.15 kB │ gzip:     1.53 kB
+dist/assets/MobileBoardGameDashboard-lpt3CxIv.js                    3.21 kB │ gzip:     1.27 kB
+dist/assets/NpcMemorySummaryFlowMobileModal-C-C5AL6r.js             3.48 kB │ gzip:     1.48 kB
+dist/assets/NpcMemorySummaryFlowModal-DPcAb6Vt.js                   3.71 kB │ gzip:     1.56 kB
+dist/assets/NewGameWizard-CsIopPVG.js                               3.75 kB │ gzip:     1.69 kB
+dist/assets/RpgBattleIntegration-BYnDXoeb.js                        3.93 kB │ gzip:     1.80 kB
+dist/assets/MemorySummaryFlowMobileModal-BnpxwKIe.js                3.96 kB │ gzip:     1.67 kB
+dist/assets/useRpgStateBridge-yM975FRL.js                           3.98 kB │ gzip:     1.57 kB
+dist/assets/MemorySummaryFlowModal-BHUCJ73x.js                      4.05 kB │ gzip:     1.66 kB
+dist/assets/MobileMapExplorerModal-Cac1jAmz.js                      4.14 kB │ gzip:     1.69 kB
+dist/assets/BoardGameDashboard-DnNk_FyF.js                          4.26 kB │ gzip:     1.64 kB
+dist/assets/BDSMNegotiationPanel-B235H8G8.js                        4.27 kB │ gzip:     1.79 kB
+dist/assets/BDSMSafetyModal-BXLJhOJd.js                             4.37 kB │ gzip:     1.79 kB
+dist/assets/RpgEquipmentIntegration-h5HlsRwU.js                     4.39 kB │ gzip:     1.72 kB
+dist/assets/MobileUrbanDriverApp-49c7Za6d.js                        4.45 kB │ gzip:     1.48 kB
+dist/assets/novelWritingService-Dt50nvwX.js                         4.66 kB │ gzip:     1.55 kB
+dist/assets/RpgKungfuIntegration-Cg09JAvS.js                        4.74 kB │ gzip:     1.90 kB
+dist/assets/BDSMContractModal-BBcRhPYB.js                           5.09 kB │ gzip:     1.74 kB
+dist/assets/MapExplorerModal-C0Hhiek-.js                            5.55 kB │ gzip:     2.21 kB
+dist/assets/RpgTaskIntegration-B8D0p1DQ.js                          5.58 kB │ gzip:     2.00 kB
+dist/assets/MobileBarPanel-DIfYkVVt.js                              5.61 kB │ gzip:     1.79 kB
+dist/assets/MobileBattleModal-BXdVGUbH.js                           5.63 kB │ gzip:     1.94 kB
+dist/assets/BarPanel-D4dVq97H.js                                    5.69 kB │ gzip:     1.75 kB
+dist/assets/CGGallery-EflaRbPv.js                                   5.73 kB │ gzip:     1.83 kB
+dist/assets/MobileAgreementModal-BnGhiqwd.js                        6.06 kB │ gzip:     1.93 kB
+dist/assets/MobileMusicPlayer-h___XoI6.js                           6.36 kB │ gzip:     2.22 kB
+dist/assets/MobileCampusDesireApp-Cv4LOcJ7.js                       6.62 kB │ gzip:     2.28 kB
+dist/assets/MobileTask-BEsE5y8v.js                                  6.63 kB │ gzip:     2.42 kB
+dist/assets/BDSMContractNegotiation-CaJVGK7z.js                     7.06 kB │ gzip:     2.41 kB
+dist/assets/MobileKungfuModal-BF1QgS1p.js                           7.29 kB │ gzip:     2.41 kB
+dist/assets/RelationGraphView-5x7eXvwb.js                           7.85 kB │ gzip:     3.01 kB
+dist/assets/UrbanDriverDashboard-DICy-A1b.js                        8.64 kB │ gzip:     2.78 kB
+dist/assets/MobileExposureDashboard-DrhJa-Du.js                     8.87 kB │ gzip:     2.58 kB
+dist/assets/MobileStory-CAp0l5eA.js                                 8.94 kB │ gzip:     2.31 kB
+dist/assets/BDSMRelationshipModal-CkudbHmQ.js                       9.15 kB │ gzip:     2.85 kB
+dist/assets/MobileSect-CnN5XMLe.js                                  9.17 kB │ gzip:     2.77 kB
+dist/assets/SaveLoadModal-Daimi5Wv.js                               9.74 kB │ gzip:     4.19 kB
+dist/assets/AgreementModal-CRjFRknI.js                              9.77 kB │ gzip:     2.96 kB
+dist/assets/MobileNovelWritingWorkbenchModal-BB0DtUga.js           10.11 kB │ gzip:     2.71 kB
+dist/assets/StoryModal-BUcYNxPu.js                                 10.84 kB │ gzip:     2.74 kB
+dist/assets/BattleModal-D8-LOx7x.js                                11.10 kB │ gzip:     3.73 kB
+dist/assets/CampusDesireDashboard-COdPOKwF.js                      11.53 kB │ gzip:     3.45 kB
+dist/assets/MobileTeamModal-D5a0efF8.js                            11.75 kB │ gzip:     2.90 kB
+dist/assets/NovelWritingWorkbenchModal-BfFQGYqO.js                 11.79 kB │ gzip:     3.12 kB
+dist/assets/MobileInventoryModal-Z-6JGmb5.js                       11.99 kB │ gzip:     3.54 kB
+dist/assets/SectModal-BpLHj93m.js                                  12.02 kB │ gzip:     3.52 kB
+dist/assets/MobileEquipmentModal-C57Eywlq.js                       12.44 kB │ gzip:     3.47 kB
+dist/assets/fflate-vendor-UBxmY-BC.js                              12.56 kB │ gzip:     6.11 kB
+dist/assets/MobileMemory-C77x-tB4.js                               12.81 kB │ gzip:     4.10 kB
+dist/assets/NsfwControlCenter-CySdUwUk.js                          12.84 kB │ gzip:     4.09 kB
+dist/assets/MobileMapModal-xzr0tO-Z.js                             12.99 kB │ gzip:     3.48 kB
+dist/assets/MobileHeroinePlanModal-DUuK3FT0.js                     13.24 kB │ gzip:     2.99 kB
+dist/assets/ExposureDashboard-CppC6r-z.js                          14.24 kB │ gzip:     3.95 kB
+dist/assets/TeamModal-WJ18-cIm.js                                  14.30 kB │ gzip:     3.98 kB
+dist/assets/TaskModal-D1zHtr9I.js                                  14.97 kB │ gzip:     4.35 kB
+dist/assets/MobilePhotographyDashboard-CGRxb-pN.js                 15.43 kB │ gzip:     3.65 kB
+dist/assets/settings-unified-entry-_CWlgoxd.js                     15.45 kB │ gzip:     4.13 kB
+dist/assets/骰子游戏Panel-DEhvbLF_.js                                  15.57 kB │ gzip:     5.12 kB
+dist/assets/HeroinePlanModal-C_IwR9C9.js                           16.61 kB │ gzip:     4.01 kB
+dist/assets/MapModal-Dyrpd4Om.js                                   19.46 kB │ gzip:     5.16 kB
+dist/assets/MobileWorldModal-0u4PKslf.js                           19.68 kB │ gzip:     4.14 kB
+dist/assets/WorldModal-CmuAX9Iu.js                                 22.10 kB │ gzip:     4.56 kB
+dist/assets/InventoryModal-BNHiUVGM.js                             22.85 kB │ gzip:     5.93 kB
+dist/assets/EquipmentModal-DxQYYgXH.js                             23.19 kB │ gzip:     6.19 kB
+dist/assets/MobileWorldbookManagerModal-9NS1Vu5m.js                23.25 kB │ gzip:     5.22 kB
+dist/assets/WorldbookManagerModal-CFrHQmVe.js                      23.37 kB │ gzip:     5.43 kB
+dist/assets/KungfuModal-_yvZX7CQ.js                                25.64 kB │ gzip:     6.19 kB
+dist/assets/PhotographyDashboard-g156SB_P.js                       26.72 kB │ gzip:     5.49 kB
+dist/assets/MobileCharacter-D5vDIwfx.js                            32.02 kB │ gzip:     7.70 kB
+dist/assets/CharacterModal-CtqnZ-3_.js                             32.90 kB │ gzip:     8.16 kB
+dist/assets/SocialNetworkView-D3t6ETK4.js                          34.58 kB │ gzip:    10.10 kB
+dist/assets/MemoryModal-J_WMBZJe.js                                34.73 kB │ gzip:     9.55 kB
+dist/assets/MobileSocial-DshDxJZr.js                               66.16 kB │ gzip:    15.15 kB
+dist/assets/SocialModal-BzpxYDvH.js                                71.38 kB │ gzip:    16.30 kB
+dist/assets/image-manager-mobile-RC8_G19N.js                      115.05 kB │ gzip:    22.83 kB
+dist/assets/MobileDeviceModal-jlKH9Kyq.js                         153.93 kB │ gzip:    33.97 kB
+dist/assets/image-manager-desktop-DTaTmtN7.js                     196.47 kB │ gzip:    37.21 kB
+dist/assets/index-AL4j_jQG.js                                     327.02 kB │ gzip:    91.64 kB
+dist/assets/EraSelector-L2mCAOnN.js                               465.54 kB │ gzip:   139.27 kB
+dist/assets/settings-panels-BgJd0H7j.js                           494.06 kB │ gzip:   113.93 kB
+dist/assets/game-runtime-Tp-1UFq_.js                            2,862.39 kB │ gzip:   871.35 kB
+dist/assets/vendor-Cb-LRGt4.js                                  3,616.03 kB │ gzip: 1,701.81 kB
+
+(!) Some chunks are larger than 700 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 14.43s
