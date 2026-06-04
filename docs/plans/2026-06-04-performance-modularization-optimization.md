@@ -99,7 +99,7 @@
   ]
   ```
 - [x] **0.2 添加体积检查到 CI** —— `.github/workflows/*.yml` 在 build 后跑 `npx size-limit`，超阈值失败
-- [ ] **0.3 跑一次 `npm run metrics:baseline`** 并把结果 commit 到 `artifacts/baseline-2026-06-04.json`
+- [x] **0.3 跑一次 `npm run metrics:baseline`** 并把结果 commit 到 `artifacts/baseline-2026-06-04.json`
 - [ ] **0.4 跑一次 `npm run build` 记录 raw 输出**（`artifacts/build-2026-06-04.txt`）作为对比基准
 
 **验证：** `npm run build` 后查看新生成 `artifacts/baseline-2026-06-04.json` 与 size-limit 报告。
