@@ -10,7 +10,7 @@ import {
     提示词结构
 } from '../types';
 import { useEffect, useRef, useCallback } from 'react';
-import * as textAIService from '../services/ai/text';
+import { parseStoryRawText } from '../services/ai/text';
 import { useGameState } from './useGameState';
 import { 规范化接口设置, 获取变量计算接口配置, 获取世界演变接口配置, 获取文生图接口配置, 获取场景文生图接口配置, 获取生图词组转化器接口配置, 获取生图画师串预设, 获取词组转化器预设提示词, 接口配置是否可用, 变量校准功能已启用 as 变量生成功能已启用, 获取变量生成并发配置 } from '../utils/apiConfig';
 import { 推进游戏时间 } from './useGame/travel/travelWorkflow';
@@ -546,7 +546,7 @@ export const useGame = () => {
         规范化视觉设置, 规范化场景图片档案, normalizeCanonicalGameTime,
         构建即时记忆条目, 构建短期记忆条目, 写入四段记忆,
         估算AI输出Token, 提取解析失败原始信息, 提取原始报错详情,
-        构建标签解析选项, parseStoryRawText: textAIService.parseStoryRawText,
+        构建标签解析选项, parseStoryRawText,
         执行正文润色: undefined as any, 规范化游戏设置,
         按世界演变分流净化响应, 应用并同步记忆系统FromRuntime: 应用并同步记忆系统,
         performAutoSave: (...args: any[]) => performAutoSaveRef.current?.(...args),
