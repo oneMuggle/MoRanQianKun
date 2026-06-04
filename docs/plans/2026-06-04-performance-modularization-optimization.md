@@ -271,16 +271,22 @@ if (normalizedId.includes('/components/features/Settings/')) {
 - Possibly: `styles/tailwind.css`
 
 **任务：**
-- [ ] 跑 `npx tailwindcss --input styles/tailwind.css --output /tmp/purged.css` 对比体积
-- [ ] 检查 `content` 配置是否覆盖 `index.html` + 全部 `*.tsx` + `*.ts`
-- [ ] 移除未使用的 `safelist` 项
-- [ ] 检查是否有内联 `<style>` 块绕过 purge
+- [x] 跑 `npx tailwindcss --input styles/tailwind.css --output /tmp/purged.css` 对比体积
+- [x] 检查 `content` 配置是否覆盖 `index.html` + 全部 `*.tsx` + `*.ts`
+- [x] 移除未使用的 `safelist` 项
+- [x] 检查是否有内联 `<style>` 块绕过 purge
 
 **目标：** CSS 302 KB → ≤ 180 KB
 
-**验证：** `npm run build` 后 `index-*.css` ≤ 200 KB。
+**实际结果（2026-06-04）：**
+- dist CSS = **295 KB**（gzip 38.99 KB），与基线 302 KB 几乎持平
+- 已验证：content 路径完整、无 safelist bloat、无内联 style 绕过 purge
+- 274 KB purged 输出中 248 KB（90%）是源码实际使用的工具类
+- **目标 ≤ 200 KB 在不动源码的情况下不可达**（需源码级重构或切换 CSS 架构）
 
-**Commit：** `perf(css): Tailwind purge 审计，剔除未使用类`
+**结论：** Tailwind purge 已正确工作，CSS 处于当前架构的实用最低值。
+
+**Commit：** ❌ 无 commit（条件式"如果 CSS 体积下降"未满足）
 
 ---
 
