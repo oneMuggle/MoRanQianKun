@@ -16,8 +16,14 @@
     "lint:graph": "madge --circular --extensions ts,tsx --warning .",
     "lint:dead": "ts-prune",
     "lint:unused": "knip",
-    "metrics:baseline": "node scripts/collectMetricsBaseline.mjs"
+    "metrics:baseline": "node scripts/collectMetricsBaseline.mjs",
+    "size": "size-limit"
   },
+  "size-limit": [
+    { "name": "entry",       "path": "dist/assets/index-*.js",        "limit": "350 KB" },
+    { "name": "vendor",      "path": "dist/assets/vendor-*.js",       "limit": "3.7 MB" },
+    { "name": "game-runtime","path": "dist/assets/game-runtime-*.js", "limit": "3.0 MB" }
+  ],
   "dependencies": {
     "@capacitor/android": "^7.4.5",
     "@capacitor/cli": "^7.4.5",
