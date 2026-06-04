@@ -13,7 +13,6 @@ import { MemoryModals } from './components/app/MemoryModals';
 import { ModalRenderer, useModalManager } from './core/module-registry';
 import './core/module-registry/bootstrap'; // 激活所有模块注册
 import { getModuleLoader, PromptRegistry } from './core/engine';
-import { 核心提示词 } from './prompts/core-prompts';
 import FPSDisplay from './components/features/Performance/FPSDisplay';
 import PerformanceDashboard from './components/features/Performance/PerformanceDashboard';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -29,9 +28,12 @@ const App: React.FC = () => {
     React.useEffect(() => {
         const loader = getModuleLoader();
 
-        // 注册核心提示词到 PromptRegistry
-        const promptTexts = 核心提示词.map(p => p.内容).filter(Boolean);
-        PromptRegistry.registerCoreMany(promptTexts);
+        // 注册核心提示词到 PromptRegistry（异步加载 prompts/core-prompts，避免拉入 entry chunk）
+        void (async () => {
+            const { 核心提示词 } = await import('./prompts/core-prompts');
+            const promptTexts = 核心提示词.map(p => p.内容).filter(Boolean);
+            PromptRegistry.registerCoreMany(promptTexts);
+        })();
 
         // 注入运行时上下文
         loader.setContext({
