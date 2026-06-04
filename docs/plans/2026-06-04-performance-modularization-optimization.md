@@ -350,23 +350,33 @@ if (cfg?.启用校园NSFW深化系统) {
 
 **Commit：** `perf(bootstrap): 移除 index.tsx 同步 NSFW 注册，改为运行时按 gameConfig 异步激活`
 
-#### Task 2.2：合并两套 module-registry
+#### Task 2.2：合并两套 module-registry `[x]`
 
 **Files:**
-- Confirm target: `core/module-registry/`（App.tsx 已用此）
-- Migrate callers of: `utils/moduleRegistry/`
-- Delete: `utils/moduleRegistry/`（确认无引用后删除）
+- Confirm target: `core/module-registry/`（App.tsx 已用此）`[x]`
+- Migrate callers of: `utils/moduleRegistry/` `[x]`（无引用方，全部 0 个）
+- Delete: `utils/moduleRegistry/`（确认无引用后删除）`[x]`
 
-**验证步骤：**
+**实际调查结果：**
+- `diff -rq` 仅 `index.ts` 不同；其余 7 文件 md5 字节级相同
+- `grep -rln` 仅有 `core/module-registry/index.ts` 注释提到旧路径，**无任何 import**
+- `core/module-registry/index.ts` 用 `export *` 风格，是旧版 `index.ts` 的严格超集
+- 结论：旧版无独有能力，可直接删除
+
+**验证步骤：** `[x]`
 ```bash
 grep -rln "utils/moduleRegistry" --include="*.ts" --include="*.tsx" .
-# 若有命中，逐个迁移到 core/module-registry
+# 0 个 import 命中（仅一处注释提及）
 rm -rf utils/moduleRegistry
 ```
 
-**风险：** 旧注册器可能有未迁移的注册中心。需 `npm run build` 确认无 import 错误。
+**验证结果：**
+- `npm run build` 成功（21.07s）
+- `npx tsc --noEmit` 无新增错误（ModuleLoader.ts(302,34) 错误为预先存在，已用 git stash 验证）
+- `npm run dev` 启动正常，HTTP 200
+- `npm run lint` 无新增错误（9 个错误均为预先存在的 react-hooks 命名问题）
 
-**Commit：** `refactor(registry): 合并 core/module-registry 与 utils/moduleRegistry，移除遗留副本`
+**Commit：** `[x]` `c36c9bb refactor(registry): 合并 core/module-registry 与 utils/moduleRegistry，移除遗留副本`
 
 #### Task 2.3：懒加载核心提示词
 
