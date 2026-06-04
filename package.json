@@ -21,7 +21,8 @@
   },
   "size-limit": [
     { "name": "entry",       "path": "dist/assets/index-*.js",        "limit": "350 KB" },
-    { "name": "vendor",      "path": "dist/assets/vendor-*.js",       "limit": "3.7 MB" },
+    { "name": "vendor",      "path": "dist/assets/*-vendor-*.js",     "limit": "3.7 MB" },
+    { "name": "tiktoken",    "path": "dist/assets/tiktoken-vendor-*.js", "limit": "3.4 MB" },
     { "name": "game-runtime","path": "dist/assets/game-runtime-*.js", "limit": "3.0 MB" }
   ],
   "dependencies": {
