@@ -192,8 +192,8 @@ export default defineConfig(({ mode }) => {
             }
 
             // 阶段 1.2：拆分原 game-runtime 为 5 块
-            // 已知风险：prompts → models → useGame → prompts 存在循环 import
-            // 当前通过把所有这些目录都打到单个 chunk 来避开 ESM TDZ
+            // 已知风险：prompts → models → useGame 存在循环 import
+            // 通过把使用方/被使用方精确分配到不同 chunk 规避 ESM TDZ
             // 拆分顺序：prompts-core 优先匹配（避免被 runtime 抢先），再 prompts-runtime，再 models，再 ai-clients，最后 useGame-runtime
 
             // 1. prompts 核心（变化频率低，可被浏览器长期缓存）
