@@ -15,7 +15,7 @@ import type {
     事件链,
     周期性配置,
     增强条件,
-} from '../../../models/eventTrigger';
+} from '../../../../models/eventTrigger';
 import {
     求值增强条件,
     检查周期性触发,

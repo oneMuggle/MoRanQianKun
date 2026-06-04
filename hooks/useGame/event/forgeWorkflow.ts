@@ -3,9 +3,9 @@
 // 成功率受角色属性（悟性、根骨）和功法熟练度影响
 // 锻造出的装备带有随机词条
 
-import { 角色数据结构 } from '../../../models/domain/character';
-import { 游戏物品, 武器, 防具, 基础物品, 物品品质, 物品词条, 装备槽位 } from '../../../models/domain/item';
-import { 功法结构 } from '../../../models/domain/kungfu';
+import { 角色数据结构 } from '../../../models/character';
+import { 游戏物品, 武器, 防具, 基础物品, 物品品质, 物品词条, 装备槽位 } from '../../../models/item';
+import { 功法结构 } from '../../../models/kungfu';
 
 // ---- 锻造配方 ----
 

@@ -3,7 +3,7 @@
  * 负责关系互动的 AI 工作流编排
  */
 
-import type { NPC结构 } from '../../../models/domain/social';
+import type { NPC结构 } from '../../../models/social';
 import type {
   NPC关系数据,
   互动类型,

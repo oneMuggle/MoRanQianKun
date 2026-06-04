@@ -3,7 +3,7 @@
  * 负责 NPC 关系的完整生命周期管理
  */
 
-import type { NPC结构 } from '../../../models/domain/social';
+import type { NPC结构 } from '../../../models/social';
 import type {
   NPC关系数据,
   关系事件,

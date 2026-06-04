@@ -9,7 +9,7 @@ import type {
     接口设置结构,
     视觉设置结构
 } from '../../../types';
-import type { 场景图片档案 } from '../../../models/image';
+import type { 场景图片档案 } from '../../../models/imageGeneration';
 import { 创建记忆总结处理器, type NPC记忆总结任务结构, type 记忆总结阶段类型 } from '../memory/memorySummaryHandlers';
 import type { 记忆压缩任务结构 } from '../memory/memoryUtils';
 import { 创建历史回合工作流 } from '../time/historyTurnWorkflow';
