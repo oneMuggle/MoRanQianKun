@@ -294,7 +294,7 @@ if (normalizedId.includes('/components/features/Settings/')) {
 
 **目标：** 把 `index.tsx` 与 `core/module-registry/bootstrap.ts` 中的所有同步模块注册改为基于 `gameConfig` 的运行时异步激活。
 
-#### Task 2.1：消灭 `index.tsx` 的同步 NSFW 注册
+#### Task 2.1：消灭 `index.tsx` 的同步 NSFW 注册 ✅ (2026-06-04)
 
 **Files:**
 - Modify: `index.tsx:6`
