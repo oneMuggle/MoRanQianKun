@@ -378,7 +378,7 @@ rm -rf utils/moduleRegistry
 
 **Commit：** `[x]` `c36c9bb refactor(registry): 合并 core/module-registry 与 utils/moduleRegistry，移除遗留副本`
 
-#### Task 2.3：懒加载核心提示词
+#### Task 2.3：懒加载核心提示词 ✅ (2026-06-04)
 
 **Files:**
 - Modify: `App.tsx:18, 35-37`
