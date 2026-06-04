@@ -227,7 +227,7 @@ if (normalizedId.includes('/hooks/useGame/') || normalizedId.endsWith('/hooks/us
 
 **Commit：** `perf(build): 拆分 game-runtime 为 prompts/models/ai-clients/useGame 四块`
 
-#### Task 1.3：拆分 settings-panels
+#### Task 1.3：拆分 settings-panels ✅ (2026-06-04)
 
 **Files:**
 - Modify: `vite.config.ts`
