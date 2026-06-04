@@ -405,7 +405,7 @@ PromptRegistry.registerCoreMany(promptTexts);
 
 **Commit：** `perf(prompts): 懒加载核心提示词，移出 entry chunk`
 
-#### Task 2.4：审计 `useGame` 内的通配 import
+#### Task 2.4：审计 `useGame` 内的通配 import ✅ (2026-06-04)
 
 **Files:**
 - Modify: `hooks/useGame.ts:13`
