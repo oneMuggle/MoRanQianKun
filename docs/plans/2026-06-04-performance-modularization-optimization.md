@@ -463,7 +463,7 @@ import { chatCompletionRequest, streamChatCompletion } from '../services/ai/text
 
 **Commit：** `refactor(useGame): 将 130 个子工作流按领域重组到子目录`
 
-#### Task 3.2：抽取领域域到 Zustand 切片
+#### Task 3.2：抽取领域域到 Zustand 切片 ✅ (2026-06-04)
 
 **Files:**
 - Create: `hooks/useGame/domains/imageSlice.ts`
