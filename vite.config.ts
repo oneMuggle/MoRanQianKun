@@ -150,13 +150,24 @@ export default defineConfig(({ mode }) => {
             const normalizedId = id.replace(/\\/g, '/');
  
             if (normalizedId.includes('/node_modules/')) {
+              if (normalizedId.includes('/react/') || normalizedId.includes('/react-dom/') ||
+                  normalizedId.includes('/scheduler/')) {
+                return 'react-vendor';
+              }
               if (normalizedId.includes('/fflate/')) {
                 return 'fflate-vendor';
               }
-              if (normalizedId.includes('/@google/genai/')) {
+              if (normalizedId.includes('/js-tiktoken/')) {
+                return 'tiktoken-vendor';
+              }
+              if (normalizedId.includes('/@google/genai/') || normalizedId.includes('/openai/') ||
+                  normalizedId.includes('/@anthropic-ai/')) {
                 return 'ai-sdk-vendor';
               }
-              return 'vendor';
+              if (normalizedId.includes('/zustand/')) {
+                return 'state-vendor';
+              }
+              return 'vendor-misc';
             }
  
             // 时代模块拆分（按需加载）
