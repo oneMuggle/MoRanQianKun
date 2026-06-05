@@ -16,6 +16,7 @@
  */
 
 import { 世界变量结构参考提示词 } from './worldDataSchema';
+import type { 提示词结构 } from '../../types';
 
 export const 构建世界演变系统提示词 = (options?: { fandom?: boolean }): string => [
     '你是 WuXia 项目的"世界演变引擎"，负责在每回合主剧情之后维护后台世界，让 NPC、事件、势力、镜头和环境按时间门槛与条件门槛持续运转。',

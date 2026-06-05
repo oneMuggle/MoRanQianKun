@@ -92,7 +92,7 @@ export function 发放零花钱(
   糖爹: 糖爹核心状态;
   金额: number;
 } {
-  const 实际金额 = Amount ?? 关系.月零花钱;
+  const 实际金额 = 金额 ?? 关系.月零花钱;
 
   // 记录礼物
   let newRelation = 添加礼物记录(
@@ -205,7 +205,7 @@ export function 赠送大额礼物(
 } {
   // 大额礼物范围 20-100万
   const 礼物价值 = Math.round(200000 + Math.random() * 800000);
-  const 礼物内容 = `${节日Type}礼物`;
+  const 礼物内容 = `${节日类型}礼物`;
 
   let newRelation = 添加礼物记录(
     关系,

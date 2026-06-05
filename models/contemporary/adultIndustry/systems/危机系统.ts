@@ -215,7 +215,7 @@ export function 评估危机处理策略(params: {
   // 根据危机等级调整策略
   if (危机等级 === '致命') {
     if (!资源状态.法律支援) {
-      推荐Strategy.push('紧急寻求法律支援');
+      推荐策略.push('紧急寻求法律支援');
     }
     推荐策略.push('评估永久退出可能性');
   }
@@ -250,7 +250,7 @@ export function 评估危机处理策略(params: {
 
   成功率 = Math.max(5, Math.min(95, 成功率));
 
-  return { 推荐策略, 备选Strategy, 预期成本, 成功率 };
+  return { 推荐策略, 备选策略, 预期成本, 成功率 };
 }
 
 /**

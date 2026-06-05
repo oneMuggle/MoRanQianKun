@@ -7,6 +7,7 @@ import { 创建场景生图触发工作流 } from '../image/sceneImageTriggerWor
 import { 规范化环境信息, 构建完整地点文本 } from '../core/stateTransforms';
 import { 提取NPC生图基础数据 } from '../npcContext';
 import { 环境时间转标准串 } from '../time/timeUtils';
+import type { 当前可用接口结构 } from '../../../utils/apiConfig';
 import type { 场景图片档案, 场景生图任务记录, 生图任务来源类型 } from '../../../types';
 
 interface SceneImageArchiveDeps {
