@@ -201,11 +201,24 @@ export default defineConfig(({ mode }) => {
             if (normalizedId.includes('/prompts/runtime/')) {
               return 'prompts-runtime';
             }
-            // 3. 模型类型定义独立
+            // 3. 阶段 3.x：修复 models ↔ useGame 循环 import 导致的 TDZ
+            //    某些 models/* 文件（import hooks/useGame/ 中的基类/引擎）若被打到
+            //    models-types chunk，会在 useGame-runtime chunk 初始化前触发 TDZ。
+            //    必须在 /models/ 通用规则之前精确匹配，路由到 useGame-runtime。
+            //    已知循环源（手工白名单，新增时务必先确认 import 图）：
+            //    - models/contemporary/barNSFW/engine.ts extends BaseEngine
+            //    - models/outdoorNSFW/index.ts 重导出 hooks/useGame/nsfw/outdoorNSFWEngine
+            if (
+              normalizedId.endsWith('/models/contemporary/barNSFW/engine.ts') ||
+              normalizedId.endsWith('/models/outdoorNSFW/index.ts')
+            ) {
+              return 'useGame-runtime';
+            }
+            // 4. 模型类型定义独立
             if (normalizedId.includes('/models/')) {
               return 'models-types';
             }
-            // 4. AI 客户端独立
+            // 5. AI 客户端独立
             if (normalizedId.includes('/services/ai/')) {
               return 'ai-clients';
             }
