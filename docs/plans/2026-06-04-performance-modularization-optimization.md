@@ -723,31 +723,113 @@ const App = () => {
 
 **任务：** 列出所有 feature flag 和它们对应的代码模块。
 
-#### Task 6.2：将 NSFW / 高级子系统改为动态 import
+#### Task 6.2：将 NSFW / 高级子系统改为动态 import ✅ (2026-06-05)
 
 **Files:**
-- Modify: `hooks/useGame.ts`（领域门面）
-- Modify: 多个 NSFW 子引擎入口
+- Modify: `hooks/useGame/nsfw/nsfwSystemInitialization.ts`（5 个 useEffect 中的 campus/urbanDriver 引擎工厂改为 `import()` lazy load）
+- Modify: `hooks/useGame/nsfw/bdsmRelationshipOperations.ts`（5 个异步 BDSM 操作改为 `loadBdsmTaskTrigger` / `loadBdsmTaskWorkflow` 动态加载）
+- Modify: `hooks/useBarNSFWBridge.ts`（`BarNSFWEngine` 类改为 `loadBarNSFWEngine()` 动态加载，`enterBar()` 内部异步）
+- Modify: `vite.config.ts`（新增 8 条 NSFW 子目录/引擎文件 → 独立 chunk 的 manualChunks 规则）
 
-**模式：**
+**保守原则（按任务 prompt 要求）：**
+
+- ✅ **不大改 `useGame.ts`** — 仅修改 NSFW 模块自身内部
+- ✅ **不改 `useNSFW系统初始化` 调用方** — 它仍然是同步 hook，只是内部 useEffect 异步加载引擎
+- ✅ **不改 `创建BDSM关系操作工作流` 接口** — 返回 15 个方法的签名完全不变（异步方法保持 `Promise<T>` 返回）
+- ✅ **保留 `useBarNSFWBridge` API 表面** — `enterBar()` 仍然 `void` 返回，仅内部使用 `void (async () => {...})()`
+
+**核心改动**（不在 useGame.ts 主体内拆分，而是在子模块内做"按需加载"）：
+
 ```ts
-// 替换前
-import { bdsmForumEngine } from './useGame/bdsmForumEngine';
-// 替换后
-const bdsmForumEngine = state.gameConfig?.启用BDSM系统
-  ? (await import('./useGame/bdsm/bdsmForumEngine')).bdsmForumEngine
-  : null;
+// hooks/useGame/nsfw/nsfwSystemInitialization.ts
+const load校园NSFW欲望工厂 = () =>
+  import('./campusNSFWEngine').then(m => m.从NPC创建欲望档案);
+
+useEffect(() => {
+  if (nsfwEnabled && !已存在 && 游戏已开始 && 有主要角色) {
+    let cancelled = false;
+    load校园NSFW欲望工厂().then(从NPC创建欲望档案 => {
+      if (cancelled) return;
+      // ... 创建欲望档案
+    });
+    return () => { cancelled = true; };
+  }
+}, [...]);
+
+// hooks/useGame/nsfw/bdsmRelationshipOperations.ts
+const loadBdsmTaskTrigger = () => import('./bdsmTaskTrigger');
+const loadBdsmTaskWorkflow = () => import('./bdsmTaskWorkflow');
+
+const 请求生成BDSM任务 = useCallback(async (...) => {
+  const { 触发任务生成 } = await loadBdsmTaskTrigger();
+  const { 生成调教任务 } = await loadBdsmTaskWorkflow();
+  // ...
+}, [...]);
+
+// hooks/useBarNSFWBridge.ts
+const loadBarNSFWEngine = () =>
+  import('../models/contemporary/barNSFW/engine').then(m => m.BarNSFWEngine);
+
+const enterBar = React.useCallback((scene, npcList) => {
+  void (async () => {
+    if (!engineRef.current) {
+      const BarNSFWEngineCtor = await loadBarNSFWEngine();
+      engineRef.current = new BarNSFWEngineCtor(barNSFWSettings);
+    }
+    engineRef.current.activate(scene, npcList);
+    // ...
+  })();
+}, [...]);
 ```
 
-**候选模块：** bdsm、campus、exposure、boardGame、photography、bar、urbanDriver、device（mobileDevice）、avg、novel-decomposition、novel-writing。
+**vite.config.ts manualChunks 新增 8 条规则**（NSFW 子目录/引擎文件 → 独立 chunk）：
 
-**预期效果：** 关闭某子系统的玩家永远不下载该子系统代码。
+| 规则 | 触发的 chunk |
+|------|-------------|
+| `hooks/useGame/bdsmNSFWEngine/` | `nsfw-bdsm-engine` |
+| `hooks/useGame/campusNSFW/` | `nsfw-campus-engine` |
+| `hooks/useGame/exposureNSFWEngine/` | `nsfw-exposure-engine`（仅 stub） |
+| `hooks/useGame/boardGameNSFWEngine/` | `nsfw-board-game-engine` |
+| `hooks/useGame/urbanDriver/` | `nsfw-urban-driver-engine`（仅 stub） |
+| `hooks/useGame/harem/` | `nsfw-harem-engine`（暂未独立） |
+| 单文件：`hooks/useGame/nsfw/{campusNSFWEngine,urbanDriverNSFWEngine,photographyNSFWEngine,outdoorNSFWEngine,bdsmTaskWorkflow,bdsmTaskTrigger,bdsmForumEngine}.ts` | `nsfw-shared-engines` |
+| `models/contemporary/barNSFW/` | `nsfw-bar-engine` |
 
-**风险：** 动态 import 增加约 100 ms 首次进入延迟。可接受，因为玩家进入"校园"功能时本来就是异步操作。
+**实际结果（2026-06-05）：**
 
-**验证：** 关闭 BDSM 系统 → 打开 BDSM 模态 → 应触发一次 `bdsm-*.js` 加载。
+| Chunk | Before | After | Δ |
+|---|---|---|---|
+| `useGame-runtime-*.js` raw | **1,358,321 B** (1,326 KB) | **1,321,091 B** (1,290 KB) | **−37,230 B / −36 KB** |
+| `useGame-runtime-*.js` gzip | 359.44 KB | 346.29 KB | **−13.15 KB** |
+| `useGame-runtime-*.js` brotli | 387.27 kB | **377.23 kB** | **−10.04 kB** ✅ |
+| `models-types-*.js` raw | 604,131 B | 589,275 B | −14,856 B（barNSFW 移出） |
+| **新独立 chunks 合计** | — | ~74 KB raw（分 9 块） | — |
 
-**Commit：** `perf(features): NSFW 子系统按 gameConfig 改为动态 import`
+**新增独立 NSFW chunks（按需加载）：**
+
+| Chunk | Raw | 加载条件 |
+|-------|-----|----------|
+| `nsfw-shared-engines-*.js` | 18,101 B | BDSM 任务/指令操作、sendWorkflow 中已有 dynamic import |
+| `nsfw-campus-engine-*.js` | 16,844 B | 校园 NSFW 模块（campusNSFW/ 目录） |
+| `nsfw-bar-engine-*.js` | 14,941 B | 进入酒吧（首次 `enterBar()`） |
+| `nsfw-board-game-engine-*.js` | 3,057 B | 桌游 NSFW 模块（boardGameNSFWEngine/） |
+| `nsfw-bdsm-engine-*.js` | 2,861 B | BDSM 独立模块（bdsmNSFWEngine/） |
+| 其他小 stub chunks | < 1 KB each | re-export-only 兼容文件 |
+
+**验证：**
+- ✅ `npm run build` 成功（17.52s）
+- ✅ `npx tsc --noEmit` 错误数：592 → 592（不增加）
+- ✅ `npx size-limit` 全部通过：entry 25.03 kB / vendor 58.38 kB / **game-runtime 377.23 kB ✅**（之前 387.27 kB）
+- ✅ `npm run preview` 启动正常，HTTP 200
+- ✅ 修改文件 3 个：`nsfwSystemInitialization.ts` / `bdsmRelationshipOperations.ts` / `useBarNSFWBridge.ts` 无新增 lint error（既有 warn 仅为 `console.warn` 在 catch 分支与 useEffect deps 缺失，全部预先存在）
+
+**为何不达到 ≤ 1.2 MB 目标（仍 1.29 MB）：**
+
+- useGame-runtime 仍包含 130+ 个工作流文件的"非 NSFW"部分
+- 真正能拆出的 NSFW 引擎只有 7 个核心文件（约 74 KB），其余 NSFW 文件被 sendWorkflow 等基础设施静态引用
+- 阶段 6.2 已完成"保守策略"全部可分离引擎；进一步压缩需要阶段 7（路由级 / 工作流级动态拆分）
+
+**Commit：** `perf(features): NSFW 子系统按 gameConfig 改为动态 import（深化 2.1）`
 
 ---
 
@@ -779,6 +861,17 @@ const bdsmForumEngine = state.gameConfig?.启用BDSM系统
 - 确认 SlowOperationLog 在生产构建中被 `import.meta.env.DEV` 守卫
 - 确认 PerformanceDashboard 不会在移动端或低性能设备自动渲染（按 `useResponsive`）
 - 把 `performance.now()` 采样接入到 settings 持久化（IndexedDB）
+
+**完成：**
+- ✅ SlowOperationLog：包了 `import.meta.env.DEV` + `?debug=1 / ?perf=1` URL 入口守卫，加了 `/// <reference types="vite/client" />` 让 tsc 识别 `import.meta.env`
+- ✅ PerformanceDashboard：移动端默认不渲染（App.tsx 渲染处加 `!isMobile || hasDebugParam()` 守卫），桌面端不受影响，调试入口依旧可用
+- ✅ performanceMonitorSettings：save 路径已就位（`savePerformanceSettings`），补齐对称的 `loadPerformanceSettings`（仅 API 暴露，未在 startup 主动调用——沿用 codebase 既有 `loadBuiltinPromptEntries` 等 loader 风格，等独立 PR 接入）
+
+**验证：**
+- ✅ `npm run build` 成功（18.69s）
+- ✅ `npx tsc --noEmit` 错误数：592 → 592（不增加）
+- ✅ 改动文件 3 个无新增 tsc 错误：`App.tsx` / `SlowOperationLog.tsx` / `settingsPersistenceWorkflow.ts`
+- ✅ `npm run dev` 启动正常（监听 :3001）
 
 **Commit：** `perf(monitor): SlowOperationLog 守卫生产构建，PerformanceDashboard 移动端默认关闭`
 

@@ -110,7 +110,18 @@ const App: React.FC = () => {
     }, []); // 仅初始化一次
 
     // --- 性能面板快捷键 Ctrl+Shift+P ---
+    // 移动端默认关闭：useResponsive() === 'mobile' 时不渲染 PerformanceDashboard
+    // 桌面端不受影响；移动端用户也可通过 ?debug=1 显式开启
     const [showPerfDashboard, setShowPerfDashboard] = React.useState(false);
+    const hasDebugParam = React.useCallback((): boolean => {
+        if (typeof window === 'undefined') return false;
+        try {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('debug') === '1' || params.get('perf') === '1';
+        } catch {
+            return false;
+        }
+    }, []);
     React.useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if (e.ctrlKey && e.shiftKey && e.key === 'P') {
@@ -409,7 +420,7 @@ const App: React.FC = () => {
                         enabled={(state as any).performanceConfig?.显示FPS}
                     />
                 )}
-                {state.view === 'game' && showPerfDashboard && (
+                {state.view === 'game' && showPerfDashboard && (!isMobile || hasDebugParam()) && (
                     <PerformanceDashboard
                         perfData={actions.perfData ?? { fps: 0 }}
                         aiQueueStats={actions.perfActions?.AI队列统计?.() ?? { activeCount: 0, pendingCount: 0, totalCount: 0, completedCount: 0, failedCount: 0, averageDurationMs: 0, longestPending: null }}
