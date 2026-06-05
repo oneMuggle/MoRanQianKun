@@ -2,6 +2,7 @@ import React, { Profiler } from 'react';
 import { useGame } from './hooks/useGame';
 import { useResponsive } from './hooks/useResponsive';
 import { useConfirmSystem } from './hooks/useConfirmSystem';
+import { useIdlePreload } from './hooks/useIdlePreload';
 import { MusicProvider } from './components/features/Music/MusicProvider';
 import { 懒加载边界, NewGameWizard, MobileNewGameWizard, LandingPage, GameView } from './components/features/lazyComponents';
 import { useAppModalState } from './components/app/useAppModalState';
@@ -132,6 +133,16 @@ const App: React.FC = () => {
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, []);
+
+    // --- 4.3 视图 idle preload：在浏览器空闲帧预拉下一视图 chunk ---
+    // home → NewGameWizard / MobileNewGameWizard（按 isMobile 选择匹配的）
+    // new_game → GameView
+    // game     → 已是终态，不再预拉
+    useIdlePreload(
+        isMobile ? MobileNewGameWizard.preload : NewGameWizard.preload,
+        state.view === 'home',
+    );
+    useIdlePreload(GameView.preload, state.view === 'new_game');
 
     // 监听新系统弹窗事件（由 ModalRenderer 的 modalManager 派发）
     // eslint-disable-next-line react-hooks/exhaustive-deps
