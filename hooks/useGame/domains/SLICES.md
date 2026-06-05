@@ -116,3 +116,136 @@ const appendNpcImage = useGameStore(s => s.appendNpcImage);
 - ✅ 通过 `npx tsc --noEmit` 类型检查（不增加错误数，592 → 592）
 - ✅ 通过 `npm run build` 生产构建
 - ✅ 阶段 3.2 目标达成
+
+---
+
+## 集成路径（阶段 3.4，types-only bridge）
+
+> 阶段 3.4 目标：**不改 runtime**，仅建立"6 slice ↔ zustandStore.GameStore" 的类型桥接。
+> 本节描述当前对接状态、字段归属清单，以及未来真正集成时的 4 步路径。
+
+### 现状（3.4 完成后）
+
+| 项目 | 状态 |
+|------|------|
+| 6 slice 文件 | ✅ 仍为骨架（自包含 `StateCreator<SelfSlice, [], [], SelfSlice>`） |
+| 运行时引用 | ❌ 0 处（zustandStore.ts 不 import 任何 `domains/*Slice.ts`） |
+| 类型桥接 | ✅ 新增 `domains/sliceAdapter.ts`（types-only） |
+| `domains/index.ts` | ✅ 新增 6 slice 的 `export type` re-export + sliceAdapter 类型导出 |
+| 文档化字段映射 | ✅ 见下方"已对接 / 未对接字段清单" |
+| `useGame.ts` runtime | ❌ 完全未动 |
+| `zustandStore.ts` runtime | ❌ 完全未动 |
+
+### 字段归属原则
+
+- `zustandStore`：字段已存在于 `GameStore` 中（即 `zustandStore.ts` 的 18 个内联 slice 之一）
+- `useGameHook`：字段当前在 `hooks/useGame.ts` 的 `useState` / `useRef` 中
+- `both`：字段同时存在于两处（迁移时需去重）
+
+### 已对接 / 未对接字段清单（命名/概念层）
+
+#### imageSlice
+
+| 字段 | 归属 | zustand 字段 | 备注 |
+|------|------|-------------|------|
+| `npcImageArchive` | `useGameHook` | — | useGame.ts 的 useState；zustandStore 无对应字段 |
+| `sceneImageArchive` | `zustandStore` | `场景图片档案`（SceneConfigSlice） | 同名字段，但类型不严格一致（`Record<string, any>` vs 真实 `场景图片档案`） |
+| `playerImageArchive` | `useGameHook` | — | useGame.ts 局部 useState |
+| `appendNpcImage` / `mergeNpcImages` / `loadSceneImageArchive` | — | — | 语义化 action，zustandStore 缺 |
+
+**已对接字段数：1 / 未对接：5**
+
+#### memorySlice
+
+| 字段 | 归属 | zustand 字段 | 备注 |
+|------|------|-------------|------|
+| `待处理记忆总结任务` | `zustandStore` | `待处理记忆总结任务`（MemorySlice） | 类型一致 |
+| `记忆总结阶段` | `zustandStore` | `记忆总结阶段` | 类型一致 |
+| `记忆总结草稿` | `zustandStore` | `记忆总结草稿` | 类型一致 |
+| `待处理NPC记忆总结队列` | `zustandStore` | `待处理NPC记忆总结队列` | 类型一致 |
+| `NPC记忆总结阶段` | `zustandStore` | `NPC记忆总结阶段` | 类型一致 |
+| `后台记忆总结状态` | `zustandStore` | `后台记忆总结状态` | 类型一致 |
+| `后台记忆总结草稿` | `zustandStore` | `后台记忆总结草稿` | 类型一致 |
+| `后台记忆总结任务` | `zustandStore` | `后台记忆总结任务` | 类型一致 |
+| `触发记忆总结` / `更新记忆阶段` / `清空总结流程` | — | — | 语义化 action，zustandStore 缺 |
+
+**已对接字段数：8 / 未对接：3**
+
+#### saveSlice / nsfwSlice / settingSlice / planSlice
+
+**全部字段当前归属 `useGameHook`，zustandStore 无对应字段。**
+
+| Slice | 已对接 | 未对接 |
+|-------|--------|--------|
+| saveSlice | 0 | 8（存档列表、读档状态、读档错误、存读档工作流状态、当前存档ID + 3 个 action） |
+| nsfwSlice | 0 | 6（bdsm关系映射、campus关系映射、nsfw上下文已加载、激活子系统列表 + 2 个 action） |
+| settingSlice | 0 | 7（apiConfig、visualConfig、memoryConfig、imageManagerConfig、持久化中 + 2 个 action） |
+| planSlice | 0 | 6（故事计划、变量生成上下文、规划更新中、最近规划更新时间 + 2 个 action） |
+
+### 聚合统计
+
+```
+总切片数: 6
+已对接切片数: 0   ← 仍为骨架，零运行时挂载
+概念对齐字段总数: 9  (image: 1 + memory: 8)
+未对接字段总数: 35
+```
+
+> 上述数字以 `domains/sliceAdapter.ts` 中 `SliceIntegrationReport` 接口为唯一定义源。
+> 任何字段归属变更需先改 `sliceAdapter.ts`，再改本表。
+
+### 未来真正集成的 4 步路径
+
+> 警告：以下 4 步**不在阶段 3.4 范围内**，留待后续阶段（3.5+）。
+> 任何执行者必须先更新 `sliceAdapter.ts` 的字段映射，再做 runtime 改动。
+
+#### 步骤 1：类型对齐
+
+```ts
+// 1.1 用真实类型替换 slice 中的 any/Record<string, any>
+export interface ImageSliceState {
+    npcImageArchive: Record<string, NpcImageRecord[]>; // 而非 any[]
+    sceneImageArchive: 场景图片档案;                  // 而非 Record<string, any>
+    playerImageArchive: PlayerImageRecord;            // 而非 any
+}
+```
+
+#### 步骤 2：state 字段迁移（按 slice 顺序：image → memory → setting → plan → save → nsfw）
+
+```ts
+// 2.1 在 zustandStore.ts 中追加 6 个内联 slice（与现有 18 个内联 slice 同款写法）
+//    ⚠️ 必须**就地**扩展 GameStore（不能 import domains/*Slice.ts）
+const createImageSlice: ZustandSlice<ImageSlice> = (set) => ({ ... });
+// 2.2 在 GameStore extends 列表追加：..., V2ImageSlice, V2MemorySlice, V2SaveSlice, ...
+// 2.3 useGameStore create 函数内追加：...createV2ImageSlice(...a), ...
+```
+
+#### 步骤 3：action 迁移
+
+```ts
+// 3.1 把 useGame.ts 中的 useState setter 替换为 useGameStore 调用
+//     替换前
+const [npcImageArchive, setNpcImageArchive] = useState<Record<string, any[]>>({});
+//     替换后
+const npcImageArchive = useGameStore(s => s.npcImageArchive);
+const appendNpcImage = useGameStore(s => s.appendNpcImage);
+// 3.2 删除 useGame.ts 中对应的 useState + useEffect/useCallback
+```
+
+#### 步骤 4：清理 6 slice 骨架
+
+```ts
+// 4.1 domains/*Slice.ts 的 StateCreator 第一个泛型从 XxxSlice 改为 GameStore
+export const createImageSlice: StateCreator<GameStore, [], [], ImageSlice> = (set) => ({ ... });
+// 4.2 升级 domains/index.ts 的 export type → export { createImageSlice, type ImageSlice }
+// 4.3 zustandStore.ts 删除对应的内联 createXxxSlice 块（v2 取代）
+// 4.4 更新 sliceAdapter.ts 中对应字段的 `字段归属` 为 'zustandStore'，并删除其备注
+```
+
+### 阶段 3.4 验收
+
+- ✅ 不改 `zustandStore.ts`、不改 `useGame.ts` runtime
+- ✅ `npx tsc --noEmit` 错误数不增加（仅新增 types-only 接口，零运行时影响）
+- ✅ `npm run build` 成功
+- ✅ 文档化清晰（本节 + `sliceAdapter.ts` 内的 `SliceIntegrationReport`）
+- ✅ Commit: `refactor(state): 阶段 3.4 集成 slice 类型对接（保守策略：types-only bridge）`
