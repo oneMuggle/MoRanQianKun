@@ -4,7 +4,7 @@
  * 生成咨询师、医生等角色的提示词
  */
 
-import type { 医美机构状态 } from './types';
+import type { 医美机构状态 } from '../types';
 
 /**
  * 生成咨询师提示词

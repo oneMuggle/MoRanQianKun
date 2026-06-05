@@ -172,10 +172,10 @@ export interface DeviceGroup {
 // 游戏状态上下文 — 设备 App 需要的数据子集
 // ============================================================
 
-import type { NPC结构 } from './domain/social';
-import type { 世界数据结构 } from './game/world';
-import type { 剧情系统结构 } from './game/story';
-import type { 角色数据结构 } from './domain/character';
+import type { NPC结构 } from './social';
+import type { 世界数据结构 } from './world';
+import type { 剧情系统结构 } from './story';
+import type { 角色数据结构 } from './character';
 import type { 聊天记录结构, 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../types';
 import type { 校园系统数据 } from './campusPhone';
 

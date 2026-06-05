@@ -10,8 +10,8 @@ import type {
   手术类型,
   手术级别,
   整形危机,
-} from './types';
-import { 手术失败率配置 } from './types';
+} from '../types';
+import { 手术失败率配置 } from '../types';
 import { 记录手术失败, 更新整形者状态 } from '../states/整形者状态';
 import { 记录机构事故, 更新机构状态 } from '../states/机构状态';
 

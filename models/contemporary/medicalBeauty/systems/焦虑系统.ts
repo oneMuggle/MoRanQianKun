@@ -4,8 +4,8 @@
  * 社会审美标准与焦虑触发机制
  */
 
-import type { 整形者核心状态 } from './types';
-import { 审美标准配置 } from './types';
+import type { 整形者核心状态 } from '../types';
+import { 审美标准配置 } from '../types';
 
 // ==================== 审美标准 ====================
 

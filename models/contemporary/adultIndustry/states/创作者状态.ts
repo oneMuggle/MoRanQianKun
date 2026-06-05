@@ -12,7 +12,7 @@ import type {
   账号状态,
   职业阶段,
   税务状况,
-} from './types';
+} from '../types';
 
 /**
  * 创建默认创作者状态

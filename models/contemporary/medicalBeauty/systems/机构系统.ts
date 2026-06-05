@@ -8,7 +8,7 @@ import type {
   医美机构状态,
   机构类型,
   机构档次,
-} from './types';
+} from '../types';
 import { 
   根据档次创建机构, 
   评估机构安全性,

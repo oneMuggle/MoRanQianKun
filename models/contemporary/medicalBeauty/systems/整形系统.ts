@@ -11,7 +11,7 @@ import type {
   手术级别,
   医生资质,
   消费能力,
-} from './types';
+} from '../types';
 import { 资质安全系数 } from '../scenes/手术场景';
 import { 根据档次创建机构 } from '../states/机构状态';
 

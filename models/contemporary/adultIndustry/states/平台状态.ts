@@ -7,7 +7,7 @@ import type {
   平台状态,
   平台类型,
   审核严格度,
-} from './types';
+} from '../types';
 
 /**
  * 创建默认平台状态

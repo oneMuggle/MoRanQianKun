@@ -7,7 +7,7 @@ import type {
   粉丝核心状态,
   粉丝类型,
   内容类型,
-} from './types';
+} from '../types';
 
 /**
  * 创建默认粉丝状态

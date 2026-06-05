@@ -4,7 +4,7 @@
  * 生成整形者角色的提示词
  */
 
-import type { 整形者核心状态 } from './types';
+import type { 整形者核心状态 } from '../types';
 
 /**
  * 生成整形者提示词

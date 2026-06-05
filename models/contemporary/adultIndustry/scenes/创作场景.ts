@@ -3,7 +3,7 @@
  * v1.0
  */
 
-import type { 内容类型, 内容分级, 创作流程配置 } from './types';
+import type { 内容类型, 内容分级, 创作流程配置 } from '../types';
 
 /**
  * 创作场景配置

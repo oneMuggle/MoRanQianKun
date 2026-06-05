@@ -4,7 +4,7 @@
  */
 
 import type { DeviceMessage } from '../mobileDevice';
-import type { 角色数据结构 } from './character';
+import type { 角色数据结构 } from '../character';
 
 // 时代对应的精力消耗
 const 时代精力消耗: Record<string, number> = {

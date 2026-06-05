@@ -3,7 +3,7 @@
  * v1.0
  */
 
-import type { 危机类型, 危机等级 } from './types';
+import type { 危机类型, 危机等级 } from '../types';
 
 /**
  * 危机场景配置

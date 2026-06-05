@@ -8,9 +8,9 @@ import type {
   整形者核心状态, 
   医美机构状态,
   整形危机,
-} from './types';
-import { 获取维权选项, 执行维权 } from './systems/失败系统';
-import { 评估还款压力, 评估逾期危机 } from './systems/贷款系统';
+} from '../types';
+import { 获取维权选项, 执行维权 } from '../systems/失败系统';
+import { 评估还款压力, 评估逾期危机 } from '../systems/贷款系统';
 
 // ==================== 维权场景 ====================
 

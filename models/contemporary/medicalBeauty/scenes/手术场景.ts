@@ -10,8 +10,8 @@ import type {
   手术类型,
   手术级别,
   医生资质,
-} from './types';
-import { 模拟手术结果 } from './systems/失败系统';
+} from '../types';
+import { 模拟手术结果 } from '../systems/失败系统';
 
 // ==================== 手术配置 ====================
 

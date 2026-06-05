@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import type { 游戏物品 } from '../../../../models/item';
+import type { 游戏物品 } from '../../../models/item';
 import { WeaponShopPanel } from './regionPanels/WeaponShopPanel';
 import { TavernPanel, type MenuItem } from './regionPanels/TavernPanel';
 import { TeaHousePanel } from './regionPanels/TeaHousePanel';

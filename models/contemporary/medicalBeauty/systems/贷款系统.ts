@@ -4,8 +4,8 @@
  * 医美贷套路与还款压力计算
  */
 
-import type { 整形者核心状态, 医美贷产品 } from './types';
-import { 医美贷产品列表 } from './types';
+import type { 整形者核心状态, 医美贷产品 } from '../types';
+import { 医美贷产品列表 } from '../types';
 import { 申请整形贷 } from '../states/整形者状态';
 
 // ==================== 贷款产品分析 ====================

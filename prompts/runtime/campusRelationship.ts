@@ -4,7 +4,7 @@
  */
 
 import type { NPC关系数据, 关系类型, 互动类型 } from '../../models/campusNSFW';
-import type { NPC结构 } from '../../models/domain/social';
+import type { NPC结构 } from '../../models/social';
 
 /**
  * 关系阶段阈值表

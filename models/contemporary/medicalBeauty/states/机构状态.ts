@@ -6,7 +6,7 @@ import type {
   医美机构状态,
   机构类型,
   机构档次,
-} from './types';
+} from '../types';
 
 // 机构名称生成
 const 机构名池 = [

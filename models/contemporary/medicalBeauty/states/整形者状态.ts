@@ -8,7 +8,7 @@ import type {
   整形阶段,
   消费能力,
   手术类型,
-} from './types';
+} from '../types';
 
 // 默认化名池
 const 化名池 = [
