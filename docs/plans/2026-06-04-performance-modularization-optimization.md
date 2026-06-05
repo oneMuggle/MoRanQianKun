@@ -635,9 +635,22 @@ const App = () => {
 - Possibly: 删除或改用 `tiktoken/lite`
 
 **任务：**
-- [ ] 跑 `npx vite-bundle-visualizer` 确认 `js-tiktoken` 是否进 `dist/assets/`
-- [ ] 若进入：考虑改为 `tiktoken` 的 `lite` 子路径（更小）
-- [ ] 或将 `tokenEstimate` 改为纯估算（4 字符 ≈ 1 token 的简化算法），不依赖 js-tiktoken
+- [x] 跑 `npx vite-bundle-visualizer` 确认 `js-tiktoken` 是否进 `dist/assets/`
+- [x] 若进入：考虑改为 `tiktoken` 的 `lite` 子路径（更小）
+- [x] 或将 `tokenEstimate` 改为纯估算（4 字符 ≈ 1 token 的简化算法），不依赖 js-tiktoken
+
+**实际结果（2026-06-05）：**
+- 原 `tiktoken-vendor-*.js`：3.34 MB raw / 1.19 MB brotli（确认进入 production bundle）
+- `utils/tokenEstimate.ts` 改写：移除 `import { Tiktoken } from 'js-tiktoken/lite'` + `cl100k_base` + `o200k_base` 三个 import，删除 `分词器缓存` 与 `文本Token缓存`（基于 BPE 的 LRU 缓存不再需要），替换为基于字符类别的启发式估算：
+  - CJK 字符：≈ 1.0 token / 字符
+  - ASCII 字符：≈ 0.25 token / 字符（4 字符 ≈ 1 token）
+  - 公式：`Math.ceil(cjkChars * 1.0 + asciiChars * 0.25)`
+- `package.json`：移除 `js-tiktoken: ^1.0.21` 依赖；移除 size-limit 中 `tiktoken` 预算
+- `vite.config.ts`：移除 `manualChunks` 中 `if (normalizedId.includes('/js-tiktoken/'))` 规则
+- API 表面完全保留：`countOpenAITextTokens` / `countOpenAIChatMessagesTokens` / `countOpenAIChatMessagesTokensWithBreakdown` / `estimateTextTokens*` / `estimateHistory*` / `estimatePromptPoolTokens` / `buildHistoryTokenSource` / `解析OpenAI编码名称` 签名未变
+- 构建后 `dist/assets/` 不再出现 `tiktoken-vendor-*.js`
+- `npx size-limit` 全部通过：entry 24.7 kB / vendor 58.38 kB / game-runtime 387.27 kB
+- vendor 块从 1.28 MB brotli → 58.38 kB brotli（缩减 95.4%）
 
 **Commit：** `perf(deps): tokenEstimate 移除 js-tiktoken 依赖，改为简化估算`
 

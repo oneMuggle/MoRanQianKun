@@ -22,7 +22,6 @@
   "size-limit": [
     { "name": "entry",       "path": "dist/assets/index-*.js",        "limit": "350 KB" },
     { "name": "vendor",      "path": "dist/assets/*-vendor-*.js",     "limit": "3.7 MB" },
-    { "name": "tiktoken",    "path": "dist/assets/tiktoken-vendor-*.js", "limit": "3.4 MB" },
     { "name": "game-runtime","path": "dist/assets/*-runtime-*.js", "limit": "3.0 MB" }
   ],
   "dependencies": {
@@ -30,7 +29,6 @@
     "@capacitor/cli": "^7.4.5",
     "@capacitor/core": "^7.4.5",
     "fflate": "^0.8.2",
-    "js-tiktoken": "^1.0.21",
     "node": "^25.6.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

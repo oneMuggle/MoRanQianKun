@@ -157,9 +157,6 @@ export default defineConfig(({ mode }) => {
               if (normalizedId.includes('/fflate/')) {
                 return 'fflate-vendor';
               }
-              if (normalizedId.includes('/js-tiktoken/')) {
-                return 'tiktoken-vendor';
-              }
               if (normalizedId.includes('/@google/genai/') || normalizedId.includes('/openai/') ||
                   normalizedId.includes('/@anthropic-ai/')) {
                 return 'ai-sdk-vendor';
