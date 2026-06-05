@@ -3,7 +3,7 @@ import { 角色数据结构, 战斗状态结构 } from '../../../types';
 import { IconSwords, IconYinYang } from '../../ui/Icons';
 import BattleActionPanel from './BattleActionPanel';
 import { RpgBattleIntegration, shouldUseRpgBattle } from './RpgBattleIntegration';
-import { 战斗行动结果 } from '../../../hooks/useGame/combatCalculation';
+import { 战斗行动结果 } from '../../../hooks/useGame/combat/combatCalculation';
 
 interface Props {
     character: 角色数据结构;

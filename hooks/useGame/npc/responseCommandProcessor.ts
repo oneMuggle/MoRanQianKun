@@ -167,7 +167,7 @@ export const 执行响应命令处理 = (
             const 欲望系统状态匹配 = rawContent.match(/<欲望系统状态>\s*([\s\S]*?)\s*<\/欲望系统状态>/);
             if (欲望系统状态匹配) {
                 try {
-                    const 解析结果 = JSON.parse(欲望系统状态匹配[1]) as { 更新档案?: Record<string, Partial<import('../../models/campusNSFW').NPC欲望档案>> };
+                    const 解析结果 = JSON.parse(欲望系统状态匹配[1]) as { 更新档案?: Record<string, Partial<import('../../../models/campusNSFW').NPC欲望档案>> };
                     if (解析结果.更新档案 && Object.keys(解析结果.更新档案).length > 0) {
                         const 欲望系统 = (campusBuffer.欲望系统 || {}) as NonNullable<校园NSFW系统扩展['欲望系统']>;
                         const 现有档案 = 欲望系统.NPC欲望档案 || {};

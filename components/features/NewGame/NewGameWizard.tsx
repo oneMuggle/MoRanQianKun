@@ -2,7 +2,7 @@ import React from 'react';
 import GameButton from '../../ui/GameButton';
 import { NewGameWizardContent } from './NewGameWizardContent';
 import { useNewGameWizardState } from './useNewGameWizardState';
-import { EraSelector } from '../EraSelector';
+import { EraSelector } from '../lazyComponents';
 import type { OpeningConfig, WorldGenConfig, 角色数据结构 } from '../../../types';
 import { useUIText } from '../../../hooks/useUIText';
 import { 获取时代主题方案 } from '../../../models/eraTheme';
@@ -39,25 +39,27 @@ const NewGameWizard: React.FC<Props> = ({ onComplete, onCancel, onEraSelect, loa
     return (
         <>
             {showEraSelector && (
-                <EraSelector
-                    value={wizard.worldConfig.时代配置ID || 'ancient_eastern_wuxia'}
-                    onChange={(eraId) => {
-                        wizard.setWorldConfig((prev: WorldGenConfig) => ({ ...prev, 时代配置ID: eraId }));
-                        onEraSelect?.(eraId);
-                        // 应用时代配色、字体到根元素，实时预览主题变化
-                        const eraScheme = 获取时代主题方案(eraId);
-                        if (eraScheme) {
-                            应用时代主题到根元素(eraScheme);
-                        }
-                        // 同步古代体系选择：根据新 eras 的支持体系重置
-                        const era = 全部时代配置.find(c => c.id === eraId);
-                        if (era && Array.isArray(era.支持体系) && era.支持体系.length > 0) {
-                            wizard.设置古代体系选择(era.支持体系[0]);
-                        }
-                        setShowEraSelector(false);
-                    }}
-                    onCancel={() => setShowEraSelector(false)}
-                />
+                <React.Suspense fallback={null}>
+                    <EraSelector
+                        value={wizard.worldConfig.时代配置ID || 'ancient_eastern_wuxia'}
+                        onChange={(eraId) => {
+                            wizard.setWorldConfig((prev: WorldGenConfig) => ({ ...prev, 时代配置ID: eraId }));
+                            onEraSelect?.(eraId);
+                            // 应用时代配色、字体到根元素，实时预览主题变化
+                            const eraScheme = 获取时代主题方案(eraId);
+                            if (eraScheme) {
+                                应用时代主题到根元素(eraScheme);
+                            }
+                            // 同步古代体系选择：根据新 eras 的支持体系重置
+                            const era = 全部时代配置.find(c => c.id === eraId);
+                            if (era && Array.isArray(era.支持体系) && era.支持体系.length > 0) {
+                                wizard.设置古代体系选择(era.支持体系[0]);
+                            }
+                            setShowEraSelector(false);
+                        }}
+                        onCancel={() => setShowEraSelector(false)}
+                    />
+                </React.Suspense>
             )}
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm">
                 <div className="relative w-full h-full max-w-7xl mx-auto flex flex-col bg-black/95 border border-gray-800 shadow-2xl overflow-hidden">

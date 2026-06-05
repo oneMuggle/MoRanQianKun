@@ -1,7 +1,7 @@
 /**
  * 模块注册表系统导出入口
  *
- * 从 utils/moduleRegistry 迁移而来，保持 API 兼容。
+ * UI 功能模块注册中心，应用启动时通过 `bootstrap` 激活。
  */
 export { UIFeatureRegistry } from './registry';
 export { ModalRenderer } from './modalRenderer';

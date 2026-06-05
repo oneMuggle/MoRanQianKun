@@ -1,19 +1,16 @@
 import React, { Profiler } from 'react';
-import LandingPage from './components/layout/LandingPage';
 import { useGame } from './hooks/useGame';
 import { useResponsive } from './hooks/useResponsive';
 import { useConfirmSystem } from './hooks/useConfirmSystem';
 import { MusicProvider } from './components/features/Music/MusicProvider';
-import { 懒加载边界, NewGameWizard, MobileNewGameWizard } from './components/features/lazyComponents';
+import { 懒加载边界, NewGameWizard, MobileNewGameWizard, LandingPage, GameView } from './components/features/lazyComponents';
 import { useAppModalState } from './components/app/useAppModalState';
 import { useAppEffects } from './components/app/useAppEffects';
-import { GameView } from './components/app/GameView';
 import { ModalLayer } from './components/app/ModalLayer';
 import { MemoryModals } from './components/app/MemoryModals';
 import { ModalRenderer, useModalManager } from './core/module-registry';
 import './core/module-registry/bootstrap'; // 激活所有模块注册
 import { getModuleLoader, PromptRegistry } from './core/engine';
-import { 核心提示词 } from './prompts/core-prompts';
 import FPSDisplay from './components/features/Performance/FPSDisplay';
 import PerformanceDashboard from './components/features/Performance/PerformanceDashboard';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -29,9 +26,12 @@ const App: React.FC = () => {
     React.useEffect(() => {
         const loader = getModuleLoader();
 
-        // 注册核心提示词到 PromptRegistry
-        const promptTexts = 核心提示词.map(p => p.内容).filter(Boolean);
-        PromptRegistry.registerCoreMany(promptTexts);
+        // 注册核心提示词到 PromptRegistry（异步加载 prompts/core-prompts，避免拉入 entry chunk）
+        void (async () => {
+            const { 核心提示词 } = await import('./prompts/core-prompts');
+            const promptTexts = 核心提示词.map(p => p.内容).filter(Boolean);
+            PromptRegistry.registerCoreMany(promptTexts);
+        })();
 
         // 注入运行时上下文
         loader.setContext({
@@ -67,18 +67,33 @@ const App: React.FC = () => {
             })();
         }
 
-        // 根据 gameConfig 激活 NSFW 模块
-        if (state.gameConfig?.启用校园NSFW深化系统) {
-            void (async () => {
-                const { nsfwModules } = await import('./modules');
-                const mod = nsfwModules['nsfw-campus'];
-                if (mod) {
-                    const { manifest } = await mod();
+        // 根据 gameConfig 激活 NSFW 模块（按 gameConfig 异步加载，单个失败不影响其它）
+        void (async () => {
+            const cfg: any = state.gameConfig;
+            if (!cfg) return;
+            const { nsfwModules } = await import('./modules');
+            const nsfwFlags: Array<[string, boolean]> = [
+                ['nsfw-campus',       !!cfg.校园NSFW设置?.启用校园NSFW深化系统],
+                ['nsfw-bdsm',         !!cfg.BDSM系统设置?.启用BDSM独立系统],
+                ['nsfw-board-game',   !!cfg.桌游社交NSFW设置?.启用桌游社交NSFW系统],
+                ['nsfw-exposure',     !!cfg.校园NSFW设置?.启用露出系统],
+                ['nsfw-photography',  !!cfg.写真NSFW设置?.启用写真NSFW系统],
+                ['nsfw-urban-driver', !!cfg.都市网约车NSFW设置?.启用都市网约车NSFW系统],
+                ['nsfw-bar',          !!cfg.酒吧NSFW设置?.启用酒吧NSFW系统],
+            ];
+            for (const [id, enabled] of nsfwFlags) {
+                if (!enabled) continue;
+                const loaderFn = nsfwModules[id];
+                if (!loaderFn) continue;
+                try {
+                    const { manifest } = await loaderFn();
                     loader.register(manifest);
                     await loader.activate(manifest.id);
+                } catch (err) {
+                    console.warn(`[NSFW模块] ${id} 激活失败：`, err);
                 }
-            })();
-        }
+            }
+        })();
 
         // 根据 gameConfig 激活业务域模块
         if (state.gameConfig?.启用修炼体系) {
@@ -95,7 +110,18 @@ const App: React.FC = () => {
     }, []); // 仅初始化一次
 
     // --- 性能面板快捷键 Ctrl+Shift+P ---
+    // 移动端默认关闭：useResponsive() === 'mobile' 时不渲染 PerformanceDashboard
+    // 桌面端不受影响；移动端用户也可通过 ?debug=1 显式开启
     const [showPerfDashboard, setShowPerfDashboard] = React.useState(false);
+    const hasDebugParam = React.useCallback((): boolean => {
+        if (typeof window === 'undefined') return false;
+        try {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('debug') === '1' || params.get('perf') === '1';
+        } catch {
+            return false;
+        }
+    }, []);
     React.useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if (e.ctrlKey && e.shiftKey && e.key === 'P') {
@@ -242,16 +268,18 @@ const App: React.FC = () => {
 
                 {/* View Switching */}
                 {state.view === 'home' && (
-                    <LandingPage
-                        onStart={handleStartFromLanding}
-                        onLoad={openLoad}
-                        onImageManager={() => { modalManager.open('imageManager'); }}
-                        onWorldbookManager={openWorldbookManager}
-                        onNovelDecomposition={() => { void openNovelDecompositionWorkbench(); }}
-                        onNovelWriting={() => { modalManager.open('novelWritingWorkbench'); }}
-                        onSettings={openSettings}
-                        hasSave={state.hasSave}
-                    />
+                    <懒加载边界>
+                        <LandingPage
+                            onStart={handleStartFromLanding}
+                            onLoad={openLoad}
+                            onImageManager={() => { modalManager.open('imageManager'); }}
+                            onWorldbookManager={openWorldbookManager}
+                            onNovelDecomposition={() => { void openNovelDecompositionWorkbench(); }}
+                            onNovelWriting={() => { modalManager.open('novelWritingWorkbench'); }}
+                            onSettings={openSettings}
+                            hasSave={state.hasSave}
+                        />
+                    </懒加载边界>
                 )}
 
                 {state.view === 'new_game' && (
@@ -279,81 +307,83 @@ const App: React.FC = () => {
                 )}
 
                 {state.view === 'game' && (
-                    (() => {
-                        const gameViewContent = (
-                            <GameView
-                                state={state}
-                                meta={meta}
-                                actions={actions}
-                                isMobile={isMobile}
-                                currentOptions={currentOptions}
-                                当前背景图片地址={当前背景图片地址}
-                                玩家头像地址={玩家头像地址}
-                                hideBottomTicker={hideBottomTicker}
-                                启用修炼体系={启用修炼体系}
-                                chatContentHidden={chatContentHidden}
-                                setChatContentHidden={setChatContentHidden}
-                                galgameModeEnabled={galgameModeEnabled}
-                                toggleGalgameMode={toggleGalgameMode}
-                                galgameImmersion={galgameImmersion}
-                                toggleGalgameImmersion={toggleGalgameImmersion}
-                                rpgModeEnabled={rpgModeEnabled}
-                                toggleRpgMode={toggleRpgMode}
-                                sceneQuickGenHint={sceneQuickGenHint}
-                                sceneQuickGenToastVisible={sceneQuickGenToastVisible}
-                                tickerEvents={tickerEvents}
-                                fontFaceStyleText={fontFaceStyleText}
-                                uiTextStyleVars={uiTextStyleVars}
-                                openDevice={(actions as any).openDevice}
-                                openCharacter={openCharacter}
-                                openSettings={openSettings}
-                                openInventory={openInventory}
-                                openEquipment={openEquipment}
-                                openBattle={openBattle}
-                                openTeam={openTeam}
-                                openSocial={openSocial}
-                                openKungfu={openKungfu}
-                                openWorld={openWorld}
-                                openMap={openMap}
-                                openSect={openSect}
-                                openTask={openTask}
-                                openAgreement={openAgreement}
-                                openStory={openStory}
-                                openHeroinePlan={openHeroinePlan}
-                                openMemory={openMemory}
-                                openCGGallery={openCGGallery}
-                                openRelationGraph={openRelationGraph}
-                                openMapExplorer={openMapExplorer}
-                                openImageManagerWithCheck={() => { modalManager.open('imageManager'); }}
-                                openNovelDecompositionWorkbench={openNovelDecompositionWorkbench}
-                                openSave={openSave}
-                                openLoad={openLoad}
-                                openNsfwCenter={() => modalManager.open('nsfwCenter')}
-                                togglePerfDashboard={() => setShowPerfDashboard(prev => !prev)}
-                                perfDashboardOpen={showPerfDashboard}
-                                openRpgBattle={() => modalManager.open('rpgBattle')}
-                                openRpgEquipment={() => modalManager.open('rpgEquipment')}
-                                openRpgKungfu={() => modalManager.open('rpgKungfu')}
-                                openRpgTask={() => modalManager.open('rpgTask')}
-                                closeMobileMusic={closeMobileMusic}
-                                showMobileMusic={showMobileMusic}
-                                activeMobileWindow={activeMobileWindowResolved}
-                                handleMobileMenuClick={handleMobileMenuClick}
-                                dismissNotification={(actions as any).dismissNotification}
-                                renderTickerItems={renderTickerItems}
-                                requestConfirm={requestConfirm}
-                            />
-                        );
-                        const renderProfilingEnabled = state.gameConfig?.性能监控配置?.启用渲染分析;
-                        if (renderProfilingEnabled && actions.renderProfilerRef?.current) {
-                            return (
-                                <Profiler id="GameView" onRender={actions.renderProfilerRef.current.onRender}>
-                                    {gameViewContent}
-                                </Profiler>
+                    <懒加载边界>
+                        {(() => {
+                            const gameViewContent = (
+                                <GameView
+                                    state={state}
+                                    meta={meta}
+                                    actions={actions}
+                                    isMobile={isMobile}
+                                    currentOptions={currentOptions}
+                                    当前背景图片地址={当前背景图片地址}
+                                    玩家头像地址={玩家头像地址}
+                                    hideBottomTicker={hideBottomTicker}
+                                    启用修炼体系={启用修炼体系}
+                                    chatContentHidden={chatContentHidden}
+                                    setChatContentHidden={setChatContentHidden}
+                                    galgameModeEnabled={galgameModeEnabled}
+                                    toggleGalgameMode={toggleGalgameMode}
+                                    galgameImmersion={galgameImmersion}
+                                    toggleGalgameImmersion={toggleGalgameImmersion}
+                                    rpgModeEnabled={rpgModeEnabled}
+                                    toggleRpgMode={toggleRpgMode}
+                                    sceneQuickGenHint={sceneQuickGenHint}
+                                    sceneQuickGenToastVisible={sceneQuickGenToastVisible}
+                                    tickerEvents={tickerEvents}
+                                    fontFaceStyleText={fontFaceStyleText}
+                                    uiTextStyleVars={uiTextStyleVars}
+                                    openDevice={(actions as any).openDevice}
+                                    openCharacter={openCharacter}
+                                    openSettings={openSettings}
+                                    openInventory={openInventory}
+                                    openEquipment={openEquipment}
+                                    openBattle={openBattle}
+                                    openTeam={openTeam}
+                                    openSocial={openSocial}
+                                    openKungfu={openKungfu}
+                                    openWorld={openWorld}
+                                    openMap={openMap}
+                                    openSect={openSect}
+                                    openTask={openTask}
+                                    openAgreement={openAgreement}
+                                    openStory={openStory}
+                                    openHeroinePlan={openHeroinePlan}
+                                    openMemory={openMemory}
+                                    openCGGallery={openCGGallery}
+                                    openRelationGraph={openRelationGraph}
+                                    openMapExplorer={openMapExplorer}
+                                    openImageManagerWithCheck={() => { modalManager.open('imageManager'); }}
+                                    openNovelDecompositionWorkbench={openNovelDecompositionWorkbench}
+                                    openSave={openSave}
+                                    openLoad={openLoad}
+                                    openNsfwCenter={() => modalManager.open('nsfwCenter')}
+                                    togglePerfDashboard={() => setShowPerfDashboard(prev => !prev)}
+                                    perfDashboardOpen={showPerfDashboard}
+                                    openRpgBattle={() => modalManager.open('rpgBattle')}
+                                    openRpgEquipment={() => modalManager.open('rpgEquipment')}
+                                    openRpgKungfu={() => modalManager.open('rpgKungfu')}
+                                    openRpgTask={() => modalManager.open('rpgTask')}
+                                    closeMobileMusic={closeMobileMusic}
+                                    showMobileMusic={showMobileMusic}
+                                    activeMobileWindow={activeMobileWindowResolved}
+                                    handleMobileMenuClick={handleMobileMenuClick}
+                                    dismissNotification={(actions as any).dismissNotification}
+                                    renderTickerItems={renderTickerItems}
+                                    requestConfirm={requestConfirm}
+                                />
                             );
-                        }
-                        return gameViewContent;
-                    })()
+                            const renderProfilingEnabled = state.gameConfig?.性能监控配置?.启用渲染分析;
+                            if (renderProfilingEnabled && actions.renderProfilerRef?.current) {
+                                return (
+                                    <Profiler id="GameView" onRender={actions.renderProfilerRef.current.onRender}>
+                                        {gameViewContent}
+                                    </Profiler>
+                                );
+                            }
+                            return gameViewContent;
+                        })()}
+                    </懒加载边界>
                 )}
 
                 {/* Modal Layer (global decorative frame only) */}
@@ -390,7 +420,7 @@ const App: React.FC = () => {
                         enabled={(state as any).performanceConfig?.显示FPS}
                     />
                 )}
-                {state.view === 'game' && showPerfDashboard && (
+                {state.view === 'game' && showPerfDashboard && (!isMobile || hasDebugParam()) && (
                     <PerformanceDashboard
                         perfData={actions.perfData ?? { fps: 0 }}
                         aiQueueStats={actions.perfActions?.AI队列统计?.() ?? { activeCount: 0, pendingCount: 0, totalCount: 0, completedCount: 0, failedCount: 0, averageDurationMs: 0, longestPending: null }}

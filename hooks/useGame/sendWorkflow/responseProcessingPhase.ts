@@ -14,8 +14,8 @@ import {
     写入四段记忆
 } from '../memory/memoryUtils';
 import { 规范化记忆配置 } from '../memory/memoryUtils';
-import { 处理BDSM状态更新, type BDSM状态更新回调 } from '../bdsmStateIntegration';
-import { 解析见面预约更新 } from '../bdsmMeetingTrigger';
+import { 处理BDSM状态更新, type BDSM状态更新回调 } from '../nsfw/bdsmStateIntegration';
+import { 解析见面预约更新 } from '../nsfw/bdsmMeetingTrigger';
 import type { GameResponse, 聊天记录结构, 剧情系统结构, 记忆系统结构 } from '../../../types';
 import type { 世界演变进度, 规划分析进度, 正文润色进度, 变量生成进度, 设备消息进度 } from './independentStages';
 import type { 回合快照结构 } from './index';
@@ -267,7 +267,7 @@ export const 执行响应处理阶段 = async (
 
     // ─── 都市网约车 NSFW 状态解析与应用 ────────────────────────────────
     const { 解析都市网约车系统状态更新, 移除都市网约车系统状态标签, 应用都市网约车状态更新 } =
-        await import('../urbanDriverNSFWIntegration');
+        await import('../nsfw/urbanDriverNSFWIntegration');
     const nsfwUpdate = 解析都市网约车系统状态更新(rawAiText);
     if (nsfwUpdate) {
         currentState.都市网约车系统 = 应用都市网约车状态更新(
@@ -279,7 +279,7 @@ export const 执行响应处理阶段 = async (
 
     // ─── 写真 NSFW 状态解析与应用 ──────────────────────────────────────
     const { 解析写真系统状态更新, 移除写真系统状态标签, 应用写真系统状态更新 } =
-        await import('../photographyNSFWIntegration');
+        await import('../nsfw/photographyNSFWIntegration');
     const 写真更新 = 解析写真系统状态更新(rawAiText);
     console.log('[写真系统诊断] 解析LLM响应:', {
         有更新: !!写真更新,
@@ -303,7 +303,7 @@ export const 执行响应处理阶段 = async (
     const 行程系统 = (currentState.都市网约车系统 as { 行程系统?: Record<string, unknown> } | undefined)?.行程系统;
     if (行程系统 && typeof 行程系统 === 'object') {
         try {
-            const { 判定行程NSFW类型, 生成后果事件 } = await import('../urbanDriverNSFWEngine');
+            const { 判定行程NSFW类型, 生成后果事件 } = await import('../nsfw/urbanDriverNSFWEngine');
             const nsfw设置 = (currentState.gameConfig as any)?.都市网约车NSFW设置;
             const 时代ID = (currentState.环境 as any)?.时代配置ID;
 

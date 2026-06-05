@@ -24,7 +24,7 @@ import {
   构建里模式阶段注入 as _rawLiModeStage,
 } from '../../../prompts/runtime/eraLiMode';
 import { 构建行动选项运行时指令 as _rawActionOpts } from '../../../prompts/runtime/actionOptionsRuntime';
-import { 构建校规注入提示词 as _rawCampusRules, 构建催眠注入提示词 as _rawCampusHypnosis } from '../campusPromptInjector';
+import { 构建校规注入提示词 as _rawCampusRules, 构建催眠注入提示词 as _rawCampusHypnosis } from '../nsfw/campusPromptInjector';
 import { 构建设备通讯摘要 as _rawDeviceSummary } from '../device/triggerDeviceMessageWorkflow';
 import { 构建BDSM论坛叙事约束 as _rawBdsmForum } from '../../../prompts/runtime/bdsmForum';
 import { 构建桌游NSFW完整叙事约束 as _rawBoardGame } from '../../../prompts/runtime/boardGameNSFW';

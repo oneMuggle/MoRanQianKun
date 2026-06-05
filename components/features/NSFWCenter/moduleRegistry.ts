@@ -19,13 +19,13 @@ export interface NsfwModuleUI {
 
 // 模块 ID → 设置组件映射（手动维护，直到实现自动发现）
 const settingsComponentMap: Record<string, React.LazyExoticComponent<React.FC<any>>> = {
-  campusNSFW: React.lazy(() => import('../Settings/CampusNSFWSettings')),
-  photographyNSFW: React.lazy(() => import('../Settings/PhotographyNSFWSettings')),
-  urbanDriverNSFW: React.lazy(() => import('../Settings/UrbanDriverNSFWSettings')),
-  bdsmNSFW: React.lazy(() => import('../Settings/BDSMNSFWSettings')),
-  exposureNSFW: React.lazy(() => import('../Settings/ExposureNSFWSettings')),
-  boardGameNSFW: React.lazy(() => import('../Settings/BoardGameNSFWSettings')),
-  barNSFW: React.lazy(() => import('../Settings/BarNSFWSettings')),
+  campusNSFW: React.lazy(() => import('../Settings/Image/CampusNSFWSettings')),
+  photographyNSFW: React.lazy(() => import('../Settings/Image/PhotographyNSFWSettings')),
+  urbanDriverNSFW: React.lazy(() => import('../Settings/Image/UrbanDriverNSFWSettings')),
+  bdsmNSFW: React.lazy(() => import('../Settings/Image/BDSMNSFWSettings')),
+  exposureNSFW: React.lazy(() => import('../Settings/Image/ExposureNSFWSettings')),
+  boardGameNSFW: React.lazy(() => import('../Settings/Image/BoardGameNSFWSettings')),
+  barNSFW: React.lazy(() => import('../Settings/Image/BarNSFWSettings')),
 };
 
 const dashboardLabelMap: Record<string, string> = {

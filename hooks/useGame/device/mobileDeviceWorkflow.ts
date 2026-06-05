@@ -7,7 +7,7 @@ import { getDeviceConfig, getAppName } from '../../../models/eraDevice';
 import { 构建子纪元里模式注入, LiModeIntensity } from '../../../prompts/runtime/eraLiMode';
 
 /** 初始设备统计 */
-export function 初始设备统计(): import('../../models/mobileDevice').DeviceStats {
+export function 初始设备统计(): import('../../../models/mobileDevice').DeviceStats {
     return {
         totalMessagesSent: 0,
         totalMessagesReceived: 0,

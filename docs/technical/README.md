@@ -17,6 +17,7 @@
 | 04 | [ai-pipeline](./04-ai-pipeline.md) | AI 客户端、多 provider 抽象、图像/文本/流式 |
 | 05 | [persistence](./05-persistence.md) | IndexedDB、dbService、GitHub Sync、存档迁移 |
 | 06 | [module-registry](./06-module-registry.md) | 弹窗注册、桌面/移动组件工厂、动态导入 |
+| 06 | [feature-flags-inventory](./06-feature-flags-inventory.md) | Feature Flag 总览（阶段 6.1 产出，~155 个 flag 按 domain 分组） |
 | 07 | [eras-and-themes](./07-eras-and-themes.md) | 多纪元系统、时代主题、子纪元预设 |
 | 08 | [nsfw-systems](./08-nsfw-systems.md) | NSFW 子系统合集（harem、bar、bdsm、photography、campus） |
 | 09 | [image-pipeline](./09-image-pipeline.md) | 图像生成、NovelAI 代理、资产引用 |
@@ -24,6 +25,7 @@
 | 11 | [testing-strategy](./11-testing-strategy.md) | 测试体系：utils 100% 覆盖 + 96+ hooks 测试文件 + 2200+ 用例 |
 | 12 | [error-handling](./12-error-handling.md) | 错误处理三层：全局 ErrorBoundary + ToastManager + 业务 try/catch |
 | 13 | [performance](./13-performance.md) | 性能与构建：game-runtime 2.86MB chunk 根因 + 优化路线 |
+| 13b | [performance-modularization](./13b-performance-modularization.md) | 性能与模块化优化（2026-06 实施完成）：entry 326→100KB，vendor 1.27MB→58KB，game-runtime 636→377KB brotli |
 | 11 | [memory-system](./11-memory-system.md) | 四段记忆（短期/中期/长期/背景）、记忆检索与总结 |
 | 12 | [novel-decomposition](./12-novel-decomposition.md) | 小说拆解调度、长篇规划注入 |
 | 13 | [planning-systems](./13-planning-systems.md) | 剧情规划、女主规划、同人规划 |

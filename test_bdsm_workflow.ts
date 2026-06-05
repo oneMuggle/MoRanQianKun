@@ -4,11 +4,11 @@
  * 验证 5 个核心函数的 AI 调用路径
  */
 
-import { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './hooks/useGame/bdsmTaskWorkflow';
+import { 生成调教任务, 生成日常指令, 评价任务完成, 生成契约条款, 判定关系阶段推进 } from './hooks/useGame/nsfw/bdsmTaskWorkflow';
 import type { 当前可用接口结构 } from './utils/apiConfig';
 import { 生成设备原始消息, 解析AIBDSM帖子 } from './hooks/useGame/device/deviceAiWorkflow';
-import { 计算BDSM帖子总影响, 应用BDSM帖子影响, 判定寻主召奴联系结果, 生成联系初始对话 } from './hooks/useGame/bdsmForumEngine';
-import { 构建见面场景提示词, 解析见面结果 } from './hooks/useGame/bdsmMeetingWorkflow';
+import { 计算BDSM帖子总影响, 应用BDSM帖子影响, 判定寻主召奴联系结果, 生成联系初始对话 } from './hooks/useGame/nsfw/bdsmForumEngine';
+import { 构建见面场景提示词, 解析见面结果 } from './hooks/useGame/nsfw/bdsmMeetingWorkflow';
 import { 请求模型文本 } from './services/ai/chatCompletionClient';
 
 const TEST_API: 当前可用接口结构 = {
@@ -308,7 +308,7 @@ async function test8_寻主召奴联系判定() {
 async function test9_私聊工作流() {
   console.log('\n========== 测试 9: 私聊工作流 ==========');
   try {
-    const 执行私聊发送工作流 = (await import('./hooks/useGame/privateChatWorkflow')).执行私聊发送工作流;
+    const 执行私聊发送工作流 = (await import('./hooks/useGame/npc/privateChatWorkflow')).执行私聊发送工作流;
 
     const 私聊上下文 = {
       npcId: 'npc-test-001',

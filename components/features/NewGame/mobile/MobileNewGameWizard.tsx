@@ -2,7 +2,7 @@ import React from 'react';
 import GameButton from '../../../ui/GameButton';
 import { NewGameWizardContent } from '../NewGameWizardContent';
 import { useNewGameWizardState } from '../useNewGameWizardState';
-import { EraSelector } from '../../EraSelector';
+import { EraSelector } from '../../lazyComponents';
 import type { OpeningConfig, WorldGenConfig, 角色数据结构 } from '../../../../types';
 import { 获取时代主题方案 } from '../../../../models/eraTheme';
 import { 应用时代主题到根元素 } from '../../../../styles/themes';
@@ -36,24 +36,26 @@ const MobileNewGameWizard: React.FC<Props> = ({ onComplete, onCancel, onEraSelec
     return (
         <>
             {showEraSelector && (
-                <EraSelector
-                    value={wizard.worldConfig.时代配置ID || 'ancient_eastern_wuxia'}
-                    onChange={(eraId) => {
-                        wizard.setWorldConfig((prev: WorldGenConfig) => ({ ...prev, 时代配置ID: eraId }));
-                        onEraSelect?.(eraId);
-                        const eraScheme = 获取时代主题方案(eraId);
-                        if (eraScheme) {
-                            应用时代主题到根元素(eraScheme);
-                        }
-                        // 同步古代体系选择
-                        const era = 全部时代配置.find(c => c.id === eraId);
-                        if (era && Array.isArray(era.支持体系) && era.支持体系.length > 0) {
-                            wizard.设置古代体系选择(era.支持体系[0]);
-                        }
-                        setShowEraSelector(false);
-                    }}
-                    onCancel={() => setShowEraSelector(false)}
-                />
+                <React.Suspense fallback={null}>
+                    <EraSelector
+                        value={wizard.worldConfig.时代配置ID || 'ancient_eastern_wuxia'}
+                        onChange={(eraId) => {
+                            wizard.setWorldConfig((prev: WorldGenConfig) => ({ ...prev, 时代配置ID: eraId }));
+                            onEraSelect?.(eraId);
+                            const eraScheme = 获取时代主题方案(eraId);
+                            if (eraScheme) {
+                                应用时代主题到根元素(eraScheme);
+                            }
+                            // 同步古代体系选择
+                            const era = 全部时代配置.find(c => c.id === eraId);
+                            if (era && Array.isArray(era.支持体系) && era.支持体系.length > 0) {
+                                wizard.设置古代体系选择(era.支持体系[0]);
+                            }
+                            setShowEraSelector(false);
+                        }}
+                        onCancel={() => setShowEraSelector(false)}
+                    />
+                </React.Suspense>
             )}
             <div className="fixed inset-0 z-50 flex flex-col bg-black overflow-hidden">
                 {/* Mobile Header */}

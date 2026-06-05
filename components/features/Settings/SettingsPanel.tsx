@@ -7,28 +7,28 @@ import {
 } from '../../../types';
 import { 时代主题方案 } from '../../../models/eraTheme';
 
-const ApiSettings = React.lazy(() => import('./ApiSettings'));
-const ImageGenerationSettings = React.lazy(() => import('./ImageGenerationSettings'));
+const ApiSettings = React.lazy(() => import('./Api/ApiSettings'));
+const ImageGenerationSettings = React.lazy(() => import('./Image/ImageGenerationSettings'));
 const PromptManager = React.lazy(() => import('./PromptManager'));
-const StorageManager = React.lazy(() => import('./StorageManager'));
+const StorageManager = React.lazy(() => import('./Debug/StorageManager'));
 const ThemeSettings = React.lazy(() => import('./ThemeSettings'));
 const VisualSettings = React.lazy(() => import('./VisualSettings'));
 const WorldSettings = React.lazy(() => import('./WorldSettings'));
 const GameSettings = React.lazy(() => import('./GameSettings'));
 const RealitySettings = React.lazy(() => import('./RealitySettings'));
-const TavernPresetSettings = React.lazy(() => import('./TavernPresetSettings'));
+const TavernPresetSettings = React.lazy(() => import('./Api/TavernPresetSettings'));
 const MemorySettings = React.lazy(() => import('./MemorySettings'));
-const HistoryViewer = React.lazy(() => import('./HistoryViewer'));
-const ContextViewer = React.lazy(() => import('./ContextViewer'));
-const IntegratedModelSettings = React.lazy(() => import('./IntegratedModelSettings'));
-const IndependentApiGptModeSettings = React.lazy(() => import('./IndependentApiGptModeSettings'));
-const NovelDecompositionApiSettings = React.lazy(() => import('./NovelDecompositionApiSettings'));
-const CurrentNovelDecompositionInjectionSettings = React.lazy(() => import('./CurrentNovelDecompositionInjectionSettings'));
+const HistoryViewer = React.lazy(() => import('./Debug/HistoryViewer'));
+const ContextViewer = React.lazy(() => import('./Debug/ContextViewer'));
+const IntegratedModelSettings = React.lazy(() => import('./Api/IntegratedModelSettings'));
+const IndependentApiGptModeSettings = React.lazy(() => import('./Api/IndependentApiGptModeSettings'));
+const NovelDecompositionApiSettings = React.lazy(() => import('./Api/NovelDecompositionApiSettings'));
+const CurrentNovelDecompositionInjectionSettings = React.lazy(() => import('./Api/CurrentNovelDecompositionInjectionSettings'));
 const MusicSettings = React.lazy(() => import('./MusicSettings'));
 const NpcManager = React.lazy(() => import('./NpcManager'));
 const VariableManager = React.lazy(() => import('./VariableManager'));
-const DebugPanel = React.lazy(() => import('./DebugPanel'));
-const PerformanceMonitorSettings = React.lazy(() => import('./PerformanceMonitorSettings'));
+const DebugPanel = React.lazy(() => import('./Debug/DebugPanel'));
+const PerformanceMonitorSettings = React.lazy(() => import('./Debug/PerformanceMonitorSettings'));
 
 type RuntimeStateSections = Record<'角色' | '环境' | '社交' | '世界' | '战斗' | '剧情' | '女主剧情规划' | '玩家门派' | '任务列表' | '约定列表' | '记忆系统', unknown>;
 

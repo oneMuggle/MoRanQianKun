@@ -42,7 +42,7 @@ import type { 玩家库存 } from '../models/nsfwCore/shopSystem';
 import { 初始化库存 } from '../models/nsfwCore/shopSystem';
 import type { 成就进度 } from '../models/nsfwCore/achievementTree';
 import { 初始化成就进度 } from '../models/nsfwCore/achievementTree';
-import { 创建空房产状态, 创建初始房产 } from './useGame/storyState';
+import { 创建空房产状态, 创建初始房产 } from './useGame/core/storyState';
 import * as dbService from '../core/db';
 import { THEMES, 应用主题到根元素, 应用时代主题到根元素 } from '../styles/themes';
 import { 获取时代主题方案 } from '../models/system';
@@ -59,7 +59,7 @@ import {
     创建开场空白剧情,
     创建空剧情规划,
     创建空门派状态
-} from './useGame/storyState';
+} from './useGame/core/storyState';
 
 const 加载默认提示词 = async (): Promise<提示词结构[]> => {
     const mod = await import('../prompts');

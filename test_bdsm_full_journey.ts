@@ -6,11 +6,11 @@
  */
 
 import type { 当前可用接口结构 } from './utils/apiConfig';
-import { 生成调教任务, 生成日常指令, 评价任务完成, 判定关系阶段推进 } from './hooks/useGame/bdsmTaskWorkflow';
-import { 触发任务生成 } from './hooks/useGame/bdsmTaskTrigger';
-import { 执行私聊发送工作流 } from './hooks/useGame/privateChatWorkflow';
-import { 构建见面场景提示词, 解析见面结果 } from './hooks/useGame/bdsmMeetingWorkflow';
-import { 判定寻主召奴联系结果, 生成联系初始对话, 计算BDSM帖子总影响 } from './hooks/useGame/bdsmForumEngine';
+import { 生成调教任务, 生成日常指令, 评价任务完成, 判定关系阶段推进 } from './hooks/useGame/nsfw/bdsmTaskWorkflow';
+import { 触发任务生成 } from './hooks/useGame/nsfw/bdsmTaskTrigger';
+import { 执行私聊发送工作流 } from './hooks/useGame/npc/privateChatWorkflow';
+import { 构建见面场景提示词, 解析见面结果 } from './hooks/useGame/nsfw/bdsmMeetingWorkflow';
+import { 判定寻主召奴联系结果, 生成联系初始对话, 计算BDSM帖子总影响 } from './hooks/useGame/nsfw/bdsmForumEngine';
 import { 请求模型文本, 规范化文本补全消息链 } from './services/ai/chatCompletionClient';
 
 const TEST_API: 当前可用接口结构 = {

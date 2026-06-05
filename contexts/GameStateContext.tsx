@@ -41,7 +41,7 @@ import type {
     OpeningConfig,
     ThemePreset
 } from '../types';
-import type { DeviceState, MobileApp } from '../hooks/useGame/mobileDeviceWorkflow';
+import type { DeviceState, MobileApp } from '../hooks/useGame/device/mobileDeviceWorkflow';
 import type { 校园系统数据 } from '../models/campusPhone';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../types';
 

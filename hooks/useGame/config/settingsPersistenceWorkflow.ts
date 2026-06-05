@@ -357,10 +357,20 @@ export const 创建设置持久化工作流 = (deps: 设置持久化工作流依
         await dbService.保存设置(设置键.性能监控设置, normalized);
     };
 
+    const loadPerformanceSettings = async () => {
+        try {
+            const saved = await dbService.读取设置(设置键.性能监控设置);
+            deps.设置性能监控配置(规范化性能监控设置(saved));
+        } catch (error) {
+            console.error('读取性能监控设置失败', error);
+        }
+    };
+
     return {
         loadBuiltinPromptEntries,
         loadWorldbooks,
         loadWorldbookPresetGroups,
+        loadPerformanceSettings,
         saveSettings,
         saveBuiltinPromptEntries,
         saveWorldbooks,
