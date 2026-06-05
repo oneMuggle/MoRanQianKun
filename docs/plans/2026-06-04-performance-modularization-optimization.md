@@ -654,15 +654,51 @@ const App = () => {
 
 **Commit：** `perf(deps): tokenEstimate 移除 js-tiktoken 依赖，改为简化估算`
 
-#### Task 5.2：检查 `puppeteer-core` / `playwright-core` 隔离
+#### Task 5.2：检查 `puppeteer-core` / `playwright-core` 隔离 ✅
 
 **Files:**
 - Audit: `package.json`
 
 **任务：**
-- [ ] 确认 `puppeteer-core` 是 `devDependencies`（不是 `dependencies`）
-- [ ] 确认未在源码中 import
-- [ ] 若必须保留在 `devDependencies`，加 `.npmrc` 防止误装到 `dependencies`
+- [x] 确认 `puppeteer-core` 是 `devDependencies`（不是 `dependencies`）
+- [x] 确认未在源码中 import
+- [x] 若必须保留在 `devDependencies`，加 `.npmrc` 防止误装到 `dependencies`
+
+**审计结果（2026-06-05）：**
+
+1. **直接依赖位置：**
+   - `package.json:dependencies` 中无任何 puppeteer/playwright 条目（生产依赖仅 `@capacitor/*`、`fflate`、`node`、`react`、`react-dom`、`zustand`）
+   - `package.json:devDependencies` 中含 `@playwright/test ^1.59.1` ✓
+
+2. **传递依赖（`npm ls`）：**
+   ```
+   ├─┬ @playwright/test@1.59.1               [devDep]
+   │ └─┬ playwright@1.59.1
+   │   └── playwright-core@1.59.1            ✓ 仅作为 devDep 传递
+   └─┬ @size-limit/preset-app@12.1.0          [devDep]
+     └─┬ @size-limit/time@12.1.0
+       └─┬ estimo@3.0.5
+         └── puppeteer-core@24.22.0          ✓ 仅作为 devDep 传递
+   ```
+
+3. **源码 import 审计：**
+   - `grep -rln "puppeteer\|playwright" --include="*.ts" --include="*.tsx" --include="*.mjs" --include="*.js"`（排除 node_modules）命中 5 个文件：
+     - `playwright.config.ts`（根目录 E2E 配置，非生产源码）
+     - `e2e/saveLoad.spec.ts`、`e2e/storyProgression.spec.ts`、`e2e/eraTheme.spec.ts`、`e2e/photographyNSFW/settings.spec.ts`（E2E 测试代码）
+   - 生产源码（`App.tsx`、`hooks/`、`components/`、`services/`、`prompts/`、`utils/`、`core/`、`models/`、`modules/`、`functions/api/` 等）零命中
+   - 反向检查：`grep -rln "from ['\"].*e2e/"` 在生产源码中无任何匹配 → e2e/ 目录隔离干净
+
+4. **`.npmrc` 决策：**
+   - 仓库当前不存在 `.npmrc`
+   - **不**新增 `production=true` 的 `.npmrc`：该设置会让所有开发者的 `npm install` 默认跳过 devDeps，破坏 `vite`/`playwright`/`vitest`/`eslint` 等本地开发与测试链路，弊大于利
+   - 生产隔离应在部署侧用 `npm ci --omit=dev` 或 `NODE_ENV=production npm ci` 实现（已默认行为）
+   - 由于直接 dependencies 中已无 puppeteer/playwright，且二者都只在 devDeps 传递树中，无需额外防御
+
+5. **构建验证：**
+   - `npm run build` 成功（19.00s），无任何 puppeteer/playwright 出现在 `dist/assets/` 输出
+   - bundle 体积与阶段 5.1 后一致，未引入新依赖
+
+**结论：** 隔离已天然成立，无需代码改动。本阶段仅更新文档归档审计结果。
 
 **Commit：** `chore(deps): 审计 E2E 依赖隔离，确保 puppeteer/playwright 不进入生产`
 
