@@ -135,14 +135,14 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
 
     return (
         <div ref={rootRef} className="space-y-6 animate-fadeIn">
-            <div className="flex justify-between items-center border-b border-wuxia-gold/30 pb-3 mb-6">
+            <div className="wuxia-section-header">
                 <h3 className="text-wuxia-gold font-serif font-bold text-xl">游戏设定</h3>
                 {showSuccess && <span className="text-green-400 text-xs font-bold animate-pulse">✔ 设定已保存</span>}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-sm text-wuxia-cyan font-bold">字数要求</label>
+                    <label className="wuxia-section-title">字数要求</label>
                     <input 
                         type="number"
                         min={50}
@@ -158,7 +158,7 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm text-wuxia-cyan font-bold">叙事人称</label>
+                    <label className="wuxia-section-title">叙事人称</label>
                     {渲染内置下拉({
                         menuKey: 'perspective',
                         value: form.叙事人称,
@@ -168,7 +168,7 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm text-wuxia-cyan font-bold">剧情风格</label>
+                    <label className="wuxia-section-title">剧情风格</label>
                     {渲染内置下拉({
                         menuKey: 'style',
                         value: form.剧情风格,
@@ -179,7 +179,7 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
                 {form.剧情风格 === 'NTL后宫' && (
                     <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm text-wuxia-cyan font-bold">NTL后宫档位</label>
+                        <label className="wuxia-section-title">NTL后宫档位</label>
                         {渲染内置下拉({
                             menuKey: 'ntl',
                             value: form.NTL后宫档位,
@@ -191,10 +191,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 )}
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">行动选项功能</div>
+                        <div className="wuxia-section-title">行动选项功能</div>
                         <div className="text-xs text-gray-400 mt-1">开启后，将在上下文注入“行动选项规范”，并要求输出 \`&lt;行动选项&gt;\` 标签。</div>
                     </div>
                     <ToggleSwitch
@@ -205,10 +205,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">行动选项增强</div>
+                        <div className="wuxia-section-title">行动选项增强</div>
                         <div className="text-xs text-gray-400 mt-1">开启后，每回合按多种推进速度（缓慢/正常/快速/跳关键节点）分组生成行动选项，用户可自由选择节奏推进。</div>
                     </div>
                     <ToggleSwitch
@@ -219,9 +219,9 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="space-y-2">
-                    <div className="text-sm text-wuxia-cyan font-bold">行动选项输入模式</div>
+                    <div className="wuxia-section-title">行动选项输入模式</div>
                     <div className="text-xs text-gray-400">点击行动选项时，是将文本追加到输入框，还是替换整个输入框内容。</div>
                     <div className="flex gap-2 mt-2">
                         {(['追加', '替换'] as const).map((mode) => (
@@ -242,10 +242,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">防止说话（NoControl）</div>
+                        <div className="wuxia-section-title">防止说话（NoControl）</div>
                         <div className="text-xs text-gray-400 mt-1">开启后追加“防止说话/角色边界”提示词，禁止代写玩家言行。</div>
                     </div>
                     <ToggleSwitch
@@ -256,10 +256,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">COT伪装历史消息注入</div>
+                        <div className="wuxia-section-title">COT伪装历史消息注入</div>
                         <div className="text-xs text-gray-400 mt-1">开启后，会在 \`user:开始任务\` 之后注入一条伪装历史消息，用于强化思考段输出习惯。</div>
                     </div>
                     <ToggleSwitch
@@ -270,10 +270,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">GPT模式</div>
+                        <div className="wuxia-section-title">GPT模式</div>
                         <div className="text-xs text-gray-400 mt-1">这里控制主剧情链路。开启后，\`user:开始任务\` 会改为本回合真实用户输入，并移除 AI 角色里的“本回合玩家输入”注入；其他独立 API 可在“独立 API GPT 模式”页单独配置。</div>
                     </div>
                     <ToggleSwitch
@@ -284,10 +284,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">免责声明输出要求</div>
+                        <div className="wuxia-section-title">免责声明输出要求</div>
                         <div className="text-xs text-gray-400 mt-1">开启后，AI 会在本回合最后追加独立免责声明段落；不会插入到正文中间。</div>
                     </div>
                     <ToggleSwitch
@@ -298,10 +298,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">标签检测完整性</div>
+                        <div className="wuxia-section-title">标签检测完整性</div>
                         <div className="text-xs text-gray-400 mt-1">开启后，系统会校验 `&lt;正文&gt;`/`&lt;短期记忆&gt;`/`&lt;命令&gt;` 三个标签是否完整，不完整会直接报错并阻止写入。</div>
                     </div>
                     <ToggleSwitch
@@ -312,10 +312,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">标签自动修复</div>
+                        <div className="wuxia-section-title">标签自动修复</div>
                         <div className="text-xs text-gray-400 mt-1">开启后，系统会在解析前自动修复常见标签错误（如重复开标签、缺失闭标签）。</div>
                     </div>
                     <ToggleSwitch
@@ -326,10 +326,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">生成失败自动重试</div>
+                        <div className="wuxia-section-title">生成失败自动重试</div>
                         <div className="text-xs text-gray-400 mt-1">开启后，生成或解析报错时会直接自动重试，最多 3 次；中间不会立即进入错误修改区域或重试确认弹窗。</div>
                     </div>
                     <ToggleSwitch
@@ -340,10 +340,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">女主剧情规划</div>
+                        <div className="wuxia-section-title">女主剧情规划</div>
                         <div className="text-xs text-gray-400 mt-1">开启后保留女主规划状态，并启用每回合独立规划分析链路；主剧情只读取状态，不再直接维护女主规划提示词。</div>
                     </div>
                     <ToggleSwitch
@@ -354,10 +354,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">NSFW模式</div>
+                        <div className="wuxia-section-title">NSFW模式</div>
                         <div className="text-xs text-gray-400 mt-1">开启后才会注入独立 NSFW 提示词，并在江湖谱中显示女主私密档案 UI；关闭时提示词与 UI 都不生效。</div>
                     </div>
                     <ToggleSwitch
@@ -369,7 +369,7 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 {form.启用NSFW模式 === true && (
                     <div className="flex items-center justify-between gap-4 pt-2 border-t border-wuxia-gold/10">
                         <div>
-                            <div className="text-sm text-wuxia-cyan font-bold">NSFW推进选项</div>
+                            <div className="wuxia-section-title">NSFW推进选项</div>
                             <div className="text-xs text-gray-400 mt-1">开启后，根据当前场景和故事节奏，在暧昧场景中自动生成促进亲密关系的行动选项。非暧昧场景不受影响。</div>
                         </div>
                         <ToggleSwitch
@@ -381,10 +381,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 )}
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">饱腹与水分系统</div>
+                        <div className="wuxia-section-title">饱腹与水分系统</div>
                         <div className="text-xs text-gray-400 mt-1">关闭后，将停止注入饱腹/口渴相关提示词，并隐藏前端对应状态条；旧存档字段会保留但不再重点管理。</div>
                     </div>
                     <ToggleSwitch
@@ -395,10 +395,10 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 </div>
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <div className="text-sm text-wuxia-cyan font-bold">修炼体系相关内容</div>
+                        <div className="wuxia-section-title">修炼体系相关内容</div>
                         <div className="text-xs text-gray-400 mt-1">关闭后，将停止注入境界/功法/内力/修炼相关提示词与上下文，并关闭前端功法模块；旧存档字段保留但不再重点管理。</div>
                     </div>
                     <ToggleSwitch
@@ -529,7 +529,7 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                 })()}
             </div>
 
-            <div className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+            <div className="wuxia-section-card">
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <div className="text-sm text-wuxia-red font-bold">成人内容</div>
@@ -544,7 +544,7 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
             </div>
 
             <div className="space-y-2">
-                <label className="text-sm text-wuxia-cyan font-bold">额外要求提示词 (Custom Prompt)</label>
+                <label className="wuxia-section-title">额外要求提示词 (Custom Prompt)</label>
                 <textarea 
                     value={form.额外提示词}
                     onChange={(e) => {

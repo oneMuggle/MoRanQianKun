@@ -1800,30 +1800,30 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                         <div className="space-y-6">
                             <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
                                 <div className="rounded-lg border border-white/5 bg-black/30 p-4 hover:bg-white/5 transition-colors">
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">当前作品</div>
+                                    <div className="wuxia-section-label">当前作品</div>
                                     <div className="text-sm font-bold text-gray-200 truncate" title={selectedDataset.作品名 || selectedDataset.标题}>{selectedDataset.作品名 || selectedDataset.标题}</div>
                                 </div>
                                 <div className="rounded-lg border border-white/5 bg-black/30 p-4 hover:bg-white/5 transition-colors relative overflow-hidden group">
                                     <div className={`absolute inset-0 opacity-10 transition-opacity ${selectedDataset.激活注入 ? 'bg-wuxia-gold group-hover:opacity-20' : 'bg-transparent'}`}></div>
                                     <div className="relative">
-                                        <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">注入状态</div>
+                                        <div className="wuxia-section-label">注入状态</div>
                                         <div className={`text-sm font-bold ${selectedDataset.激活注入 ? 'text-wuxia-gold' : 'text-gray-400'}`}>{selectedDataset.激活注入 ? '★ 当前注入中' : '未激活'}</div>
                                     </div>
                                 </div>
                                 <div className="rounded-lg border border-white/5 bg-black/30 p-4 hover:bg-white/5 transition-colors">
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">数据来源</div>
+                                    <div className="wuxia-section-label">数据来源</div>
                                     <div className="text-sm font-bold text-gray-200">{来源类型文本映射[selectedDataset.来源类型] || selectedDataset.来源类型}</div>
                                 </div>
                                 <div className="rounded-lg border border-white/5 bg-black/30 p-4 hover:bg-white/5 transition-colors">
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">章节 / 分段</div>
+                                    <div className="wuxia-section-label">章节 / 分段</div>
                                     <div className="text-sm font-bold text-gray-200"><span className="text-blue-400">{selectedDataset.总章节数}</span> / <span className="text-emerald-400">{selectedDataset.分段列表.length}</span></div>
                                 </div>
                                 <div className="rounded-lg border border-white/5 bg-black/30 p-4 hover:bg-white/5 transition-colors">
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">原文长度</div>
+                                    <div className="wuxia-section-label">原文长度</div>
                                     <div className="text-sm font-bold text-gray-200">{(selectedDataset.原始文本长度 || 0).toLocaleString()}</div>
                                 </div>
                                 <div className="rounded-lg border border-white/5 bg-black/30 p-4 hover:bg-white/5 transition-colors">
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">关联任务</div>
+                                    <div className="wuxia-section-label">关联任务</div>
                                     <div className="text-sm font-bold text-gray-200">{selectedDatasetTasks.length}</div>
                                 </div>
                             </div>
@@ -1902,7 +1902,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                     <div className="flex-1 flex flex-col min-h-0 space-y-4">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
                             <div className="rounded-lg border border-white/5 bg-black/30 p-4">
-                                <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">可浏览章节</div>
+                                <div className="wuxia-section-label">可浏览章节</div>
                                 <div className="text-lg font-bold text-gray-200">{previewChapters.length}</div>
                             </div>
                             <div className="rounded-lg border border-white/5 bg-black/30 p-4">
@@ -2120,7 +2120,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                     <div className="shrink-0 p-4 border-b border-white/5 bg-black/40 flex flex-wrap items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
                                             <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">分段状态</span>
+                                                <span className="wuxia-section-label">分段状态</span>
                                                 <span className={`text-sm font-bold ${
                                                     selectedSegment.处理状态 === '已完成' ? 'text-emerald-400' :
                                                     selectedSegment.处理状态 === '失败' ? 'text-red-400' : 'text-blue-400'
@@ -2128,12 +2128,12 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                             </div>
                                             <div className="w-px h-8 bg-white/10"></div>
                                             <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">注入开关</span>
+                                                <span className="wuxia-section-label">注入开关</span>
                                                 <span className="text-sm font-bold text-gray-200">{selectedSegment.启用注入 === false ? '已关闭' : '开启中'}</span>
                                             </div>
                                             <div className="w-px h-8 bg-white/10"></div>
                                             <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">分段字数</span>
+                                                <span className="wuxia-section-label">分段字数</span>
                                                 <span className="text-sm font-bold text-gray-200">{selectedSegment.字数 || 0}</span>
                                             </div>
                                         </div>
@@ -2253,7 +2253,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                             </button>
                                                             <div className="space-y-4">
                                                                 <div className="pr-8">
-                                                                    <label className="text-[10px] text-gray-500 mb-1 block">约束内容</label>
+                                                                    <label className="wuxia-label-tiny">约束内容</label>
                                                                     <input
                                                                         type="text"
                                                                         value={item.内容}
@@ -2264,7 +2264,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 </div>
                                                                 <div className="grid grid-cols-2 gap-3">
                                                                     <div>
-                                                                        <label className="text-[10px] text-gray-500 mb-1 block">谁知道</label>
+                                                                        <label className="wuxia-label-tiny">谁知道</label>
                                                                         <textarea
                                                                             value={格式化逐行列表文本(item.信息可见性?.谁知道 || [])}
                                                                             onChange={(e) => 更新可见信息条目可见性字段('原著硬约束', index, '谁知道', 解析索引列表文本(e.target.value))}
@@ -2273,7 +2273,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                         />
                                                                     </div>
                                                                     <div>
-                                                                        <label className="text-[10px] text-gray-500 mb-1 block">谁不知道</label>
+                                                                        <label className="wuxia-label-tiny">谁不知道</label>
                                                                         <textarea
                                                                             value={格式化逐行列表文本(item.信息可见性?.谁不知道 || [])}
                                                                             onChange={(e) => 更新可见信息条目可见性字段('原著硬约束', index, '谁不知道', 解析索引列表文本(e.target.value))}
@@ -2323,7 +2323,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                             </button>
                                                             <div className="space-y-4">
                                                                 <div className="pr-8">
-                                                                    <label className="text-[10px] text-gray-500 mb-1 block">铺垫内容</label>
+                                                                    <label className="wuxia-label-tiny">铺垫内容</label>
                                                                     <input
                                                                         type="text"
                                                                         value={item.内容}
@@ -2334,7 +2334,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 </div>
                                                                 <div className="grid grid-cols-2 gap-3">
                                                                     <div>
-                                                                        <label className="text-[10px] text-gray-500 mb-1 block">谁知道</label>
+                                                                        <label className="wuxia-label-tiny">谁知道</label>
                                                                         <textarea
                                                                             value={格式化逐行列表文本(item.信息可见性?.谁知道 || [])}
                                                                             onChange={(e) => 更新可见信息条目可见性字段('可提前铺垫', index, '谁知道', 解析索引列表文本(e.target.value))}
@@ -2343,7 +2343,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                         />
                                                                     </div>
                                                                     <div>
-                                                                        <label className="text-[10px] text-gray-500 mb-1 block">谁不知道</label>
+                                                                        <label className="wuxia-label-tiny">谁不知道</label>
                                                                         <textarea
                                                                             value={格式化逐行列表文本(item.信息可见性?.谁不知道 || [])}
                                                                             onChange={(e) => 更新可见信息条目可见性字段('可提前铺垫', index, '谁不知道', 解析索引列表文本(e.target.value))}
@@ -2437,7 +2437,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
 
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">开始时间</label>
+                                                                <label className="wuxia-label-tiny">开始时间</label>
                                                                 <input
                                                                     type="text"
                                                                     value={item.开始时间}
@@ -2446,7 +2446,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">结束时间</label>
+                                                                <label className="wuxia-label-tiny">结束时间</label>
                                                                 <input
                                                                     type="text"
                                                                     value={item.结束时间}
@@ -2455,7 +2455,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">最早开始</label>
+                                                                <label className="wuxia-label-tiny">最早开始</label>
                                                                 <input
                                                                     type="text"
                                                                     value={item.最早开始时间}
@@ -2464,7 +2464,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">最迟开始</label>
+                                                                <label className="wuxia-label-tiny">最迟开始</label>
                                                                 <input
                                                                     type="text"
                                                                     value={item.最迟开始时间}
@@ -2475,7 +2475,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                         </div>
 
                                                         <div>
-                                                            <label className="text-[10px] text-gray-500 mb-1 block">事件说明</label>
+                                                            <label className="wuxia-label-tiny">事件说明</label>
                                                             <textarea
                                                                 value={item.事件说明}
                                                                 onChange={(e) => 更新结构化列表字段('关键事件', index, '事件说明', e.target.value)}
@@ -2486,7 +2486,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
 
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">前置条件</label>
+                                                                <label className="wuxia-label-tiny">前置条件</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.前置条件)}
                                                                     onChange={(e) => 更新结构化列表字段('关键事件', index, '前置条件', 解析索引列表文本(e.target.value))}
@@ -2495,7 +2495,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">触发条件</label>
+                                                                <label className="wuxia-label-tiny">触发条件</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.触发条件)}
                                                                     onChange={(e) => 更新结构化列表字段('关键事件', index, '触发条件', 解析索引列表文本(e.target.value))}
@@ -2504,7 +2504,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">阻断条件</label>
+                                                                <label className="wuxia-label-tiny">阻断条件</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.阻断条件)}
                                                                     onChange={(e) => 更新结构化列表字段('关键事件', index, '阻断条件', 解析索引列表文本(e.target.value))}
@@ -2516,7 +2516,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
 
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">事件结果</label>
+                                                                <label className="wuxia-label-tiny">事件结果</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.事件结果)}
                                                                     onChange={(e) => 更新结构化列表字段('关键事件', index, '事件结果', 解析索引列表文本(e.target.value))}
@@ -2525,7 +2525,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">对下一组影响</label>
+                                                                <label className="wuxia-label-tiny">对下一组影响</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.对下一组影响)}
                                                                     onChange={(e) => 更新结构化列表字段('关键事件', index, '对下一组影响', 解析索引列表文本(e.target.value))}
@@ -2603,7 +2603,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                         </div>
                                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">组前状态</label>
+                                                                <label className="wuxia-label-tiny">组前状态</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.本组前状态)}
                                                                     onChange={(e) => 更新结构化列表字段('角色推进', index, '本组前状态', 解析索引列表文本(e.target.value))}
@@ -2612,7 +2612,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">本组变化</label>
+                                                                <label className="wuxia-label-tiny">本组变化</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.本组变化)}
                                                                     onChange={(e) => 更新结构化列表字段('角色推进', index, '本组变化', 解析索引列表文本(e.target.value))}
@@ -2621,7 +2621,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">组后状态</label>
+                                                                <label className="wuxia-label-tiny">组后状态</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.本组后状态)}
                                                                     onChange={(e) => 更新结构化列表字段('角色推进', index, '本组后状态', 解析索引列表文本(e.target.value))}
@@ -2630,7 +2630,7 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] text-gray-500 mb-1 block">下组影响</label>
+                                                                <label className="wuxia-label-tiny">下组影响</label>
                                                                 <textarea
                                                                     value={格式化逐行列表文本(item.对下一组影响)}
                                                                     onChange={(e) => 更新结构化列表字段('角色推进', index, '对下一组影响', 解析索引列表文本(e.target.value))}
@@ -2718,27 +2718,27 @@ const NovelDecompositionSettings: React.FC<Props> = ({ settings, onSave, request
 
                     <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
                         <div className="rounded-lg border border-white/5 bg-black/30 p-4">
-                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">数据集</div>
+                            <div className="wuxia-section-label">数据集</div>
                             <div className="text-lg font-bold text-gray-200">{datasetsCount}</div>
                         </div>
                         <div className="rounded-lg border border-white/5 bg-black/30 p-4">
-                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">总任务</div>
+                            <div className="wuxia-section-label">总任务</div>
                             <div className="text-lg font-bold text-gray-200">{tasks.length}</div>
                         </div>
                         <div className="rounded-lg border border-white/5 bg-black/30 p-4">
-                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">扫描中/挂起</div>
+                            <div className="wuxia-section-label">扫描中/挂起</div>
                             <div className="text-lg font-bold text-gray-200"><span className="text-wuxia-gold">{runningTaskCount}</span> / {resumableTaskCount}</div>
                         </div>
                         <div className="rounded-lg border border-white/5 bg-black/30 p-4">
-                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">调度器状态</div>
+                            <div className="wuxia-section-label">调度器状态</div>
                             <div className={`text-sm font-bold mt-1 ${schedulerState.running ? 'text-emerald-400' : 'text-gray-400'}`}>{schedulerState.running ? (schedulerState.busy ? '● 扫描处理中' : '● 运行监控中') : '○ 已停止'}</div>
                         </div>
                         <div className="rounded-lg border border-white/5 bg-black/30 p-4">
-                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">大模型执行器</div>
+                            <div className="wuxia-section-label">大模型执行器</div>
                             <div className={`text-sm font-bold mt-1 ${schedulerState.executorReady ? 'text-emerald-400' : 'text-amber-400'}`}>{schedulerState.executorReady ? '已接入' : '未就绪'}</div>
                         </div>
                         <div className="rounded-lg border border-white/5 bg-black/30 p-4">
-                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">轮询频率</div>
+                            <div className="wuxia-section-label">轮询频率</div>
                             <div className="text-sm font-bold mt-1 text-gray-200">{Math.max(1, Math.floor((schedulerState.intervalMs || 0) / 1000))} s/次</div>
                         </div>
                     </div>

@@ -56,7 +56,7 @@ const IndependentApiGptModeSettings: React.FC<Props> = ({ settings, onSave }) =>
 
     return (
         <div className="space-y-6 animate-fadeIn">
-            <div className="flex justify-between items-center border-b border-wuxia-gold/30 pb-3 mb-6">
+            <div className="wuxia-section-header">
                 <div>
                     <h3 className="text-wuxia-gold font-serif font-bold text-xl">独立 API GPT 模式</h3>
                     <div className="mt-1 text-xs text-gray-400">
@@ -72,10 +72,10 @@ const IndependentApiGptModeSettings: React.FC<Props> = ({ settings, onSave }) =>
 
             <div className="space-y-3">
                 {功能项列表.map((item) => (
-                    <div key={item.key} className="space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4">
+                    <div key={item.key} className="wuxia-section-card">
                         <div className="flex items-center justify-between gap-4">
                             <div>
-                                <div className="text-sm text-wuxia-cyan font-bold">{item.title}</div>
+                                <div className="wuxia-section-title">{item.title}</div>
                                 <div className="mt-1 text-xs text-gray-400">{item.description}</div>
                             </div>
                             <ToggleSwitch

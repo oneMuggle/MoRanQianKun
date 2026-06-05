@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =============================================================
+ * 共享 wuxia UI 模式抽取（P3 perf: 减少 dist CSS 体积）
+ * 抽取自 components/features/Settings/ 中重复 utility 串。
+ * 后续可在更多文件中复用 wuxia-* 类。
+ * ============================================================= */
+@layer components {
+  /* 小节标题：青金 + 粗体，常用于分组/子项标题 */
+  .wuxia-section-title {
+    @apply text-sm text-wuxia-cyan font-bold;
+  }
+
+  /* 小节副标签：极小字号 + 灰，常用于表单字段上方 */
+  .wuxia-label-tiny {
+    @apply text-[10px] text-gray-500 mb-1 block;
+  }
+
+  /* 小节副标签（带 uppercase + tracking）：常用于字段分组 */
+  .wuxia-section-label {
+    @apply text-[10px] text-gray-500 uppercase tracking-wider mb-1;
+  }
+
+  /* 带金色描边的子区域容器：space-y + 内边距 + 半透明背景 */
+  .wuxia-section-card {
+    @apply space-y-3 rounded-md border border-wuxia-gold/20 bg-black/30 p-4;
+  }
+
+  /* 设置区段标题行：底部金色细线分隔 */
+  .wuxia-section-header {
+    @apply flex justify-between items-center border-b border-wuxia-gold/30 pb-3 mb-6;
+  }
+
+  /* 元信息文字：中等灰 */
+  .wuxia-text-meta {
+    @apply text-sm font-medium text-gray-400;
+  }
+
+  /* 强调文字：粗体 + 纸白 */
+  .wuxia-text-strong {
+    @apply text-sm font-bold text-paper-white;
+  }
+}
