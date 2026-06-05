@@ -1,3 +1,78 @@
+/**
+ * useGame — 顶层门面（Facade）Hook
+ * =================================
+ *
+ * 角色定位
+ * --------
+ * `useGame` 是整个游戏的**唯一对外 Hook 入口**，被 `App.tsx` 与所有视图组件消费。
+ * 它本身**不实现业务逻辑**，仅完成下列 4 类工作：
+ *
+ *   1. **状态访问层初始化**：通过 `useGameState` + `createGameStateAccess` 拿到扁平化的
+ *      state/setter 解构，供下游 domain 使用。
+ *   2. **领域域（Domain）组装**：按 6 个领域 — 工具 / 记忆运行时 / 图片 / 工作流 /
+ *      发送 / 会话 — 调用 `createXxxDomain` 把状态访问 + refs 注入到对应领域。
+ *   3. **桥接层（Bridge）挂载**：桌游 (`useBoardGameBridge`)、酒吧 NSFW
+ *      (`useBarNSFWBridge`)、探索 (`useExplorationBridge`) 三个跨领域系统在
+ *      `handleSend` 入口处的暂停/恢复包装。
+ *   4. **副作用编排**：NPC 记忆总结队列刷新、人物关系谱懒初始化、时间初始化、
+ *      探索引擎懒初始化等 4 个 `useEffect`。
+ *
+ * 当前结构（阶段 3.1 + 3.2 已完成）
+ * ---------------------------------
+ *
+ *   hooks/useGame.ts (本文件，门面，1196 行)
+ *        │
+ *        ├── domains/utilityDomain       — 工具域（设置 / 通知 / 设备 / 旅行 / 追加系统消息）
+ *        ├── domains/memoryRuntimeDomain — 记忆 + 变量生成运行时域
+ *        ├── domains/imageDomain         — 图片生成域（NPC / 场景 / 主角 / 预设）
+ *        ├── domains/workflowDomain      — 工作流协调域（开档 / 提示词 / 重 Roll / 解析 / 重试）
+ *        ├── domains/sendDomain          — 核心发送域（handleSend / privateChat / worldEvolution）
+ *        ├── domains/sessionDomain       — 会话生命周期域（新档 / 读档 / 写档 / 自动存档）
+ *        │
+ *        ├── subsystems/zustandStore     — 跨域共享状态（按 6 个 slice 划分：阶段 3.2 已落骨架）
+ *        │
+ *        └── bridges/                    — 桌游 / 酒吧 / 探索三个跨域系统的桥接层
+ *
+ * 设计原则
+ * --------
+ *
+ * 1. **薄编排**（Thin Orchestration）— 本文件不写业务；任何"if 状态则动作"逻辑都下沉到
+ *    domain。
+ * 2. **闭包稳定**（Stable Closures）— 6 个 domain creator 接收"原始 state/refs"作参数，
+ *    在 domain 内部用 `useCallback` / `useRef` 锁定，**不**在 useGame 顶层做 `useCallback`
+ *    包装（避免每次 render 都重建）。
+ * 3. **可替换**（Swappable Domains）— domain 接口（参数 + 返回）已稳定，未来若某个域
+ *    切换到 Zustand slice（阶段 3.2 骨架已就绪），useGame 顶层的"注入"模式无需改动。
+ * 4. **不破坏调用方**（Caller Compatibility）— `构建useGame返回值` 仍返回 `{ state, meta,
+ *    setters, actions }` 4 元组，与重构前 API 表面一致，`App.tsx` 无需联动修改。
+ *
+ * 为什么不再"无脑拆小"
+ * --------------------
+ *
+ * 在阶段 3.3 评估时，对剩余 6 处局部闭包（`移除NPC` / `规范化社交列表安全` /
+ * `handleSendWithBoardGame` / `handleTravelNarrative` / `onActionNarrative` /
+ * `lazyInitExploration`）做了如下分析：
+ *
+ *   - 全部依赖 useGame 顶层解构出的 5-15 个闭包变量。
+ *   - 若抽到 `facadeHelpers.ts`，需要把这些闭包变量作为参数传入，参数列表长度
+ *     将抵消行数收益（净行数变化 ≈ 0）。
+ *   - 抽到独立 hook 反而引入新的 useCallback 包装层，与"稳定闭包"原则冲突。
+ *
+ * 结论：保持现状，以 facade 注释 + FACADE.md 把设计原则显式化为可演进文档。
+ * 下一阶段（阶段 4 路由拆分 + 阶段 6 feature flag 动态 import）落地时，domain 接口
+ * 不变，仅 useGame.ts 的"挂载顺序"调整。
+ *
+ * 演进路径（Future Work）
+ * ---------------------
+ *
+ * 阶段 3.4+ 可考虑的演进方向（按风险/收益排序）：
+ *   - 把 `stateAccess` 整体下沉到 `useGameStore`（6 个 slice 已就绪，零业务改动）。
+ *   - 把 domain 改为接收 Zustand selector（彻底消除 props drilling）。
+ *   - 把 3 个 bridge 的 "onChatMessageSent / onAIReplyReceived" 包装抽到 `useBridgedSend`。
+ *   - 把 4 个 useEffect 拆为 `useGame/useGameSideEffects` 独立 hook。
+ *
+ * 详细设计说明见：hooks/useGame/FACADE.md
+ */
 
 import {
     记忆系统结构,
