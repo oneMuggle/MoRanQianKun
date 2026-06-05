@@ -17,6 +17,7 @@
 | 04 | [ai-pipeline](./04-ai-pipeline.md) | AI 客户端、多 provider 抽象、图像/文本/流式 |
 | 05 | [persistence](./05-persistence.md) | IndexedDB、dbService、GitHub Sync、存档迁移 |
 | 06 | [module-registry](./06-module-registry.md) | 弹窗注册、桌面/移动组件工厂、动态导入 |
+| 06 | [feature-flags-inventory](./06-feature-flags-inventory.md) | Feature Flag 总览（阶段 6.1 产出，~155 个 flag 按 domain 分组） |
 | 07 | [eras-and-themes](./07-eras-and-themes.md) | 多纪元系统、时代主题、子纪元预设 |
 | 08 | [nsfw-systems](./08-nsfw-systems.md) | NSFW 子系统合集（harem、bar、bdsm、photography、campus） |
 | 09 | [image-pipeline](./09-image-pipeline.md) | 图像生成、NovelAI 代理、资产引用 |
