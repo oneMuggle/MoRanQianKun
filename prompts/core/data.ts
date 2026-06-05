@@ -1,10 +1,15 @@
 import { 提示词结构 } from '../../types';
 import { 构建修炼体系附加块 } from '../../utils/promptFeatureToggles';
 
-export const 核心_数据格式: 提示词结构 = {
-    id: 'core_data',
-    标题: '数据格式',
-    内容: `
+// 注意：原本 `内容: \`...模板字符串...\`` 在模块顶层立即求值，
+// 模板里直接调用了 `构建修炼体系附加块`（来自
+// `utils/promptFeatureToggles.ts`，被打到 `prompts-runtime` chunk）。
+// 在双向 chunk 循环下，这些顶层调用在 `prompts-core` chunk 加载阶段
+// 会触发 "Cannot access 'r' before initialization" 的 ESM TDZ。
+// 修复：把模板字符串内容包成按需调用的函数 `获取核心_数据格式内容()`，
+// 并用 `Object.defineProperty` 把 `核心_数据格式.内容` 改为惰性 getter，
+// 让 `构建修炼体系附加块` 调用延迟到消费者首次取内容时（此时 chunk 循环已收口）。
+const 获取核心_数据格式内容 = (): string => `
 <数据结构定义>
 # 数据结构定义
 
@@ -227,7 +232,17 @@ ${构建修炼体系附加块('├─ 推荐境界: string')}
 ${构建修炼体系附加块('- 修炼口径以对应专项协议为准。')}
 - 小说分解不在本节重复定义；它是独立资产。
 </数据结构定义>
-`,
+`;
+
+const 核心_数据格式_base: Omit<提示词结构, '内容'> = {
+    id: 'core_data',
+    标题: '数据格式',
     类型: '核心设定',
     启用: true
 };
+Object.defineProperty(核心_数据格式_base, '内容', {
+    get: () => 获取核心_数据格式内容(),
+    enumerable: true,
+    configurable: true
+});
+export const 核心_数据格式: 提示词结构 = 核心_数据格式_base as 提示词结构;

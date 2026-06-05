@@ -1,5 +1,5 @@
 import { 提示词结构 } from '../../types';
-import { 主剧情COT共享守则 } from './cotShared';
+import { 获取主剧情COT共享守则 } from './cotShared';
 import { 构建修炼体系附加块 } from '../../utils/promptFeatureToggles';
 
 export const 构建女主主COT内容 = (options: { ntl: boolean; fandom?: boolean }): string => {
@@ -33,7 +33,7 @@ export const 构建女主主COT内容 = (options: { ntl: boolean; fandom?: boole
                 '- 同人模式下，`【当前章节内容】` 是主线推进、女主承接和 `<剧情规划>` 判断的第一执行锚点；只要还没有正式切章，本回合的主场景、主事件、主矛盾、女主互动核心落点与关系推进都必须优先贴住 `【当前章节内容】`，不能提前改由 `【下一章节内容】` 主导。']
             : []),
         '',
-        主剧情COT共享守则,
+        获取主剧情COT共享守则(),
         '',
         '<正文规划思考协议>',
         '',
@@ -209,34 +209,61 @@ export const 构建女主主COT内容 = (options: { ntl: boolean; fandom?: boole
     ].join('\n');
 };
 
-export const 核心_思维链_女主规划版: 提示词结构 = {
+// 注意：原本 `内容: 构建女主主COT内容(...)` 会在模块顶层立即求值，
+// 进而触发 `构建修炼体系附加块`（来自 `utils/promptFeatureToggles.ts`，
+// 被打到 `prompts-runtime` chunk）。在双向 chunk 循环下，`构建修炼体系附加块`
+// 在 `prompts-core` chunk 加载阶段尚处于 TDZ，会报
+// "Cannot access 'r' before initialization"。
+// 修复：用 `Object.defineProperty` 把 `内容` 改为惰性 getter，让求值延迟到
+// 消费者首次访问时（此时 chunk 循环已收口）。
+const 核心_思维链_女主规划版_base: Omit<提示词结构, '内容'> = {
     id: 'core_cot_heroine_variant',
     标题: '思维链 (COT) 设定 - 女主规划版',
-    内容: 构建女主主COT内容({ ntl: false }),
     类型: '核心设定',
     启用: false
 };
+Object.defineProperty(核心_思维链_女主规划版_base, '内容', {
+    get: () => 构建女主主COT内容({ ntl: false }),
+    enumerable: true,
+    configurable: true
+});
+export const 核心_思维链_女主规划版: 提示词结构 = 核心_思维链_女主规划版_base as 提示词结构;
 
-export const 核心_思维链_NTL女主规划版: 提示词结构 = {
+const 核心_思维链_NTL女主规划版_base: Omit<提示词结构, '内容'> = {
     id: 'core_cot_heroine_ntl_variant',
     标题: '思维链 (COT) 设定 - NTL女主规划版',
-    内容: 构建女主主COT内容({ ntl: true }),
     类型: '核心设定',
     启用: false
 };
+Object.defineProperty(核心_思维链_NTL女主规划版_base, '内容', {
+    get: () => 构建女主主COT内容({ ntl: true }),
+    enumerable: true,
+    configurable: true
+});
+export const 核心_思维链_NTL女主规划版: 提示词结构 = 核心_思维链_NTL女主规划版_base as 提示词结构;
 
-export const 核心_思维链_同人女主规划版: 提示词结构 = {
+const 核心_思维链_同人女主规划版_base: Omit<提示词结构, '内容'> = {
     id: 'core_cot_fandom_heroine_variant',
     标题: '思维链 (COT) 设定 - 同人女主规划版',
-    内容: 构建女主主COT内容({ ntl: false, fandom: true }),
     类型: '核心设定',
     启用: false
 };
+Object.defineProperty(核心_思维链_同人女主规划版_base, '内容', {
+    get: () => 构建女主主COT内容({ ntl: false, fandom: true }),
+    enumerable: true,
+    configurable: true
+});
+export const 核心_思维链_同人女主规划版: 提示词结构 = 核心_思维链_同人女主规划版_base as 提示词结构;
 
-export const 核心_思维链_同人NTL女主规划版: 提示词结构 = {
+const 核心_思维链_同人NTL女主规划版_base: Omit<提示词结构, '内容'> = {
     id: 'core_cot_fandom_heroine_ntl_variant',
     标题: '思维链 (COT) 设定 - 同人NTL女主规划版',
-    内容: 构建女主主COT内容({ ntl: true, fandom: true }),
     类型: '核心设定',
     启用: false
 };
+Object.defineProperty(核心_思维链_同人NTL女主规划版_base, '内容', {
+    get: () => 构建女主主COT内容({ ntl: true, fandom: true }),
+    enumerable: true,
+    configurable: true
+});
+export const 核心_思维链_同人NTL女主规划版: 提示词结构 = 核心_思维链_同人NTL女主规划版_base as 提示词结构;

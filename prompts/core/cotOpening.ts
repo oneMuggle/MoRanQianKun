@@ -1,9 +1,17 @@
 import { 提示词结构, 游戏设置结构 } from '../../types';
-import { 主剧情COT共享守则 } from './cotShared';
+import { 获取主剧情COT共享守则 } from './cotShared';
 import { 通用境界速查 } from '../shared/realmDefaults';
 import { 按功能开关过滤提示词内容, 构建修炼体系附加块, 构建NSFW附加块 } from '../../utils/promptFeatureToggles';
 
-const 开局COT单思考协议 = [
+// 注意：原本是模块顶层 `const 开局COT单思考协议 = [...].join('\n')`，
+// 数组里直接调用了 `构建修炼体系附加块`/`构建NSFW附加块`（来自
+// `utils/promptFeatureToggles.ts`，被打到 `prompts-runtime` chunk）。
+// 在双向 chunk 循环下，这些顶层调用在 `prompts-core` chunk 加载阶段
+// 会触发 "Cannot access 'r' before initialization" 的 ESM TDZ。
+// 修复：把 `开局COT单思考协议` 改为按需调用的 getter 函数
+// `获取开局COT单思考协议()`，让所有 `构建*附加块` 调用延迟到消费者
+// 真正取内容时（此时 chunk 循环已收口）。
+const 获取开局COT单思考协议 = (): string => [
     '# 【开局COT｜第0回合前台初始化链路】',
     '',
     '## 总体职责',
@@ -30,7 +38,7 @@ const 开局COT单思考协议 = [
     '- 若同人开局的 `【当前章节内容】` 没有给出足够证据证明主角此刻就拥有稳定社交网，`社交` 可以留空或只写极少数已成立人物，不为了满足数量乱造关系。',
     '- 若需要初始化新的 `社交[]` / `玩家门派.重要成员[]` / `战斗.敌方[]` 对象，`姓名/名字` 字段必须明确存在；缺少姓名、只写关系标签、只写称谓或空字符串对象，视为非法，不得写进 `<变量规划>`。',
     '',
-    主剧情COT共享守则,
+    获取主剧情COT共享守则(),
     '',
     '<开局规划思考协议>',
     '',
@@ -134,14 +142,19 @@ const 开局COT单思考协议 = [
     '</开局规划思考协议>'
 ].join('\n');
 
-export const 核心_开局思维链: 提示词结构 = {
+const 核心_开局思维链_base: Omit<提示词结构, '内容'> = {
     id: 'core_cot_opening',
     标题: '开局思维链 (COT)',
-    内容: 开局COT单思考协议,
     类型: '核心设定',
     启用: true
 };
+Object.defineProperty(核心_开局思维链_base, '内容', {
+    get: () => 获取开局COT单思考协议(),
+    enumerable: true,
+    configurable: true
+});
+export const 核心_开局思维链: 提示词结构 = 核心_开局思维链_base as 提示词结构;
 
 export const 获取开局思维链提示词 = (config?: Partial<游戏设置结构> | null): string => (
-    按功能开关过滤提示词内容(开局COT单思考协议, config)
+    按功能开关过滤提示词内容(获取开局COT单思考协议(), config)
 );

@@ -1,10 +1,14 @@
 import { 提示词结构 } from '../../types';
 import { 构建修炼体系附加块 } from '../../utils/promptFeatureToggles';
 
-export const 核心_判定思维链: 提示词结构 = {
-    id: 'core_cot_judge',
-    标题: '判定思维链',
-    内容: `
+// 注意：原本 `内容: \`...模板字符串...\`` 在模块顶层立即求值，
+// 模板里直接调用了 `构建修炼体系附加块`（来自
+// `utils/promptFeatureToggles.ts`，被打到 `prompts-runtime` chunk）。
+// 在双向 chunk 循环下，这些顶层调用在 `prompts-core` chunk 加载阶段
+// 会触发 ESM TDZ。
+// 修复：把模板内容包成函数 `获取核心_判定思维链内容()`，并用
+// `Object.defineProperty` 把 `核心_判定思维链.内容` 改为惰性 getter。
+const 获取核心_判定思维链内容 = (): string => `
 <判定COT协议>
 # 【判定COT协议｜判定专属思考】
 
@@ -106,7 +110,17 @@ ${构建修炼体系附加块([
 - 复核完成后，判定段即形成闭环：主链负责插入，本协议负责计算、结果与摘要承接。
 
 </判定COT协议>
-`.trim(),
+`.trim();
+
+const 核心_判定思维链_base: Omit<提示词结构, '内容'> = {
+    id: 'core_cot_judge',
+    标题: '判定思维链',
     类型: '核心设定',
     启用: true
 };
+Object.defineProperty(核心_判定思维链_base, '内容', {
+    get: () => 获取核心_判定思维链内容(),
+    enumerable: true,
+    configurable: true
+});
+export const 核心_判定思维链: 提示词结构 = 核心_判定思维链_base as 提示词结构;

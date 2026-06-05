@@ -1,6 +1,19 @@
 import { 构建修炼体系附加块 } from '../../utils/promptFeatureToggles';
 
-export const 主剧情COT共享守则 = [
+// 注意：此处原先是模块顶层 const 数组 + .join('\n')，并在顶层调用
+// `构建修炼体系附加块([...])`。该顶层调用会在 `prompts-core` chunk 初始化
+// 时立即求值，而 `构建修炼体系附加块` 来自 `utils/promptFeatureToggles.ts`
+// （被打到 `prompts-runtime` chunk）。由于
+//   - `prompts-runtime` chunk 中的 intimacy / protocolDirectives /
+//     planningAnalysis / eraLiMode 等又会反向 import `prompts/core/*`
+// 形成双向 chunk 循环 + 模块顶层求值，从而在 `prompts-core` chunk 加载阶段
+// 触发 "Cannot access 'r' before initialization" 的 ESM TDZ。
+//
+// 修复（方案 C-1，最小侵入）：把顶层数组求值包成按需调用的 getter 函数
+// `获取主剧情COT共享守则()`，让 `构建修炼体系附加块` 的调用延迟到函数实际
+// 被调用时（已脱离 chunk 初始化阶段）。所有调用方需把
+//   主剧情COT共享守则   →   获取主剧情COT共享守则()
+export const 获取主剧情COT共享守则 = (): string => [
     '## 认知、叙事与语义守则',
     '',
     '### NPC 信息域职责',
