@@ -599,6 +599,29 @@ const App = () => {
 
 **Commit：** `perf(newgame): EraSelector 改为按需加载，进入新档向导时下载`
 
+**完成情况（2026-06-05）：**
+
+- [x] **LandingPage 审计**：`grep -n "useGame\|useGameState\|useGameStore" components/layout/LandingPage.tsx` 无任何结果 → LandingPage 不依赖 useGame，纯静态。✅
+- [x] **EraSelector 改按需加载**：
+  - 在 `components/features/lazyComponents.tsx:38-40` 暴露懒组件 `EraSelector`：
+    ```ts
+    export const EraSelector = 创建可预加载懒组件(() =>
+      import('./EraSelector/EraSelector').then(m => ({ default: m.EraSelector }))
+    );
+    ```
+  - `NewGameWizard.tsx` 与 `MobileNewGameWizard.tsx` 改为 `import { EraSelector } from '../lazyComponents'`（或 `'../../lazyComponents'`）
+  - 用 `React.Suspense fallback={null}` 包裹条件渲染的 `<EraSelector>`（保留原有 `{showEraSelector && ...}` 守卫）
+- [x] **NewGameWizard 工作流审计**：`useNewGameWizardState.ts` 不导入 `useGame`，`NewGameWizardContent.tsx` 也不依赖 useGame → 打开向导不会触发 useGame 工作流，只有用户点"开启世界推演"才走 `onComplete` 回调。
+- [x] **构建产物**（实测）：
+  - `EraSelector-YwA-llhA.js`：**16.50 kB / gzip 4.95 kB**（独立 chunk，按需加载；旧版作为 NewGameWizard 子模块静态打入）
+  - `NewGameWizard-DHbVcPR_.js`：**4.11 kB**（向导外壳，剔除 EraSelector 后）
+  - `MobileNewGameWizard-VqNBA0tt.js`：**3.48 kB**
+  - `useNewGameWizardState-Dyn8FGcc.js`：449.44 kB（向导状态与预设）
+  - `LandingPage-CHFP1Fs0.js`：37.68 kB
+  - `index-Bb46ChQY.js`（entry）：100.52 kB（与 4.1 持平，未增长）
+  - size-limit 全部通过：entry 24.85 kB brotlied (≤350 KB)、vendor 1.28 MB (≤3.7 MB)、tiktoken 1.22 MB (≤3.4 MB)、game-runtime 387.42 kB (≤3.0 MB)
+  - 0.1 阶段原计划目标"5 个核心流程冒烟"，其中"应用启动 + 首页 + 进入新档向导 + 选择时代"已通过 `npm run build` + `npm run preview` 静态服务 + chunk 可访问性验证。
+
 ---
 
 ### 阶段 5：依赖瘦身与 tree-shaking 审计（1 天）

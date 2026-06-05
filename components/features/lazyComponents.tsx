@@ -35,6 +35,10 @@ export const MobileCharacter = 创建可预加载懒组件(() => import('./Chara
 export const NewGameWizard = 创建可预加载懒组件(() => import('./NewGame/NewGameWizard'));
 export const MobileNewGameWizard = 创建可预加载懒组件(() => import('./NewGame/mobile/MobileNewGameWizard'));
 
+// EraSelector（被 NewGameWizard 在用户点击"选择时代"时才打开）
+// 阶段 4.2：拆出独立 chunk，避免 465KB 时代主题静态打入向导入口
+export const EraSelector = 创建可预加载懒组件(() => import('./EraSelector/EraSelector').then(m => ({ default: m.EraSelector })));
+
 // Top-level Views (App.tsx 路由级 code splitting)
 // - LandingPage: 默认导出，懒加载
 // - GameView: 命名导出，通过 .then(m => ({ default: m.GameView })) 转默认导出形式
