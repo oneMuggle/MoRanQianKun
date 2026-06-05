@@ -7,12 +7,12 @@ import type { 校园NSFW设置 } from './campusNSFW';
 import type { 都市网约车NSFW设置 } from './urbanDriverNSFW';
 import type { 写真NSFW设置, 写真系统扩展 } from './photographyNSFW';
 import type { BDSM系统设置 } from './bdsmNSFW';
+import type { ExposureNSFW设置 } from './exposureNSFW';
 import type { 桌游社交NSFW设置 } from './boardGameNSFW';
 import type { 酒吧NSFW设置 } from './contemporary/barNSFW';
 import { 生图目标类型, 生图筛选性别类型, 生图筛选重要性类型, 场景图片档案 } from './imageGeneration';
 import { NPC结构 } from './social';
 import type { 关系网络数据 } from './relationship';
-import type { 最近开局配置结构 } from './game-settings';
 import { 世界数据结构 } from './world';
 import { 详细门派结构 } from './sect';
 import { 任务结构, 约定结构 } from './task';
@@ -792,6 +792,15 @@ export interface WorldGenConfig {
 
 export type SaveType = 'manual' | 'auto';
 
+/** 快速重开所需的开局配置快照 */
+export interface 最近开局配置结构 {
+    worldConfig: WorldGenConfig;
+    charData: 角色数据结构;
+    openingConfig?: OpeningConfig;
+    openingStreaming: boolean;
+    openingExtraPrompt: string;
+}
+
 export interface 酒馆预设提示词结构 {
     identifier: string;
     name?: string;
@@ -849,6 +858,8 @@ export interface 游戏设置结构 {
     都市网约车NSFW设置?: 都市网约车NSFW设置; // Urban ride-hailing driver NSFW subsystem toggles (contemporary_urban only)
     写真NSFW设置?: 写真NSFW设置; // Photography NSFW subsystem toggles (contemporary_* only)
     BDSM系统设置?: BDSM系统设置; // BDSM independent subsystem toggles (all eras)
+    BDSMNSFW设置?: BDSM系统设置; // Alias of 系统设置 used by some runtime code paths
+    ExposureNSFW设置?: ExposureNSFW设置; // 露出独立 NSFW 子系统
     桌游社交NSFW设置?: 桌游社交NSFW设置; // Board game social NSFW subsystem toggles (all eras)
     酒吧NSFW设置?: 酒吧NSFW设置; // Bar NSFW subsystem toggles (contemporary_urban only)
     启用NSFW增强系统?: boolean; // Toggle NSFW enhancement subsystem (pregnancy, aftercare, clothing layers, scene modifiers, consequences, cross-module linker)
