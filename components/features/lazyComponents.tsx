@@ -35,6 +35,12 @@ export const MobileCharacter = 创建可预加载懒组件(() => import('./Chara
 export const NewGameWizard = 创建可预加载懒组件(() => import('./NewGame/NewGameWizard'));
 export const MobileNewGameWizard = 创建可预加载懒组件(() => import('./NewGame/mobile/MobileNewGameWizard'));
 
+// Top-level Views (App.tsx 路由级 code splitting)
+// - LandingPage: 默认导出，懒加载
+// - GameView: 命名导出，通过 .then(m => ({ default: m.GameView })) 转默认导出形式
+export const LandingPage = 创建可预加载懒组件(() => import('../layout/LandingPage'));
+export const GameView = 创建可预加载懒组件(() => import('../app/GameView').then(m => ({ default: m.GameView })));
+
 // Settings
 export const SettingsPanel = 创建可预加载懒组件(() => import('./Settings/SettingsPanel'));
 

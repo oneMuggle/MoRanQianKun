@@ -1,13 +1,11 @@
 import React, { Profiler } from 'react';
-import LandingPage from './components/layout/LandingPage';
 import { useGame } from './hooks/useGame';
 import { useResponsive } from './hooks/useResponsive';
 import { useConfirmSystem } from './hooks/useConfirmSystem';
 import { MusicProvider } from './components/features/Music/MusicProvider';
-import { 懒加载边界, NewGameWizard, MobileNewGameWizard } from './components/features/lazyComponents';
+import { 懒加载边界, NewGameWizard, MobileNewGameWizard, LandingPage, GameView } from './components/features/lazyComponents';
 import { useAppModalState } from './components/app/useAppModalState';
 import { useAppEffects } from './components/app/useAppEffects';
-import { GameView } from './components/app/GameView';
 import { ModalLayer } from './components/app/ModalLayer';
 import { MemoryModals } from './components/app/MemoryModals';
 import { ModalRenderer, useModalManager } from './core/module-registry';
@@ -259,16 +257,18 @@ const App: React.FC = () => {
 
                 {/* View Switching */}
                 {state.view === 'home' && (
-                    <LandingPage
-                        onStart={handleStartFromLanding}
-                        onLoad={openLoad}
-                        onImageManager={() => { modalManager.open('imageManager'); }}
-                        onWorldbookManager={openWorldbookManager}
-                        onNovelDecomposition={() => { void openNovelDecompositionWorkbench(); }}
-                        onNovelWriting={() => { modalManager.open('novelWritingWorkbench'); }}
-                        onSettings={openSettings}
-                        hasSave={state.hasSave}
-                    />
+                    <懒加载边界>
+                        <LandingPage
+                            onStart={handleStartFromLanding}
+                            onLoad={openLoad}
+                            onImageManager={() => { modalManager.open('imageManager'); }}
+                            onWorldbookManager={openWorldbookManager}
+                            onNovelDecomposition={() => { void openNovelDecompositionWorkbench(); }}
+                            onNovelWriting={() => { modalManager.open('novelWritingWorkbench'); }}
+                            onSettings={openSettings}
+                            hasSave={state.hasSave}
+                        />
+                    </懒加载边界>
                 )}
 
                 {state.view === 'new_game' && (
@@ -296,81 +296,83 @@ const App: React.FC = () => {
                 )}
 
                 {state.view === 'game' && (
-                    (() => {
-                        const gameViewContent = (
-                            <GameView
-                                state={state}
-                                meta={meta}
-                                actions={actions}
-                                isMobile={isMobile}
-                                currentOptions={currentOptions}
-                                当前背景图片地址={当前背景图片地址}
-                                玩家头像地址={玩家头像地址}
-                                hideBottomTicker={hideBottomTicker}
-                                启用修炼体系={启用修炼体系}
-                                chatContentHidden={chatContentHidden}
-                                setChatContentHidden={setChatContentHidden}
-                                galgameModeEnabled={galgameModeEnabled}
-                                toggleGalgameMode={toggleGalgameMode}
-                                galgameImmersion={galgameImmersion}
-                                toggleGalgameImmersion={toggleGalgameImmersion}
-                                rpgModeEnabled={rpgModeEnabled}
-                                toggleRpgMode={toggleRpgMode}
-                                sceneQuickGenHint={sceneQuickGenHint}
-                                sceneQuickGenToastVisible={sceneQuickGenToastVisible}
-                                tickerEvents={tickerEvents}
-                                fontFaceStyleText={fontFaceStyleText}
-                                uiTextStyleVars={uiTextStyleVars}
-                                openDevice={(actions as any).openDevice}
-                                openCharacter={openCharacter}
-                                openSettings={openSettings}
-                                openInventory={openInventory}
-                                openEquipment={openEquipment}
-                                openBattle={openBattle}
-                                openTeam={openTeam}
-                                openSocial={openSocial}
-                                openKungfu={openKungfu}
-                                openWorld={openWorld}
-                                openMap={openMap}
-                                openSect={openSect}
-                                openTask={openTask}
-                                openAgreement={openAgreement}
-                                openStory={openStory}
-                                openHeroinePlan={openHeroinePlan}
-                                openMemory={openMemory}
-                                openCGGallery={openCGGallery}
-                                openRelationGraph={openRelationGraph}
-                                openMapExplorer={openMapExplorer}
-                                openImageManagerWithCheck={() => { modalManager.open('imageManager'); }}
-                                openNovelDecompositionWorkbench={openNovelDecompositionWorkbench}
-                                openSave={openSave}
-                                openLoad={openLoad}
-                                openNsfwCenter={() => modalManager.open('nsfwCenter')}
-                                togglePerfDashboard={() => setShowPerfDashboard(prev => !prev)}
-                                perfDashboardOpen={showPerfDashboard}
-                                openRpgBattle={() => modalManager.open('rpgBattle')}
-                                openRpgEquipment={() => modalManager.open('rpgEquipment')}
-                                openRpgKungfu={() => modalManager.open('rpgKungfu')}
-                                openRpgTask={() => modalManager.open('rpgTask')}
-                                closeMobileMusic={closeMobileMusic}
-                                showMobileMusic={showMobileMusic}
-                                activeMobileWindow={activeMobileWindowResolved}
-                                handleMobileMenuClick={handleMobileMenuClick}
-                                dismissNotification={(actions as any).dismissNotification}
-                                renderTickerItems={renderTickerItems}
-                                requestConfirm={requestConfirm}
-                            />
-                        );
-                        const renderProfilingEnabled = state.gameConfig?.性能监控配置?.启用渲染分析;
-                        if (renderProfilingEnabled && actions.renderProfilerRef?.current) {
-                            return (
-                                <Profiler id="GameView" onRender={actions.renderProfilerRef.current.onRender}>
-                                    {gameViewContent}
-                                </Profiler>
+                    <懒加载边界>
+                        {(() => {
+                            const gameViewContent = (
+                                <GameView
+                                    state={state}
+                                    meta={meta}
+                                    actions={actions}
+                                    isMobile={isMobile}
+                                    currentOptions={currentOptions}
+                                    当前背景图片地址={当前背景图片地址}
+                                    玩家头像地址={玩家头像地址}
+                                    hideBottomTicker={hideBottomTicker}
+                                    启用修炼体系={启用修炼体系}
+                                    chatContentHidden={chatContentHidden}
+                                    setChatContentHidden={setChatContentHidden}
+                                    galgameModeEnabled={galgameModeEnabled}
+                                    toggleGalgameMode={toggleGalgameMode}
+                                    galgameImmersion={galgameImmersion}
+                                    toggleGalgameImmersion={toggleGalgameImmersion}
+                                    rpgModeEnabled={rpgModeEnabled}
+                                    toggleRpgMode={toggleRpgMode}
+                                    sceneQuickGenHint={sceneQuickGenHint}
+                                    sceneQuickGenToastVisible={sceneQuickGenToastVisible}
+                                    tickerEvents={tickerEvents}
+                                    fontFaceStyleText={fontFaceStyleText}
+                                    uiTextStyleVars={uiTextStyleVars}
+                                    openDevice={(actions as any).openDevice}
+                                    openCharacter={openCharacter}
+                                    openSettings={openSettings}
+                                    openInventory={openInventory}
+                                    openEquipment={openEquipment}
+                                    openBattle={openBattle}
+                                    openTeam={openTeam}
+                                    openSocial={openSocial}
+                                    openKungfu={openKungfu}
+                                    openWorld={openWorld}
+                                    openMap={openMap}
+                                    openSect={openSect}
+                                    openTask={openTask}
+                                    openAgreement={openAgreement}
+                                    openStory={openStory}
+                                    openHeroinePlan={openHeroinePlan}
+                                    openMemory={openMemory}
+                                    openCGGallery={openCGGallery}
+                                    openRelationGraph={openRelationGraph}
+                                    openMapExplorer={openMapExplorer}
+                                    openImageManagerWithCheck={() => { modalManager.open('imageManager'); }}
+                                    openNovelDecompositionWorkbench={openNovelDecompositionWorkbench}
+                                    openSave={openSave}
+                                    openLoad={openLoad}
+                                    openNsfwCenter={() => modalManager.open('nsfwCenter')}
+                                    togglePerfDashboard={() => setShowPerfDashboard(prev => !prev)}
+                                    perfDashboardOpen={showPerfDashboard}
+                                    openRpgBattle={() => modalManager.open('rpgBattle')}
+                                    openRpgEquipment={() => modalManager.open('rpgEquipment')}
+                                    openRpgKungfu={() => modalManager.open('rpgKungfu')}
+                                    openRpgTask={() => modalManager.open('rpgTask')}
+                                    closeMobileMusic={closeMobileMusic}
+                                    showMobileMusic={showMobileMusic}
+                                    activeMobileWindow={activeMobileWindowResolved}
+                                    handleMobileMenuClick={handleMobileMenuClick}
+                                    dismissNotification={(actions as any).dismissNotification}
+                                    renderTickerItems={renderTickerItems}
+                                    requestConfirm={requestConfirm}
+                                />
                             );
-                        }
-                        return gameViewContent;
-                    })()
+                            const renderProfilingEnabled = state.gameConfig?.性能监控配置?.启用渲染分析;
+                            if (renderProfilingEnabled && actions.renderProfilerRef?.current) {
+                                return (
+                                    <Profiler id="GameView" onRender={actions.renderProfilerRef.current.onRender}>
+                                        {gameViewContent}
+                                    </Profiler>
+                                );
+                            }
+                            return gameViewContent;
+                        })()}
+                    </懒加载边界>
                 )}
 
                 {/* Modal Layer (global decorative frame only) */}
