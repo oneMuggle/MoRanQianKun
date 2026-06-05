@@ -209,7 +209,70 @@ export default defineConfig(({ mode }) => {
             if (normalizedId.includes('/services/ai/')) {
               return 'ai-clients';
             }
-            // 5. useGame 主入口
+            // 5a. useGame/nsfw 子分组（阶段 P2：进一步拆分 sendWorkflow 子树）
+            //    这些 NSFW 文件位于 useGame/nsfw/ 下，但都是叶子模块（仅 import 类型），
+            //    通过提前匹配可避免被 useGame-runtime 兜底吞掉，体积更分散、可懒加载。
+            //    必须放在 /hooks/useGame/ 通配规则之前。
+            if (normalizedId.includes('/hooks/useGame/nsfw/')) {
+              // 5a.1 写真系统（Integration + Engine + Workflow + Leak）
+              if (
+                normalizedId.endsWith('/nsfw/photographyNSFWIntegration.ts') ||
+                normalizedId.endsWith('/nsfw/photographyNSFWEngine.ts') ||
+                normalizedId.endsWith('/nsfw/photographyShootWorkflow.ts') ||
+                normalizedId.endsWith('/nsfw/photographyLeakWorkflow.ts')
+              ) {
+                return 'usegame-nsfw-photography';
+              }
+              // 5a.2 都市网约车系统（Integration + Engine）
+              if (
+                normalizedId.endsWith('/nsfw/urbanDriverNSFWIntegration.ts') ||
+                normalizedId.endsWith('/nsfw/urbanDriverNSFWEngine.ts')
+              ) {
+                return 'usegame-nsfw-urban-driver';
+              }
+              // 5a.3 跨系统联动 + 精力管理 + 论坛引擎（合并为杂项块）
+              //      注意：outdoorNSFWEngine 不可拆出 — 它与 models/outdoorNSFW/index.ts
+              //      存在循环 import（models 重导出 outdoorNSFWEngine 的值，
+              //      outdoorNSFWEngine 又 import models 的 const 数据），
+              //      跨 chunk 拆分会触发 ESM TDZ 错误，必须留在 useGame-runtime。
+              if (
+                normalizedId.endsWith('/nsfw/crossSystemLinker.ts') ||
+                normalizedId.endsWith('/nsfw/energyManagement.ts') ||
+                normalizedId.endsWith('/nsfw/bdsmForumEngine.ts')
+              ) {
+                return 'usegame-nsfw-misc';
+              }
+              // 其余 NSFW 文件仍跟随 useGame-runtime
+            }
+            // 5c. useGame/image 动态加载工作流独立成块（阶段 P2）
+            //     useGame.ts 通过 () => import('...') 动态加载这三个工作流，
+            //     默认会被 /hooks/useGame/ 兜底规则吞回 useGame-runtime，
+            //     必须显式提早匹配才能实现真正的代码分割与懒加载。
+            if (
+              normalizedId.endsWith('/hooks/useGame/image/npcImageWorkflow.ts') ||
+              normalizedId.endsWith('/hooks/useGame/image/npcSecretImageWorkflow.ts') ||
+              normalizedId.endsWith('/hooks/useGame/image/sceneImageWorkflow.ts')
+            ) {
+              return 'usegame-image-lazy';
+            }
+            // 5d. useGame/image 同步工作流（纯函数模块，无 React hook）合并独立成块
+            //     这些工作流虽然被 useGame.ts 静态 import，但内部全是纯函数 + 类型，
+            //     可通过 chunk 间静态边连接，把 ~30KB 体积从 useGame-runtime 切出去。
+            //     ⚠ TDZ 风险点：
+            //       - sceneImageArchiveWorkflow.ts 触发 'Je' before init（与 models-types
+            //         及 utils/imageAssets 形成循环），故排除；
+            //       - playerImageWorkflow / imageGenerationCoordinator 含跨 chunk
+            //         re-export，保守起见也排除；
+            //     最终只迁出真正叶子（仅 type-only import 或纯函数模块）：
+            if (
+              normalizedId.endsWith('/hooks/useGame/image/imagePresetWorkflow.ts') ||
+              normalizedId.endsWith('/hooks/useGame/image/npcImageStateWorkflow.ts') ||
+              normalizedId.endsWith('/hooks/useGame/image/sceneImageTriggerWorkflow.ts') ||
+              normalizedId.endsWith('/hooks/useGame/image/manualImageActionsWorkflow.ts')
+            ) {
+              return 'usegame-image-core';
+            }
+            // 5b. useGame 主入口（兜底）
             if (normalizedId.includes('/hooks/useGame/') || normalizedId.endsWith('/hooks/useGame.ts')) {
               return 'useGame-runtime';
             }
