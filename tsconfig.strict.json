@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.core.json",
   "compilerOptions": {
     "strictNullChecks": true,
     "noImplicitOverride": true
