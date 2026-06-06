@@ -84,13 +84,13 @@ function clamp(value: number, min: number, max: number): number {
 export function 生成NSFW画像(npc: NPC结构, eraId: string | null | undefined): NPCNSFW画像 {
   const 亲密度等级 = 计算亲密度等级(npc.好感度 ?? 0);
 
-  const 人格 = 匹配人格档案(npc.核心性格特征, npc.身份, eraId);
+  const 人格 = 匹配人格档案(npc.核心性格特征, npc.身份, eraId ?? undefined);
 
   const 性癖 = 构建性癖档案(npc, 人格, eraId ?? '', 亲密度等级);
 
   const 敏感点 = 构建敏感点档案(npc, 人格, eraId ?? '');
 
-  const 推荐场景 = 人格?.推荐场景 ?? 获取性癖推荐({ eraId, 最大条目数: 3 }).map(f => f.子类型);
+  const 推荐场景 = 人格?.推荐场景 ?? 获取性癖推荐({ eraId: eraId ?? undefined, 最大条目数: 3 }).map(f => f.子类型);
 
   const 画像: NPCNSFW画像 = { 人格, 性癖, 敏感点, 推荐场景 };
 

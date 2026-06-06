@@ -68,3 +68,4 @@ canshu
 .playwright-mcp/
 /playwright-report/
 /test-results/
+tsc-error-trend.txt

@@ -21,7 +21,7 @@ export function 计算包厢费用(
     return 0;
   }
 
-  const 单价 = 费用表.包厢费[包厢大小] || 0;
+  const 单价 = (费用表.包厢费 as Record<string, number>)[包厢大小] || 0;
   return 单价 * 时长;
 }
 
@@ -39,7 +39,7 @@ export function 计算酒水消费(
     return { 总价: 0, 利润: 0 };
   }
 
-  const 档次价格 = 价格表[档次];
+  const 档次价格 = (价格表 as Record<string, { 进价: number; 售价: number }>)[档次];
   
   if (!档次价格) {
     return { 总价: 0, 利润: 0 };

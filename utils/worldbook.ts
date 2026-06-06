@@ -854,7 +854,7 @@ export const 规范化世界书 = (raw: unknown, fallback?: Partial<世界书结
                 ? base.条目
                 : [];
     const entryMap = new Map<string, 世界书条目结构>();
-    rawEntries.forEach((item) => {
+    rawEntries.forEach((item: unknown) => {
         const normalized = 规范化世界书条目(item);
         entryMap.set(normalized.id, normalized);
     });

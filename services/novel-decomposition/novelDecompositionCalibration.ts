@@ -200,8 +200,8 @@ export const 应用剧情小说时间校准到分段 = (
 ): 小说拆分分段结构 => {
     const anchor = 获取分段可用校准锚点(规范化章节时间校准列表(calibrations), segment);
     if (!anchor) return segment;
-    const offsetMinutes = 计算小说时间偏移分钟(anchor.原始起始时间, anchor.校准后起始时间);
-    if (!Number.isFinite(offsetMinutes) || offsetMinutes === 0) return segment;
+    const offsetMinutes: number = 计算小说时间偏移分钟(anchor.原始起始时间, anchor.校准后起始时间) ?? 0;
+    if (offsetMinutes === 0) return segment;
 
     return {
         ...segment,

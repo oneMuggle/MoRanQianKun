@@ -55,8 +55,8 @@ const 规范化顺序 = (raw: unknown): 酒馆预设顺序结构 | null => {
     const characterId = 读取数值(source.character_id);
     const orderRaw = Array.isArray(source.order) ? source.order : [];
     const order = orderRaw
-        .map((item) => 规范化顺序项(item))
-        .filter((item): item is 酒馆预设顺序项结构 => Boolean(item));
+        .map((item: unknown) => 规范化顺序项(item))
+        .filter((item: 酒馆预设顺序项结构 | null): item is 酒馆预设顺序项结构 => Boolean(item));
     if (characterId === null || order.length === 0) return null;
     return {
         character_id: characterId,
@@ -71,11 +71,11 @@ export const 规范化酒馆预设 = (raw: unknown): 酒馆预设结构 | null =
     const promptOrderRaw = Array.isArray(source.prompt_order) ? source.prompt_order : [];
 
     const prompts = promptsRaw
-        .map((item) => 规范化提示词(item))
-        .filter((item): item is 酒馆预设提示词结构 => Boolean(item));
+        .map((item: unknown) => 规范化提示词(item))
+        .filter((item: 酒馆预设提示词结构 | null): item is 酒馆预设提示词结构 => Boolean(item));
     const prompt_order = promptOrderRaw
-        .map((item) => 规范化顺序(item))
-        .filter((item): item is 酒馆预设顺序结构 => Boolean(item));
+        .map((item: unknown) => 规范化顺序(item))
+        .filter((item: 酒馆预设顺序结构 | null): item is 酒馆预设顺序结构 => Boolean(item));
 
     if (prompts.length === 0 || prompt_order.length === 0) return null;
     return { prompts, prompt_order };

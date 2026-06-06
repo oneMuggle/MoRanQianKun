@@ -217,7 +217,7 @@ export function 生成泄露心理变化(params: {
 ${心理阶段.join('\n\n')}
 
 【当前心理阴影程度】
-${模特.心理阴影程度}/100 → ${Math.min(100, 模特.心理阴影程度 + getPsychologicalImpact(传播范围))}/100
+${模特.心理阴影程度 ?? 0}/100 → ${Math.min(100, (模特.心理阴影程度 ?? 0) + getPsychologicalImpact(传播范围))}/100
 `;
 }
 

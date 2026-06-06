@@ -141,5 +141,5 @@ export const 糖宝人设变体 = {
 };
 
 export function 获取糖宝人设变体(身份类型: 糖宝核心状态['身份类型']) {
-  return 糖宝人设变体[身份类型] || 糖宝人设变体.兼职糖宝;
+  return (糖宝人设变体 as Record<string, { 语气特点: string; 常用词汇: string[]; 心理特点: string }>)[身份类型] || 糖宝人设变体.兼职糖宝;
 }

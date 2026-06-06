@@ -604,6 +604,7 @@ export const 校验境界体系提示词完整性 = (content: string): {
 };
 
 const 构建同人世界观模板 = (params: ReturnType<typeof 读取同人配置>): string => {
+    if (!params) return '';
     const keepRoleRule = params.keepCanonicalCharacters
         ? '可直接保留原著角色、原著势力与其时间线位置，但要校验是否符合原著时期、立场、已知关系与性格边界。'
         : '禁止把原著角色实体直接落入世界母本；只继承原著母题、势力结构、审美、冲突机制与时代质感。';

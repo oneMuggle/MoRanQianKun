@@ -707,7 +707,7 @@ export const generatePlanningAnalysis = async (
                 socialJson: params.socialJson,
                 envJson: params.envJson,
                 recentBodiesText: params.recentBodiesText,
-                currentPlanText: params.currentPlanText,
+                currentPlanText: params.currentPlanText ?? '',
                 auditFocusText: params.auditFocusText,
                 heroineEnabled: params.heroineEnabled === true
             })}`

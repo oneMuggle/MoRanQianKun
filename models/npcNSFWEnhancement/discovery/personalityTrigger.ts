@@ -264,7 +264,7 @@ function 构建触发上下文(npc: NPC结构, 完整状态: 完整演化状态)
   const 信任度 = Math.round((npc.好感度 ?? 0) * 0.5);
   const 性癖解锁数 = 完整状态.性癖发现?.已解锁性癖?.length ?? 0;
   const 敏感点开发数 = (npc.敏感点档案?.主要敏感点 ?? []).filter((p): p is 敏感点条目 & { 开发程度: 敏感点开发程度 } =>
-    p.开发程度 && p.开发程度 !== '未开发'
+    p.开发程度 !== undefined && p.开发程度 !== '未开发'
   ).length;
 
   return {

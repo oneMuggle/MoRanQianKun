@@ -621,7 +621,7 @@ export class 游戏大师协调器 {
 export const 创建游戏大师协调器 = (
     deps: 游戏大师依赖接口,
     params?: 游戏大师触发参数
-): 游戏大师协调器 => new 游戏大师协调器(deps, params);
+): 游戏大师协调器 => new 游戏大师协调器(deps, params ?? ({} as 游戏大师触发参数));
 
 /**
  * 执行游戏大师流程（便捷函数）
@@ -630,6 +630,6 @@ export const 执行游戏大师流程 = async (
     deps: 游戏大师依赖接口,
     params?: 游戏大师触发参数
 ): Promise<游戏大师协调结果> => {
-    const coordinator = new 游戏大师协调器(deps, params);
+    const coordinator = new 游戏大师协调器(deps, params ?? ({} as 游戏大师触发参数));
     return coordinator.execute();
 };

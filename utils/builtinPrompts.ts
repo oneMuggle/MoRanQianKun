@@ -86,7 +86,7 @@ export const 规范化内置提示词列表 = (raw: unknown): 内置提示词条
     const defaultMap = 默认内置提示词映射();
     const mergedMap = new Map<string, 内置提示词条目结构>(defaultMap);
 
-    list.forEach((item) => {
+    list.forEach((item: unknown) => {
         if (!item || typeof item !== 'object') return;
         const source = item as Partial<内置提示词条目结构>;
         const base = defaultMap.get(读取文本(source.槽位ID).trim()) || null;
