@@ -15,21 +15,33 @@ export default defineViteConfig({
         globals: true,
         environment: 'jsdom',
         include: ['**/*.test.ts', '**/*.test.tsx'],
+        // 2026-06-06 Phase 5 Day 46：注入全局 setup（jest-dom + fake-indexeddb + msw）
+        setupFiles: ['./src/test-utils/setup.ts'],
         coverage: {
             provider: 'v8',
-            reporter: ['text', 'html', 'json-summary'],
-            // 2026-06-03 起步门槛：只对 utils/ 设最低门槛（5%）
-            // 后续 Phase 5+ 渐进提升门槛
-            include: ['utils/**/*.ts'],
+            reporter: ['text', 'html', 'json-summary', 'lcov'],
+            // 2026-06-06 Phase 5 Day 46：把 models/ 也纳入 coverage 范围
+            // 后续 Day 48 写完 models 测试后把 threshold 提到 ≥ 50%
+            include: ['utils/**/*.ts', 'models/**/*.ts'],
             exclude: [
                 'node_modules/',
                 'dist/',
-                '**/*.test.ts',
-                '**/*.test.tsx',
-                'utils/__tests__/**',
+                '**/*.test.{ts,tsx}',
+                '**/__tests__/**',
+                'src/test-utils/**',
+                // NSFW 子系统（spec 禁区：18 个）
+                'models/bdsmNSFW/**',
+                'models/boardGameNSFW/**',
+                'models/campusNSFW/**',
+                'models/exposureNSFW/**',
+                'models/npcNSFWEnhancement/**',
+                'models/nsfwCore/**',
+                'models/outdoorNSFW/**',
+                'models/photographyNSFW/**',
+                'utils/nsfwResourceOps.ts',
             ],
             thresholds: {
-                // 2026-06-03 起步门槛：0（先建立 CI 机制，下个 Phase 提升到 5%）
+                // 2026-06-06 Phase 5 Day 46 起步门槛：0（Day 48 写完测试后提升到 50%）
                 lines: 0,
                 functions: 0,
                 branches: 0,
