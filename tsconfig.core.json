@@ -8,7 +8,10 @@
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "useUnknownInCatchVariables": true
   },
   "include": [
     "models/character.ts",
