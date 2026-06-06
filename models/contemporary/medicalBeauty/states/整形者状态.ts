@@ -215,7 +215,7 @@ export function 曝光被发现(
     case '家人': updates.家人知道 = true; break;
     case '朋友': updates.朋友知道 = true; break;
     case '同事': updates.同事知道 = true; break;
-    case '男友/老公': updates.男朋友知道 = true; break;
+    case '男友/老公': (updates as any)['男朋友/老公知道'] = true; break;
   }
 
   return 更新整形者状态(state, updates);
