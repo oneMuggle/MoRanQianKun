@@ -217,7 +217,7 @@ export const 外置化图片字段 = async (value: unknown, seen: WeakSet<object
     seen.add(value as object);
 
     if (Array.isArray(value)) {
-        const nextList = [];
+        const nextList: unknown[] = [];
         for (const item of value) {
             nextList.push(await 外置化图片字段(item, seen));
         }
