@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  },
+  "include": [
+    "hooks/useGame/**/*.ts",
+    "hooks/useGame.ts",
+    "utils/**/*.ts",
+    "prompts/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "hooks/useGame/**/*.test.ts",
+    "prompts/**/__tests__/**"
+  ]
+}
