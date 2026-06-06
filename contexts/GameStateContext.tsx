@@ -138,22 +138,22 @@ export interface GameCampusSystems {
 // ============================================================================
 
 /** 核心游戏状态 Context */
-const GameStateContext = createContext<GameState | null>(null);
+export const GameStateContext = createContext<GameState | null>(null);
 
 /** 游戏元信息 Context */
-const GameMetaContext = createContext<GameMeta | null>(null);
+export const GameMetaContext = createContext<GameMeta | null>(null);
 
 /** 配置状态 Context */
-const GameConfigContext = createContext<GameConfig | null>(null);
+export const GameConfigContext = createContext<GameConfig | null>(null);
 
 /** UI 弹窗状态 Context */
-const GameModalContext = createContext<GameModal | null>(null);
+export const GameModalContext = createContext<GameModal | null>(null);
 
 /** 设备状态 Context */
-const GameDeviceContext = createContext<GameDevice | null>(null);
+export const GameDeviceContext = createContext<GameDevice | null>(null);
 
 /** 校园系统状态 Context */
-const GameCampusSystemsContext = createContext<GameCampusSystems | null>(null);
+export const GameCampusSystemsContext = createContext<GameCampusSystems | null>(null);
 
 // ============================================================================
 // Provider 组件
@@ -206,23 +206,23 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
  * 提供游戏元信息（view、loading、history等）
  */
 export const GameMetaProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { meta } = useGame();
-    
+    const { state } = useGame();
+
     const value = useMemo<GameMeta>(() => ({
-        view: meta.view,
-        hasSave: meta.hasSave,
-        loading: meta.loading,
-        历史记录: meta.历史记录,
-        prompts: meta.prompts,
-        promptsReady: meta.promptsReady,
-        festivals: meta.festivals,
-        currentTheme: meta.currentTheme,
-        currentEra: meta.currentEra,
-        时代信息: meta.时代信息,
+        view: state.view,
+        hasSave: state.hasSave,
+        loading: state.loading,
+        历史记录: state.历史记录,
+        prompts: state.prompts,
+        promptsReady: state.promptsReady,
+        festivals: state.festivals,
+        currentTheme: state.currentTheme,
+        currentEra: state.currentEra,
+        时代信息: state.时代信息,
     }), [
-        meta.view, meta.hasSave, meta.loading, meta.历史记录,
-        meta.prompts, meta.promptsReady, meta.festivals,
-        meta.currentTheme, meta.currentEra, meta.时代信息
+        state.view, state.hasSave, state.loading, state.历史记录,
+        state.prompts, state.promptsReady, state.festivals,
+        state.currentTheme, state.currentEra, state.时代信息
     ]);
     
     return (
