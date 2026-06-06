@@ -14,10 +14,20 @@
 
 import { 初始化数据库 } from './initialization';
 import { SETTINGS_STORE } from './schema';
-import { 获取设置项定义, 设置分类定义表 } from '../../utils/settingsSchema';
+import { 获取设置项定义, 设置分类定义表, 设置键 } from '../../utils/settingsSchema';
 import { 估算对象字节数, 估算设置摘要 } from './_helpers';
-import { 清理未引用图片资源 } from './image-assets';
+import { 清理未引用图片资源, 外置化图片字段 } from './image-assets';
 import type { 设置存储记录, 设置管理项 } from './types';
+
+// ────────────────────────────────────────────────────────────────
+// 常量
+// ────────────────────────────────────────────────────────────────
+
+/** 设置记录的 schema 版本号（写入 SETTINGS_STORE 时随带） */
+const 设置记录版本 = 2;
+
+/** 存档保护设置 key */
+const 存档保护设置键 = 设置键.存档保护;
 
 // ────────────────────────────────────────────────────────────────
 // 跨模块依赖（Day 38：从 image-assets.ts 直接导入，移除 globalThis 桥接）
@@ -53,6 +63,49 @@ const 读取全部设置记录 = async (): Promise<设置存储记录[]> => {
 // ────────────────────────────────────────────────────────────────
 // 对外 API（CRUD 通用方法）
 // ────────────────────────────────────────────────────────────────
+
+/** 保存设置项（自动外置化 dataUrl 到 IMAGE_ASSETS_STORE） */
+export const 保存设置 = async (key: string, value: any): Promise<void> => {
+    const db = await 初始化数据库();
+    const persistedValue = await 外置化图片字段(value);
+    const def = 获取设置项定义(key);
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([SETTINGS_STORE], 'readwrite');
+        const store = transaction.objectStore(SETTINGS_STORE);
+        const request = store.put({
+            key,
+            value: persistedValue,
+            version: 设置记录版本,
+            updatedAt: Date.now(),
+            category: def?.category || 'unknown'
+        });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+};
+
+/** 读取设置项；不存在时返回 null */
+export const 读取设置 = async (key: string): Promise<any> => {
+    const db = await 初始化数据库();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([SETTINGS_STORE], 'readonly');
+        const store = transaction.objectStore(SETTINGS_STORE);
+        const request = store.get(key);
+        request.onsuccess = () => resolve(request.result ? request.result.value : null);
+        request.onerror = () => reject(request.error);
+    });
+};
+
+/** 读取存档保护开关 */
+export const 读取存档保护状态 = async (): Promise<boolean> => {
+    const value = await 读取设置(存档保护设置键);
+    return value === true;
+};
+
+/** 设置存档保护开关 */
+export const 设置存档保护状态 = async (enabled: boolean): Promise<void> => {
+    await 保存设置(存档保护设置键, enabled === true);
+};
 
 /** 获取设置管理清单（带元信息） */
 export const 获取设置管理清单 = async (): Promise<设置管理项[]> => {
