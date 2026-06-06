@@ -67,7 +67,7 @@ export interface 递进场景 {
   可能后果: string[];
 }
 
-export const 尺度递进场景: 递进场景[] = [
+export const 尺度递进场景列表: 递进场景[] = [
   {
     触发条件: '服装要求递进',
     摄影师话术: [

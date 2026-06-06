@@ -28,5 +28,5 @@ export * from './scenes/危机场景';
 
 // 提示词导出
 export * from './prompts/消费者提示词';
-export * from './prompts/服务人员提示词';
+export { 描述服务人员心理 as 描述服务人员心理_提示词 } from './prompts/服务人员提示词';
 export * from './prompts/危机提示词';

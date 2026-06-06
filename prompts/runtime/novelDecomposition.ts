@@ -40,7 +40,7 @@ export const 小说分解后续组输入模板 = `【前一组参考】
 {nextChapterTitle}
 `;
 
-export const 构建小说分解系统提示词 = (options?: { isFirstGroup?: boolean }): string => {
+export const 构建小说分解系统提示词 = (options?: { isFirstGroup?: boolean; [key: string]: unknown }): string => {
     const isFirstGroup = options?.isFirstGroup !== false;
 
     const firstGroupSpecific = isFirstGroup ? [

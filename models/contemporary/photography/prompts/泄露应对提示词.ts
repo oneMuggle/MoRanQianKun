@@ -156,9 +156,10 @@ function get可能结果(处理方式: string): string {
  */
 export function 生成心理疏导提示词(params: {
   模特: 模特核心状态;
+  泄露类型: 泄露类型;
   传播范围: 传播范围;
 }): string {
-  const { 模特, 传播范围 } = params;
+  const { 模特, 泄露类型, 传播范围 } = params;
 
   return `【特殊场景：心理疏导】
 
