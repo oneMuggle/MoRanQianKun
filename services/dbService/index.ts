@@ -1,6 +1,5 @@
 
 import { 存档结构 } from '../../types';
-import { 创建图片资源引用, 解析图片资源引用ID, 是否图片资源引用, 注册图片资源缓存, 批量注册图片资源缓存, 清空图片资源缓存, 确保CDN清单已加载, 从CDN解析资源 } from '../../utils/imageAssets';
 import { 获取设置项定义, 设置分类定义表, 设置键, type 设置分类类型 } from '../../utils/settingsSchema';
 import { 默认功能模型占位, 规范化接口设置 } from '../../utils/apiConfig';
 
@@ -15,9 +14,22 @@ import { 初始化数据库, safeNumber } from './initialization';
 import { 深拷贝, 估算字符串字节数, 估算对象字节数, 估算设置摘要, 读取环境时间文本, 构建存档去重键, 清洗导入存档 } from './_helpers';
 export { 初始化数据库, safeNumber } from './initialization';
 
-// Day 37：stores 子模块承载通用 settings CRUD（保存设置 等依赖外置化图片字段的留到 Day 38 迁移）
+// Day 37：stores 子模块承载通用 settings CRUD
 export * from './stores';
 import { 批量删除设置 } from './stores';
+
+// Day 38：image-assets 子模块承载 IMAGE_ASSETS_STORE CRUD + 运行时缓存
+export * from './image-assets';
+import { 外置化图片字段, 清理未引用图片资源, 清理运行时图片缓存 } from './image-assets';
+
+// Day 38：migrations 子模块承载版本升级 / 模板导入导出
+export * from './migrations';
+import {
+    读取设置保护快照,
+    回写设置保护快照,
+    自定义背景天赋保护键,
+} from './migrations';
+
 export {
     DB_NAME as _DB_NAME,
     STORE_NAME as _STORE_NAME,
@@ -42,278 +54,10 @@ const 存档保护设置键 = 设置键.存档保护;
 const 图片资源迁移版本键 = 设置键.图片资源迁移版本;
 const 设置记录版本 = 2;
 
-// 2026-06-03：图片资源签名相关 helper 移到 _helpers（深拷贝/估算/读取/构建键/清洗已合并）
-// 仍需图片资源签名缓存 + 生成图片资源ID + 生成图片资源签名
-const 图片资源签名缓存 = new Map<string, string>();
-const 生成图片资源ID = (): string => `img_asset_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-const 生成图片资源签名 = (dataUrl: string): string => {
-    const text = typeof dataUrl === 'string' ? dataUrl.trim() : '';
-    if (!text) return '';
-    return `${text.length}:${text.slice(0, 96)}:${text.slice(-96)}`;
-};
-
-// 2026-06-03：初始化数据库 已移到 ./initialization.ts（避免与上方 import 冲突）
-
-export const 保存图片资源 = async (dataUrl: string, preferredId?: string): Promise<string> => {
-    const normalized = typeof dataUrl === 'string' ? dataUrl.trim() : '';
-    if (!normalized) {
-        throw new Error('保存图片资源失败：图片内容为空');
-    }
-    const signature = 生成图片资源签名(normalized);
-    const cachedRef = signature ? 图片资源签名缓存.get(signature) : '';
-    if (cachedRef) return cachedRef;
-    const id = (typeof preferredId === 'string' ? preferredId.trim() : '') || 生成图片资源ID();
-    const db = await 初始化数据库();
-    await new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction([IMAGE_ASSETS_STORE], 'readwrite');
-        const store = transaction.objectStore(IMAGE_ASSETS_STORE);
-        const request = store.put({
-            id,
-            dataUrl: normalized,
-            createdAt: Date.now()
-        });
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-    注册图片资源缓存(id, normalized);
-    const ref = 创建图片资源引用(id);
-    if (signature) {
-        图片资源签名缓存.set(signature, ref);
-    }
-    return ref;
-};
-
-export const 读取图片资源 = async (refOrId: string): Promise<string> => {
-    const id = 解析图片资源引用ID(refOrId) || (typeof refOrId === 'string' ? refOrId.trim() : '');
-    if (!id) return '';
-
-    // 1. 尝试 IndexedDB
-    const db = await 初始化数据库();
-    try {
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-            const transaction = db.transaction([IMAGE_ASSETS_STORE], 'readonly');
-            const store = transaction.objectStore(IMAGE_ASSETS_STORE);
-            const request = store.get(id);
-            request.onsuccess = () => {
-                const dataUrl = typeof request.result?.dataUrl === 'string' ? request.result.dataUrl.trim() : '';
-                if (dataUrl) {
-                    注册图片资源缓存(id, dataUrl);
-                    const signature = 生成图片资源签名(dataUrl);
-                    if (signature) {
-                        图片资源签名缓存.set(signature, 创建图片资源引用(id));
-                    }
-                }
-                resolve(dataUrl);
-            };
-            request.onerror = () => reject(request.error);
-        });
-        if (dataUrl) return dataUrl;
-    } catch {
-        // IndexedDB 读取失败，继续尝试 CDN
-    }
-
-    // 2. 尝试从 CDN 加载
-    确保CDN清单已加载();
-    const cdnUrl = 从CDN解析资源(id);
-    if (cdnUrl) {
-        try {
-            const response = await fetch(cdnUrl);
-            if (response.ok) {
-                const blob = await response.blob();
-                const dataUrl = await new Promise<string>((res, rej) => {
-                    const reader = new FileReader();
-                    reader.onload = () => res(reader.result as string);
-                    reader.onerror = rej;
-                    reader.readAsDataURL(blob);
-                });
-                注册图片资源缓存(id, dataUrl);
-                // 写入 IndexedDB 作为本地缓存
-                try {
-                    await 保存图片资源(dataUrl, id);
-                } catch {
-                    // 写入失败不影响使用
-                }
-                return dataUrl;
-            }
-        } catch {
-            // CDN 加载失败，优雅降级
-        }
-    }
-
-    return '';
-};
-
-export const 预热图片资源缓存 = async (): Promise<number> => {
-    const db = await 初始化数据库();
-    const entries = await new Promise<Array<{ id: string; dataUrl: string }>>((resolve, reject) => {
-        const transaction = db.transaction([IMAGE_ASSETS_STORE], 'readonly');
-        const store = transaction.objectStore(IMAGE_ASSETS_STORE);
-        const request = store.getAll();
-        request.onsuccess = () => resolve(
-            (Array.isArray(request.result) ? request.result : [])
-                .map((item: any) => ({
-                    id: typeof item?.id === 'string' ? item.id.trim() : '',
-                    dataUrl: typeof item?.dataUrl === 'string' ? item.dataUrl.trim() : ''
-                }))
-                .filter((item) => item.id && item.dataUrl)
-        );
-        request.onerror = () => reject(request.error);
-    });
-    清空图片资源缓存();
-    图片资源签名缓存.clear();
-    批量注册图片资源缓存(entries);
-    entries.forEach((item) => {
-        const signature = 生成图片资源签名(item.dataUrl);
-        if (signature) {
-            图片资源签名缓存.set(signature, 创建图片资源引用(item.id));
-        }
-    });
-    return entries.length;
-};
-
-const 外置化图片字段 = async (value: unknown, seen: WeakSet<object> = new WeakSet()): Promise<unknown> => {
-    if (!value || typeof value !== 'object') {
-        if (typeof value === 'string') {
-            const text = value.trim();
-            if (/^data:image\//i.test(text)) {
-                return await 保存图片资源(text);
-            }
-        }
-        return value;
-    }
-    if (seen.has(value as object)) return value;
-    seen.add(value as object);
-
-    if (Array.isArray(value)) {
-        const nextList = [];
-        for (const item of value) {
-            nextList.push(await 外置化图片字段(item, seen));
-        }
-        return nextList;
-    }
-
-    const source = value as Record<string, unknown>;
-    const next: Record<string, unknown> = { ...source };
-    for (const [key, child] of Object.entries(source)) {
-        if (typeof child === 'string') {
-            const text = child.trim();
-            if (text) {
-                if ((key === '本地路径' || key === '图片URL' || key === '背景图片' || key === '头像图片URL' || key.endsWith('图片URL') || key.endsWith('音频URL')) && /^data:(image|audio)\//i.test(text)) {
-                    next[key] = await 保存图片资源(text);
-                    continue;
-                }
-                if ((key === '本地路径' || key === '图片URL' || key === '背景图片' || key === '头像图片URL' || key.endsWith('图片URL') || key.endsWith('音频URL')) && 是否图片资源引用(text)) {
-                    next[key] = 创建图片资源引用(解析图片资源引用ID(text));
-                    continue;
-                }
-            }
-        }
-        if (child && typeof child === 'object') {
-            next[key] = await 外置化图片字段(child, seen);
-        }
-    }
-    return next;
-};
-
-const 收集图片资源引用ID = (
-    value: unknown,
-    refs: Set<string>,
-    seen: WeakSet<object> = new WeakSet()
-): void => {
-    if (typeof value === 'string') {
-        const refId = 解析图片资源引用ID(value);
-        if (refId) refs.add(refId);
-        return;
-    }
-    if (!value || typeof value !== 'object') return;
-    if (seen.has(value as object)) return;
-    seen.add(value as object);
-
-    if (Array.isArray(value)) {
-        value.forEach((item) => 收集图片资源引用ID(item, refs, seen));
-        return;
-    }
-
-    Object.values(value as Record<string, unknown>).forEach((child) => {
-        收集图片资源引用ID(child, refs, seen);
-    });
-};
-
-const 读取全部图片资源记录 = async (): Promise<Array<{ id: string; dataUrl?: string }>> => {
-    const db = await 初始化数据库();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([IMAGE_ASSETS_STORE], 'readonly');
-        const store = transaction.objectStore(IMAGE_ASSETS_STORE);
-        const request = store.getAll();
-        request.onsuccess = () => resolve(
-            (Array.isArray(request.result) ? request.result : [])
-                .filter((item: any) => typeof item?.id === 'string')
-                .map((item: any) => ({
-                    id: item.id.trim(),
-                    dataUrl: typeof item?.dataUrl === 'string' ? item.dataUrl.trim() : undefined
-                }))
-                .filter((item) => item.id)
-        );
-        request.onerror = () => reject(request.error);
-    });
-};
-
-const 读取已引用图片资源ID集合 = async (): Promise<Set<string>> => {
-    const db = await 初始化数据库();
-    const [saves, settings] = await Promise.all([
-        new Promise<any[]>((resolve, reject) => {
-            const transaction = db.transaction([STORE_NAME], 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.getAll();
-            request.onsuccess = () => resolve(Array.isArray(request.result) ? request.result : []);
-            request.onerror = () => reject(request.error);
-        }),
-        new Promise<Array<{ key: string; value: any }>>((resolve, reject) => {
-            const transaction = db.transaction([SETTINGS_STORE], 'readonly');
-            const store = transaction.objectStore(SETTINGS_STORE);
-            const request = store.getAll();
-            request.onsuccess = () => resolve(
-                (Array.isArray(request.result) ? request.result : [])
-                    .filter((item: any) => typeof item?.key === 'string')
-                    .map((item: any) => ({ key: item.key, value: item.value }))
-            );
-            request.onerror = () => reject(request.error);
-        })
-    ]);
-
-    const refs = new Set<string>();
-    saves.forEach((save) => 收集图片资源引用ID(save, refs));
-    settings.forEach((item) => 收集图片资源引用ID(item?.value, refs));
-    return refs;
-};
-
-export const 清理未引用图片资源 = async (): Promise<number> => {
-    const [referencedIds, assetEntries] = await Promise.all([
-        读取已引用图片资源ID集合(),
-        读取全部图片资源记录()
-    ]);
-    const unusedIds = assetEntries
-        .map((item) => item.id)
-        .filter((id) => !referencedIds.has(id));
-    if (unusedIds.length <= 0) return 0;
-
-    const db = await 初始化数据库();
-    await new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction([IMAGE_ASSETS_STORE], 'readwrite');
-        const store = transaction.objectStore(IMAGE_ASSETS_STORE);
-        unusedIds.forEach((id) => store.delete(id));
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-    });
-
-    图片资源签名缓存.clear();
-    await 预热图片资源缓存();
-    return unusedIds.length;
-};
-
-// Day 37：注册到 globalThis，供 ./stores（删除设置 / 批量删除设置）通过 getter 桥接调用
-// Day 38 image-assets.ts 完成后可移除此桥接
-(globalThis as any).__dbService_清理未引用图片资源 = 清理未引用图片资源;
+// Day 38：图片资源签名缓存 / 生成 ID / 生成签名 / 保存图片资源 / 读取图片资源 /
+// 预热图片资源缓存 / 外置化图片字段 / 收集图片资源引用ID / 读取全部图片资源记录 /
+// 读取已引用图片资源ID集合 / 清理未引用图片资源 / 清理运行时图片缓存 已迁移到 ./image-assets
+// Day 37 globalThis 桥接随之移除
 
 export const 维护自动存档 = async (db: IDBDatabase, maxKeep: number = 自动存档最大保留数): Promise<void> => {
     const keepCount = Math.max(0, Math.floor(maxKeep));
@@ -388,7 +132,7 @@ export const 保存存档 = async (存档: Omit<存档结构, 'id'>): Promise<nu
 };
 
 // 类型已抽到 ./types（re-export 见顶部）
-const 研发设置模板版本 = 1;
+// `研发设置模板版本` / `导出研发设置模板` / `导入研发设置模板` 已迁移到 ./migrations
 
 export const 导出存档数据 = async (): Promise<存档导出结构> => {
     const saves = await 读取存档列表();
@@ -610,64 +354,8 @@ export const 读取设置 = async (key: string): Promise<any> => {
 };
 
 // `获取设置管理清单` 已迁移到 ./stores（export * from './stores' 见顶部）
-
-export const 迁移图片资源到独立存储 = async (): Promise<{ saves: number; settings: number }> => {
-    const migrated = await 读取设置(图片资源迁移版本键);
-    if (migrated === true) {
-        return { saves: 0, settings: 0 };
-    }
-
-    const db = await 初始化数据库();
-    const [saves, settings] = await Promise.all([
-        new Promise<any[]>((resolve, reject) => {
-            const transaction = db.transaction([STORE_NAME], 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.getAll();
-            request.onsuccess = () => resolve(Array.isArray(request.result) ? request.result : []);
-            request.onerror = () => reject(request.error);
-        }),
-        new Promise<Array<{ key: string; value: any }>>((resolve, reject) => {
-            const transaction = db.transaction([SETTINGS_STORE], 'readonly');
-            const store = transaction.objectStore(SETTINGS_STORE);
-            const request = store.getAll();
-            request.onsuccess = () => resolve(
-                (Array.isArray(request.result) ? request.result : [])
-                    .filter((item: any) => typeof item?.key === 'string')
-                    .map((item: any) => ({ key: item.key, value: item.value }))
-            );
-            request.onerror = () => reject(request.error);
-        })
-    ]);
-
-    let migratedSaves = 0;
-    for (const save of saves) {
-        const nextSave = await 外置化图片字段(save) as 存档结构;
-        await new Promise<void>((resolve, reject) => {
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.put(nextSave);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-        });
-        migratedSaves += 1;
-    }
-
-    let migratedSettings = 0;
-    for (const item of settings) {
-        const nextValue = await 外置化图片字段(item.value);
-        await new Promise<void>((resolve, reject) => {
-            const transaction = db.transaction([SETTINGS_STORE], 'readwrite');
-            const store = transaction.objectStore(SETTINGS_STORE);
-            const request = store.put({ key: item.key, value: nextValue });
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-        });
-        migratedSettings += 1;
-    }
-
-    await 保存设置(图片资源迁移版本键, true);
-    return { saves: migratedSaves, settings: migratedSettings };
-};
+// `迁移图片资源到独立存储` / `导出研发设置模板` / `导入研发设置模板` 已迁移到 ./migrations
+// `清理运行时图片缓存` 已迁移到 ./image-assets
 
 export const 读取存档保护状态 = async (): Promise<boolean> => {
     const value = await 读取设置(存档保护设置键);
@@ -679,86 +367,7 @@ export const 设置存档保护状态 = async (enabled: boolean): Promise<void> 
 };
 
 // `删除设置` / `批量删除设置` 已迁移到 ./stores（export * from './stores' 见顶部）
-
-const 自定义背景天赋保护键 = [
-    设置键.视觉设置,
-    设置键.自定义天赋,
-    设置键.自定义背景,
-    设置键.自定义开局预设
-] as const;
-
-const 提取可保留接口配置 = (raw: unknown): unknown => {
-    const normalized = 规范化接口设置(raw);
-    const feature = normalized.功能模型占位;
-    return {
-        activeConfigId: normalized.activeConfigId,
-        configs: 深拷贝(normalized.configs),
-        // 这里直接保留完整的归一化功能配置，避免新增字段时因白名单遗漏导致“能改不能存”。
-        功能模型占位: 深拷贝({
-            ...默认功能模型占位,
-            ...feature
-        })
-    };
-};
-
-const 读取设置保护快照 = async (keys: string[]): Promise<Array<{ key: string; value: any }>> => {
-    const snapshots: Array<{ key: string; value: any }> = [];
-    for (const key of keys) {
-        const value = await 读取设置(key);
-        if (value !== null && value !== undefined) {
-            snapshots.push({
-                key,
-                value: key === 设置键.API配置 ? 提取可保留接口配置(value) : value
-            });
-        }
-    }
-    return snapshots;
-};
-
-const 回写设置保护快照 = async (snapshots: Array<{ key: string; value: any }>): Promise<void> => {
-    for (const item of snapshots) {
-        await 保存设置(item.key, item.value);
-    }
-};
-
-export const 导出研发设置模板 = async (): Promise<研发设置模板结构> => {
-    const rawApiSettings = await 读取设置(设置键.API配置);
-    return {
-        version: 研发设置模板版本,
-        exportedAt: new Date().toISOString(),
-        payload: {
-            apiSettings: 提取可保留接口配置(rawApiSettings)
-        }
-    };
-};
-
-export const 导入研发设置模板 = async (payload: unknown): Promise<研发设置模板导入结果> => {
-    if (!payload || typeof payload !== 'object') {
-        throw new Error('导入失败：设置模板内容为空或格式不正确。');
-    }
-
-    const root = payload as Record<string, unknown>;
-    const rawContainer = (root.payload && typeof root.payload === 'object')
-        ? root.payload as Record<string, unknown>
-        : root;
-    const candidateApiSettings = rawContainer.apiSettings ?? rawContainer.api ?? root[设置键.API配置];
-
-    if (candidateApiSettings === undefined || candidateApiSettings === null) {
-        throw new Error('导入失败：未找到 apiSettings 字段。');
-    }
-
-    const sanitizedApiSettings = 提取可保留接口配置(candidateApiSettings);
-    await 保存设置(设置键.API配置, sanitizedApiSettings);
-
-    return {
-        appliedKeys: [设置键.API配置]
-    };
-};
-
-const 清理运行时图片缓存 = (): void => {
-    清空图片资源缓存();
-    图片资源签名缓存.clear();
-};
+// `自定义背景天赋保护键` / `读取设置保护快照` / `回写设置保护快照` 已迁移到 ./migrations
 
 const 清除浏览器侧缓存 = async (options?: { includeLocalStorage?: boolean }): Promise<void> => {
     const tasks: Promise<unknown>[] = [];

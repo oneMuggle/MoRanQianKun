@@ -16,21 +16,12 @@ import { 初始化数据库 } from './initialization';
 import { SETTINGS_STORE } from './schema';
 import { 获取设置项定义, 设置分类定义表 } from '../../utils/settingsSchema';
 import { 估算对象字节数, 估算设置摘要 } from './_helpers';
+import { 清理未引用图片资源 } from './image-assets';
 import type { 设置存储记录, 设置管理项 } from './types';
 
 // ────────────────────────────────────────────────────────────────
-// 跨模块依赖（globalThis 桥接，由 index.ts 在顶层注册）
+// 跨模块依赖（Day 38：从 image-assets.ts 直接导入，移除 globalThis 桥接）
 // ────────────────────────────────────────────────────────────────
-
-/**
- * `清理未引用图片资源` 仍在 index.ts 中（Day 38 拆分到 image-assets.ts）
- * index.ts 模块加载后会把真实函数挂到 globalThis 的同名属性上
- * 这里通过 getter 取值，避免循环 import 在模块初始化时报错
- */
-const get清理未引用图片资源 = (): (() => Promise<number>) => {
-    const fn = (globalThis as any).__dbService_清理未引用图片资源;
-    return typeof fn === 'function' ? fn : async () => 0;
-};
 
 // ────────────────────────────────────────────────────────────────
 // 内部 helper（不导出；仅为本模块服务）
@@ -96,7 +87,7 @@ export const 获取设置管理清单 = async (): Promise<设置管理项[]> => 
         });
 };
 
-/** 删除设置项（依赖清理未引用图片资源，跨模块通过 globalThis 桥接） */
+/** 删除设置项（依赖清理未引用图片资源，跨模块通过 image-assets 导入） */
 export const 删除设置 = async (key: string): Promise<void> => {
     const db = await 初始化数据库();
     await new Promise<void>((resolve, reject) => {
@@ -106,7 +97,7 @@ export const 删除设置 = async (key: string): Promise<void> => {
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
     });
-    await get清理未引用图片资源()();
+    await 清理未引用图片资源();
 };
 
 /** 批量删除设置项 */
@@ -120,5 +111,5 @@ export const 批量删除设置 = async (keys: string[]): Promise<void> => {
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
     });
-    await get清理未引用图片资源()();
+    await 清理未引用图片资源();
 };
