@@ -53,8 +53,8 @@ export async function 请求带故障切换(
                 baseUrl: cfg.baseUrl,
                 apiKey: cfg.apiKey,
                 model: cfg.model || primaryConfig?.model || '',
-                maxTokens: cfg.maxTokens,
-                temperature: cfg.temperature,
+                ...(cfg.maxTokens !== undefined && { maxTokens: cfg.maxTokens }),
+                ...(cfg.temperature !== undefined && { temperature: cfg.temperature }),
             });
         }
     }
@@ -67,6 +67,7 @@ export async function 请求带故障切换(
 
     for (let i = 0; i < candidates.length; i++) {
         const candidate = candidates[i];
+        if (!candidate) continue;
         try {
             const response = await 请求模型文本(candidate, messages, {
                 ...options,

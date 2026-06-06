@@ -90,14 +90,14 @@ export function autoAssignModels(configs: ConfigWithModels[]): AssignmentRecomme
         // For image tasks, ONLY consider image-tier models (never fall back to text models)
         if (area.preferredTier === 'image' && area.fallbackTier === 'image') {
             const imageModels = tierMap.get('image') || [];
-            if (imageModels.length > 0) {
-                const pick = imageModels[0];
+            const firstImage = imageModels[0];
+            if (firstImage) {
                 return {
                     areaLabel: area.label,
                     modelField: area.modelField,
                     configIdField: area.configIdField,
-                    assignedModel: pick.modelId,
-                    assignedConfigId: pick.configId,
+                    assignedModel: firstImage.modelId,
+                    assignedConfigId: firstImage.configId,
                     tier: 'image',
                 };
             }
@@ -129,6 +129,16 @@ export function autoAssignModels(configs: ConfigWithModels[]): AssignmentRecomme
         if (candidates.length > 0) {
             // Pick the first one in the preferred tier (highest priority within tier)
             const pick = candidates[0];
+            if (!pick) {
+                return {
+                    areaLabel: area.label,
+                    modelField: area.modelField,
+                    configIdField: area.configIdField,
+                    assignedModel: null,
+                    assignedConfigId: null,
+                    tier: 'unknown',
+                };
+            }
             return {
                 areaLabel: area.label,
                 modelField: area.modelField,

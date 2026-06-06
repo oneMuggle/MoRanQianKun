@@ -131,10 +131,11 @@ const loadCdnManifest = async (): Promise<void> => {
                 if (!Array.isArray(subList)) continue;
                 for (const entry of subList) {
                     if (entry && typeof entry === 'object' && 'id' in entry && 'cdn_url' in entry) {
-                        cdnResourceMap.set(
-                            (entry as Record<string, string>).id,
-                            (entry as Record<string, string>).cdn_url,
-                        );
+                        const idValue = (entry as Record<string, string>).id;
+                        const urlValue = (entry as Record<string, string>).cdn_url;
+                        if (idValue !== undefined) {
+                            cdnResourceMap.set(idValue, urlValue ?? '');
+                        }
                     }
                 }
             }

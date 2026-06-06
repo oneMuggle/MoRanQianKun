@@ -342,7 +342,7 @@ export async function analyzeUnknownErrorWithLLM(
     try {
         const response = await 请求模型文本(tempConfig, messages, {
             temperature: 0.1,
-            signal: llmOptions.signal,
+            ...(llmOptions.signal && { signal: llmOptions.signal }),
             responseFormat: 'json_object',
         });
 
@@ -432,22 +432,25 @@ export function autoAssignModelsWithRedundancy(
         // Image tier: no fallback to text models
         if (area.preferredTier === 'image') {
             const imageModels = pickCandidates('image');
-            if (imageModels.length > 0) {
-                primary = { modelId: imageModels[0].modelId, configId: imageModels[0].configId, tier: 'image' };
+            const firstImage = imageModels[0];
+            if (firstImage) {
+                primary = { modelId: firstImage.modelId, configId: firstImage.configId, tier: 'image' };
             }
             return { areaLabel: area.label, modelField: area.modelField, configIdField: area.configIdField, primary, fallback: null, tier: 'unknown' };
         }
 
         // Primary from preferred tier
         const preferred = pickCandidates(area.preferredTier);
-        if (preferred.length > 0) {
-            primary = { modelId: preferred[0].modelId, configId: preferred[0].configId, tier: area.preferredTier };
+        const firstPreferred = preferred[0];
+        if (firstPreferred) {
+            primary = { modelId: firstPreferred.modelId, configId: firstPreferred.configId, tier: area.preferredTier };
         }
 
         // Fallback from fallback tier
         const fallbackList = pickCandidates(area.fallbackTier);
-        if (fallbackList.length > 0) {
-            fallback = { modelId: fallbackList[0].modelId, configId: fallbackList[0].configId, tier: area.fallbackTier };
+        const firstFallback = fallbackList[0];
+        if (firstFallback) {
+            fallback = { modelId: firstFallback.modelId, configId: firstFallback.configId, tier: area.fallbackTier };
         }
 
         // If no preferred, use fallback as primary
@@ -471,8 +474,8 @@ export function autoAssignModelsWithRedundancy(
         provider: cfg.provider as 接口供应商类型,
         modelCount: cfg.models.length,
         status: cfg.health?.status ?? (cfg.models.length > 0 ? 'healthy' : 'unavailable'),
-        latencyMs: cfg.health?.latencyMs,
-        error: cfg.health?.error,
+        ...(cfg.health?.latencyMs !== undefined && { latencyMs: cfg.health.latencyMs }),
+        ...(cfg.health?.error !== undefined && { error: cfg.health.error }),
         models: cfg.models,
     }));
 

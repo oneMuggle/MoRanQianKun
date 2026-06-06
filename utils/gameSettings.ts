@@ -324,6 +324,8 @@ export const 规范化游戏设置 = (
         启用调试模式: 读取布尔(source.启用调试模式, fallback.启用调试模式 === true),
         调试日志保留条数: typeof source.调试日志保留条数 === 'number' && Number.isFinite(source.调试日志保留条数)
             ? Math.max(5, Math.min(100, Math.floor(source.调试日志保留条数)))
-            : fallback.调试日志保留条数 ?? 20
-    };
+            : fallback.调试日志保留条数 ?? 20,
+        启用动态难度: 读取布尔(source.启用动态难度, fallback.启用动态难度 === true),
+        ...(typeof source.变量生成最大重试次数 === 'number' && { 变量生成最大重试次数: source.变量生成最大重试次数 })
+    } as 游戏设置结构;
 };

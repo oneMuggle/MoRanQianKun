@@ -10,15 +10,11 @@
     "exactOptionalPropertyTypes": true
   },
   "include": [
-    "hooks/useGame/**/*.ts",
-    "hooks/useGame.ts",
-    "utils/**/*.ts",
-    "prompts/**/*.ts"
+    "utils/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "hooks/useGame/**/*.test.ts",
-    "prompts/**/__tests__/**"
+    "utils/**/*.test.ts"
   ]
 }

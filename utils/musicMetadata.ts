@@ -61,7 +61,8 @@ export async function parseMusicMetadata(buffer: ArrayBuffer): Promise<MusicMeta
             } else if (frameId === "TPE1" || frameId === "TP1") {
                 metadata.artist = decodeTextFrame(frameData);
             } else if (frameId === "APIC" || frameId === "PIC") {
-                metadata.coverUrl = decodeImageFrame(frameData, version);
+                const cover = decodeImageFrame(frameData, version);
+                if (cover !== undefined) metadata.coverUrl = cover;
             } else if (frameId === "USLT" || frameId === "ULT") {
                 metadata.lyrics = decodeLyricsFrame(frameData, version);
             }

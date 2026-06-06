@@ -124,7 +124,7 @@ export const countOpenAIChatMessagesTokensWithBreakdown = (
         return {
             role: item.role,
             content: item.content,
-            name: item.name || undefined,
+            ...(item.name && { name: item.name }),
             roleTokens,
             contentTokens,
             nameTokens,
@@ -136,8 +136,10 @@ export const countOpenAIChatMessagesTokensWithBreakdown = (
 
     if (items.length > 0) {
         const last = items[items.length - 1];
-        last.primingTokens = OpenAI回复预留开销;
-        last.totalTokens += OpenAI回复预留开销;
+        if (last) {
+            last.primingTokens = OpenAI回复预留开销;
+            last.totalTokens += OpenAI回复预留开销;
+        }
     }
 
     return {

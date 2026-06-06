@@ -20,6 +20,7 @@ export const 标准化开局预设方案 = (raw: any): 开局预设方案结构 
 
     const id = 标准化文本(raw.id) || 生成自定义开局预设ID();
     const 名称 = 标准化文本(raw.名称);
+    const normalizedOpeningConfig = 规范化可选开局配置(raw?.openingConfig);
     if (!名称) return null;
 
     const 属性 = 属性键列表.reduce((acc, key) => {
@@ -73,10 +74,10 @@ export const 标准化开局预设方案 = (raw: any): 开局预设方案结构 
                 ? raw.character.天赋名称列表.map((item: unknown) => 标准化文本(item)).filter(Boolean).slice(0, 3)
                 : []
         },
-        openingConfig: 规范化可选开局配置(raw?.openingConfig),
+        ...(normalizedOpeningConfig !== undefined && { openingConfig: normalizedOpeningConfig }),
         openingStreaming: raw?.openingStreaming !== false,
         openingExtraRequirement: 标准化文本(raw?.openingExtraRequirement)
-    };
+    } as 开局预设方案结构;
 };
 
 export const 合并去重开局预设方案 = (rawList: 开局预设方案结构[]): 开局预设方案结构[] => {

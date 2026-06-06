@@ -187,6 +187,7 @@ const 应用路径命令 = (
     for (let index = 0; index < tokens.length - 1; index += 1) {
         const token = tokens[index];
         const nextToken = tokens[index + 1];
+        if (token === undefined || nextToken === undefined) continue;
         if (typeof token === 'number') {
             if (!Array.isArray(cursor)) return draft;
             if (cursor[token] === undefined) {
@@ -202,6 +203,7 @@ const 应用路径命令 = (
     }
 
     const lastToken = tokens[tokens.length - 1];
+    if (lastToken === undefined) return draft;
     if (typeof lastToken === 'number') {
         if (!Array.isArray(cursor)) return draft;
         if (action === 'delete') {

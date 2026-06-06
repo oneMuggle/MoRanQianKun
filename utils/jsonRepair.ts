@@ -140,14 +140,14 @@ const closeDanglingString = (input: string): string => {
 
 const findPrevNonWhitespaceIndex = (text: string, from: number): number => {
     for (let i = Math.min(from, text.length - 1); i >= 0; i--) {
-        if (!/\s/.test(text[i])) return i;
+        if (!/\s/.test(text[i]!)) return i;
     }
     return -1;
 };
 
 const findNextNonWhitespaceIndex = (text: string, from: number): number => {
     for (let i = Math.max(0, from); i < text.length; i++) {
-        if (!/\s/.test(text[i])) return i;
+        if (!/\s/.test(text[i]!)) return i;
     }
     return -1;
 };
@@ -169,7 +169,7 @@ const repairMissingCommaByParseError = (input: string, errorMessage?: string): s
     const nextCh = input[nextIdx];
     const beforeHasComma = prevCh === ',';
     const looksLikeAdjacentNextKey = nextCh === '"' || nextCh === '{' || nextCh === '[';
-    const valueEnded = prevCh === '"' || prevCh === '}' || prevCh === ']' || /[0-9a-zA-Z]/.test(prevCh);
+    const valueEnded = prevCh === '"' || prevCh === '}' || prevCh === ']' || /[0-9a-zA-Z]/.test(prevCh!);
 
     if (!beforeHasComma && looksLikeAdjacentNextKey && valueEnded) {
         return `${input.slice(0, nextIdx)},${input.slice(nextIdx)}`;
@@ -219,10 +219,10 @@ const repairExpectedQuotedPropertyNameByParseError = (input: string, errorMessag
     }
 
     const keyStartChar = input[nextIdx];
-    const isKeyStart = /[A-Za-z_\u4e00-\u9fa5]/.test(keyStartChar);
+    const isKeyStart = /[A-Za-z_\u4e00-\u9fa5]/.test(keyStartChar!);
     if (isKeyStart) {
         let endIdx = nextIdx + 1;
-        while (endIdx < input.length && /[A-Za-z0-9_\u4e00-\u9fa5-]/.test(input[endIdx])) {
+        while (endIdx < input.length && /[A-Za-z0-9_\u4e00-\u9fa5-]/.test(input[endIdx]!)) {
             endIdx += 1;
         }
         const colonIdx = findNextNonWhitespaceIndex(input, endIdx);

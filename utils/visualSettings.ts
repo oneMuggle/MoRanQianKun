@@ -118,8 +118,8 @@ export const 规范化视觉设置 = (raw?: Partial<视觉设置结构> | null):
         背景图片: typeof raw?.背景图片 === 'string' ? raw.背景图片 : '',
         常驻壁纸: typeof raw?.常驻壁纸 === 'string' ? raw.常驻壁纸 : '',
         渲染层数: Math.max(1, Number(raw?.渲染层数) || 10),
-        字体大小: Number(raw?.字体大小) || 区域文字样式.聊天.字号,
-        段落间距: Number(raw?.段落间距) || 区域文字样式.聊天.行高,
+        字体大小: Number(raw?.字体大小) || 区域文字样式.聊天.字号 || 14,
+        段落间距: Number(raw?.段落间距) || 区域文字样式.聊天.行高 || 1.5,
         AI思考流式折叠: raw?.AI思考流式折叠 !== false,
         底部滚动关闭显示: raw?.底部滚动关闭显示 === true,
         字体资源列表,
@@ -160,7 +160,7 @@ export const 获取区域运行时样式 = (settings: 视觉设置结构 | undef
 export const 获取字体资源 = (settings: 视觉设置结构 | undefined, fontId?: string): 字体资源结构 => {
     const normalized = 规范化视觉设置(settings);
     const matched = normalized.字体资源列表?.find(item => item.id === fontId);
-    return matched || 默认系统字体列表[0];
+    return matched || 默认系统字体列表[0]!;
 };
 
 export const 获取UI文字样式 = (settings: 视觉设置结构 | undefined, token: 可用UI文字令牌): Required<Pick<UI文字样式结构, '启用自定义' | '字体ID' | '字体颜色' | '字号' | '行高' | '字形'>> => {
@@ -190,17 +190,18 @@ export const 构建UI文字样式 = (settings: 视觉设置结构 | undefined, t
 
 export const 构建UI文字CSS变量 = (settings: 视觉设置结构 | undefined): React.CSSProperties => {
     const normalized = 规范化视觉设置(settings);
-    return UI文字令牌列表.reduce<React.CSSProperties>((acc, item) => {
+    const acc: Record<string, string | number> = {};
+    for (const item of UI文字令牌列表) {
         const style = 获取UI文字样式(normalized, item.key);
         const font = 获取字体资源(normalized, style.字体ID);
         const tokenKey = item.key;
-        acc[`--ui-${tokenKey}-font-family` as any] = font.fontFamily;
-        acc[`--ui-${tokenKey}-font-size` as any] = `${style.字号}px`;
-        acc[`--ui-${tokenKey}-line-height` as any] = String(style.行高);
-        acc[`--ui-${tokenKey}-color` as any] = style.字体颜色;
-        acc[`--ui-${tokenKey}-font-style` as any] = style.字形;
-        return acc;
-    }, {});
+        acc[`--ui-${tokenKey}-font-family`] = font.fontFamily;
+        acc[`--ui-${tokenKey}-font-size`] = `${style.字号}px`;
+        acc[`--ui-${tokenKey}-line-height`] = String(style.行高);
+        acc[`--ui-${tokenKey}-color`] = style.字体颜色;
+        acc[`--ui-${tokenKey}-font-style`] = style.字形;
+    }
+    return acc as React.CSSProperties;
 };
 
 export const 构建区域文字样式 = (settings: 视觉设置结构 | undefined, area: 可用视觉区域): React.CSSProperties => {

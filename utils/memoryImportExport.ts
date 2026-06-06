@@ -27,7 +27,7 @@ export const 快速导出记忆JSON = (
         包含短期记忆: true,
         包含中期记忆: true,
         包含长期记忆: true,
-        角色名称,
+        ...(角色名称 !== undefined && { 角色名称 }),
     });
 };
 
@@ -45,7 +45,7 @@ export const 快速导出记忆Txt = (
         包含短期记忆: true,
         包含中期记忆: true,
         包含长期记忆: true,
-        角色名称,
+        ...(角色名称 !== undefined && { 角色名称 }),
     });
 };
 
@@ -63,7 +63,7 @@ export const 仅导出回忆档案 = (
         包含短期记忆: false,
         包含中期记忆: false,
         包含长期记忆: false,
-        角色名称,
+        ...(角色名称 !== undefined && { 角色名称 }),
     });
 };
 
@@ -81,7 +81,7 @@ export const 导出短中期记忆 = (
         包含短期记忆: true,
         包含中期记忆: true,
         包含长期记忆: false,
-        角色名称,
+        ...(角色名称 !== undefined && { 角色名称 }),
     });
 };
 
@@ -99,7 +99,7 @@ export const 仅导出长期记忆 = (
         包含短期记忆: false,
         包含中期记忆: false,
         包含长期记忆: true,
-        角色名称,
+        ...(角色名称 !== undefined && { 角色名称 }),
     });
 };
 
