@@ -70,7 +70,7 @@ export interface 博主种草场景Result {
     费用是否透明: boolean;
     评价真实性: number;  // 0-100
   };
-  你的状态变化: {
+  状态变化: {
     焦虑变化: number;
     下单冲动: number;
   };
@@ -400,29 +400,6 @@ export function 生成博主种草场景(
     ],
   };
 }
-
-type 博主种草场景Result = {
-  场景描述: string;
-  博主信息: 医美博主信息;
-  种草内容: {
-    推荐项目: string;
-    推荐机构: string;
-    术前术后对比: string;
-    恢复期描述: string;
-    费用描述: string;
-  };
-  可信度分析: {
-    是否有照片证据: boolean;
-    是否提及风险: boolean;
-    费用是否透明: boolean;
-    评价真实性: number;
-  };
-  状态变化: {
-    焦虑变化: number;
-    下单冲动: number;
-  };
-  选择: string[];
-};
 
 // ==================== 中介引流场景 ====================
 

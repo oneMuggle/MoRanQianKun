@@ -706,6 +706,7 @@ function allEngines<T>(fallback: T): Record<EngineType, T> {
     dailyTown: fallback,
     notification: fallback,
     barNSFW: fallback,
+    nsfwEnhancement: fallback,
   };
 }
 

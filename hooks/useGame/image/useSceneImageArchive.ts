@@ -44,8 +44,8 @@ export function useSceneImageArchive(deps: SceneImageArchiveDeps) {
     const 已提示后台场景生图任务Ref = useRef<Set<string>>(new Set());
 
     const 获取场景图历史上限 = useCallback((): number => (
-        规范化图片管理设置(deps.imageManagerConfigRef.current || deps.imageManagerConfig || 默认图片管理设置).场景图历史上限
-    ), [deps.imageManagerConfigRef, deps.imageManagerConfig]);
+        规范化图片管理设置(deps.imageManagerConfigRef.current || (deps as any).imageManagerConfig || 默认图片管理设置).场景图历史上限
+    ), [deps.imageManagerConfigRef]);
 
     const 应用场景图片档案到状态 = (value: 场景图片档案 | null | undefined) => {
         const normalized = 规范化场景图片档案(value || {});
@@ -75,7 +75,7 @@ export function useSceneImageArchive(deps: SceneImageArchiveDeps) {
         },
         获取当前场景图片档案: () => 场景图片档案Ref.current || {},
         清理未引用图片资源: dbService.清理未引用图片资源,
-        获取当前视觉设置: () => deps.visualConfigRef.current || deps.visualConfig,
+        获取当前视觉设置: () => (deps.visualConfigRef.current || deps.visualConfig) as any,
         应用视觉设置到状态: deps.应用视觉设置到状态,
         深拷贝: deps.深拷贝,
         加载图片AI服务: deps.加载图片AI服务
@@ -162,7 +162,7 @@ export function useSceneImageArchive(deps: SceneImageArchiveDeps) {
             return 获取生图画师串预设(...args);
         },
         获取当前PNG画风预设: (presetId?: string) => deps.获取当前PNG画风预设摘要(presetId, 'scene'),
-        获取场景角色锚点: (...args: any[]) => deps.按NPC读取角色锚点(...args),
+        获取场景角色锚点: (npcId: string) => deps.按NPC读取角色锚点(npcId),
         获取词组转化器预设提示词: (...args: any[]) => {
             const { 获取词组转化器预设提示词 } = require('../../utils/apiConfig');
             return 获取词组转化器预设提示词(...args);

@@ -163,7 +163,7 @@ async function step5_任务执行(state: JourneyState): Promise<boolean> {
     log(state, '步骤5', `评价: ${评价.评价}, 服从度变化: ${评价.服从度变化}`);
     state.服从度 = Math.max(0, Math.min(100, state.服从度 + 评价.服从度变化));
     state.完成任务数 += 1;
-    if (评价.评价 === '完美' || (评价.评价 as string) === '完美') state.完美服从数 += 1;
+    if (评价.评价 === '完美服从') state.完美服从数 += 1;
     state.任务列表[0].状态 = '已完成';
     return true;
   } catch (err) {

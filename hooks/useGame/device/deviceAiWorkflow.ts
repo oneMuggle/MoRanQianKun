@@ -118,6 +118,106 @@ export function 构建设备消息系统提示词(
             角色: 'BDSM 论坛帖子生成器',
             输出格式: 'JSON 数组，每个帖子包含 author（匿名昵称）、title（标题）、content（正文）、time（时间）、replies（回复数，0-3）、views（浏览数，50-5000）、replyList（回复列表，2-4条）、impactLevel（影响等级：轻微/中等/严重）。category 字段必须从以下子分类中选择且只能选一个：匿名讨论、经验交流、物品话题、心理探索、安全科普、寻主召奴。约 1/5 的帖子应为寻主召奴类型，此类额外包含 recruiterRole（寻主/召奴/不限）、relationshipType（期望关系类型，如 DS关系/主奴关系/玩伴关系等）',
         },
+        phone: {
+            角色: '通话记录生成器',
+            输出格式: 'JSON 数组，每条记录包含 name（联系人）、number（号码）、time（时间）、duration（时长）、type（来电/去电/未接）',
+        },
+        sms: {
+            角色: '短信内容生成器',
+            输出格式: 'JSON 数组，每条短信包含 sender（发送者）、content（内容）、time（时间）、read（是否已读）',
+        },
+        camera: {
+            角色: '相机相册描述者',
+            输出格式: 'JSON 数组，每张图片包含 title（标题）、description（描述）、date（日期）、location（拍摄地点）',
+        },
+        settings: {
+            角色: '系统设置项描述者',
+            输出格式: 'JSON 数组，每项包含 name（设置项）、value（当前值）、category（分类）',
+        },
+        weather: {
+            角色: '天气信息描述者',
+            输出格式: 'JSON 对象，包含 temperature（温度）、humidity（湿度）、wind（风力）、condition（天气状况）、forecast（未来几天预报数组）',
+        },
+        calendar: {
+            角色: '日历事件生成器',
+            输出格式: 'JSON 数组，每个事件包含 title（标题）、date（日期）、time（时间）、location（地点）、description（描述）',
+        },
+        clock: {
+            角色: '时钟/闹钟描述者',
+            输出格式: 'JSON 数组，每个闹钟包含 label（标签）、time（时间）、repeat（重复周期）',
+        },
+        files: {
+            角色: '文件列表描述者',
+            输出格式: 'JSON 数组，每个文件包含 name（名称）、size（大小）、type（类型）、modified（修改时间）',
+        },
+        ride_hailing: {
+            角色: '网约车订单生成器',
+            输出格式: 'JSON 数组，每个订单包含 from（起点）、to（终点）、time（时间）、fare（费用）、status（状态）',
+        },
+        delivery: {
+            角色: '外卖/配送订单生成器',
+            输出格式: 'JSON 数组，每个订单包含 orderId（订单号）、items（商品列表）、address（地址）、status（状态）',
+        },
+        appointment: {
+            角色: '预约记录生成器',
+            输出格式: 'JSON 数组，每个预约包含 service（服务项目）、time（时间）、provider（服务方）、status（状态）',
+        },
+        ledger: {
+            角色: '记账条目生成器',
+            输出格式: 'JSON 数组，每条记录包含 type（收入/支出）、amount（金额）、category（分类）、date（日期）、note（备注）',
+        },
+        work_schedule: {
+            角色: '工作排班生成器',
+            输出格式: 'JSON 数组，每个班次包含 date（日期）、time（时间段）、role（岗位）、location（地点）',
+        },
+        property: {
+            角色: '房源信息生成器',
+            输出格式: 'JSON 数组，每个房源包含 address（地址）、area（面积）、rent（月租）、status（状态）',
+        },
+        shopping: {
+            角色: '购物订单生成器',
+            输出格式: 'JSON 数组，每个订单包含 product（商品）、price（价格）、quantity（数量）、status（状态）',
+        },
+        social_media: {
+            角色: '社交媒体内容生成器',
+            输出格式: 'JSON 数组，每个帖子包含 author（作者）、content（内容）、likes（点赞数）、comments（评论数）、time（时间）',
+        },
+        app_store: {
+            角色: '应用市场描述者',
+            输出格式: 'JSON 数组，每个应用包含 name（名称）、category（分类）、rating（评分）、description（简介）',
+        },
+        music: {
+            角色: '音乐播放器描述者',
+            输出格式: 'JSON 数组，每首歌曲包含 title（歌名）、artist（歌手）、album（专辑）、duration（时长）',
+        },
+        video: {
+            角色: '视频内容描述者',
+            输出格式: 'JSON 数组，每个视频包含 title（标题）、duration（时长）、views（播放量）、description（简介）',
+        },
+        fitness: {
+            角色: '运动健康数据生成器',
+            输出格式: 'JSON 数组，每条记录包含 type（运动类型）、duration（时长）、calories（消耗卡路里）、date（日期）',
+        },
+        map_app: {
+            角色: '地图导航描述者',
+            输出格式: 'JSON 数组，每个地点包含 name（名称）、address（地址）、distance（距离）、rating（评分）',
+        },
+        dating: {
+            角色: '约会交友资料生成器',
+            输出格式: 'JSON 数组，每个用户包含 nickname（昵称）、age（年龄）、bio（简介）、distance（距离）、tags（标签）',
+        },
+        adult_forum: {
+            角色: '成人论坛内容生成器',
+            输出格式: 'JSON 数组，每个帖子包含 author（作者）、title（标题）、content（内容）、replies（回复数）',
+        },
+        nsfw_gallery: {
+            角色: '私密相册内容生成器',
+            输出格式: 'JSON 数组，每张图片包含 title（标题）、description（描述）、date（日期）',
+        },
+        live_stream: {
+            角色: '直播间信息生成器',
+            输出格式: 'JSON 数组，每个直播包含 streamer（主播）、title（标题）、viewers（观众数）、category（分类）',
+        },
     };
 
     const appInfo = appTypeMap[appType];
