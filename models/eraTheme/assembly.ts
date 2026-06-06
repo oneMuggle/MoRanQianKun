@@ -119,6 +119,7 @@ export function resolveEraNode(id: string): {
         // 从节点自身向根遍历（path 是 [root, ..., leaf]，需要反转）
         for (let i = path.length - 1; i >= 0; i--) {
             const n = path[i];
+            if (!n) continue;
             const val = getter(n);
             if (val !== undefined) {
                 return { value: val, sourceId: n.id };
