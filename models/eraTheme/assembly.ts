@@ -221,7 +221,7 @@ function toLegacyEra(node: EraNode): 时代主题方案 | null {
         描述: node.description ?? '',
         配色: resolved.inherited.colors as 时代主题配色,
         字体: resolved.inherited.typography as 时代主题字体,
-        界面文案: node.uiCopy,
+        ...(node.uiCopy !== undefined && { 界面文案: node.uiCopy }),
     };
 }
 

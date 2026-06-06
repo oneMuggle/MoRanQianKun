@@ -197,5 +197,5 @@ export function makeNode(
     extra: Partial<Pick<EraNode, 'colors' | 'typography' | 'uiStyle' | 'bgmTags' | 'artStyle' | 'description' | 'uiCopy' | 'promptVars' | 'openingScenes' | 'characterArchetypes' | 'writingSamples' | 'conflictTypes' | 'liMode' | 'realm'>> = {},
     children: EraNode[] = []
 ): EraNode {
-    return { id, name, depth, parent, ...extra, children: children.length > 0 ? children : undefined };
+    return { id, name, depth, parent, ...extra, ...(children.length > 0 && { children }) };
 }
