@@ -64,13 +64,13 @@ const NPCRelationshipPanel: React.FC<NPCRelationshipPanelProps> = ({
   onClose,
   onInteraction,
 }) => {
-  const 关系数据 = npc.关系数据;
+  const 关系数据 = (npc as any).关系数据;
   const 当前阶段 = 关系数据 ? 计算关系类型(关系数据) : '陌生';
   const 阶段颜色 = 关系类型颜色[当前阶段];
 
   // 计算到下一阶段需要的数值
   const 下一阶段阈值 = useMemo(() => {
-    if (当前阶段 === '陌生人') return null;
+    if (当前阶段 === '陌生') return null;
     const 阈值表: Record<关系类型, { 好感度: number; 亲密度: number; 信任度: number; 感情值: number }> = {
       '陌生': { 好感度: 20, 亲密度: 10, 信任度: 5, 感情值: 5 },
       '相识': { 好感度: 40, 亲密度: 25, 信任度: 20, 感情值: 15 },

@@ -1,5 +1,6 @@
 import React from 'react';
 import MobileDevice from './MobileDevice';
+const TypedMobileDevice = MobileDevice as unknown as React.FC<any>;
 import type { 接口设置结构 } from '../../../models/system';
 import type { 当前可用接口结构 } from '../../../utils/apiConfig';
 import { DeviceState, MobileApp, DeviceGameContext } from '../../../models/mobileDevice';
@@ -11,7 +12,7 @@ import type { BDSM论坛帖子 } from '../../../models/campusNSFW/bdsm-forum';
 
 // MobileDeviceModal uses the full 接口设置结构 internally to pass to sub-components
 // that need access to the complete API configuration.
-type ApiConfigLike = 当前可用接口结构 | 接口设置结构 | Record<string, unknown>;
+type ApiConfigLike = import('./MobileHome').ApiConfigLike | Record<string, unknown>;
 
 interface MobileDeviceModalProps {
     eraId: string;
@@ -71,7 +72,7 @@ const MobileDeviceModal: React.FC<MobileDeviceModalProps> = ({
                 className="w-full max-w-lg h-[70vh] mx-4"
                 onClick={(e) => e.stopPropagation()}
             >
-                <MobileDevice
+                <TypedMobileDevice
                     eraId={eraId}
                     deviceState={deviceState}
                     onAppClick={onAppClick}
@@ -88,12 +89,12 @@ const MobileDeviceModal: React.FC<MobileDeviceModalProps> = ({
                     onCreateChatSession={onCreateChatSession}
                     onConfirmNegotiation={onConfirmNegotiation}
                     onBDSM保存安全设置={onBDSM保存安全设置}
-                    apiConfig={apiConfig}
-                    installedApps={installedApps}
+                    apiConfig={apiConfig as any}
+                    installedApps={installedApps as any}
                     nsfwEnabled={nsfwEnabled}
                     maxNsfwLevel={maxNsfwLevel}
-                    onInstallApp={onInstallApp}
-                    onUninstallApp={onUninstallApp}
+                    onInstallApp={onInstallApp as any}
+                    onUninstallApp={onUninstallApp as any}
                 />
             </div>
         </div>

@@ -186,11 +186,11 @@ export function GameView({
                 {/* 顶部导航栏 */}
                 <div className={`shrink-0 z-40 bg-ink-black/90 border-b border-wuxia-gold/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] relative rounded-t-xl overflow-visible mx-1 mt-1 lixia-topbar ${(state.gameConfig as any)?.启用里志怪模式 ? 'lizhiguai-topbar' : ''}`}>
                     <TopBar
-                        环境={state.环境}
+                        环境={state.环境 as any}
                         游戏初始时间={state.游戏初始时间 as string}
                         timeFormat={(state.visualConfig as any)?.时间显示格式}
-                        festivals={state.festivals}
-                        visualConfig={state.visualConfig}
+                        festivals={state.festivals as any}
+                        visualConfig={state.visualConfig as any}
                         eraId={state.currentEra as string}
                         启用子纪元里模式={(state.gameConfig as any)?.启用子纪元里模式}
                         子纪元里模式强度={(state.gameConfig as any)?.子纪元里模式强度}
@@ -236,11 +236,11 @@ export function GameView({
                     {/* 左侧栏 */}
                     <div className={`hidden md:block w-[14.285714%] h-full relative z-20 bg-ink-black/95 border-r border-wuxia-gold/20 flex flex-col shadow-[10px_0_20px_rgba(0,0,0,0.5)] lixia-panel-left ${(state.gameConfig as any)?.启用里志怪模式 ? 'lizhiguai-panel-left' : ''} transition-all duration-500 ${galgameImmersion ? 'opacity-0 pointer-events-none md:w-0 overflow-hidden' : ''}`}>
                         <LeftPanel
-                            角色={state.角色}
+                            角色={state.角色 as any}
                             onOpenCharacter={openCharacter}
                             onUploadAvatar={(actions as any).updatePlayerAvatar}
-                            visualConfig={state.visualConfig}
-                            gameConfig={state.gameConfig}
+                            visualConfig={state.visualConfig as any}
+                            gameConfig={state.gameConfig as any}
                         />
                     </div>
 
@@ -446,13 +446,13 @@ export function GameView({
                             ) : (
                                 <>
                                     <ChatList
-                                        history={state.历史记录}
+                                        history={state.历史记录 as any}
                                         loading={state.loading as boolean}
-                                        scrollRef={state.scrollRef}
+                                        scrollRef={state.scrollRef as any}
                                         onUpdateHistory={(actions as any).updateHistoryItem}
                                         onPolishTurn={(actions as any).handlePolishTurn}
-                                        visualConfig={state.visualConfig}
-                                        socialList={state.社交}
+                                        visualConfig={state.visualConfig as any}
+                                        socialList={state.社交 as any}
                                         playerProfile={playerProfile}
                                         renderCount={(state.visualConfig as any)?.渲染层数}
                                         suppressAutoScrollToken={(meta as any).chatScrollSuppressToken}
@@ -520,7 +520,7 @@ export function GameView({
                             enableKungfu={启用修炼体系}
                             onSave={openSave}
                             onLoad={openLoad}
-                            visualConfig={state.visualConfig}
+                            visualConfig={state.visualConfig as any}
                             rpgModeEnabled={rpgModeEnabled}
                             onOpenRpgBattle={openRpgBattle}
                             onOpenRpgEquipment={openRpgEquipment}

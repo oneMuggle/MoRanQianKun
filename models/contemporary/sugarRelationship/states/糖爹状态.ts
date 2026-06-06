@@ -112,9 +112,9 @@ export function 根据身份创建糖爹(
 // 更新糖爹状态
 export function 更新糖爹状态(
   state: 糖爹核心状态,
-  updates: Partial<糖爹核心状态>
+  updates: any
 ): 糖爹核心状态 {
-  return { ...state, ...updates };
+  return { ...state, ...(updates as Partial<糖爹核心状态>) };
 }
 
 // 增加累计花费

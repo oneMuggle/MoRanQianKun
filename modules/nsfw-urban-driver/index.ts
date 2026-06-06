@@ -12,12 +12,8 @@ export const manifest: ModuleManifest = {
   configValue: true,
   dependencies: [],
   promptBlock: () => {
-    return 构建行程NSFW叙事约束({
-      行程阶段: '未开始',
-      内容强度: '微暗',
-      乘客好感度: 0,
-    } as any);
+    return 构建行程NSFW叙事约束('未开始' as any, '微暗');
   },
 };
 
-export type { 网约车NSFW设置 } from '../../models/urbanDriverNSFW';
+export type { 都市网约车NSFW设置 } from '../../models/urbanDriverNSFW';

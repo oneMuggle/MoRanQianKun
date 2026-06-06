@@ -513,7 +513,7 @@ const MemoryModal: React.FC<Props> = ({
                                         
                                         {activeTab === 'search' && '层' in mem && (
                                             <div className="text-xs text-purple-400/70 font-mono mb-4 border-b border-gray-800/80 pb-2 flex items-center gap-2">
-                                                <span className="text-base text-purple-500">◷</span> {mem.层} · 回合{mem.回合} · 匹配度{Math.round(mem.匹配度 * 10) / 10}
+                                                <span className="text-base text-purple-500">◷</span> {mem.层} · 回合{(mem as any).回合} · 匹配度{Math.round((mem as any).匹配度 * 10) / 10}
                                             </div>
                                         )}
                                         {mem.rawDate && activeTab !== 'search' && (

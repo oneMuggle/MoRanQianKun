@@ -680,8 +680,8 @@ export const 构建NPC上下文 = (
           // Phase 1 新增：内在动机
           if (演化状态?.内在动机) {
             const 动机 = 演化状态.内在动机;
-            const 最未满足 = Object.values(动机.欲望状态)
-              .sort((a, b) => a.当前满足度 - b.当前满足度)[0];
+            const 最未满足 = Object.values(动机.欲望状态 as any)
+              .sort((a: any, b: any) => a.当前满足度 - b.当前满足度)[0];
             if (最未满足 && 最未满足.当前满足度 < 60) {
               组件.push(`【内在动机】${最未满足.维度}未满足（${Math.round(最未满足.当前满足度)}%）`);
             }

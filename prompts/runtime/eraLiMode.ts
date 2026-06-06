@@ -15,8 +15,8 @@ import { 构建NPCNSFW注入 } from './npcNSFWEnhancement';
 
 /** 里模式强度级别 */
 // 2026-06-03 P4-9: LiModeIntensity 已提取到 prompts/core/liMode.ts（解决循环）
-export type { LiModeIntensity } from '../core/liMode';
-import { LiModeIntensity as _LiModeIntensity } from '../core/liMode';
+import { LiModeIntensity } from '../core/liMode';
+export type { LiModeIntensity };
 
 /** 默认阶段规则 — 通用模板，SubEra 可通过 stageRules 覆盖 */
 const DEFAULT_STAGE_RULES: Record<LiModeStage, string> = {

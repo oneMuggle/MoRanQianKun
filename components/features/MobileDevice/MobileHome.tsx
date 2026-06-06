@@ -8,7 +8,7 @@ import type { AppInstallState } from '../../../models/installedApps';
 import type { NsfwLevel } from '../../../models/appRegistry';
 import { isAppVisible } from '../../../models/nsfwApps';
 
-type ApiConfigLike = 当前可用接口结构 | Record<string, unknown>;
+export type ApiConfigLike = 当前可用接口结构 | Record<string, unknown>;
 import MapApp from './apps/MapApp';
 import ContactsApp from './apps/ContactsApp';
 import NewsApp from './apps/NewsApp';

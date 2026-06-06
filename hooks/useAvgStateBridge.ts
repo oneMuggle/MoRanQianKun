@@ -206,6 +206,26 @@ export function useAvgStateBridge(): UseAvgStateBridgeReturn {
     [syncStateToZustand]
   );
 
+  const syncNpcWuxiaToAvg = React.useCallback(
+    (npcId: string, wuxiaIntimacy: number): number => {
+      const engine = engineRef.current;
+      if (!engine) return 0;
+      const result = engine.syncNpcWuxiaToAvg(npcId, wuxiaIntimacy);
+      syncStateToZustand();
+      return result;
+    },
+    [syncStateToZustand]
+  );
+
+  const getNpcIntimacyMapping = React.useCallback(
+    (npcId: string) => {
+      const engine = engineRef.current;
+      if (!engine) return null;
+      return engine.getNpcIntimacyMapping(npcId);
+    },
+    []
+  );
+
   return {
     engineRef,
     getSnapshot,
@@ -217,5 +237,7 @@ export function useAvgStateBridge(): UseAvgStateBridgeReturn {
     resolveEnding,
     completeEnding,
     setFlag,
+    syncNpcWuxiaToAvg,
+    getNpcIntimacyMapping,
   };
 }

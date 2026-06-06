@@ -9,7 +9,7 @@ import type { 潜水等级 } from '../types';
 /**
  * OW课程配置
  */
-export const OW课程配置 = {
+export const OW课程配置数据 = {
   总天数: 4,
   内容: {
     理论: ['潜水装备认识', '水中呼吸技巧', '面罩排水', '课堂测试'],

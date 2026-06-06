@@ -35,7 +35,7 @@ export type {
 
 // ==================== 状态导出 ====================
 
-export type { 相亲者核心状态 as 相亲者状态 } from './states/相亲者状态';
+export type { 相亲者核心状态 as 相亲者状态 } from './types';
 export {
   创建默认相亲者状态,
   根据身份创建相亲者,
@@ -53,7 +53,7 @@ export {
   获取相亲者摘要,
 } from './states/相亲者状态';
 
-export type { 相亲对象核心状态 as 对象状态 } from './states/对象状态';
+export type { 相亲对象核心状态 as 对象状态 } from './types';
 export {
   创建默认相亲对象,
   创建骗子对象,
@@ -69,7 +69,7 @@ export {
   获取对象摘要,
 } from './states/对象状态';
 
-export type { 婚恋平台状态 as 平台状态 } from './states/平台状态';
+export type { 婚恋平台状态 as 平台状态 } from './types';
 export {
   创建默认婚恋平台,
   创建婚恋平台,
@@ -200,9 +200,9 @@ export const 默认婚恋相亲NSFW设置: 婚恋相亲NSFW设置 = {
 // ==================== 系统扩展接口 ====================
 
 export interface 婚恋相亲系统扩展 {
-  相亲者档案?: Record<string, import('./states/相亲者状态').相亲者核心状态>;
-  对象档案?: Record<string, import('./states/对象状态').相亲对象核心状态>;
-  平台档案?: Record<string, import('./states/平台状态').婚恋平台状态>;
+  相亲者档案?: Record<string, import('./types').相亲者核心状态>;
+  对象档案?: Record<string, import('./types').相亲对象核心状态>;
+  平台档案?: Record<string, import('./types').婚恋平台状态>;
   当前相亲信息?: {
     相亲对象: string;
     当前阶段: import('./types').关系状态;

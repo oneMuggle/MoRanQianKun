@@ -21,4 +21,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 桌游类型, 桌游NSFW设置 } from '../../models/boardGameNSFW';
+export type { 桌游类型, 桌游社交NSFW设置 } from '../../models/boardGameNSFW';

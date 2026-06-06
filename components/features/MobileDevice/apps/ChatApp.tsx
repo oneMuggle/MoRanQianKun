@@ -61,8 +61,8 @@ const ChatApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameContext, 
                     const context = {
                         当前场景: gameContext?.世界?.进行中事件?.[0]?.事件名 || '',
                         角色名: gameContext?.角色?.姓名 || '',
-                        当前位置: gameContext?.世界?.当前位置?.名称 || '',
-                        世界状态: gameContext?.世界?.状态?.描述 || '',
+                        当前位置: (gameContext as any)?.世界?.当前地点 || (gameContext as any)?.世界?.位置 || '',
+                        世界状态: (gameContext as any)?.世界?.状态?.描述 || (gameContext as any)?.世界?.时间 || '',
                     };
 
                     const generatedGroups = await 生成设备群组(

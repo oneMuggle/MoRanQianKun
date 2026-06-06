@@ -215,9 +215,9 @@ export const 默认糖关系NSFW设置: 糖关系NSFW设置 = {
 // ==================== 系统扩展接口 ====================
 
 export interface 糖关系系统扩展 {
-  糖宝档案?: Record<string, import('./states/糖宝状态').糖宝核心状态>;
-  糖爹档案?: Record<string, import('./states/糖爹状态').糖爹核心状态>;
-  关系档案?: Record<string, import('./states/关系状态').糖关系状态完整>;
+  糖宝档案?: Record<string, import('./types').糖宝核心状态>;
+  糖爹档案?: Record<string, import('./types').糖爹核心状态>;
+  关系档案?: Record<string, import('./types').糖关系状态完整>;
   当前配对?: {
     糖宝ID: string;
     糖爹ID: string;

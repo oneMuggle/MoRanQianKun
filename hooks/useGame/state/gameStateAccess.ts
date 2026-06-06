@@ -91,6 +91,8 @@ export interface GameStateAccess {
     setShowRelationship: GameStateSlice['setShowRelationship'];
     showCGGallery: GameStateSlice['showCGGallery'];
     setShowCGGallery: GameStateSlice['setShowCGGallery'];
+    showRelationGraph: GameStateSlice['showRelationGraph'];
+    setShowRelationGraph: GameStateSlice['setShowRelationGraph'];
     showMapExplorer: GameStateSlice['showMapExplorer'];
     setShowMapExplorer: GameStateSlice['setShowMapExplorer'];
 
@@ -396,6 +398,8 @@ export function createGameStateAccess(
         setShowRelationship: gameState.setShowRelationship,
         showCGGallery: gameState.showCGGallery,
         setShowCGGallery: gameState.setShowCGGallery,
+        showRelationGraph: gameState.showRelationGraph,
+        setShowRelationGraph: gameState.setShowRelationGraph,
         showMapExplorer: gameState.showMapExplorer,
         setShowMapExplorer: gameState.setShowMapExplorer,
 

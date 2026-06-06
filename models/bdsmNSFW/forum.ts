@@ -47,6 +47,7 @@ export interface BDSM论坛帖子 extends 基础帖子 {
   子分类: BDSM帖子分类;
   影响等级: 影响等级;
   寻主召奴信息?: 寻主召奴信息;
+  回复列表?: import('../campusPhone').论坛回复[];
 }
 
 export interface BDSM影响记录 {

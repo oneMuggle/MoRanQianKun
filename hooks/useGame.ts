@@ -383,7 +383,7 @@ export const useGame = () => {
         环境, 设置角色, 设置环境, useTravelAndTrade,
         NPC生图任务队列, 场景生图任务队列,
         useBackgroundImageMonitor,
-        都市网约车系统, 写真系统,
+        都市网约车系统: 都市网约车系统 as any, 写真系统: 写真系统 as any,
         设置都市网约车系统, 设置写真系统,
         useNSFW系统初始化,
         创建追加系统消息, 设置历史记录,

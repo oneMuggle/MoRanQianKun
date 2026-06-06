@@ -1,8 +1,9 @@
 import React from 'react';
 import MobileHome from './MobileHome';
 import type { 当前可用接口结构 } from '../../../utils/apiConfig';
+import type { 接口设置结构 } from '../../../models/system';
 
-type ApiConfigLike = 当前可用接口结构 | Record<string, unknown>;
+type ApiConfigLike = 当前可用接口结构 | 接口设置结构 | Record<string, unknown>;
 import { DeviceState, MobileApp, DeviceGameContext } from '../../../models/mobileDevice';
 import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级 } from '../../../types';
 import type { NPC结构 } from '../../../models/social';
@@ -69,7 +70,7 @@ const MobileDevice: React.FC<MobileDeviceProps> = ({
                 onCreateChatSession={onCreateChatSession}
                 onConfirmNegotiation={onConfirmNegotiation}
                 onBDSM保存安全设置={onBDSM保存安全设置}
-                apiConfig={apiConfig}
+                apiConfig={apiConfig as any}
             />
         </div>
     );

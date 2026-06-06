@@ -500,8 +500,7 @@ export const useIsInBattle = () => useBattle().是否战斗中;
  */
 export const useCurrentLocation = () => {
     const env = useEnvironment();
-    const world = useWorld();
-    const 大地点 = env.大地点 || world.当前地点?.名称 || '';
+    const 大地点 = env.大地点 || '';
     const 中地点 = env.中地点 || '';
     const 小地点 = env.小地点 || '';
     return [大地点, 中地点, 小地点].filter(Boolean).join(' - ') || '未知地点';

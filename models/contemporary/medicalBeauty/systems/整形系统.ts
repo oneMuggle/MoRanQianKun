@@ -331,7 +331,7 @@ export function 推荐医生(
   const 阈值 = 消费阈值[消费能力];
 
   return 医生列表
-    .filter(医生 => 医生.price等级 <= 阈值 + 1)
+    .filter(医生 => (医生 as any).price等级 <= 阈值 + 1)
     .sort((a, b) => b.满意率 - a.满意率);
 }
 
@@ -448,9 +448,9 @@ export function 计算费用明细(
   // 计算各项费用
   const 手术费 = Math.round(基础手术费 * 机构加价率 * 医生加价率);
   const 麻醉费 = Math.round(手术费 * 0.15);
-  const 住院费 = 项目.级别 === '三级' || 项目.级别 === '四级' ? 2000 : 500;
+  const 住院费 = (项目 as any).级别 === '三级' || (项目 as any).级别 === '四级' ? 2000 : 500;
   const 药费 = Math.round(手术费 * 0.05);
-  const 复查费 = 项目.级别 === '三级' || 项目.级别 === '四级' ? 2000 : 500;
+  const 复查费 = (项目 as any).级别 === '三级' || (项目 as any).级别 === '四级' ? 2000 : 500;
   const 其他费 = Math.round(手术费 * 0.08);
 
   const 总计 = 手术费 + 麻醉费 + 住院费 + 药费 + 复查费 + 其他费;

@@ -157,27 +157,6 @@ ${氛围.map(a => `- ${a}`).join('\n')}
 }
 
 /**
- * 计算别墅综合暧昧指数
+ * 计算别墅综合暧昧指数（重导出自 systems/别墅系统）
  */
-export function 计算别墅暧昧指数(
-  场景基础指数: number,
-  空间设施加分: number[],
-  氛围加成: number[],
-  时间段: string
-): number {
-  let 指数 = 场景基础指数;
-
-  // 空间设施加成
-  指数 += 空间设施加分.reduce((sum, val) => sum + val, 0);
-
-  // 氛围加成
-  指数 += 氛围加成.reduce((sum, val) => sum + val, 0);
-
-  // 时间段加成
-  const 时间氛围 = 别墅时间段氛围[时间段];
-  if (时间氛围) {
-    指数 += 时间氛围.暧昧加成;
-  }
-
-  return Math.max(0, Math.min(100, Math.round(指数)));
-}
+export { 计算别墅暧昧指数 } from '../systems/别墅系统';

@@ -18,7 +18,7 @@ export * from './models/battle';
 export * from './models/worldbook';
 export * from './models/novelDecomposition';
 export * from './models/campusPhone';
-export * from './models/campusNSFW';
+export type * from './models/campusNSFW';
 export * from './models/relationship';
 
 // Re-export 最近开局配置结构 from game-settings (type conflicts prevent full re-export)

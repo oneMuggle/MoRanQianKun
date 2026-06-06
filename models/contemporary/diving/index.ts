@@ -9,33 +9,33 @@
 
 // ==================== 类型导出 ====================
 
-export * from './types';
+export type * from './types';
 
 // ==================== 状态管理导出 ====================
 
-export * from './states/潜水者状态';
-export * from './states/教练状态';
-export * from './states/场所状态';
-export * from './states/项目状态';
+export type * from './states/潜水者状态';
+export type * from './states/教练状态';
+export type * from './states/场所状态';
+export type * from './states/项目状态';
 
 // ==================== 系统导出 ====================
 
-export * from './systems/潜水教学系统';
-export * from './systems/潜伴互助系统';
-export * from './systems/派对系统';
-export * from './systems/别墅系统';
-export * from './systems/暧昧催化剂系统';
-export * from './systems/安全系统';
+export type * from './systems/潜水教学系统';
+export type * from './systems/潜伴互助系统';
+export type * from './systems/派对系统';
+export type * from './systems/别墅系统';
+export type * from './systems/暧昧催化剂系统';
+export type * from './systems/安全系统';
 
 // ==================== 场景导出 ====================
 
-export * from './scenes/潜水教学场景';
-export * from './scenes/游艇派对场景';
-export * from './scenes/别墅私密场景';
+export type * from './scenes/潜水教学场景';
+export type * from './scenes/游艇派对场景';
+export type * from './scenes/别墅私密场景';
 
 // ==================== 提示词导出 ====================
 
-export * from './prompts/教练提示词';
+export type * from './prompts/教练提示词';
 export * from './prompts/派对NPC提示词';
 export * from './prompts/别墅场景提示词';
 

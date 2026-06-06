@@ -441,7 +441,7 @@ const MobileMemory: React.FC<Props> = ({
                                 <div className="text-[9px] text-gray-500 font-mono mb-2 border-b border-gray-800/50 pb-1 flex items-center justify-between">
                                     <span>{mem.rawDate}</span>
                                     {'匹配度' in mem && mem.匹配度 !== undefined && (
-                                        <span className="text-wuxia-gold/70">匹配度: {mem.匹配度.toFixed(1)}</span>
+                                        <span className="text-wuxia-gold/70">匹配度: {(mem.匹配度 as number).toFixed(1)}</span>
                                     )}
                                 </div>
                             )}

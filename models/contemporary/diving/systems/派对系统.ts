@@ -7,7 +7,7 @@
 /**
  * 派对类型配置
  */
-export const 派对类型配置: Record<string, {
+export const 派对类型配置数据: Record<string, {
   名称: string;
   人数范围: string;
   人数最小: number;
@@ -78,7 +78,7 @@ export const 派对类型配置: Record<string, {
 /**
  * 暧昧游戏配置
  */
-export const 暧昧游戏配置: Record<string, {
+export const 暧昧游戏配置数据: Record<string, {
   游戏名称: string;
   规则描述: string;
   暧昧点: string[];
@@ -213,7 +213,7 @@ export function 计算派对暧昧指数(
   催化剂激活数量: number,
   参与人数: number
 ): number {
-  const 类型配置 = 派对类型配置[派对类型];
+  const 类型配置 = 派对类型配置数据[派对类型];
   if (!类型配置) return 0;
 
   let 指数 = 类型配置.暧昧指数;

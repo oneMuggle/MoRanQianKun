@@ -32,8 +32,8 @@ export function 初始化NPC关系(npcId: string): NPC关系数据 {
  * 如果 NPC 已有关系数据则返回，否则创建新的
  */
 export function 从NPC初始化关系(npc: NPC结构): NPC关系数据 {
-  if (npc.关系数据 && 验证关系数据(npc.关系数据)) {
-    return npc.关系数据;
+  if ((npc as any).关系数据 && 验证关系数据((npc as any).关系数据)) {
+    return (npc as any).关系数据;
   }
   return 创建默认关系数据(npc.id);
 }

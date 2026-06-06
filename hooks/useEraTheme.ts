@@ -59,7 +59,7 @@ export function resolveEraThemeConfig(eraId: string | null | undefined): EraThem
         colors: inherited.colors || DEFAULT_THEME.colors,
         typography: inherited.typography || DEFAULT_THEME.typography,
         uiStyle: inherited.uiStyle || DEFAULT_THEME.uiStyle,
-        uiCopy: inherited.uiCopy || {},
+        uiCopy: (inherited as any).uiCopy || {},
         decorations: inherited.uiStyle?.decorations || [],
         artStyle: inherited.artStyle || DEFAULT_THEME.artStyle,
         bgmTags: inherited.bgmTags || [],
