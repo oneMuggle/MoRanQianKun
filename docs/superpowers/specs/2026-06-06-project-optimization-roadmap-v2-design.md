@@ -44,6 +44,10 @@
 - 把测试覆盖率从 < 5% 提升到 ≥ 30%，关键路径 ≥ 60%
 - 不破坏存档、API、UI 兼容性；允许"可控破坏"（TS 严格启用、重复文件合并、UI 组件合并）
 
+**Day 1 定义**：本文档"Day N" 计数起点为 v2.0 路线图正式启动日（即本文档批准后第一个工作日，2026-06-09 候选）。如启动日延后，Day N 同步顺延。
+
+**NSFW 子系统数量口径**："约 18 个" 系按 06-03 方案与近期 commit（commit `3ddd269` 等修复 6 个 NSFW 模块的类型错误）粗略统计，最终数量以 P5 启动时 `find modules/era-*` / `find data/nsfw*` 实测为准。
+
 ### 1.4 范围外（v2.0 不做）
 
 - Phase 1 文档归一化（下一轮 60 天）
@@ -198,12 +202,14 @@ tsconfig.json                      # 根：引用 + 路径映射
 
 ### 5.3 测试金字塔
 
-| 层级 | 目标对象 | 目标覆盖率 | 工具 | 工期 |
+| 层级 | 目标对象 | 目标覆盖率（终态） | 工具 | 工期 |
 |---|---|---|---|---|
 | **T1 纯函数** | `utils/**`、`models/**`（纯类型与计算） | 80% | Vitest | Day 46-48 |
 | **T2 服务层** | `services/ai/text/**`、`dbService` 抽象层 | 60% | Vitest + msw | Day 49-52 |
 | **T3 工作流** | `hooks/useGame/` 子工作流（sendWorkflow、memoryRecall、saveCoordinator） | 60% | Vitest + renderHook | Day 53-56 |
 | **T4 关键组件** | `App.tsx` 路由、`NewGameWizard`、`Chat` 主组件 | 30% | @testing-library/react | Day 57-60 |
+
+> 注：表内"目标覆盖率"为各层级 **Day 60 终态目标**。Day 48/52/56 的 milestone gate 数值（5.6 节）为此终态的阶段性检查点，预期 Day 60 达到或超过终态值。
 
 ### 5.4 测试样板与协作约定
 
