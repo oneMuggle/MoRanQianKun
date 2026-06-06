@@ -14,6 +14,10 @@ export * from './deviceMessages';
 import { 初始化数据库, safeNumber } from './initialization';
 import { 深拷贝, 估算字符串字节数, 估算对象字节数, 估算设置摘要, 读取环境时间文本, 构建存档去重键, 清洗导入存档 } from './_helpers';
 export { 初始化数据库, safeNumber } from './initialization';
+
+// Day 37：stores 子模块承载通用 settings CRUD（保存设置 等依赖外置化图片字段的留到 Day 38 迁移）
+export * from './stores';
+import { 批量删除设置 } from './stores';
 export {
     DB_NAME as _DB_NAME,
     STORE_NAME as _STORE_NAME,
@@ -306,6 +310,10 @@ export const 清理未引用图片资源 = async (): Promise<number> => {
     await 预热图片资源缓存();
     return unusedIds.length;
 };
+
+// Day 37：注册到 globalThis，供 ./stores（删除设置 / 批量删除设置）通过 getter 桥接调用
+// Day 38 image-assets.ts 完成后可移除此桥接
+(globalThis as any).__dbService_清理未引用图片资源 = 清理未引用图片资源;
 
 export const 维护自动存档 = async (db: IDBDatabase, maxKeep: number = 自动存档最大保留数): Promise<void> => {
     const keepCount = Math.max(0, Math.floor(maxKeep));
@@ -601,37 +609,7 @@ export const 读取设置 = async (key: string): Promise<any> => {
     });
 };
 
-export const 获取设置管理清单 = async (): Promise<设置管理项[]> => {
-    const records = await 读取全部设置记录();
-    return records
-        .map((item) => {
-            const def = 获取设置项定义(item.key);
-            const category: 设置管理项['category'] = def?.category || 'unknown';
-            return {
-                key: item.key,
-                label: def?.label || item.key,
-                category,
-                categoryLabel: category === 'unknown' ? '未登记项' : 设置分类定义表[category].label,
-                description: def?.description || '该设置项尚未登记到设置 schema。',
-                size: 估算对象字节数(item.value),
-                summary: 估算设置摘要(item.key, item.value),
-                updatedAt: Number.isFinite(item.updatedAt) ? Number(item.updatedAt) : null,
-                internal: def?.internal === true,
-                known: Boolean(def)
-            };
-        })
-        .sort((a, b) => {
-            const aDef = 获取设置项定义(a.key);
-            const bDef = 获取设置项定义(b.key);
-            const aCategoryOrder = a.category === 'unknown' ? 999 : 设置分类定义表[a.category].order;
-            const bCategoryOrder = b.category === 'unknown' ? 999 : 设置分类定义表[b.category].order;
-            if (aCategoryOrder !== bCategoryOrder) return aCategoryOrder - bCategoryOrder;
-            const aOrder = aDef?.order ?? 9999;
-            const bOrder = bDef?.order ?? 9999;
-            if (aOrder !== bOrder) return aOrder - bOrder;
-            return a.label.localeCompare(b.label, 'zh-Hans-CN');
-        });
-};
+// `获取设置管理清单` 已迁移到 ./stores（export * from './stores' 见顶部）
 
 export const 迁移图片资源到独立存储 = async (): Promise<{ saves: number; settings: number }> => {
     const migrated = await 读取设置(图片资源迁移版本键);
@@ -700,30 +678,7 @@ export const 设置存档保护状态 = async (enabled: boolean): Promise<void> 
     await 保存设置(存档保护设置键, enabled === true);
 };
 
-export const 删除设置 = async (key: string): Promise<void> => {
-    const db = await 初始化数据库();
-    await new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction([SETTINGS_STORE], 'readwrite');
-        const store = transaction.objectStore(SETTINGS_STORE);
-        const request = store.delete(key);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-    await 清理未引用图片资源();
-};
-
-export const 批量删除设置 = async (keys: string[]): Promise<void> => {
-    if (!Array.isArray(keys) || keys.length === 0) return;
-    const db = await 初始化数据库();
-    await new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction([SETTINGS_STORE], 'readwrite');
-        const store = transaction.objectStore(SETTINGS_STORE);
-        keys.forEach((key) => store.delete(key));
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-    });
-    await 清理未引用图片资源();
-};
+// `删除设置` / `批量删除设置` 已迁移到 ./stores（export * from './stores' 见顶部）
 
 const 自定义背景天赋保护键 = [
     设置键.视觉设置,
