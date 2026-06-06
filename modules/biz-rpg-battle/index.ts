@@ -18,5 +18,5 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 角色属性 } from '../../models/character';
-export type { 战斗状态 } from '../../models/battle';
+export type { 角色数据结构 } from '../../models/character';
+export type { 战斗状态结构, 战斗敌方信息 } from '../../models/battle';

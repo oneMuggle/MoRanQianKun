@@ -1008,7 +1008,7 @@ export interface 存档结构 {
     当前房产存档?: 房产数据结构;
 }
 
-export type PromptCategory = '核心设定' | '数值设定' | '难度设定' | '写作设定' | '自定义';
+export type PromptCategory = '核心设定' | '数值设定' | '难度设定' | '写作设定' | '自定义' | '运行时' | '运行时Schema';
 
 export interface 提示词结构 {
     id: string;

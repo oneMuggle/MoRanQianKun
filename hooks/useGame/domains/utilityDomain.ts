@@ -40,7 +40,7 @@ export interface UtilityDomainInput {
     创建通知系统: typeof 创建通知系统;
     // useDevice 依赖
     gameConfig: 游戏设置结构 | null;
-    currentEra: number;
+    currentEra: string;
     角色: GameStateAccess['角色'];
     社交: NPC结构[];
     世界: GameStateAccess['世界'];

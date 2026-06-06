@@ -92,7 +92,7 @@ export const useWorldAndPlanning = (deps: {
     规范化角色物品容器映射: (raw?: any) => any;
     规范化记忆系统: (raw?: any) => any;
     环境时间转标准串: (env?: any) => string;
-    收集最近完整正文回合: (history: any[], n?: number) => any[];
+    收集最近完整正文回合: (params: { history: any[]; currentPlayerInput?: string; currentGameTime?: string; currentResponse?: GameResponse; maxTurns?: number; }) => any[];
     构建最近完整正文上下文: (turns: any[]) => string;
     去重文本数组: (arr: string[]) => string[];
     收集女主规划时间触发原因: (...args: any[]) => string[];
@@ -351,7 +351,7 @@ export const useWorldAndPlanning = (deps: {
         设置女主剧情规划,
         设置同人剧情规划,
         设置同人女主剧情规划,
-        performAutoSave: (...args) => performAutoSave(...args)
+        performAutoSave: (...args) => Promise.resolve(performAutoSave(...args))
     });
 
     // ==================== 强制世界演变更新 ====================

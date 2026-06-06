@@ -20,4 +20,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 酒吧NSFW设置, 酒吧时段 } from '../../models/contemporary/barNSFW';
+export type { 酒吧NSFW设置 } from '../../models/contemporary/barNSFW';

@@ -19,4 +19,4 @@ export const manifest: ModuleManifest = {
 };
 
 export type { 小说写作任务状态类型, 小说写作大纲结构 } from '../../models/novelWriting';
-export type { 小说拆分任务状态类型, 小说拆分配置结构 } from '../../models/novelDecomposition';
+export type { 小说拆分任务状态类型 } from '../../models/novelDecomposition';

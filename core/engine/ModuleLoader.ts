@@ -299,7 +299,7 @@ export class ModuleLoader {
     if (!features || features.length === 0) return;
 
     for (const feature of features) {
-      UIFeatureRegistry.register(feature);
+      UIFeatureRegistry.register(feature as unknown as Parameters<typeof UIFeatureRegistry.register>[0]);
       this._log(`  注册 UI 功能: ${feature.id}`);
     }
   }

@@ -523,14 +523,14 @@ const MemoryModal: React.FC<Props> = ({
                                         )}
                                         <p className="text-gray-300 font-serif leading-[2.5] text-sm text-justify whitespace-pre-wrap relative z-10">
                                             {activeTab === 'search' && '匹配片段' in mem && mem.匹配片段
-                                                ? <span className="text-purple-200/80">{mem.匹配片段}</span>
-                                                : (mem.content || mem.rawContent)
+                                                ? <span className="text-purple-200/80">{mem.匹配片段 as React.ReactNode}</span>
+                                                : (mem.content || mem.rawContent) as React.ReactNode
                                             }
                                         </p>
                                         {activeTab === 'search' && '记忆原文' in mem && mem.记忆原文 && (
                                             <details className="mt-4">
                                                 <summary className="text-xs text-cyan-500/60 cursor-pointer hover:text-cyan-400">查看完整记忆</summary>
-                                                <p className="mt-2 text-gray-400 font-serif leading-[2] text-xs whitespace-pre-wrap">{mem.记忆原文}</p>
+                                                <p className="mt-2 text-gray-400 font-serif leading-[2] text-xs whitespace-pre-wrap">{mem.记忆原文 as React.ReactNode}</p>
                                             </details>
                                         )}
                                         

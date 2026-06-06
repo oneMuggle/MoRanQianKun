@@ -12,7 +12,7 @@ export const manifest: ModuleManifest = {
   configValue: true,
   dependencies: ['nsfw-campus'],
   promptBlock: () => {
-    return 构建露出叙事约束('无', 'contemporary');
+    return 构建露出叙事约束(0 as 0, 'contemporary');
   },
 };
 

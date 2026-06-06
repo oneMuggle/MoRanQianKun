@@ -2,10 +2,12 @@
  * 剧情槽位工具函数
  * 提供剧情槽位的过滤、评估、注入等操作
  */
-import type { 游戏状态 } from '../models/system';
 import type { 世界书作用域 } from '../types';
 import { 剧情槽位预算, type 剧情槽位结构 } from '../models/planning/storySlots';
 import { 预设剧情槽位列表 } from '../data/story-slots';
+
+// 游戏状态类型（向后兼容别名）
+type 游戏状态 = Record<string, unknown>;
 
 /**
  * 评估条件是否满足

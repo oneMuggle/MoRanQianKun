@@ -18,4 +18,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 房产类型, 设施类型, 租户类型 } from '../../models/property/types';
+export type { 房产类型 } from '../../models/property/types';

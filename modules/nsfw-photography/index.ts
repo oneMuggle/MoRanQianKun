@@ -24,4 +24,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 写真NSFW设置, 写真拍摄阶段, 泄露事件状态 } from '../../models/photographyNSFW';
+export type { 写真NSFW设置, 泄露事件状态 } from '../../models/photographyNSFW';

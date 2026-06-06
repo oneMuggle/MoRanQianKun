@@ -140,17 +140,17 @@ export const useHistoryAndMemory = (options: UseHistoryAndMemoryOptions) => {
     // === Memory Summary Processor ===
     const 记忆总结处理器 = 创建记忆总结处理器({
         待处理记忆总结任务,
-        set待处理记忆总结任务,
+        set待处理记忆总结任务: set待处理记忆总结任务 as (v: 记忆压缩任务结构) => void,
         记忆总结阶段,
-        set记忆总结阶段,
+        set记忆总结阶段: set记忆总结阶段 as (v: 记忆总结阶段类型) => void,
         记忆总结草稿,
         set记忆总结草稿,
         记忆总结错误,
         set记忆总结错误,
         待处理NPC记忆总结队列,
-        set待处理NPC记忆总结队列,
+        set待处理NPC记忆总结队列: set待处理NPC记忆总结队列 as (v: NPC记忆总结任务结构[]) => void,
         NPC记忆总结阶段,
-        setNPC记忆总结阶段,
+        setNPC记忆总结阶段: setNPC记忆总结阶段 as (v: 记忆总结阶段类型) => void,
         NPC记忆总结草稿,
         setNPC记忆总结草稿,
         NPC记忆总结错误,
@@ -164,7 +164,7 @@ export const useHistoryAndMemory = (options: UseHistoryAndMemoryOptions) => {
         历史记录,
         performAutoSave: (...args) => performAutoSave(...args),
         规范化社交列表
-    });
+    } as unknown as Parameters<typeof 创建记忆总结处理器>[0]);
     const {
         构建记忆总结用户提示词,
         清理记忆总结输出,

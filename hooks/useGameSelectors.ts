@@ -193,7 +193,7 @@ export const useWorldEvents = () => {
 export function useGameState<T>(selector: (state: GameState) => T): T {
     const state = useContext(GameStateContext);
     if (!state) throw new Error('useGameState must be used within GameStateProvider');
-    return selector(state);
+    return selector(state as GameState);
 }
 
 // ============================================================================
@@ -296,7 +296,7 @@ export const useEraInfo = () => {
 export function useGameMeta<T>(selector: (meta: GameMeta) => T): T {
     const meta = useContext(GameMetaContext);
     if (!meta) throw new Error('useGameMeta must be used within GameMetaProvider');
-    return selector(meta);
+    return selector(meta as GameMeta);
 }
 
 // ============================================================================
@@ -354,7 +354,7 @@ export const useMemoryConfig = () => {
 export function useGameConfigSelector<T>(selector: (config: GameConfig) => T): T {
     const config = useContext(GameConfigContext);
     if (!config) throw new Error('useGameConfig must be used within GameConfigProvider');
-    return selector(config);
+    return selector(config as GameConfig);
 }
 
 // ============================================================================
@@ -421,7 +421,7 @@ export const useActiveTab = () => {
 export function useGameModal<T>(selector: (modal: GameModal) => T): T {
     const modal = useContext(GameModalContext);
     if (!modal) throw new Error('useGameModal must be used within GameModalProvider');
-    return selector(modal);
+    return selector(modal as GameModal);
 }
 
 // ============================================================================
@@ -443,7 +443,7 @@ export const useDeviceState = () => {
 export function useGameDevice<T>(selector: (device: GameDevice) => T): T {
     const device = useContext(GameDeviceContext);
     if (!device) throw new Error('useGameDevice must be used within GameDeviceProvider');
-    return selector(device);
+    return selector(device as GameDevice);
 }
 
 // ============================================================================
@@ -483,7 +483,7 @@ export const useHypnosisSystem = () => {
 export function useGameCampusSystems<T>(selector: (campus: GameCampusSystems) => T): T {
     const campus = useContext(GameCampusSystemsContext);
     if (!campus) throw new Error('useGameCampusSystems must be used within GameCampusSystemsProvider');
-    return selector(campus);
+    return selector(campus as GameCampusSystems);
 }
 
 // ============================================================================

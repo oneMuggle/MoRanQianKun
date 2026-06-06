@@ -87,7 +87,6 @@ export interface 艺术从业者状态 {
   // 安全
   诈骗风险: number;                 // 0-100
   法律风险: number;                 // 0-100
-  行业名声: number;                 // 0-100
 }
 
 // 藏家状态

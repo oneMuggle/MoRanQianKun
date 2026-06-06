@@ -187,15 +187,15 @@ export function GameView({
                 <div className={`shrink-0 z-40 bg-ink-black/90 border-b border-wuxia-gold/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] relative rounded-t-xl overflow-visible mx-1 mt-1 lixia-topbar ${(state.gameConfig as any)?.启用里志怪模式 ? 'lizhiguai-topbar' : ''}`}>
                     <TopBar
                         环境={state.环境}
-                        游戏初始时间={state.游戏初始时间}
+                        游戏初始时间={state.游戏初始时间 as string}
                         timeFormat={(state.visualConfig as any)?.时间显示格式}
                         festivals={state.festivals}
                         visualConfig={state.visualConfig}
-                        eraId={state.currentEra}
+                        eraId={state.currentEra as string}
                         启用子纪元里模式={(state.gameConfig as any)?.启用子纪元里模式}
                         子纪元里模式强度={(state.gameConfig as any)?.子纪元里模式强度}
                         子纪元里模式阶段={(state.gameConfig as any)?.子纪元里模式阶段}
-                        onLiModeIntensityChange={(eraId: string, intensity: number) => {
+                        onLiModeIntensityChange={(eraId: string, intensity: '暧昧' | '微暗' | '露骨') => {
                             const prev = (state.gameConfig as any)?.子纪元里模式强度 || {};
                             (actions.saveGameSettings as any)?.({ ...(state.gameConfig as any), 子纪元里模式强度: { ...prev, [eraId]: intensity } });
                         }}
@@ -447,7 +447,7 @@ export function GameView({
                                 <>
                                     <ChatList
                                         history={state.历史记录}
-                                        loading={state.loading}
+                                        loading={state.loading as boolean}
                                         scrollRef={state.scrollRef}
                                         onUpdateHistory={(actions as any).updateHistoryItem}
                                         onPolishTurn={(actions as any).handlePolishTurn}
@@ -467,7 +467,7 @@ export function GameView({
                                         onRecoverParseErrorRaw={(actions as any).handleRecoverFromParseErrorRaw}
                                         onQuickRestart={(actions as any).handleQuickRestart}
                                         requestConfirm={requestConfirm}
-                                        loading={state.loading}
+                                        loading={state.loading as boolean}
                                         variableGenerationRunning={(meta as any).variableGenerationRunning}
                                         backgroundSummaryLocking={(meta as any).backgroundMemorySummaryStatus === 'running'}
                                         canReroll={(meta as any).canRerollLatest}

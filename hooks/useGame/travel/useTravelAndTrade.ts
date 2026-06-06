@@ -14,7 +14,7 @@ interface TravelAndTradeDeps {
     设置角色: React.Dispatch<React.SetStateAction<角色数据结构 | null>>;
     设置环境: React.Dispatch<React.SetStateAction<环境信息结构 | null>>;
     gameConfig: 游戏设置结构 | null;
-    currentEra: number;
+    currentEra: string;
     设置历史记录: (updater: (prev: 聊天记录结构[]) => 聊天记录结构[]) => void;
 }
 

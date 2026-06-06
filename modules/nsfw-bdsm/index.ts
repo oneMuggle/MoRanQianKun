@@ -14,18 +14,20 @@ export const manifest: ModuleManifest = {
   dependencies: ['nsfw-campus'],
   promptBlock: () => {
     const bdsm = 构建BDSM完整叙事约束({
-      内容强度: '关闭' as any,
-      SM场景类型: [],
-      调教任务列表: [],
-      多角色BDSM: false,
+      权力倾向: undefined,
+      服从度: 0,
+      已解锁SM场景: [],
+      活跃任务: [],
+      日常指令: [],
+      其他Npc欲望摘要: '',
     });
     const forum = 构建BDSM论坛叙事约束({
-      启用BDSM论坛: false,
-      BDSM内容强度: '关闭' as any,
-      论坛活跃帖子数: 0,
+      活跃帖子数: 0,
+      内容强度: '关闭' as '关闭' | '轻度' | '中度' | '深度',
+      寻主召奴未联系帖数: 0,
     });
     return `${bdsm}\n\n${forum}`;
   },
 };
 
-export type { BDSM设置, BDSM内容强度 } from '../../models/bdsmNSFW';
+export type { BDSM系统设置 } from '../../models/bdsmNSFW';

@@ -65,8 +65,8 @@ const ContactsApp: React.FC<AppProps> = ({ eraId, mode, appId, onBack, gameConte
                         eraId,
                         mode,
                         context,
-                        apiConfig as Parameters<typeof 生成设备联系人>[2],
                         apiConfig as Parameters<typeof 生成设备联系人>[3],
+                        apiConfig as Parameters<typeof 生成设备联系人>[4],
                         8
                     );
 

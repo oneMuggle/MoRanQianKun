@@ -13,9 +13,10 @@ export const manifest: ModuleManifest = {
   dependencies: [],
   promptBlock: () => {
     return 构建桌游NSFW完整叙事约束({
-      桌游类型: '真心话大冒险' as any,
-      参与人数: 2,
-      内容强度: '微暗',
+      桌游类型: '真心话大冒险' as '真心话大冒险',
+      密室主题: '古宅惊魂',
+      紧张度: 0,
+      参与NPC摘要: '',
     });
   },
 };

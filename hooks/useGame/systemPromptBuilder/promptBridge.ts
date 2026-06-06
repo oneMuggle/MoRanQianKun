@@ -42,7 +42,7 @@ PromptRegistry.registerBuilder('era-theme', 'era-realism', _rawEraRealism);
 PromptRegistry.registerBuilder('era-theme', 'liMode-inject', _rawLiModeInject);
 PromptRegistry.registerBuilder('era-theme', 'liMode-npc', _rawLiModeNpc);
 PromptRegistry.registerBuilder('era-theme', 'liMode-stage', _rawLiModeStage);
-PromptRegistry.registerBuilder('era-theme', 'liMode-check', _rawLiModeCheck);
+PromptRegistry.registerBuilder('era-theme', 'liMode-check', _rawLiModeCheck as unknown as (...args: any[]) => string);
 PromptRegistry.registerBuilder('nsfw-campus', 'action-options', _rawActionOpts);
 PromptRegistry.registerBuilder('nsfw-campus', 'campus-rules', _rawCampusRules);
 PromptRegistry.registerBuilder('nsfw-campus', 'campus-hypnosis', _rawCampusHypnosis);
@@ -71,7 +71,7 @@ export const 获取时代现实提示词ByEraId = adapt('era-realism', _rawEraRe
 export const 构建子纪元里模式注入 = adapt('liMode-inject', _rawLiModeInject);
 export const 构建里模式NPC原型注入 = adapt('liMode-npc', _rawLiModeNpc);
 export const 构建里模式阶段注入 = adapt('liMode-stage', _rawLiModeStage);
-export const 子纪元里模式是否已注入 = adapt('liMode-check', _rawLiModeCheck);
+export const 子纪元里模式是否已注入 = adapt('liMode-check', _rawLiModeCheck as unknown as (...args: any[]) => string);
 export const 构建行动选项运行时指令 = adapt('action-options', _rawActionOpts);
 export const 构建校规注入提示词 = adapt('campus-rules', _rawCampusRules);
 export const 构建催眠注入提示词 = adapt('campus-hypnosis', _rawCampusHypnosis);

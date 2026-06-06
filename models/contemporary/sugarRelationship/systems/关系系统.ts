@@ -180,7 +180,7 @@ export function 推进关系时间(
   }
 
   // 更新糖爹状态
-  let newSugarDaddy = 更新糖爹状态(糖爹, newRelation.状态);
+  let newSugarDaddy = 更新糖爹状态(糖爹, { 关系状态: newRelation.状态 } as Partial<糖爹核心状态>);
   newSugarDaddy.累计花费 = 糖爹.累计花费 + 关系.月零花钱 * 月数;
 
   return {

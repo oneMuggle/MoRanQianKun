@@ -30,14 +30,14 @@ export const 默认游戏大师配置: 游戏大师配置结构 = {
     parallelGroups: [
         {
             agents: [
-                { type: 'world', priority: 2 },
-                { type: 'variable', priority: 3 },
+                { 类型: 'world', priority: 2 },
+                { 类型: 'variable', priority: 3 },
             ],
             等待完成: true,
         },
         {
             agents: [
-                { type: 'planning', priority: 4 },
+                { 类型: 'planning', priority: 4 },
             ],
             等待完成: false,
         },
