@@ -4,7 +4,7 @@ import * as gameSettings from '../../../utils/gameSettings';
 import * as promptRuntime from './promptRuntime';
 import * as historyUtils from '../time/historyUtils';
 
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => ({
         启用修炼体系: true,
         启用GPT模式: false,
@@ -28,26 +28,26 @@ vi.mock('./promptRuntime', () => ({
     ]),
     酒馆预设模式可用: vi.fn(() => false),
 }));
-vi.mock('../../prompts/runtime/storyStyles', () => ({
+vi.mock('../../../prompts/runtime/storyStyles', () => ({
     构建剧情风格助手提示词: vi.fn(() => '<剧情风格>'),
 }));
-vi.mock('../../prompts/runtime/realWorldMode', () => ({
+vi.mock('../../../prompts/runtime/realWorldMode', () => ({
     构建真实世界模式提示词: vi.fn(() => '<真实世界>'),
 }));
-vi.mock('../../prompts/runtime/nsfw', () => ({
+vi.mock('../../../prompts/runtime/nsfw', () => ({
     构建运行时额外提示词: vi.fn((s: string) => s),
 }));
-vi.mock('../../utils/worldbook', () => ({
+vi.mock('../../../utils/worldbook', () => ({
     世界书本体槽位: { 真实世界模式: 'real_world_mode' },
 }));
-vi.mock('../../utils/builtinPrompts', () => ({
+vi.mock('../../../utils/builtinPrompts', () => ({
     获取剧情风格内置槽位: vi.fn(() => 'style_slot'),
     获取内置提示词槽位内容: vi.fn(({ fallback }: any) => fallback),
 }));
-vi.mock('../../utils/promptFeatureToggles', () => ({
+vi.mock('../../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((c: string) => c),
 }));
-vi.mock('./time/historyUtils', () => ({
+vi.mock('../time/historyUtils', () => ({
     formatHistoryToScript: vi.fn(() => '<剧本>'),
 }));
 

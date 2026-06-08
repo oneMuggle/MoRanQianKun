@@ -8,9 +8,9 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { BranchTracker, createBranchTracker } from '../avg/branch/branchTracker';
-import { ConsequenceResolver, createConsequenceResolver, applyConsequence } from '../avg/branch/consequenceResolver';
-import { AvgBranchEngine, createAvgBranchEngine } from '../engine/avgBranchEngine';
+import { BranchTracker, createBranchTracker } from '../../avg/branch/branchTracker';
+import { ConsequenceResolver, createConsequenceResolver, applyConsequence } from '../../avg/branch/consequenceResolver';
+import { AvgBranchEngine, createAvgBranchEngine } from '../avgBranchEngine';
 import type { BranchPoint, Consequence } from '../../../../models/avg/branchNarrative';
 
 // ==================== 测试辅助函数 ====================

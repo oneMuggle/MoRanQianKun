@@ -3,11 +3,11 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { MapGraph, createMapGraph } from '../exploration/mapGraph';
-import { rollEncounter, calculateEncounterRate } from '../exploration/encounterCalculator';
-import { rollTreasure } from '../exploration/treasureDetector';
-import { EventTriggerManager, createEventTriggerManager } from '../exploration/eventTriggerPoint';
-import { ExplorationEngine, createExplorationEngine } from '../engine/explorationEngine';
+import { MapGraph, createMapGraph } from '../../exploration/mapGraph';
+import { rollEncounter, calculateEncounterRate } from '../../exploration/encounterCalculator';
+import { rollTreasure } from '../../exploration/treasureDetector';
+import { EventTriggerManager, createEventTriggerManager } from '../../exploration/eventTriggerPoint';
+import { ExplorationEngine, createExplorationEngine } from '../explorationEngine';
 import type { MapNode } from '../../../../models/exploration/mapNode';
 
 function makeNode(overrides: Partial<MapNode> = {}): MapNode {

@@ -2,17 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as dbService from '../../../services/dbService';
 import { 创建存档数据, 执行手动存档, 执行自动存档, 执行读取存档 } from './saveCoordinator';
 
-vi.mock('../../services/dbService', () => ({
+vi.mock('../../../services/dbService', () => ({
     保存存档: vi.fn(),
     保存设置: vi.fn(),
 }));
-vi.mock('../../prompts/core/world', () => ({
+vi.mock('../../../prompts/core/world', () => ({
     核心_世界观: { id: 'core_world', 内容: 'world view' },
 }));
-vi.mock('../../prompts/core/realm', () => ({
+vi.mock('../../../prompts/core/realm', () => ({
     核心_境界体系: { id: 'core_realm', 内容: 'realm system' },
 }));
-vi.mock('../../utils/settingsSchema', () => ({
+vi.mock('../../../utils/settingsSchema', () => ({
     设置键: { 提示词池: 'prompt_pool' },
 }));
 

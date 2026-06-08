@@ -3,13 +3,13 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { RelationGraph, createRelationGraph } from '../avg/relation/relationGraph';
-import { IntimacyTrigger, IntimacyStateMachine, createIntimacyTrigger } from '../avg/intimacy/intimacyStateMachine';
-import type { IntimacyEvent } from '../avg/intimacy/intimacyStateMachine';
-import { RouteResolver, createRouteResolver } from '../avg/galgame/routeResolver';
-import { EndingResolver, createEndingResolver, CGManager, createCGManager } from '../avg/galgame/endingResolver';
-import { AvgRelationEngine, createAvgRelationEngine } from '../engine/avgRelationEngine';
-import type { PlayerAction } from '../engine/types';
+import { RelationGraph, createRelationGraph } from '../../avg/relation/relationGraph';
+import { IntimacyTrigger, IntimacyStateMachine, createIntimacyTrigger } from '../../avg/intimacy/intimacyStateMachine';
+import type { IntimacyEvent } from '../../avg/intimacy/intimacyStateMachine';
+import { RouteResolver, createRouteResolver } from '../../avg/galgame/routeResolver';
+import { EndingResolver, createEndingResolver, CGManager, createCGManager } from '../../avg/galgame/endingResolver';
+import { AvgRelationEngine, createAvgRelationEngine } from '../avgRelationEngine';
+import type { PlayerAction } from '../types';
 import type { RelationEdge } from '../../../../models/avg/relationGraph';
 import type { GalgameRoute, GalgameEnding, GalgameCG, GalgameState } from '../../../../models/avg/galgame';
 import { INTIMACY_THRESHOLDS } from '../../../../models/avg/relationGraph';

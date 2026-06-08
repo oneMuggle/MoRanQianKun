@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { 执行响应命令处理 } from '../npc/responseCommandProcessor';
 import * as stateHelpers from '../../../utils/stateHelpers';
 
-vi.mock('../../utils/stateHelpers', () => ({
+vi.mock('../../../utils/stateHelpers', () => ({
     applyStateCommand: vi.fn((char, env, social, world, battle, story, storyPlan, heroinePlan, fandomStoryPlan, fandomHeroinePlan, sect, tasks, agreements, key, value, action) => {
         return { char, env, social, world, battle, story, storyPlan, heroinePlan, fandomStoryPlan, fandomHeroinePlan, sect, tasks, agreements };
     }),

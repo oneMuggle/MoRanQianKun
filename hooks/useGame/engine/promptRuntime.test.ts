@@ -7,32 +7,32 @@ import {
     构建酒馆预设消息链,
 } from './promptRuntime';
 
-vi.mock('../../prompts/core/cot', () => ({
+vi.mock('../../../prompts/core/cot', () => ({
     核心_思维链: { id: 'core_cot', 内容: '<COT base>', 启用: true },
     核心_思维链_同人版: { id: 'core_cot_fandom', 内容: '<COT fandom>', 启用: true },
 }));
-vi.mock('../../prompts/core/cotHeroine', () => ({
+vi.mock('../../../prompts/core/cotHeroine', () => ({
     核心_思维链_女主规划版: { id: 'core_cot_heroine', 内容: '<COT heroine>', 启用: true },
     核心_思维链_NTL女主规划版: { id: 'core_cot_ntl_heroine', 内容: '<COT NTL heroine>', 启用: true },
     核心_思维链_同人女主规划版: { id: 'core_cot_fandom_heroine', 内容: '<COT fandom heroine>', 启用: true },
     核心_思维链_同人NTL女主规划版: { id: 'core_cot_fandom_ntl_heroine', 内容: '<COT fandom NTL heroine>', 启用: true },
 }));
-vi.mock('../../prompts/runtime/defaults', () => ({
+vi.mock('../../../prompts/runtime/defaults', () => ({
     默认COT伪装历史消息提示词: '<AI身份名称占位>好的，将以<正文></正文>包裹正文，<正文>前以<thinking>作为开头进行思考并以</thinking>闭合：',
 }));
-vi.mock('../../prompts/writing/noControl', () => ({
+vi.mock('../../../prompts/writing/noControl', () => ({
     写作_防止说话: { id: 'writing_no_control', 内容: '- 若同时存在 `<NoControl>`...\n- 复核 `<NoControl>`...\nIt never overrides NoControl,...', 启用: true },
 }));
-vi.mock('../../utils/tavernPreset', () => ({
+vi.mock('../../../utils/tavernPreset', () => ({
     获取酒馆预设顺序: vi.fn((preset: any) => preset ? { order: preset.prompt_order } : null),
 }));
-vi.mock('./thinkingContext', () => ({
+vi.mock('../quality/thinkingContext', () => ({
     提取响应规划文本: vi.fn(() => ''),
 }));
-vi.mock('../../utils/promptFeatureToggles', () => ({
+vi.mock('../../../utils/promptFeatureToggles', () => ({
     按功能开关过滤提示词内容: vi.fn((c: string) => c),
 }));
-vi.mock('../../prompts/runtime/promptOwnership', () => ({
+vi.mock('../../../prompts/runtime/promptOwnership', () => ({
     变量命令提示词ID集合: new Set(['core_var_commands']),
 }));
 

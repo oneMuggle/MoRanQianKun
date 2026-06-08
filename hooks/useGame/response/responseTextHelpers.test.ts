@@ -10,7 +10,7 @@ import {
     提取响应完整正文文本,
     收集最近完整正文回合,
     构建最近完整正文上下文,
-} from './response/responseTextHelpers';
+} from './responseTextHelpers';
 
 describe('获取原始AI消息', () => {
     it('returns string as-is', () => {

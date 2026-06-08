@@ -16,7 +16,7 @@ vi.mock('../memory/memoryUtils', () => ({
     规范化记忆配置: vi.fn((v: any) => v || {})
 }));
 
-vi.mock('../mainStoryRequest', () => ({
+vi.mock('../engine/mainStoryRequest', () => ({
     构建主剧情请求参数: vi.fn(() => ({
         messageEntries: [
             { id: 'system', title: '系统提示词', category: 'system', role: 'system' as const, content: '你是武侠世界的AI' },
@@ -32,7 +32,7 @@ vi.mock('../memory/memoryRecall', () => ({
     构建剧情回忆检索上下文: vi.fn(() => '回忆上下文')
 }));
 
-vi.mock('../promptRuntime', () => ({
+vi.mock('../engine/promptRuntime', () => ({
     构建COT伪装提示词: vi.fn(() => 'COT伪装')
 }));
 

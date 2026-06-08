@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 创建运行时变量工作流 } from './runtimeVariableWorkflow';
 import * as stateHelpers from '../../../utils/stateHelpers';
 
-vi.mock('../../utils/stateHelpers', () => ({
+vi.mock('../../../utils/stateHelpers', () => ({
     normalizeStateCommandKey: vi.fn((k: string) => k),
     applyStateCommand: vi.fn((char: any, env: any, social: any, world: any, battle: any, story: any, storyPlan: any, heroinePlan: any, fandomStoryPlan: any, fandomHeroinePlan: any, sect: any, tasks: any, agreements: any) => ({
         char: char || {}, env: env || {}, social: social || [], world: world || {},
@@ -12,7 +12,7 @@ vi.mock('../../utils/stateHelpers', () => ({
         tasks: tasks || [], agreements: agreements || [],
     })),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionCalibration', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionCalibration', () => ({
     同步剧情小说分解时间校准: vi.fn((p: any) => Promise.resolve(p.nextStory || {})),
 }));
 

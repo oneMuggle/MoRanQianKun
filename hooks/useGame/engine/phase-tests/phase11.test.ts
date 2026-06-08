@@ -3,11 +3,11 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ConditionEvaluator, createConditionEvaluator } from '../avg/dialogue/conditionEvaluator';
-import type { GameContext } from '../avg/dialogue/conditionEvaluator';
-import { NodeResolver, createNodeResolver } from '../avg/dialogue/nodeResolver';
-import { AvgDialogueEngine, createAvgDialogueEngine } from '../engine/avgDialogueEngine';
-import type { PlayerAction } from '../engine/types';
+import { ConditionEvaluator, createConditionEvaluator } from '../../avg/dialogue/conditionEvaluator';
+import type { GameContext } from '../../avg/dialogue/conditionEvaluator';
+import { NodeResolver, createNodeResolver } from '../../avg/dialogue/nodeResolver';
+import { AvgDialogueEngine, createAvgDialogueEngine } from '../avgDialogueEngine';
+import type { PlayerAction } from '../types';
 import type { DialogueTree, DialogueNode, DialogueChoice, DialogueCondition, DialogueAction } from '../../../../models/avg/dialogueTree';
 
 const makeAction = (type: string, payload: Record<string, unknown>): PlayerAction => ({

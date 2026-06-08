@@ -4,32 +4,32 @@ import * as textAIService from '../../../services/ai/text';
 import * as apiConfig from '../../../utils/apiConfig';
 import * as gameSettings from '../../../utils/gameSettings';
 
-vi.mock('../../services/ai/text', () => ({
+vi.mock('../../../services/ai/text', () => ({
     generateStoryResponseWithFailover: vi.fn(),
     StoryResponseParseError: class StoryResponseParseError extends Error { name = 'StoryResponseParseError'; },
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取主剧情接口配置: vi.fn(),
     获取世界演变接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('../../utils/gameSettings', () => ({
+vi.mock('../../../utils/gameSettings', () => ({
     规范化游戏设置: vi.fn((c: any) => c || {}),
 }));
-vi.mock('../../utils/worldbook', () => ({
+vi.mock('../../../utils/worldbook', () => ({
     构建世界书注入文本: vi.fn(() => ''),
 }));
-vi.mock('./memoryUtils', () => ({
+vi.mock('../memory/memoryUtils', () => ({
     规范化记忆配置: vi.fn((c: any) => c || {}),
     规范化记忆系统: vi.fn((m: any) => m || { 回忆档案: [], 即时记忆: [], 短期记忆: [], 中期记忆: [], 长期记忆: [] }),
     构建即时记忆条目: vi.fn(() => ({ content: 'immediate' })),
     构建短期记忆条目: vi.fn(() => ({ content: 'short' })),
     写入四段记忆: vi.fn((mem: any) => mem),
 }));
-vi.mock('./memoryRecall', () => ({
+vi.mock('../memory/memoryRecall', () => ({
     提取剧情回忆标签: vi.fn((input: string) => ({ cleanInput: input, recallTag: '' })),
 }));
-vi.mock('./recallWorkflow', () => ({
+vi.mock('../memory/recallWorkflow', () => ({
     执行剧情回忆检索: vi.fn(),
 }));
 vi.mock('./mainStoryRequest', () => ({
@@ -46,22 +46,19 @@ vi.mock('./mainStoryRequest', () => ({
         extraPromptForService: '',
     })),
 }));
-vi.mock('./timeUtils', () => ({
+vi.mock('../time/timeUtils', () => ({
     环境时间转标准串: vi.fn(() => '2026:04:30:14:00'),
 }));
 vi.mock('./promptRuntime', () => ({
     构建COT伪装提示词: vi.fn(() => ''),
 }));
-vi.mock('./worldEvolutionUtils', () => ({
-    分析世界到期触发: vi.fn(() => null),
-}));
-vi.mock('./storyResponseGuards', () => ({
+vi.mock('../response/storyResponseGuards', () => ({
     按世界演变分流净化响应: vi.fn((r: any) => ({ response: r, removedWorldCommands: [], appendedDynamicHints: [] })),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionInjection', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionInjection', () => ({
     获取激活小说拆分注入文本: vi.fn(() => Promise.resolve('')),
 }));
-vi.mock('../../services/novel-decomposition/novelDecompositionCalibration', () => ({
+vi.mock('../../../services/novel-decomposition/novelDecompositionCalibration', () => ({
     同步剧情小说分解时间校准: vi.fn((p: any) => Promise.resolve(p.previousStory)),
 }));
 
@@ -415,7 +412,7 @@ describe('执行主剧情发送工作流', () => {
     describe('story calibration', () => {
         it('calls 同步剧情小说分解时间校准 with correct params', async () => {
             enableApiMocks();
-            const { 同步剧情小说分解时间校准 } = await import('../../services/novel-decomposition/novelDecompositionCalibration');
+            const { 同步剧情小说分解时间校准 } = await import('../../../services/novel-decomposition/novelDecompositionCalibration');
             const deps = makeDeps();
             await 执行主剧情发送工作流('player action', false, makeState(), deps);
             expect(同步剧情小说分解时间校准).toHaveBeenCalled();
@@ -423,7 +420,7 @@ describe('执行主剧情发送工作流', () => {
 
         it('sets story when calibration returns different result', async () => {
             enableApiMocks();
-            const { 同步剧情小说分解时间校准 } = await import('../../services/novel-decomposition/novelDecompositionCalibration');
+            const { 同步剧情小说分解时间校准 } = await import('../../../services/novel-decomposition/novelDecompositionCalibration');
             vi.mocked(同步剧情小说分解时间校准).mockResolvedValue({ 当前章节: { 名称: 'new chapter' } } as any);
 
             const deps = makeDeps();

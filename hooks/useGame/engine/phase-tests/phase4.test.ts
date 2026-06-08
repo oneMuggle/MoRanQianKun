@@ -5,11 +5,11 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TripScheduler, createTripScheduler } from '../urbanDriver/tripScheduler';
-import { PassengerStateMachine, createPassengerStateMachine } from '../urbanDriver/passengerStateMachine';
-import { ConsequenceChain, createConsequenceChain } from '../urbanDriver/consequenceChain';
-import { UrbanDriverEngine, createUrbanDriverEngine } from '../engine/urbanDriverEngine';
-import type { TripTriggerContext } from '../urbanDriver/tripScheduler';
+import { TripScheduler, createTripScheduler } from '../../urbanDriver/tripScheduler';
+import { PassengerStateMachine, createPassengerStateMachine } from '../../urbanDriver/passengerStateMachine';
+import { ConsequenceChain, createConsequenceChain } from '../../urbanDriver/consequenceChain';
+import { UrbanDriverEngine, createUrbanDriverEngine } from '../urbanDriverEngine';
+import type { TripTriggerContext } from '../../urbanDriver/tripScheduler';
 
 // ==================== TripScheduler ====================
 

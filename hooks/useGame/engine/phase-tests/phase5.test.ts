@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { EngineRegistry, createEngineRegistry } from '../engine/engineRegistry';
-import { GlobalTurnManager, createGlobalTurnManager } from '../engine/globalTurnManager';
+import { EngineRegistry, createEngineRegistry } from '../engineRegistry';
+import { GlobalTurnManager, createGlobalTurnManager } from '../globalTurnManager';
 import type {
   SLGEngine,
   EngineType,
@@ -19,7 +19,7 @@ import type {
   ScheduledEvent,
   ResolvedEvent,
   PauseReason,
-} from '../engine/types';
+} from '../types';
 
 // ==================== Mock Engine ====================
 

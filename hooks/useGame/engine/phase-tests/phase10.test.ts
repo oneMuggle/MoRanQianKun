@@ -6,7 +6,7 @@ import { describe, test, expect } from 'vitest';
 import {
   DailyTownEngine,
   createDailyTownEngine,
-} from '../engine/dailyTownEngine';
+} from '../dailyTownEngine';
 import type { RegionNode } from '../../../../models/dailyTown/regionNode';
 import type { NpcSchedule } from '../../../../models/dailyTown/npcSchedule';
 

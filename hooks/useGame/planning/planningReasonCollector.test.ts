@@ -18,7 +18,7 @@ vi.mock('../response/responseTextHelpers', () => ({
         return new Date(t).getTime();
     }),
 }));
-vi.mock('../storyState', () => ({
+vi.mock('../core/storyState', () => ({
     规范化剧情规划状态: vi.fn((p: any) => p || { 待触发事件: [], 当前章任务: [] }),
     规范化女主剧情规划状态: vi.fn((p: any) => p || null),
     规范化剧情状态: vi.fn((p: any) => p || { 当前章节: {} }),

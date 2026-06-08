@@ -5,13 +5,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MessageQueue } from '../device/messageQueue';
-import { MessageScheduler } from '../device/messageScheduler';
-import { PhoneEngine, createPhoneEngine } from '../engine/phoneEngine';
-import { NotificationEngine, createNotificationEngine } from '../engine/notificationEngine';
-import { SocialGraph, createSocialGraph } from '../device/socialGraph';
-import type { DisplayMessage } from '../device/messageQueue';
-import type { NPCTriggerRule, NPCProfile } from '../device/messageScheduler';
+import { MessageQueue } from '../../device/messageQueue';
+import { MessageScheduler } from '../../device/messageScheduler';
+import { PhoneEngine, createPhoneEngine } from '../phoneEngine';
+import { NotificationEngine, createNotificationEngine } from '../notificationEngine';
+import { SocialGraph, createSocialGraph } from '../../device/socialGraph';
+import type { DisplayMessage } from '../../device/messageQueue';
+import type { NPCTriggerRule, NPCProfile } from '../../device/messageScheduler';
 
 // ==================== MessageQueue ====================
 

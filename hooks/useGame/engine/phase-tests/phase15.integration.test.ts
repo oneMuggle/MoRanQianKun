@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { GameOrchestrator, createGameOrchestrator } from './gameOrchestrator';
+import { GameOrchestrator, createGameOrchestrator } from '../gameOrchestrator';
 
 // ==================== 多引擎联动 ====================
 

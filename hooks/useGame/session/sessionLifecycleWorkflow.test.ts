@@ -3,18 +3,18 @@ import { 创建会话生命周期工作流 } from './sessionLifecycleWorkflow';
 import * as dbService from '../../../services/dbService';
 import * as apiConfig from '../../../utils/apiConfig';
 
-vi.mock('../../services/dbService', () => ({
+vi.mock('../../../services/dbService', () => ({
     保存设置: vi.fn(),
     读取设置: vi.fn(),
 }));
-vi.mock('../../utils/apiConfig', () => ({
+vi.mock('../../../utils/apiConfig', () => ({
     获取主剧情接口配置: vi.fn(),
     接口配置是否可用: vi.fn(),
 }));
-vi.mock('./opening/openingStoryWorkflow', () => ({
+vi.mock('../opening/openingStoryWorkflow', () => ({
     执行开场剧情生成工作流: vi.fn(),
 }));
-vi.mock('./world/worldGenerationWorkflow', () => ({
+vi.mock('../world/worldGenerationWorkflow', () => ({
     执行世界生成工作流: vi.fn(),
 }));
 
@@ -305,7 +305,7 @@ describe('创建会话生命周期工作流', () => {
         it('world_only mode calls handleGenerateWorld with step mode', async () => {
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
-            const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
+            const { 执行世界生成工作流 } = await import('../world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
 
             const deps = makeDeps({ 最近开局配置: makeRecentConfig() });
@@ -320,7 +320,7 @@ describe('创建会话生命周期工作流', () => {
         it('opening_only mode calls generateOpeningStory directly', async () => {
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
-            const { 执行开场剧情生成工作流 } = await import('./opening/openingStoryWorkflow');
+            const { 执行开场剧情生成工作流 } = await import('../opening/openingStoryWorkflow');
             vi.mocked(执行开场剧情生成工作流).mockResolvedValue();
 
             const deps = makeDeps({ 最近开局配置: makeRecentConfig() });
@@ -334,7 +334,7 @@ describe('创建会话生命周期工作流', () => {
         it('all mode calls handleGenerateWorld with all mode', async () => {
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
-            const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
+            const { 执行世界生成工作流 } = await import('../world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
 
             const deps = makeDeps({ 最近开局配置: makeRecentConfig() });
@@ -349,7 +349,7 @@ describe('创建会话生命周期工作流', () => {
         it('opening_only handles error and shows failure message', async () => {
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
-            const { 执行开场剧情生成工作流 } = await import('./opening/openingStoryWorkflow');
+            const { 执行开场剧情生成工作流 } = await import('../opening/openingStoryWorkflow');
             vi.mocked(执行开场剧情生成工作流).mockRejectedValue(new Error('opening failed'));
 
             const deps = makeDeps({
@@ -367,7 +367,7 @@ describe('创建会话生命周期工作流', () => {
     describe('handleGenerateWorld', () => {
         it('syncs nsfw场景类型 and does not override li-wuxia/zhiguai (derived by 规范化游戏设置)', async () => {
             mock读取设置.mockResolvedValue({ 启用里武侠模式: true, 启用里志怪模式: false });
-            const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
+            const { 执行世界生成工作流 } = await import('../world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
 
             const deps = makeDeps({ gameConfig: { 启用修炼体系: true } });
@@ -387,7 +387,7 @@ describe('创建会话生命周期工作流', () => {
 
         it('syncs nsfw scene type from worldConfig', async () => {
             mock读取设置.mockResolvedValue(null);
-            const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
+            const { 执行世界生成工作流 } = await import('../world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
 
             const deps = makeDeps();
@@ -405,7 +405,7 @@ describe('创建会话生命周期工作流', () => {
 
         it('loads prompts if not available', async () => {
             mock读取设置.mockResolvedValue(null);
-            const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
+            const { 执行世界生成工作流 } = await import('../world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
 
             const deps = makeDeps({ prompts: [] });
@@ -421,7 +421,7 @@ describe('创建会话生命周期工作流', () => {
 
         it('clears opening progress states', async () => {
             mock读取设置.mockResolvedValue(null);
-            const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
+            const { 执行世界生成工作流 } = await import('../world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
 
             const deps = makeDeps();
@@ -439,7 +439,7 @@ describe('创建会话生命周期工作流', () => {
 
         it('calls world generation workflow with correct params', async () => {
             mock读取设置.mockResolvedValue(null);
-            const { 执行世界生成工作流 } = await import('./world/worldGenerationWorkflow');
+            const { 执行世界生成工作流 } = await import('../world/worldGenerationWorkflow');
             vi.mocked(执行世界生成工作流).mockResolvedValue();
 
             const deps = makeDeps();
@@ -456,7 +456,7 @@ describe('创建会话生命周期工作流', () => {
 
     describe('generateOpeningStory', () => {
         it('clears opening progress states', async () => {
-            const { 执行开场剧情生成工作流 } = await import('./opening/openingStoryWorkflow');
+            const { 执行开场剧情生成工作流 } = await import('../opening/openingStoryWorkflow');
             vi.mocked(执行开场剧情生成工作流).mockResolvedValue();
 
             const deps = makeDeps();
@@ -468,7 +468,7 @@ describe('创建会话生命周期工作流', () => {
         });
 
         it('loads prompts if promptSnapshot is empty', async () => {
-            const { 执行开场剧情生成工作流 } = await import('./opening/openingStoryWorkflow');
+            const { 执行开场剧情生成工作流 } = await import('../opening/openingStoryWorkflow');
             vi.mocked(执行开场剧情生成工作流).mockResolvedValue();
 
             const deps = makeDeps();
@@ -478,7 +478,7 @@ describe('创建会话生命周期工作流', () => {
         });
 
         it('uses provided prompts if available', async () => {
-            const { 执行开场剧情生成工作流 } = await import('./opening/openingStoryWorkflow');
+            const { 执行开场剧情生成工作流 } = await import('../opening/openingStoryWorkflow');
             vi.mocked(执行开场剧情生成工作流).mockResolvedValue();
 
             const deps = makeDeps();
@@ -489,7 +489,7 @@ describe('创建会话生命周期工作流', () => {
         });
 
         it('pushes a rollback snapshot before generating', async () => {
-            const { 执行开场剧情生成工作流 } = await import('./opening/openingStoryWorkflow');
+            const { 执行开场剧情生成工作流 } = await import('../opening/openingStoryWorkflow');
             vi.mocked(执行开场剧情生成工作流).mockResolvedValue();
 
             const deps = makeDeps();
