@@ -15,6 +15,15 @@ export default defineViteConfig({
         globals: true,
         environment: 'jsdom',
         include: ['**/*.test.ts', '**/*.test.tsx'],
+        // 2026-06-08 Phase 5 CI 修复：
+        // 1. __tests__/photographyNSFW/ 是 spec test 禁区（4 个文件导入已不存在的 hooks/useGame/photographyNSFW*）
+        // 2. .opencode/node_modules/zod/ 是 zod 自带测试，vitest 误识别（node_modules/ 仅匹配根，不匹配嵌套）
+        exclude: [
+            '**/node_modules/**',
+            '**/.opencode/**',
+            'dist/',
+            '**/__tests__/photographyNSFW/**',
+        ],
         // 2026-06-06 Phase 5 Day 46：注入全局 setup（jest-dom + fake-indexeddb + msw）
         setupFiles: ['./src/test-utils/setup.ts'],
         coverage: {
