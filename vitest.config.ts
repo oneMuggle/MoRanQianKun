@@ -20,9 +20,9 @@ export default defineViteConfig({
         coverage: {
             provider: 'v8',
             reporter: ['text', 'html', 'json-summary', 'lcov'],
-            // 2026-06-06 Phase 5 Day 46：把 models/ 也纳入 coverage 范围
-            // 后续 Day 48 写完 models 测试后把 threshold 提到 ≥ 50%
-            include: ['utils/**/*.ts', 'models/**/*.ts'],
+            // 2026-06-08 Phase 5 Day 49-52：把 services/ 也纳入 coverage 范围
+            // 写完 services 测试后 services 目标 ≥ 60%
+            include: ['utils/**/*.ts', 'models/**/*.ts', 'services/**/*.ts'],
             exclude: [
                 'node_modules/',
                 'dist/',
