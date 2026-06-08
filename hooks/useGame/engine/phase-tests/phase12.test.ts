@@ -12,7 +12,6 @@ import { AvgRelationEngine, createAvgRelationEngine } from '../avgRelationEngine
 import type { PlayerAction } from '../types';
 import type { RelationEdge } from '../../../../models/avg/relationGraph';
 import type { GalgameRoute, GalgameEnding, GalgameCG, GalgameState } from '../../../../models/avg/galgame';
-import { INTIMACY_THRESHOLDS } from '../../../../models/avg/relationGraph';
 
 const makeAction = (type: string, payload: Record<string, unknown>): PlayerAction => ({
   id: `test-${type}-${Date.now()}`,

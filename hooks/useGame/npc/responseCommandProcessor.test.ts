@@ -3,7 +3,7 @@ import { 执行响应命令处理, type 响应命令处理状态 } from '../npc/
 import * as stateHelpers from '../../../utils/stateHelpers';
 
 vi.mock('../../../utils/stateHelpers', () => ({
-    applyStateCommand: vi.fn((char, env, social, world, battle, story, storyPlan, heroinePlan, fandomStoryPlan, fandomHeroinePlan, sect, tasks, agreements, key, value, action) => {
+    applyStateCommand: vi.fn((char, env, social, world, battle, story, storyPlan, heroinePlan, fandomStoryPlan, fandomHeroinePlan, sect, tasks, agreements, _key, _value, _action) => {
         return { char, env, social, world, battle, story, storyPlan, heroinePlan, fandomStoryPlan, fandomHeroinePlan, sect, tasks, agreements };
     }),
 }));
@@ -35,9 +35,9 @@ function makeDeps(overrides: any = {}) {
         规范化门派状态: vi.fn((s: any) => s || {}),
         规范化剧情状态: vi.fn((s: any) => s || {}),
         规范化剧情规划状态: vi.fn((p: any) => p || {}),
-        规范化女主剧情规划状态: vi.fn((p: any) => undefined),
-        规范化同人剧情规划状态: vi.fn((p: any) => undefined),
-        规范化同人女主剧情规划状态: vi.fn((p: any) => undefined),
+        规范化女主剧情规划状态: vi.fn((_p: any) => undefined),
+        规范化同人剧情规划状态: vi.fn((_p: any) => undefined),
+        规范化同人女主剧情规划状态: vi.fn((_p: any) => undefined),
         规范化校园系统: vi.fn((c: any) => c || {}),
         规范化角色物品容器映射: vi.fn((r: any) => r || {}),
         战斗结束自动清空: vi.fn((b: any) => b),
@@ -100,7 +100,7 @@ describe('执行响应命令处理', () => {
         const deps = makeDeps({ 命令后校准 });
         const response = { logs: [] } as any;
         const result = 执行响应命令处理(response, state, deps);
-        expect(result.角色.气血).toBe(999);
+        expect((result.角色 as any).气血).toBe(999);
     });
 
     it('applies state to setters by default (when commands present)', () => {
