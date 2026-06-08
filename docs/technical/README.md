@@ -30,6 +30,7 @@
 | 12 | [novel-decomposition](./12-novel-decomposition.md) | 小说拆解调度、长篇规划注入 |
 | 13 | [planning-systems](./13-planning-systems.md) | 剧情规划、女主规划、同人规划 |
 | 14 | [interaction-model](./14-interaction-model.md) | 玩家交互、命令处理器、NSFW 反馈链路 |
+| 14 | [optimization-roadmap-v2](./14-optimization-roadmap-v2.md) | 60 天项目优化路线图 v2.0 实施报告（Phase 2/3/5 收口，2026-06-08 Day 60） |
 | 15 | [performance-monitoring](./15-performance-monitoring.md) | FPS 显示、性能仪表盘（来自 2026-05-17） |
 | 16 | [metrics-baseline-2026-06](./metrics-baseline-2026-06/README.md) | 2026-06-03 项目质量基线（16 循环依赖等） |
 
