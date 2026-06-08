@@ -56,17 +56,37 @@
 - `coverage.include: ['utils/**/*.ts']`（**只对 utils 强制门槛**）
 - `coverage.reporter: [..., 'json-summary']`（CI 可读 JSON）
 
-## CI 接入（未来）
+## CI 接入（2026-06-08 Day 59 完成）
 
-```yaml
-# .github/workflows/ci.yml
-- name: Run tests
-  run: pnpm exec vitest run
+- **新增 workflow**：`.github/workflows/test-coverage.yml`
+- **触发条件**：PR 或 push 到 `main` / `feat/optimization-v2`
+- **执行步骤**：
+  1. `actions/checkout@v4` + `actions/setup-node@v4`（Node 20 + npm 缓存）
+  2. `npm ci` 安装依赖
+  3. `npm run test:unit` 跑 vitest 单元测试
+  4. `npm run test:coverage` 跑 coverage 报告
+  5. `npx vitest run --coverage --coverage.thresholds.lines=12` 阈值校验
+  6. `actions/upload-artifact@v4` 上传 `coverage/` 报告（保留 7 天）
+- **当前阈值**：12%（基于 Day 58 实测覆盖率，避免 CI 红）
+- **失败豁免**：`__tests__/photographyNSFW/` 4 个文件为 spec 决策跳过（详见 `__tests__/photographyNSFW/SKIP.md`）
+- **与现有 ci.yml 的关系**：ci.yml 已有 vitest 单元测试 job（无 coverage 阈值）；test-coverage.yml 专注 coverage 报告与阈值校验，两者互补
+- **artifacts**：`coverage-report` 包含 `text / html / json-summary / lcov` 4 种 reporter 输出
 
-- name: Check coverage
-  run: |
-    pnpm exec vitest run --coverage
-    # 读取 coverage/coverage-summary.json 校验
+### 阈值演进计划
+
+| 阶段 | 阈值 | 触发条件 |
+|------|------|----------|
+| Day 59（当前） | 12% | Phase 5 实际值 |
+| Day 60（1 周内） | 20% | services/ 测试覆盖稳定 |
+| Day 60+ 60 天末 | 30%+ | hooks/ 与 components/ 覆盖率提升 |
+
+### 本地对应命令
+
+```bash
+# 等价于 CI：
+npm run test:unit                 # 仅跑测试
+npm run test:coverage             # 跑测试 + 生成 coverage
+npx vitest run --coverage --coverage.thresholds.lines=12   # 阈值校验
 ```
 
 ## 推荐优先级
