@@ -19,6 +19,7 @@ import {
 import { 设置存档保护状态, 删除设置 } from './stores';
 import { 初始化数据库 } from './initialization';
 import { STORE_NAME, SETTINGS_STORE } from './schema';
+import type { 存档结构 } from '../../models/system/memory-config';
 
 const 清空数据 = async () => {
     const db = await 初始化数据库();
@@ -33,7 +34,7 @@ const 清空数据 = async () => {
     await 删除设置('存档保护').catch(() => undefined);
 };
 
-const 基础存档 = (overrides: Partial<any> = {}) => ({
+const 基础存档 = (overrides: Partial<Omit<存档结构, 'id'>> = {}) => ({
     类型: 'manual' as const,
     时间戳: Date.now(),
     描述: '测试存档',
@@ -44,7 +45,7 @@ const 基础存档 = (overrides: Partial<any> = {}) => ({
         { role: 'assistant', content: 'hello', timestamp: 2 },
     ],
     ...overrides,
-});
+}) as Omit<存档结构, 'id'>;
 
 describe('save-archive 基础 CRUD', () => {
     beforeEach(async () => {
