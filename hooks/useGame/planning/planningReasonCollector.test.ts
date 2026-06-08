@@ -7,6 +7,12 @@ import {
     收集女主正文命中原因,
     过滤规划补丁命令,
 } from './planningReasonCollector';
+import type {
+    剧情规划结构,
+    女主剧情规划结构,
+    环境信息结构,
+    剧情系统结构,
+} from '../../../types';
 
 vi.mock('../time/timeUtils', () => ({
     环境时间转标准串: vi.fn((env: any) => env ? `${env.年}-${String(env.月).padStart(2, '0')}-${String(env.日).padStart(2, '0')}T00:00:00` : ''),
@@ -48,14 +54,14 @@ describe('planningReasonCollector', () => {
     });
 
     describe('收集剧情规划时间触发原因', () => {
-        const baseEnv = { 年: 2026, 月: 4, 日: 30 };
+        const baseEnv: 环境信息结构 = { 年: 2026, 月: 4, 日: 30 };
 
         it('returns empty array when no environment', () => {
             expect(收集剧情规划时间触发原因(undefined, undefined as any)).toEqual([]);
         });
 
         it('returns empty array when plan has no events or tasks', () => {
-            const result = 收集剧情规划时间触发原因({}, baseEnv);
+            const result = 收集剧情规划时间触发原因({} as 剧情规划结构, baseEnv);
             expect(result).toEqual([]);
         });
 
@@ -70,7 +76,7 @@ describe('planningReasonCollector', () => {
                     },
                 ],
                 当前章任务: [],
-            };
+            } as unknown as 剧情规划结构;
             const result = 收集剧情规划时间触发原因(plan, baseEnv);
             expect(result.length).toBeGreaterThan(0);
             expect(result.some((r) => r.includes('刺杀任务'))).toBe(true);
@@ -87,7 +93,7 @@ describe('planningReasonCollector', () => {
                         最迟执行时间: '2026-05-05T00:00:00',
                     },
                 ],
-            };
+            } as unknown as 剧情规划结构;
             const result = 收集剧情规划时间触发原因(plan, baseEnv);
             expect(result.some((r) => r.includes('探索密室'))).toBe(true);
         });
@@ -103,7 +109,7 @@ describe('planningReasonCollector', () => {
                     },
                 ],
                 当前章任务: [],
-            };
+            } as unknown as 剧情规划结构;
             const result = 收集剧情规划时间触发原因(plan, baseEnv);
             expect(result).toEqual([]);
         });
@@ -119,7 +125,7 @@ describe('planningReasonCollector', () => {
                     },
                 ],
                 当前章任务: [],
-            };
+            } as unknown as 剧情规划结构;
             const result = 收集剧情规划时间触发原因(plan, baseEnv);
             const uniqueReasons = new Set(result);
             expect(uniqueReasons.size).toBe(result.length);
@@ -133,21 +139,21 @@ describe('planningReasonCollector', () => {
                     },
                 ],
                 当前章任务: [],
-            };
+            } as unknown as 剧情规划结构;
             const result = 收集剧情规划时间触发原因(plan, baseEnv);
             expect(result.some((r) => r.includes('未命名事件'))).toBe(true);
         });
     });
 
     describe('收集女主规划时间触发原因', () => {
-        const baseEnv = { 年: 2026, 月: 4, 日: 30 };
+        const baseEnv: 环境信息结构 = { 年: 2026, 月: 4, 日: 30 };
 
         it('returns empty array when no plan', () => {
             expect(收集女主规划时间触发原因(undefined as any, baseEnv)).toEqual([]);
         });
 
         it('returns empty array when no events', () => {
-            const plan = { 女主互动事件: [] };
+            const plan = { 女主互动事件: [] } as unknown as 女主剧情规划结构;
             expect(收集女主规划时间触发原因(plan, baseEnv)).toEqual([]);
         });
 
@@ -162,7 +168,7 @@ describe('planningReasonCollector', () => {
                         最晚触发时间: '2026-05-01T00:00:00',
                     },
                 ],
-            };
+            } as unknown as 女主剧情规划结构;
             const result = 收集女主规划时间触发原因(plan, baseEnv);
             expect(result.some((r) => r.includes('小凤') && r.includes('花园相遇'))).toBe(true);
         });
@@ -174,7 +180,7 @@ describe('planningReasonCollector', () => {
                         计划触发时间: '2026-04-29T00:00:00',
                     },
                 ],
-            };
+            } as unknown as 女主剧情规划结构;
             const result = 收集女主规划时间触发原因(plan, baseEnv);
             expect(result.some((r) => r.includes('未知女主'))).toBe(true);
             expect(result.some((r) => r.includes('未知排期'))).toBe(true);
@@ -183,54 +189,54 @@ describe('planningReasonCollector', () => {
 
     describe('收集剧情正文命中原因', () => {
         it('returns empty array when no body text', () => {
-            expect(收集剧情正文命中原因({}, {}, '')).toEqual([]);
-            expect(收集剧情正文命中原因({}, {}, undefined as any)).toEqual([]);
+            expect(收集剧情正文命中原因({} as 剧情系统结构, {} as 剧情规划结构, '')).toEqual([]);
+            expect(收集剧情正文命中原因({} as 剧情系统结构, {} as 剧情规划结构, undefined as any)).toEqual([]);
         });
 
         it('matches keywords from story chapter title', () => {
-            const story = { 当前章节: { 标题: '刺杀行动' } };
-            const plan = { 待触发事件: [], 当前章任务: [] };
+            const story = { 当前章节: { 标题: '刺杀行动' } } as unknown as 剧情系统结构;
+            const plan = { 待触发事件: [], 当前章任务: [] } as unknown as 剧情规划结构;
             const body = '今夜执行刺杀行动，潜入敌营。';
             const result = 收集剧情正文命中原因(story, plan, body);
             expect(result).toContain('最近正文命中剧情线索「刺杀行动」');
         });
 
         it('matches keywords from planned events', () => {
-            const story = { 当前章节: {} };
+            const story = { 当前章节: {} } as unknown as 剧情系统结构;
             const plan = {
                 待触发事件: [{ 事件名: '秘境探索' }],
                 当前章任务: [],
-            };
+            } as unknown as 剧情规划结构;
             const body = '众人进入了秘境探索的入口。';
             const result = 收集剧情正文命中原因(story, plan, body);
             expect(result).toContain('最近正文命中剧情线索「秘境探索」');
         });
 
         it('matches keywords from chapter tasks', () => {
-            const story = { 当前章节: {} };
+            const story = { 当前章节: {} } as unknown as 剧情系统结构;
             const plan = {
                 待触发事件: [],
                 当前章任务: [{ 标题: '寻找秘籍' }],
-            };
+            } as unknown as 剧情规划结构;
             const body = '他踏上了寻找秘籍的旅途。';
             const result = 收集剧情正文命中原因(story, plan, body);
             expect(result).toContain('最近正文命中剧情线索「寻找秘籍」');
         });
 
         it('filters keywords shorter than 2 chars', () => {
-            const story = { 当前章节: { 标题: 'a' } };
-            const plan = { 待触发事件: [], 当前章任务: [] };
+            const story = { 当前章节: { 标题: 'a' } } as unknown as 剧情系统结构;
+            const plan = { 待触发事件: [], 当前章任务: [] } as unknown as 剧情规划结构;
             const body = 'a test';
             const result = 收集剧情正文命中原因(story, plan, body);
             expect(result).toEqual([]);
         });
 
         it('deduplicates keywords', () => {
-            const story = { 当前章节: { 标题: '重复' } };
+            const story = { 当前章节: { 标题: '重复' } } as unknown as 剧情系统结构;
             const plan = {
                 待触发事件: [{ 事件名: '重复' }],
                 当前章任务: [],
-            };
+            } as unknown as 剧情规划结构;
             const body = '重复的内容重复。';
             const result = 收集剧情正文命中原因(story, plan, body);
             expect(result.length).toBe(1);
@@ -239,7 +245,7 @@ describe('planningReasonCollector', () => {
 
     describe('收集女主正文命中原因', () => {
         it('returns empty array when no body text', () => {
-            expect(收集女主正文命中原因({}, '')).toEqual([]);
+            expect(收集女主正文命中原因({} as 女主剧情规划结构, '')).toEqual([]);
         });
 
         it('returns empty array when no plan', () => {
@@ -247,7 +253,7 @@ describe('planningReasonCollector', () => {
         });
 
         it('matches heroine names in body text', () => {
-            const plan = { 女主条目: [{ 女主姓名: '小凤' }, { 女主姓名: '小兰' }] };
+            const plan = { 女主条目: [{ 女主姓名: '小凤' }, { 女主姓名: '小兰' }] } as unknown as 女主剧情规划结构;
             const body = '小凤微笑着看向远方。';
             const result = 收集女主正文命中原因(plan, body);
             expect(result).toContain('最近正文命中女主线索「小凤」');
@@ -255,7 +261,7 @@ describe('planningReasonCollector', () => {
         });
 
         it('filters short names', () => {
-            const plan = { 女主条目: [{ 女主姓名: 'a' }] };
+            const plan = { 女主条目: [{ 女主姓名: 'a' }] } as unknown as 女主剧情规划结构;
             const body = 'a test';
             const result = 收集女主正文命中原因(plan, body);
             expect(result).toEqual([]);

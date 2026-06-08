@@ -6,6 +6,7 @@ import {
     应用NPC记忆总结,
     构建NPC记忆展示结果,
 } from '../memory/npcMemorySummary';
+import type { NPC结构 } from '../../../types';
 
 vi.mock('./memoryUtils', () => ({
     规范化记忆配置: vi.fn((c: any) => ({ NPC记忆总结阈值: 20, ...c })),
@@ -175,7 +176,7 @@ describe('npcMemorySummary', () => {
             姓名: '测试NPC',
             记忆: memories,
             总结记忆: summaries,
-        });
+        } as unknown as NPC结构);
 
         const createCandidate = (batchSize: number): any => ({
             批次: Array.from({ length: batchSize }, (_, i) => ({ 时间: `t${i}`, 内容: `m${i}` })),

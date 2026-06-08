@@ -6,6 +6,7 @@ import {
     构建运行时提示词池,
     构建酒馆预设消息链,
 } from './promptRuntime';
+import type { 游戏设置结构, 提示词结构 } from '../../../types';
 
 vi.mock('../../../prompts/core/cot', () => ({
     核心_思维链: { id: 'core_cot', 内容: '<COT base>', 启用: true },
@@ -72,13 +73,13 @@ other rule`;
 
     describe('构建COT伪装提示词', () => {
         it('replaces AI identity placeholder', () => {
-            const result = 构建COT伪装提示词({}, '你是"旁白"的助手');
+            const result = 构建COT伪装提示词({} as 游戏设置结构, '你是"旁白"的助手');
             expect(result).toContain('旁白');
             expect(result).not.toContain('<AI身份名称占位>');
         });
 
         it('defaults to AI when no identity found', () => {
-            const result = 构建COT伪装提示词({}, '');
+            const result = 构建COT伪装提示词({} as 游戏设置结构, '');
             expect(result).toContain('AI');
         });
 
@@ -93,29 +94,29 @@ other rule`;
         });
 
         it('uses default when action options is undefined', () => {
-            const result = 构建COT伪装提示词({});
+            const result = 构建COT伪装提示词({} as 游戏设置结构);
             expect(result).toContain('<行动选项>');
         });
     });
 
     describe('酒馆预设模式可用', () => {
         it('returns false when 启用酒馆预设模式 is not true', () => {
-            expect(酒馆预设模式可用({})).toBe(false);
-            expect(酒馆预设模式可用({ 启用酒馆预设模式: false })).toBe(false);
+            expect(酒馆预设模式可用({} as 游戏设置结构)).toBe(false);
+            expect(酒馆预设模式可用({ 启用酒馆预设模式: false } as 游戏设置结构)).toBe(false);
         });
 
         it('returns false when preset is missing prompts', () => {
             expect(酒馆预设模式可用({
                 启用酒馆预设模式: true,
                 酒馆预设: { prompts: [], prompt_order: [] },
-            })).toBe(false);
+            } as unknown as 游戏设置结构)).toBe(false);
         });
 
         it('returns false when preset is missing prompt_order', () => {
             expect(酒馆预设模式可用({
                 启用酒馆预设模式: true,
                 酒馆预设: { prompts: [{ identifier: 'p1', content: 'c1' }] },
-            })).toBe(false);
+            } as unknown as 游戏设置结构)).toBe(false);
         });
 
         it('returns true when all conditions met', () => {
@@ -125,23 +126,23 @@ other rule`;
                     prompts: [{ identifier: 'p1', content: 'c1' }],
                     prompt_order: [{ identifier: 'p1', enabled: true }],
                 },
-            })).toBe(true);
+            } as unknown as 游戏设置结构)).toBe(true);
         });
     });
 
     describe('构建运行时提示词池', () => {
-        const basePromptPool = [
+        const basePromptPool: 提示词结构[] = [
             { id: 'core_cot', 内容: '<COT base>', 启用: true },
             { id: 'writing_no_control', 内容: 'no control rule', 启用: true },
             { id: 'other_prompt', 内容: 'other content', 启用: true },
-        ];
-        const baseConfig = {
+        ] as unknown as 提示词结构[];
+        const baseConfig: 游戏设置结构 = {
             启用修炼体系: true,
             启用防止说话: true,
             启用饱腹口渴系统: true,
             启用女主剧情规划: false,
             剧情风格: '一般' as const,
-        };
+        } as unknown as 游戏设置结构;
 
         it('selects COT prompt and enables it', () => {
             const result = 构建运行时提示词池(basePromptPool, baseConfig);
@@ -153,7 +154,7 @@ other rule`;
             const poolWithDuplicate = [
                 { id: 'core_cot', 内容: '<old COT>', 启用: false },
                 { id: 'other_prompt', 内容: 'other', 启用: true },
-            ];
+            ] as unknown as 提示词结构[];
             const result = 构建运行时提示词池(poolWithDuplicate, baseConfig);
             const cotPrompts = result.promptPool.filter((p) => p.id === 'core_cot');
             expect(cotPrompts).toHaveLength(1);
@@ -164,7 +165,7 @@ other rule`;
             const result = 构建运行时提示词池(basePromptPool, {
                 ...baseConfig,
                 启用防止说话: false,
-            });
+            } as unknown as 游戏设置结构);
             const noControlPrompt = result.promptPool.find((p) => p.id === 'writing_no_control');
             expect(noControlPrompt?.内容).not.toContain('NoControl');
         });
@@ -174,11 +175,11 @@ other rule`;
                 ...basePromptPool,
                 { id: 'core_realm', 内容: '<realm>', 启用: true },
                 { id: 'stat_kungfu', 内容: '<kungfu>', 启用: true },
-            ];
+            ] as unknown as 提示词结构[];
             const result = 构建运行时提示词池(poolWithRealm, {
                 ...baseConfig,
                 启用修炼体系: false,
-            });
+            } as unknown as 游戏设置结构);
             expect(result.promptPool.some((p) => p.id === 'core_realm')).toBe(false);
             expect(result.promptPool.some((p) => p.id === 'stat_kungfu')).toBe(false);
         });
@@ -187,11 +188,11 @@ other rule`;
             const poolWithPhysio = [
                 ...basePromptPool,
                 { id: 'some_prompt', 内容: 'hunger and thirst\nnormal line\n口渴 line', 启用: true },
-            ];
+            ] as unknown as 提示词结构[];
             const result = 构建运行时提示词池(poolWithPhysio, {
                 ...baseConfig,
                 启用饱腹口渴系统: false,
-            });
+            } as unknown as 游戏设置结构);
             const physioPrompt = result.promptPool.find((p) => p.id === 'some_prompt');
             expect(physioPrompt?.内容).not.toContain('口渴');
             expect(physioPrompt?.内容).not.toContain('饥饿');
@@ -201,11 +202,11 @@ other rule`;
             const poolWithDiffPhysio = [
                 ...basePromptPool,
                 { id: 'diff_phys_thirst', 内容: 'thirst', 启用: true },
-            ];
+            ] as unknown as 提示词结构[];
             const result = 构建运行时提示词池(poolWithDiffPhysio, {
                 ...baseConfig,
                 启用饱腹口渴系统: false,
-            });
+            } as unknown as 游戏设置结构);
             expect(result.promptPool.some((p) => p.id.startsWith('diff_phys_'))).toBe(false);
         });
 
@@ -213,7 +214,7 @@ other rule`;
             const poolWithWorld = [
                 { id: 'core_cot', 内容: '<COT>\n- `(gameState.)世界`\nmore content', 启用: true },
                 { id: 'core_format', 内容: '□ 世界事件维护：something\n\n---', 启用: true },
-            ];
+            ] as unknown as 提示词结构[];
             const result = 构建运行时提示词池(poolWithWorld, baseConfig, {
                 启用世界演变分流: true,
             });
@@ -225,7 +226,7 @@ other rule`;
                 ...basePromptPool,
                 { id: 'core_story', 内容: '<story>', 启用: true },
                 { id: 'core_heroine_plan', 内容: '<heroine plan>', 启用: true },
-            ];
+            ] as unknown as 提示词结构[];
             const result = 构建运行时提示词池(poolWithStrippable, baseConfig);
             expect(result.promptPool.some((p) => p.id === 'core_story')).toBe(false);
             expect(result.promptPool.some((p) => p.id === 'core_heroine_plan')).toBe(false);

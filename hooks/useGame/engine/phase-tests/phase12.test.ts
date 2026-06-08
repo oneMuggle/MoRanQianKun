@@ -423,7 +423,7 @@ describe('EndingResolver', () => {
         cgIds: [],
       },
     ];
-    resolver = createEndingResolver(endings);
+    resolver = createEndingResolver(endings as GalgameEnding[]);
     state = {
       activeRouteId: 'route_a',
       unlockedRouteIds: ['route_a'],
@@ -504,7 +504,7 @@ describe('CGManager', () => {
         unlocked: false,
       },
     ];
-    manager = createCGManager(cgs);
+    manager = createCGManager(cgs as GalgameCG[]);
     state = {
       activeRouteId: null,
       unlockedRouteIds: [],

@@ -7,6 +7,7 @@ import {
     基于候选生成回忆回退结果,
     根据检索结果构建剧情回忆标签,
 } from './memoryRecall';
+import type { 记忆系统结构 } from '../../../types';
 
 describe('提取剧情回忆标签', () => {
     it('extracts content between tags', () => {
@@ -72,7 +73,7 @@ describe('解析剧情回忆输出', () => {
 
 describe('预筛剧情回忆候选', () => {
     it('returns empty for no archives', () => {
-        const result = 预筛剧情回忆候选('query', { 回忆档案: [] }, 20);
+        const result = 预筛剧情回忆候选('query', { 回忆档案: [] } as unknown as 记忆系统结构, 20);
         expect(result).toEqual([]);
     });
 
@@ -125,7 +126,7 @@ describe('预筛剧情回忆候选', () => {
 
 describe('构建剧情回忆检索上下文', () => {
     it('returns 暂无可用回忆 for empty archives', () => {
-        const result = 构建剧情回忆检索上下文({ 回忆档案: [] }, 20);
+        const result = 构建剧情回忆检索上下文({ 回忆档案: [] } as unknown as 记忆系统结构, 20);
         expect(result).toBe('暂无可用回忆。');
     });
 

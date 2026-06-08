@@ -1,6 +1,7 @@
 // 规范化函数单元测试
 
 import { 规范化写真NSFW设置 } from '../../models/photographyNSFW/normalization';
+import type { 写真NSFW设置 } from '../../models/photographyNSFW';
 
 describe('规范化写真NSFW设置', () => {
   test('N-01: 空对象返回全部默认值', () => {
@@ -35,7 +36,7 @@ describe('规范化写真NSFW设置', () => {
       启用泄露事件: true,
       泄露事件频率: '中',
       涉及BDSM模块: true,
-    };
+    } as Partial<写真NSFW设置>;
     const result = 规范化写真NSFW设置(input);
     expect(result).toEqual(input);
   });

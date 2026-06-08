@@ -3,6 +3,7 @@ import { 执行主剧情发送工作流 } from '../sendWorkflow/index';
 import * as textAIService from '../../../services/ai/text';
 import * as apiConfig from '../../../utils/apiConfig';
 import * as gameSettings from '../../../utils/gameSettings';
+import type { 游戏设置结构 } from '../../../types';
 
 vi.mock('../../../services/ai/text', () => ({
     generateStoryResponseWithFailover: vi.fn(),
@@ -308,7 +309,7 @@ describe('执行主剧情发送工作流', () => {
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
             mock获取世界演变接口配置.mockReturnValue(undefined);
-            mock规范化游戏设置.mockReturnValue({});
+            mock规范化游戏设置.mockReturnValue({} as 游戏设置结构);
 
             const ParseError = textAIService.StoryResponseParseError;
             mock生成故事响应.mockRejectedValue(new ParseError('bad parse'));
@@ -326,7 +327,7 @@ describe('执行主剧情发送工作流', () => {
             mock获取主剧情接口配置.mockReturnValue({ provider: 'openai', apiKey: 'key', baseUrl: 'url', model: 'gpt-4' } as any);
             mock接口配置是否可用.mockReturnValue(true);
             mock获取世界演变接口配置.mockReturnValue(undefined);
-            mock规范化游戏设置.mockReturnValue({ 启用自动重试: true });
+            mock规范化游戏设置.mockReturnValue({ 启用自动重试: true } as unknown as 游戏设置结构);
 
             const ParseError = textAIService.StoryResponseParseError;
             mock生成故事响应.mockRejectedValue(new ParseError('bad parse'));

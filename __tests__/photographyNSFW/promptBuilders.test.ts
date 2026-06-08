@@ -13,6 +13,7 @@ import {
   构建BDSM联动约束,
   构建写真NSFW完整叙事约束,
 } from '../../prompts/runtime/photographyNSFW';
+import type { 服装类型 } from '../../models/photographyNSFW';
 
 describe('构建玩法层约束', () => {
   test('PB-01: 灰色地带 + 露骨', () => {
@@ -32,7 +33,7 @@ describe('构建玩法层约束', () => {
 
 describe('构建拍摄场景约束', () => {
   test('PB-03: 酒店 + 私房暧昧', () => {
-    const result = 构建拍摄场景约束('私房照', '酒店', '私房暧昧', 'R级', '性感内衣', '第一组拍摄');
+    const result = 构建拍摄场景约束('私房照', '酒店', '私房暧昧', 'R级', '性感内衣' as 服装类型, '第一组拍摄');
     expect(result).toContain('酒店');
     expect(result).toContain('私房暧昧');
     expect(result).toContain('私密');

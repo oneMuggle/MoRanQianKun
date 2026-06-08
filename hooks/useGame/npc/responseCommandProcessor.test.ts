@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { 执行响应命令处理 } from '../npc/responseCommandProcessor';
+import { 执行响应命令处理, type 响应命令处理状态 } from '../npc/responseCommandProcessor';
 import * as stateHelpers from '../../../utils/stateHelpers';
 
 vi.mock('../../../utils/stateHelpers', () => ({
@@ -155,7 +155,7 @@ describe('执行响应命令处理', () => {
         const state = makeState();
         const baseState = {
             角色: { 姓名: 'BaseChar', 气血: 50, 物品列表: [], 气运列表: [] },
-        };
+        } as unknown as Partial<响应命令处理状态>;
         const deps = makeDeps();
         const response = { logs: [] } as any;
         const result = 执行响应命令处理(response, state, deps, baseState);
