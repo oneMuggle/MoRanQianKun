@@ -149,7 +149,7 @@ describe('save-archive 导入导出', () => {
     });
 
     it('导出后能导入并恢复', async () => {
-        const _id = await 保存存档(基础存档({ 描述: '往返测试' }));
+        await 保存存档(基础存档({ 描述: '往返测试' }));
         const exported = await 导出存档数据();
         expect(exported.saves).toHaveLength(1);
 
