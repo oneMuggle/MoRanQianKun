@@ -4,7 +4,9 @@
 
 **Goal:** 升级 GitHub Actions 至 Node.js 24 + 渐进提升 vitest coverage threshold，避免 2026-06-16 后 GitHub 强制升级引发的 CI 失效。
 
-**Architecture:** 在 5 个 GitHub Actions workflow 中升级 action 至 `@v5` 系列 + 添加 `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` 环境变量；修改 `vitest.config.ts` 的 `coverage.thresholds` 字段从 0 提升到 10。**不动业务逻辑、不动测试代码**。
+**Architecture:** 在 6 个 GitHub Actions workflow（test-coverage/ci/lighthouse/android/deploy/**release**）中升级 action 至 `@v5` 系列 + 添加 `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` 环境变量；修改 `vitest.config.ts` 的 `coverage.thresholds` 字段从 0 提升到 10。**不动业务逻辑、不动测试代码**。
+
+> **2026-06-09 修订**：原计划列 5 个 workflow（test-coverage/ci/lighthouse-ci/build-android-apk/deploy-cloudflare），实际仓库 6 个（lighthouse.yml / android.yml / deploy.yml + 计划外的 release.yml）。Day 1 实施时升级全部 6 个，避免 release.yml 在 2026-06-16 Node 20 deprecation deadline 后失效。文件名也以实际为准。
 
 **Tech Stack:** GitHub Actions (Node.js 20→24), Vitest v8 coverage, TypeScript
 
@@ -23,9 +25,10 @@
 |---|---|
 | `.github/workflows/test-coverage.yml` | 升级 3 个 action 到 `@v5` + 加 `env.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` |
 | `.github/workflows/ci.yml` | 同步升级（如存在） |
-| `.github/workflows/lighthouse-ci.yml` | 同步升级（如存在） |
-| `.github/workflows/build-android-apk.yml` | 同步升级（如存在） |
-| `.github/workflows/deploy-cloudflare.yml` | 同步升级（如存在） |
+| `.github/workflows/lighthouse.yml` | 升级（实际文件名，原计划误为 lighthouse-ci.yml） |
+| `.github/workflows/android.yml` | 升级（实际文件名，原计划误为 build-android-apk.yml） |
+| `.github/workflows/deploy.yml` | 升级（实际文件名，原计划误为 deploy-cloudflare.yml） |
+| `.github/workflows/release.yml` | **计划外**：实施时发现，同步升级以避免 Node 20 deprecation deadline |
 | `vitest.config.ts` | `coverage.thresholds`：`lines/functions/statements` 从 0→10，`branches` 0→8 |
 
 ---
@@ -43,7 +46,7 @@ cd /home/fz/project/MoRanJiangHu
 ls -la .github/workflows/
 ```
 
-预期看到 5 个 `.yml` 文件（test-coverage / ci / lighthouse-ci / build-android-apk / deploy-cloudflare）。
+预期看到 6 个 `.yml` 文件（test-coverage / ci / lighthouse / android / deploy / release）。
 
 - [ ] **Step 2：检查每个 workflow 当前的 action 版本**
 
@@ -162,11 +165,11 @@ if [ -f .github/workflows/ci.yml ]; then
 fi
 ```
 
-- [ ] **Step 2：同样升级 lighthouse-ci.yml / build-android-apk.yml / deploy-cloudflare.yml**
+- [ ] **Step 2：同样升级 lighthouse.yml / android.yml / deploy.yml / release.yml**
 
 ```bash
 cd /home/fz/project/MoRanJiangHu
-for f in .github/workflows/lighthouse-ci.yml .github/workflows/build-android-apk.yml .github/workflows/deploy-cloudflare.yml; do
+for f in .github/workflows/lighthouse.yml .github/workflows/android.yml .github/workflows/deploy.yml .github/workflows/release.yml; do
   if [ -f "$f" ]; then
     sed -i 's|actions/checkout@v4|actions/checkout@v5|g; s|actions/setup-node@v4|actions/setup-node@v5|g; s|actions/upload-artifact@v4|actions/upload-artifact@v5|g' "$f"
     if ! grep -q "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24" "$f"; then
@@ -196,7 +199,7 @@ cd /home/fz/project/MoRanJiangHu
 git add .github/workflows/
 git -c user.email=planner@moran.local -c user.name=planner commit -m "ci(upgrade): 升级 GitHub Actions 至 Node.js 24（解决 2026-06-16 deprecation deadline）
 
-- 5 个 workflow（test-coverage/ci/lighthouse-ci/build-android-apk/deploy-cloudflare）
+- 6 个 workflow（test-coverage/ci/lighthouse/android/deploy/release）
   的 actions/checkout|setup-node|upload-artifact 从 @v4 升级到 @v5
 - 每个 workflow 顶部加 env.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 - 不改业务逻辑、不改测试代码"
@@ -297,7 +300,7 @@ git -c user.email=planner@moran.local -c user.name=planner commit -m "ci(thresho
 
 ## 决策
 
-- 5 个 GitHub Actions workflow 升级至 Node.js 24（@v5 actions + FORCE_JAVASCRIPT_ACTIONS_TO_NODE24）
+- 6 个 GitHub Actions workflow 升级至 Node.js 24（@v5 actions + FORCE_JAVASCRIPT_ACTIONS_TO_NODE24）
 - vitest threshold 从 0% 起步门槛提升到 10%
 
 ## 升级理由
@@ -333,7 +336,7 @@ git -c user.email=planner@moran.local -c user.name=planner commit -m "docs(phase
 
 ## 验收标准（P2 完成）
 
-- [ ] 5 个 workflow 全部用 `@v5` actions + `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'`
+- [ ] 6 个 workflow 全部用 `@v5` actions + `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'`
 - [ ] `vitest.config.ts` threshold: `lines: 10, functions: 10, branches: 8, statements: 10`
 - [ ] 本地 `npm run build` 通过
 - [ ] 本地 `npx vitest run --coverage` 通过（实际 ≥ 10%）
