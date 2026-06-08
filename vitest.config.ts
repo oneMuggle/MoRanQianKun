@@ -50,11 +50,13 @@ export default defineViteConfig({
                 'utils/nsfwResourceOps.ts',
             ],
             thresholds: {
-                // 2026-06-06 Phase 5 Day 46 起步门槛：0（Day 48 写完测试后提升到 50%）
-                lines: 0,
-                functions: 0,
-                branches: 0,
-                statements: 0,
+                // 2026-06-09 v2.1 Day 2 起步门槛：
+                // 当前实测 14.78% statements / 15.21% lines / 14.5% functions / 8.63% branches
+                // Day 22 末升到 20%，Day 42 末升到 25%
+                lines: 10,
+                functions: 10,
+                branches: 8,
+                statements: 10,
             }
         }
     },
