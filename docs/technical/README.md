@@ -73,6 +73,6 @@
 
 ## 相关资源
 
-- [项目总优化方案](../../plans/2026-06-03-project-optimization.md) — 8 阶段路线图
+- [项目总优化方案](../plans/2026-06-03-project-optimization.md) — 8 阶段路线图
 - [项目根 CLAUDE.md](../../../CLAUDE.md) — Claude Code 项目指引
 - [用户手册](../user-manual/) — 面向最终用户
