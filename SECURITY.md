@@ -49,3 +49,34 @@
 - 能直接复现攻击的完整 exploit 代码
 
 感谢你选择以负责任的方式披露问题。
+
+---
+
+## 贡献者与维护者：密钥管理规范
+
+> 本节是给项目**自己**的规范，不是外部披露建议。
+
+### ❌ 禁止行为
+
+- **不要把任何 secrets 写进仓库目录**（含根目录的明文文件、子目录的 `.env*`、配置文件、注释、文档示例）
+  - 这包括但不限于：Cloudflare Account ID / API Token、GitHub OAuth Client ID / Client Secret、AI Provider API Key、加密私钥、数据库连接串
+- 不要把 secrets 写在 issue、PR 描述、commit message 中
+- 不要把 secrets 截图发到 IM / Issue 评论区
+
+### ✅ 正确做法
+
+- 所有 secrets 写入仓库**根目录的 `.env.local` / `.env.production` 等已被 `.gitignore` 忽略的文件**
+- 部署时通过 CI/CD 的 Secrets 功能注入（如 GitHub Actions Secrets、Cloudflare Pages Environment Variables）
+- 在文档中需要引用时，用占位符：`cfut_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` / `Ov23liXXXXXXXXXXXXX`
+
+### 🛡 若发现 secrets 已泄漏
+
+1. **立即轮换**（不轮换等于继续暴露）
+2. 删除本地明文文件
+3. 检查 `.gitignore` 是否覆盖该路径
+4. 若已被 commit 进 git 历史：`git filter-repo` 或 BFG 清理 + 强制 push
+5. 在 PR / 文档中追加提示，提醒其他贡献者
+
+### 历史事件
+
+- **2026-06-09**：`canshu` 文件被发现含明文 CF Token + GitHub OAuth Secret，已删除；建议立即轮换相应凭证。详见 `docs/plans/2026-06-09_root-dir-cleanup.md` Phase 0。
