@@ -1,16 +1,19 @@
-# 部署文档
+# 构建与部署
 
-本文档详细介绍 `墨染乾坤：万象纪元` 项目的部署方案，包括本地开发部署和生产环境部署。
+> 2026-06-09 由原根目录 `DEPLOY.md` 和 `GITHUB-DEPLOY.md` 合并而来。
+> 涵盖环境要求、本地开发、生产构建、Cloudflare Pages Functions 部署、GitHub 云同步配置、NovelAI 图像生成配置、4 种托管方案对比、常见问题与清单。
 
 ## 目录
 
 - [环境要求](#环境要求)
 - [本地开发部署](#本地开发部署)
 - [生产构建部署](#生产构建部署)
+- [托管方案对比](#托管方案对比)
 - [Cloudflare Pages Functions 部署](#cloudflare-pages-functions-部署)
 - [GitHub 云同步配置](#github-云同步配置)
 - [NovelAI 图像生成配置](#novelai-图像生成配置)
 - [常见部署问题](#常见部署问题)
+- [部署检查清单](#部署检查清单)
 
 ---
 
@@ -67,7 +70,7 @@ http://localhost:3000
 
 ### 可选环境变量
 
-在项目根目录创建 `.env.local` 文件：
+在项目根目录创建 `.env.local` 文件（**已被 .gitignore 忽略，不会被提交**）：
 
 ```env
 # 可选：Gemini API 密钥（旧链路兼容）
@@ -76,6 +79,8 @@ GEMINI_API_KEY=your_key_here
 # 可选：GitHub OAuth 客户端 ID
 VITE_GITHUB_CLIENT_ID=your_github_oauth_client_id
 ```
+
+> **密钥安全提示**：所有 secrets 写入 `.env.local` / `.env.production`，**绝不放进仓库目录的明文文件、注释、文档示例**。详见根目录 `SECURITY.md` 的"密钥管理规范"。
 
 ---
 
@@ -164,50 +169,122 @@ server {
 
 ---
 
+## 托管方案对比
+
+> 2026-06-09 由 `GITHUB-DEPLOY.md` 整理而来。
+
+| 方案 | 前端托管 | API 服务 | 免费额度 | 自定义域名 | 复杂度 |
+|------|---------|---------|---------|-----------|--------|
+| GitHub Pages + Cloudflare | ✅ | ✅ | ✅ | ✅ | 中 |
+| Vercel + Cloudflare Workers | ✅ | ✅ | ✅（有限） | ✅ | 低 |
+| Netlify + Cloudflare Workers | ✅ | ✅ | ✅ | ✅ | 低 |
+| 纯静态 + 独立 API | ✅ | ❌ | ✅ | ✅ | 高 |
+
+### 方案一：GitHub Pages + Cloudflare Functions
+
+**步骤**：
+
+1. 构建项目：`npm run build`
+2. 推送 `main` 分支后创建 `gh-pages` 分支并部署 dist：
+
+   ```bash
+   git checkout --orphan gh-pages
+   git rm -rf .
+   cp -r dist/* .
+   git add . && git commit -m "Deploy $(date +%Y-%m-%d)" && git push origin gh-pages
+   git checkout main
+   ```
+
+3. 在仓库 **Settings → Pages** 选择 `gh-pages` 分支
+4. 部署 Cloudflare Functions：
+
+   ```bash
+   npm install -g wrangler && wrangler login
+   wrangler deploy
+   wrangler secret put GITHUB_CLIENT_ID
+   wrangler secret put GITHUB_CLIENT_SECRET
+   ```
+
+**优点**：完全免费、静态资源与 API 同域名、Cloudflare 全球 CDN。
+
+### 方案二：Vercel + Cloudflare Workers
+
+```bash
+npm i -g vercel
+vercel --prod       # 按提示选择 ./dist 目录
+cd functions && wrangler deploy
+```
+
+在 Vercel Dashboard 添加 `VITE_GITHUB_CLIENT_ID`，在 Cloudflare `wrangler secret put GITHUB_CLIENT_SECRET`。
+
+**优点**：Vercel 部署简单、自动 HTTPS、预览部署。
+
+### 方案三：Netlify + Cloudflare Workers
+
+```bash
+npm i -g netlify-cli
+netlify deploy --prod --dir=dist
+```
+
+或通过 Netlify Dashboard 导入 GitHub 仓库，设置：
+
+| 配置项 | 值 |
+|--------|-----|
+| Build command | `npm run build` |
+| Publish directory | `dist` |
+
+**优点**：CLI 简单、Form 内置、函数支持。
+
+### 方案四：纯静态 + 独立 API
+
+GitHub Pages + Cloudflare Workers 独立部署：
+
+```bash
+wrangler init wuxia-api --type=javascript
+cp -r functions/api/* wuxia-api/src/
+cd wuxia-api && wrangler deploy
+```
+
+### 选择建议
+
+| 场景 | 推荐方案 |
+|------|---------|
+| 完全免费，个人项目 | 方案一 |
+| 快速部署试用 | 方案二 |
+| 需要 Form/Serverless | 方案三 |
+| 有现有后端服务 | 方案四 |
+
+---
+
 ## Cloudflare Pages Functions 部署
 
 此项目包含 Cloudflare Pages Functions 用于 GitHub 云同步功能，需要单独部署到 Cloudflare Pages。
 
-### 部署步骤
-
-#### 方法一：通过 Cloudflare Dashboard 部署
+### 方法一：通过 Cloudflare Dashboard
 
 1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. 进入 **Pages** → **Create a project**
-3. 选择 **Direct upload**
-4. 上传 `dist/functions/` 目录内容
-5. 配置构建命令（留空，因为这是纯 API）
-6. 设置环境变量：
+2. 进入 **Pages** → **Create a project** → **Direct upload**
+3. 上传 `dist/functions/` 目录内容
+4. 配置构建命令（留空，纯 API）
+5. 设置环境变量：
 
 | 变量名 | 说明 | 必需 |
 |--------|------|------|
 | `GITHUB_CLIENT_ID` | GitHub OAuth 应用 Client ID | 是 |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth 应用 Client Secret | 是 |
 
-#### 方法二：通过 Wrangler CLI 部署
+### 方法二：通过 Wrangler CLI
 
 ```bash
-# 安装 Wrangler
 npm install -g wrangler
-
-# 登录 Cloudflare
 wrangler login
-
-# 部署 Functions
 cd dist/functions
 wrangler pages deploy . --project-name wuxia-game-api
 ```
 
-### 配置环境变量
-
-```bash
-wrangler secret put GITHUB_CLIENT_ID
-wrangler secret put GITHUB_CLIENT_SECRET
-```
-
 ### Workers 路由配置
 
-如需自定义域名，在 Cloudflare Dashboard 中：
+如需自定义域名：
 
 1. 进入 **Pages** → 你的项目 → **Custom domains**
 2. 添加自定义域名
@@ -286,8 +363,6 @@ npm run dev
 
 ### 生产模式
 
-在生产环境使用 NovelAI：
-
 1. 申请 [NovelAI](https://novelai.net) 账号
 2. 获取 API Key
 3. 在应用内设置页配置：
@@ -300,8 +375,6 @@ npm run dev
 
 ### 代理配置（可选）
 
-如需通过代理访问 NovelAI：
-
 ```env
 # 在 .env.local 中
 NOVELAI_PROXY=http://127.0.0.1:7890
@@ -313,9 +386,8 @@ NOVELAI_PROXY=http://127.0.0.1:7890
 
 ### 构建失败
 
-**问题**：执行 `npm run build` 失败
-
 **解决**：
+
 1. 检查 Node.js 版本是否为 20+
 2. 清除缓存后重新安装依赖：
    ```bash
@@ -325,45 +397,37 @@ NOVELAI_PROXY=http://127.0.0.1:7890
 
 ### 静态资源 404
 
-**问题**：部署后样式或脚本资源加载失败
-
 **解决**：
+
 1. 确保服务器正确配置 SPA 路由（所有非文件请求回退到 `index.html`）
 2. 检查 Nginx/Apache 配置中的 `try_files` 指令
 
 ### CORS 错误
 
-**问题**：API 请求跨域错误
-
 **解决**：
-1. 生产部���时��保前端和 API 同域或配置 CORS
+
+1. 生产部署时确保前端和 API 同域或配置 CORS
 2. 如使用 Cloudflare，检查 Cloudflare 设置中的 CORS 配置
 
 ### IndexedDB 访问失败
 
-**问题**：本地存储无法写入
-
 **解决**：
+
 1. 确保使用 HTTPS（或 localhost）
 2. 检查浏览器隐私设置是否阻止 IndexedDB
 3. 清除浏览器站点数据后重试
 
 ### Cloudflare Functions 部署失败
 
-**问题**：Wrangler 部署报错
-
 **解决**：
+
 1. 确保已登录：`wrangler login`
 2. 检查 `functions/` 目录结构是否正确
 3. 查看 Cloudflare Pages 构建日志
 
 ### 大 Chunk 警告
 
-**问题**：Vite 构建显示大 chunk 警告
-
-**解决**：
-- 此为预期行为，不会阻塞构建完成
-- 如需优化，可调整 `vite.config.ts` 中的 chunk 分割策略
+**说明**：Vite 构建显示大 chunk 警告为**预期行为**，不阻塞构建完成。如需优化，可调整 `vite.config.ts` 中的 chunk 分割策略（见 13 章）。
 
 ---
 
@@ -401,8 +465,11 @@ NOVELAI_PROXY=http://127.0.0.1:7890
 
 ---
 
-## 相关文档
+## 相关链接
 
-- [README.md](./README.md) - 项目概述
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - 贡献指南
-- [SECURITY.md](./SECURITY.md) - 安全策略
+- [GitHub Pages 文档](https://docs.github.com/pages)
+- [Cloudflare Workers 文档](https://developers.cloudflare.com/workers)
+- [Vercel 部署文档](https://vercel.com/docs)
+- [Netlify 部署文档](https://docs.netlify.com)
+- [技术手册 README](./README.md)
+- [安全策略](../SECURITY.md)

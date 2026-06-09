@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "node_modules/.cache/tsc/tsconfig.core.tsbuildinfo",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
