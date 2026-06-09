@@ -1,5 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "node_modules/.cache/tsc/tsconfig.vitest.tsbuildinfo"
+  },
   "include": ["**/*.test.ts", "**/*.test.tsx", "vitest.config.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
