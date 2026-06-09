@@ -1,9 +1,10 @@
 # 根目录整理方案（Root Directory Cleanup）
 
 **日期**: 2026-06-09
-**状态**: 进行中
+**状态**: ✅ 已完成（PR: https://github.com/oneMuggle/MoRanJiangHu/pull/2）
 **目标分支**: `chore/root-dir-cleanup`
 **预计耗时**: 4-5 小时（不含凭证轮换）
+**实际耗时**: ~3 小时（含一次 GitHub secret scanning 修复 + rebase 救回）
 
 ---
 
