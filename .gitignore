@@ -69,3 +69,14 @@ canshu
 /playwright-report/
 /test-results/
 tsc-error-trend.txt
+
+# Python tooling cache (项目里 scripts/*.py 用 ruff)
+/.ruff_cache/
+
+# 2026-06-09 根目录临时文件兜底（防止再产生）
+/image_*.jpg
+/.t
+/PreviewPage.tsx
+/test_*.ts
+/.page-snapshot-*.yml
+/playwright-initial-state.yml
