@@ -80,3 +80,7 @@ tsc-error-trend.txt
 /test_*.ts
 /.page-snapshot-*.yml
 /playwright-initial-state.yml
+
+# 2026-06-09 OpenCode CLI 工具本地状态（防其他开发者误跟踪）
+# .opencode/node_modules 58MB，commands/skills 已删（OpenSpec 废弃）
+/.opencode/
