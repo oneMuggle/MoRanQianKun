@@ -16,6 +16,7 @@ import {
 import { 预设天赋, 预设背景 } from '../../../data/presets';
 import { type UseNewGameWizardStateReturn } from './useNewGameWizardState';
 import { SearchInput, ChipGroup } from '../../ui/FilterBar';
+import { CrystalStatPanel } from './CrystalStatPanel';
 import { 全部时代配置 } from '../../../models/system';
 import { allEraNodes } from '../../../models/eraTheme';
 
@@ -192,7 +193,7 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
         charName, setCharName, charGender, setCharGender, charAge, setCharAge,
         charAppearance, setCharAppearance, charPersonality, setCharPersonality,
         birthMonth, setBirthMonth, birthDay, setBirthDay, monthOpen, setMonthOpen, dayOpen, setDayOpen, monthRef, dayRef,
-        stats, remainingPoints, totalStatBudget,
+        stats, setStats, remainingPoints, totalStatBudget,
         selectedBackground, setSelectedBackground,
         selectedTalents,
         selectedQiyun,
@@ -813,47 +814,25 @@ export const NewGameWizardContent: React.FC<NewGameWizardContentProps> = ({ wiza
                     </OrnateBorder>
 
                     <OrnateBorder className="p-6 md:p-7 bg-gradient-to-br from-black/65 to-wuxia-red/5">
-                        <div className="flex items-center justify-between gap-4 border-b border-wuxia-gold/30 pb-4 mb-5">
-                            <div>
-                                <div className="text-[11px] uppercase tracking-[0.3em] text-wuxia-red/70 font-mono">Stats</div>
-                                <h3 className="text-2xl font-serif font-bold text-wuxia-gold mt-2">属性分配</h3>
-                                <p className="text-xs text-gray-400 mt-2 leading-6">
-                                    {worldConfig.difficulty.toUpperCase()} 难度总预算 {totalStatBudget} 点，当前已用 {usedPoints} 点。
-                                </p>
-                            </div>
-                            <span className={`text-sm font-mono px-3 py-1.5 rounded-lg ${
-                                remainingPoints < 0 ? 'bg-red-500/20 text-red-300' : remainingPoints === 0 ? 'bg-wuxia-gold/20 text-wuxia-gold' : 'bg-gray-800 text-gray-300'
-                            }`}>
-                                剩余 {remainingPoints} 点
-                            </span>
+                        <div className="border-b border-wuxia-gold/30 pb-4 mb-5">
+                            <div className="text-[11px] uppercase tracking-[0.3em] text-wuxia-red/70 font-mono">Stats</div>
+                            <h3 className="text-2xl font-serif font-bold text-wuxia-gold mt-2">属性分配</h3>
+                            <p className="text-xs text-gray-400 mt-2 leading-6">
+                                {worldConfig.difficulty.toUpperCase()} 难度总预算 {totalStatBudget} 点。水晶拨点：点击水晶可视觉感知属性强度，剩余点为 0 时无法再分配。
+                            </p>
                         </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            {(Object.keys(stats) as Array<keyof typeof stats>).map((key) => (
-                                <div key={key} className="rounded-xl border border-gray-800 bg-black/30 p-4 flex flex-col items-center gap-2">
-                                    <div className="text-xs text-gray-400">{key}</div>
-                                    <div className="text-xl font-mono font-bold text-wuxia-gold">{stats[key]}</div>
-                                    <div className="flex gap-1">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleStatChange(key, -1)}
-                                            disabled={stats[key] <= 属性最小值}
-                                            className="w-8 h-8 rounded-lg border border-gray-700 bg-black/40 text-gray-300 hover:border-wuxia-gold/40 hover:text-wuxia-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                        >
-                                            -
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleStatChange(key, 1)}
-                                            disabled={remainingPoints <= 0 || stats[key] >= 属性最大值}
-                                            className="w-8 h-8 rounded-lg border border-gray-700 bg-black/40 text-gray-300 hover:border-wuxia-gold/40 hover:text-wuxia-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <CrystalStatPanel
+                            stats={stats}
+                            minValue={属性最小值}
+                            maxValue={属性最大值}
+                            totalBudget={totalStatBudget}
+                            difficulty={worldConfig.difficulty}
+                            onChange={(key, newValue) => {
+                                const delta = newValue - stats[key];
+                                if (delta !== 0) handleStatChange(key, delta);
+                            }}
+                            onBatchChange={(next) => setStats(next)}
+                        />
                     </OrnateBorder>
                 </div>
             )}
