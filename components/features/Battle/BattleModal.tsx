@@ -1,6 +1,7 @@
 import React from 'react';
 import { 角色数据结构, 战斗状态结构 } from '../../../types';
 import { IconSwords, IconYinYang } from '../../ui/Icons';
+import { StatusBadge } from '../../ui/StatusBadge';
 import BattleActionPanel from './BattleActionPanel';
 import { RpgBattleIntegration, shouldUseRpgBattle } from './RpgBattleIntegration';
 import { 战斗行动结果 } from '../../../hooks/useGame/combat/combatCalculation';
@@ -164,29 +165,19 @@ const BattleModal: React.FC<Props> = ({ character, battle, onClose, onAction }) 
                                             {(enemy?.暴击率 || enemy?.闪避率 || enemy?.最大连击 || enemy?.物理抗性 || enemy?.内力抗性) ? (
                                                 <div className="mt-3 flex flex-wrap gap-1.5 relative z-10" data-testid="battle-extended-stats">
                                                     {enemy.暴击率 ? (
-                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-amber-700/50 bg-amber-900/30 text-amber-200" title="暴击率">
-                                                            暴击 {enemy.暴击率}%
-                                                        </span>
+                                                        <StatusBadge tone="warning" size="sm" value={enemy.暴击率} title="暴击率">暴击</StatusBadge>
                                                     ) : null}
                                                     {enemy.闪避率 ? (
-                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-sky-700/50 bg-sky-900/30 text-sky-200" title="闪避率">
-                                                            闪避 {enemy.闪避率}%
-                                                        </span>
+                                                        <StatusBadge tone="info" size="sm" value={enemy.闪避率} title="闪避率">闪避</StatusBadge>
                                                     ) : null}
                                                     {enemy.最大连击 ? (
-                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-fuchsia-700/50 bg-fuchsia-900/30 text-fuchsia-200" title="最大连击">
-                                                            连击 ×{enemy.最大连击}
-                                                        </span>
+                                                        <StatusBadge tone="danger" size="sm" value={enemy.最大连击} title="最大连击">连击</StatusBadge>
                                                     ) : null}
                                                     {enemy.物理抗性 ? (
-                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-stone-700/50 bg-stone-900/30 text-stone-300" title="物理抗性">
-                                                            物抗 {enemy.物理抗性}%
-                                                        </span>
+                                                        <StatusBadge tone="neutral" size="sm" value={enemy.物理抗性} title="物理抗性">物抗</StatusBadge>
                                                     ) : null}
                                                     {enemy.内力抗性 ? (
-                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-violet-700/50 bg-violet-900/30 text-violet-200" title="内力抗性">
-                                                            内抗 {enemy.内力抗性}%
-                                                        </span>
+                                                        <StatusBadge tone="primary" size="sm" value={enemy.内力抗性} title="内力抗性">内抗</StatusBadge>
                                                     ) : null}
                                                 </div>
                                             ) : null}
