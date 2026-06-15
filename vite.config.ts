@@ -128,11 +128,19 @@ const novelAiDevProxyPlugin = (): Plugin => ({
   }
 });
 
+import { resolveBasePath } from './src/utils/basePath';
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
-  const isGitHubPages = process.env.GITHUB_PAGES === 'true';
   return {
-    base: isGitHubPages ? '/MoRanJiangHu/' : '/',
+    base: resolveBasePath({
+      VITE_BASE_PATH: process.env.VITE_BASE_PATH,
+      GH_PAGES: process.env.GITHUB_PAGES,
+      GITHUB_REPOSITORY: process.env.GITHUB_REPOSITORY,
+      CF_PAGES: process.env.CF_PAGES,
+      VERCEL: process.env.VERCEL,
+      IS_NATIVE: process.env.IS_NATIVE,
+    }),
     server: {
       port: 3000,
       host: '0.0.0.0'
