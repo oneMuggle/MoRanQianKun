@@ -160,6 +160,37 @@ const BattleModal: React.FC<Props> = ({ character, battle, onClose, onAction }) 
                                                 )}
                                             </div>
 
+                                            {/* U4 扩展属性徽章：仅当 > 0 时显示，避免旧存档噪音 */}
+                                            {(enemy?.暴击率 || enemy?.闪避率 || enemy?.最大连击 || enemy?.物理抗性 || enemy?.内力抗性) ? (
+                                                <div className="mt-3 flex flex-wrap gap-1.5 relative z-10" data-testid="battle-extended-stats">
+                                                    {enemy.暴击率 ? (
+                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-amber-700/50 bg-amber-900/30 text-amber-200" title="暴击率">
+                                                            暴击 {enemy.暴击率}%
+                                                        </span>
+                                                    ) : null}
+                                                    {enemy.闪避率 ? (
+                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-sky-700/50 bg-sky-900/30 text-sky-200" title="闪避率">
+                                                            闪避 {enemy.闪避率}%
+                                                        </span>
+                                                    ) : null}
+                                                    {enemy.最大连击 ? (
+                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-fuchsia-700/50 bg-fuchsia-900/30 text-fuchsia-200" title="最大连击">
+                                                            连击 ×{enemy.最大连击}
+                                                        </span>
+                                                    ) : null}
+                                                    {enemy.物理抗性 ? (
+                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-stone-700/50 bg-stone-900/30 text-stone-300" title="物理抗性">
+                                                            物抗 {enemy.物理抗性}%
+                                                        </span>
+                                                    ) : null}
+                                                    {enemy.内力抗性 ? (
+                                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-violet-700/50 bg-violet-900/30 text-violet-200" title="内力抗性">
+                                                            内抗 {enemy.内力抗性}%
+                                                        </span>
+                                                    ) : null}
+                                                </div>
+                                            ) : null}
+
                                             <div className="mt-4 pt-3 border-t border-white/5 relative z-10">
                                                 <div className="text-[10px] text-red-500/70 tracking-[0.2em] font-serif mb-2 flex items-center gap-1.5">
                                                     <span className="w-1 h-3 bg-red-900/80 rounded-full"></span> 功法路数
