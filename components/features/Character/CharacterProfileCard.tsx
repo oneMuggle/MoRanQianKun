@@ -1,6 +1,7 @@
 import React from 'react';
 import { 角色数据结构, 视觉设置结构 } from '../../../types';
 import { 构建区域文字样式 } from '../../../utils/visualSettings';
+import { AttributeRadar } from '../../ui/AttributeRadar';
 
 interface Props {
     character: 角色数据结构;
@@ -259,9 +260,26 @@ const CharacterProfileCard: React.FC<Props> = ({ character, visualConfig }) => {
                     </div>
 
                     <div className="border border-gray-800/80 bg-black/30 p-4">
-                        <div className="mb-3 text-[10px] uppercase tracking-[0.35em] text-wuxia-gold/65">
-                            基础六维
-                            {气运列表.length > 0 && <span className="ml-2 text-[8px] text-wuxia-cyan">(气运修正中)</span>}
+                        <div className="mb-3 flex items-center justify-between">
+                            <div className="text-[10px] uppercase tracking-[0.35em] text-wuxia-gold/65">
+                                基础六维
+                                {气运列表.length > 0 && <span className="ml-2 text-[8px] text-wuxia-cyan">(气运修正中)</span>}
+                            </div>
+                        </div>
+                        <div className="flex justify-center mb-4">
+                            <AttributeRadar
+                                stats={{
+                                    力量: character.力量,
+                                    敏捷: character.敏捷,
+                                    体质: character.体质,
+                                    根骨: character.根骨,
+                                    悟性: character.悟性,
+                                    福源: character.福源,
+                                }}
+                                size={220}
+                                fillColor="#10b981"
+                                gridColor="#4b5563"
+                            />
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                             {attributes.map((attr) => (
