@@ -44,6 +44,7 @@
 - `2026-05-22_nsfw-gameplay-enhancement.md` → 08 章 NSFW 子项
 - `2026-05-31-module-refactor.md` → 02 章
 - `2026-06-01-systemPromptBuilder-migration.md` → 03 章
+- `2026-06-15_yishijie-borrow-plan.md` + `2026-06-15_yishijie-ui-gameplay-borrow-plan.md` → 17 章
 
 ## 旧主题文档（未重构）
 
