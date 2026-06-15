@@ -1,6 +1,7 @@
 import React from 'react';
 import { 角色数据结构, 战斗状态结构 } from '../../../types';
 import { IconSwords, IconYinYang } from '../../ui/Icons';
+import { StatusBadge } from '../../ui/StatusBadge';
 import BattleActionPanel from './BattleActionPanel';
 import { RpgBattleIntegration, shouldUseRpgBattle } from './RpgBattleIntegration';
 import { 战斗行动结果 } from '../../../hooks/useGame/combat/combatCalculation';
@@ -159,6 +160,27 @@ const BattleModal: React.FC<Props> = ({ character, battle, onClose, onAction }) 
                                                     <资源条 label="内力" current={qiCur} max={qiMax} tone="indigo" />
                                                 )}
                                             </div>
+
+                                            {/* U4 扩展属性徽章：仅当 > 0 时显示，避免旧存档噪音 */}
+                                            {(enemy?.暴击率 || enemy?.闪避率 || enemy?.最大连击 || enemy?.物理抗性 || enemy?.内力抗性) ? (
+                                                <div className="mt-3 flex flex-wrap gap-1.5 relative z-10" data-testid="battle-extended-stats">
+                                                    {enemy.暴击率 ? (
+                                                        <StatusBadge tone="warning" size="sm" value={enemy.暴击率} title="暴击率">暴击</StatusBadge>
+                                                    ) : null}
+                                                    {enemy.闪避率 ? (
+                                                        <StatusBadge tone="info" size="sm" value={enemy.闪避率} title="闪避率">闪避</StatusBadge>
+                                                    ) : null}
+                                                    {enemy.最大连击 ? (
+                                                        <StatusBadge tone="danger" size="sm" value={enemy.最大连击} title="最大连击">连击</StatusBadge>
+                                                    ) : null}
+                                                    {enemy.物理抗性 ? (
+                                                        <StatusBadge tone="neutral" size="sm" value={enemy.物理抗性} title="物理抗性">物抗</StatusBadge>
+                                                    ) : null}
+                                                    {enemy.内力抗性 ? (
+                                                        <StatusBadge tone="primary" size="sm" value={enemy.内力抗性} title="内力抗性">内抗</StatusBadge>
+                                                    ) : null}
+                                                </div>
+                                            ) : null}
 
                                             <div className="mt-4 pt-3 border-t border-white/5 relative z-10">
                                                 <div className="text-[10px] text-red-500/70 tracking-[0.2em] font-serif mb-2 flex items-center gap-1.5">
