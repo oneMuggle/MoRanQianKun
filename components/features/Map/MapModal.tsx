@@ -3,6 +3,7 @@ import { 世界数据结构, 地图结构, 建筑结构 } from '../../../models/
 import { 环境信息结构 } from '../../../models/environment';
 import { 角色数据结构 } from '../../../models/character';
 import { 旅行事件, 评估旅行可行性 } from '../../../hooks/useGame/travel/travelWorkflow';
+import { WorldMinimap } from './WorldMinimap';
 
 interface Props {
     world: 世界数据结构;
@@ -148,6 +149,33 @@ const MapModal: React.FC<Props> = ({ world, env, character, onTravel, onExplore,
                             <span className="text-[10px] text-gray-500 font-mono tracking-widest border border-gray-800 bg-black/50 px-2 py-0.5 rounded">{过滤后的地图列表.length} 境</span>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-3 relative z-10">
+                            {/* U7 缩略地图概览（位于列表上方） */}
+                            <div className="mb-3 pb-3 border-b border-wuxia-gold/10">
+                                <div className="text-[10px] text-wuxia-gold/70 tracking-widest font-mono mb-1.5 px-1">▦ 缩略总览</div>
+                                <WorldMinimap
+                                    maps={maps.map((m: 地图结构, i: number) => ({
+                                        id: String(i),
+                                        名称: m?.名称 || '',
+                                        归属: {
+                                            大地点: m?.归属?.大地点,
+                                            中地点: m?.归属?.中地点,
+                                            小地点: m?.归属?.小地点,
+                                        },
+                                        建筑数: Array.isArray(m?.内部建筑) ? m.内部建筑.length : 0,
+                                    }))}
+                                    currentBig={env?.大地点}
+                                    currentMid={env?.中地点}
+                                    currentSmall={env?.小地点 || env?.具体地点}
+                                    selectedMapId={String(selectedMapIndex)}
+                                    onSelectMap={(id) => {
+                                        const idx = Number(id);
+                                        if (Number.isFinite(idx) && idx >= 0 && idx < maps.length) {
+                                            setSelectedMapIndex(idx);
+                                        }
+                                    }}
+                                />
+                            </div>
+
                             {/* 搜索框 */}
                             <div className="mb-3">
                                 <div className="relative">
