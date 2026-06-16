@@ -6,8 +6,8 @@
  */
 
 import { UIFeatureRegistry } from './registry';
-import { desktopTabs, mobileTabs } from '../../components/features/Settings/tabDefinitions';
-import { 获取时代主题方案, 全部时代配置 } from '../../models/system';
+import { desktopTabs, mobileTabs } from '../../src/components/features/Settings/tabDefinitions';
+import { 获取时代主题方案, 全部时代配置 } from '../../src/models/system';
 
 // 不再静态导入组件！使用 componentFactory 模式。
 // 所有组件通过 desktopComponentFactory / mobileComponentFactory 动态加载。
@@ -26,8 +26,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Character/CharacterModal'),
-    mobileComponentFactory: () => import('../../components/features/Character/MobileCharacter'),
+    desktopComponentFactory: () => import('../../src/components/features/Character/CharacterModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Character/MobileCharacter'),
     visibility: 'always',
     stateKey: 'showCharacter',
     gameViewOnly: true,
@@ -64,8 +64,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Inventory/InventoryModal'),
-    mobileComponentFactory: () => import('../../components/features/Inventory/MobileInventoryModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Inventory/InventoryModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Inventory/MobileInventoryModal'),
     visibility: 'always',
     stateKey: 'showInventory',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -88,8 +88,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Equipment/EquipmentModal'),
-    mobileComponentFactory: () => import('../../components/features/Equipment/MobileEquipmentModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Equipment/EquipmentModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Equipment/MobileEquipmentModal'),
     visibility: 'always',
     stateKey: 'showEquipment',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -112,8 +112,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Battle/BattleModal'),
-    mobileComponentFactory: () => import('../../components/features/Battle/MobileBattleModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Battle/BattleModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Battle/MobileBattleModal'),
     visibility: 'always',
     stateKey: 'showBattle',
     gameViewOnly: true,
@@ -139,8 +139,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Social/SocialModal'),
-    mobileComponentFactory: () => import('../../components/features/Social/MobileSocial'),
+    desktopComponentFactory: () => import('../../src/components/features/Social/SocialModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Social/MobileSocial'),
     visibility: 'always',
     stateKey: 'showSocial',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -172,8 +172,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Team/TeamModal'),
-    mobileComponentFactory: () => import('../../components/features/Team/MobileTeamModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Team/TeamModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Team/MobileTeamModal'),
     visibility: 'always',
     stateKey: 'showTeam',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -197,8 +197,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Kungfu/KungfuModal'),
-    mobileComponentFactory: () => import('../../components/features/Kungfu/MobileKungfuModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Kungfu/KungfuModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Kungfu/MobileKungfuModal'),
     visibility: 'config-dependent',
     gameViewOnly: true,
     configKey: '启用修炼体系',
@@ -223,8 +223,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/SaveLoad/SaveLoadModal'),
-    mobileComponentFactory: () => import('../../components/features/SaveLoad/MobileSaveLoadModal'),
+    desktopComponentFactory: () => import('../../src/components/features/SaveLoad/SaveLoadModal'),
+    mobileComponentFactory: () => import('../../src/components/features/SaveLoad/MobileSaveLoadModal'),
     visibility: 'always',
     stateKey: 'showSaveLoad',
     propsFactory: ({ state, actions, modalManager, requestConfirm }) => {
@@ -257,8 +257,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/World/WorldModal'),
-    mobileComponentFactory: () => import('../../components/features/World/MobileWorldModal'),
+    desktopComponentFactory: () => import('../../src/components/features/World/WorldModal'),
+    mobileComponentFactory: () => import('../../src/components/features/World/MobileWorldModal'),
     visibility: 'always',
     stateKey: 'showWorld',
     propsFactory: ({ state, meta, actions, setters, modalManager }) => ({
@@ -287,8 +287,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Map/MapModal'),
-    mobileComponentFactory: () => import('../../components/features/Map/MobileMapModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Map/MapModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Map/MobileMapModal'),
     visibility: 'always',
     stateKey: 'showMap',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -316,8 +316,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Sect/SectModal'),
-    mobileComponentFactory: () => import('../../components/features/Sect/MobileSect'),
+    desktopComponentFactory: () => import('../../src/components/features/Sect/SectModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Sect/MobileSect'),
     visibility: 'always',
     stateKey: 'showSect',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -343,8 +343,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Task/TaskModal'),
-    mobileComponentFactory: () => import('../../components/features/Task/MobileTask'),
+    desktopComponentFactory: () => import('../../src/components/features/Task/TaskModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Task/MobileTask'),
     visibility: 'always',
     stateKey: 'showTask',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -370,8 +370,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Agreement/AgreementModal'),
-    mobileComponentFactory: () => import('../../components/features/Agreement/MobileAgreementModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Agreement/AgreementModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Agreement/MobileAgreementModal'),
     visibility: 'always',
     stateKey: 'showAgreement',
     propsFactory: ({ state, actions, setters, modalManager }) => ({
@@ -399,8 +399,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Story/StoryModal'),
-    mobileComponentFactory: () => import('../../components/features/Story/MobileStory'),
+    desktopComponentFactory: () => import('../../src/components/features/Story/StoryModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Story/MobileStory'),
     visibility: 'always',
     stateKey: 'showStory',
     propsFactory: ({ state, setters, modalManager }) => {
@@ -428,8 +428,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Story/HeroinePlanModal'),
-    mobileComponentFactory: () => import('../../components/features/Story/MobileHeroinePlanModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Story/HeroinePlanModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Story/MobileHeroinePlanModal'),
     visibility: 'config-dependent',
     configKey: '启用女主剧情规划',
     configValue: true,
@@ -457,8 +457,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Memory/MemoryModal'),
-    mobileComponentFactory: () => import('../../components/features/Memory/MobileMemory'),
+    desktopComponentFactory: () => import('../../src/components/features/Memory/MemoryModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Memory/MobileMemory'),
     visibility: 'always',
     stateKey: 'showMemory',
     propsFactory: ({ state, setters, modalManager }) => ({
@@ -482,8 +482,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Memory/MemorySummaryFlowModal'),
-    mobileComponentFactory: () => import('../../components/features/Memory/MemorySummaryFlowMobileModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Memory/MemorySummaryFlowModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Memory/MemorySummaryFlowMobileModal'),
     visibility: 'always',
     propsFactory: ({ modalManager }) => ({
       onClose: () => modalManager.close('memorySummaryFlow'),
@@ -501,8 +501,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Memory/NpcMemorySummaryFlowModal'),
-    mobileComponentFactory: () => import('../../components/features/Memory/NpcMemorySummaryFlowMobileModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Memory/NpcMemorySummaryFlowModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Memory/NpcMemorySummaryFlowMobileModal'),
     visibility: 'always',
     propsFactory: ({ modalManager }) => ({
       onClose: () => modalManager.close('npcMemorySummaryFlow'),
@@ -524,7 +524,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Settings/SettingsPanel'),
+    desktopComponentFactory: () => import('../../src/components/features/Settings/SettingsPanel'),
     visibility: 'always',
     stateKey: 'showSettings',
     propsFactory: ({ state, meta, setters, actions, modalManager, isMobile, requestConfirm, extraProps }) => {
@@ -590,8 +590,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Social/ImageManagerModal'),
-    mobileComponentFactory: () => import('../../components/features/Social/mobile/MobileImageManagerModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Social/ImageManagerModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Social/mobile/MobileImageManagerModal'),
     visibility: 'always',
     stateKey: 'showImageManager',
     propsFactory: ({ state, meta, actions, setters, modalManager }) => ({
@@ -663,8 +663,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Worldbook/WorldbookManagerModal'),
-    mobileComponentFactory: () => import('../../components/features/Worldbook/MobileWorldbookManagerModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Worldbook/WorldbookManagerModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Worldbook/MobileWorldbookManagerModal'),
     visibility: 'always',
     propsFactory: ({ meta, actions, modalManager, requestConfirm }) => ({
       builtinPromptEntries: meta.builtinPromptEntries,
@@ -689,8 +689,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/NovelDecomposition/NovelDecompositionWorkbenchModal'),
-    mobileComponentFactory: () => import('../../components/features/NovelDecomposition/MobileNovelDecompositionWorkbenchModal'),
+    desktopComponentFactory: () => import('../../src/components/features/NovelDecomposition/NovelDecompositionWorkbenchModal'),
+    mobileComponentFactory: () => import('../../src/components/features/NovelDecomposition/MobileNovelDecompositionWorkbenchModal'),
     visibility: 'always',
     stateKey: 'showNovelDecompositionWorkbench',
     propsFactory: ({ state, actions, modalManager, requestConfirm }) => ({
@@ -714,8 +714,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/NovelWriting/NovelWritingWorkbenchModal'),
-    mobileComponentFactory: () => import('../../components/features/NovelWriting/MobileNovelWritingWorkbenchModal'),
+    desktopComponentFactory: () => import('../../src/components/features/NovelWriting/NovelWritingWorkbenchModal'),
+    mobileComponentFactory: () => import('../../src/components/features/NovelWriting/MobileNovelWritingWorkbenchModal'),
     visibility: 'always',
     propsFactory: ({ actions, modalManager }) => ({
       open: true,
@@ -739,8 +739,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Galgame/CGGalleryModal'),
-    mobileComponentFactory: () => import('../../components/features/Galgame/MobileCGGalleryModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Galgame/CGGalleryModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Galgame/MobileCGGalleryModal'),
     visibility: 'always',
     stateKey: 'showCGGallery',
     propsFactory: ({ setters, modalManager }) => ({
@@ -762,7 +762,7 @@ UIFeatureRegistry.register({
   version: '1.0.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Galgame/RelationGraphView'),
+    desktopComponentFactory: () => import('../../src/components/features/Galgame/RelationGraphView'),
     visibility: 'always',
     stateKey: 'showRelationGraph',
     propsFactory: ({ state, modalManager }) => ({
@@ -787,7 +787,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Music/mobile/MobileMusicPlayer'),
+    desktopComponentFactory: () => import('../../src/components/features/Music/mobile/MobileMusicPlayer'),
     visibility: 'always',
     stateKey: 'showMobileMusic',
     propsFactory: ({ setters, modalManager }) => ({
@@ -811,8 +811,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Exploration/MapExplorerModal'),
-    mobileComponentFactory: () => import('../../components/features/Exploration/MobileMapExplorerModal'),
+    desktopComponentFactory: () => import('../../src/components/features/Exploration/MapExplorerModal'),
+    mobileComponentFactory: () => import('../../src/components/features/Exploration/MobileMapExplorerModal'),
     visibility: 'always',
     stateKey: 'showMapExplorer',
     propsFactory: ({ state, actions, modalManager }) => {
@@ -848,8 +848,8 @@ UIFeatureRegistry.register({
   dependencies: ['campusNSFW'],
   storyModuleId: 'campusNSFW',
   modal: {
-    desktopComponentFactory: () => import('../../components/features/CampusDesireDashboard'),
-    mobileComponentFactory: () => import('../../components/features/MobileCampusDesireApp'),
+    desktopComponentFactory: () => import('../../src/components/features/CampusDesireDashboard'),
+    mobileComponentFactory: () => import('../../src/components/features/MobileCampusDesireApp'),
     visibility: 'config-dependent',
     configKey: '启用校园NSFW深化系统',
     configValue: true,
@@ -900,8 +900,8 @@ UIFeatureRegistry.register({
   eraId: 'contemporary',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/PhotographyDashboard'),
-    mobileComponentFactory: () => import('../../components/features/MobilePhotographyDashboard'),
+    desktopComponentFactory: () => import('../../src/components/features/PhotographyDashboard'),
+    mobileComponentFactory: () => import('../../src/components/features/MobilePhotographyDashboard'),
     visibility: 'config-dependent',
     configKey: '启用写真NSFW系统',
     configValue: true,
@@ -935,8 +935,8 @@ UIFeatureRegistry.register({
   eraId: 'contemporary',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/UrbanDriverDashboard'),
-    mobileComponentFactory: () => import('../../components/features/MobileUrbanDriverApp'),
+    desktopComponentFactory: () => import('../../src/components/features/UrbanDriverDashboard'),
+    mobileComponentFactory: () => import('../../src/components/features/MobileUrbanDriverApp'),
     visibility: 'config-dependent',
     configKey: '启用都市网约车NSFW系统',
     configValue: true,
@@ -960,8 +960,8 @@ UIFeatureRegistry.register({
   dependencies: ['exposureNSFW'],
   storyModuleId: 'exposureNSFW',
   modal: {
-    desktopComponentFactory: () => import('../../components/features/ExposureDashboard'),
-    mobileComponentFactory: () => import('../../components/features/MobileExposureDashboard'),
+    desktopComponentFactory: () => import('../../src/components/features/ExposureDashboard'),
+    mobileComponentFactory: () => import('../../src/components/features/MobileExposureDashboard'),
     visibility: 'config-dependent',
     configKey: '启用露出系统',
     configValue: true,
@@ -1002,7 +1002,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/NSFWCenter/NsfwControlCenter'),
+    desktopComponentFactory: () => import('../../src/components/features/NSFWCenter/NsfwControlCenter'),
     visibility: 'config-dependent',
     configKey: '启用NSFW模式',
     configValue: true,
@@ -1043,8 +1043,8 @@ UIFeatureRegistry.register({
   version: '1.0.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/BarNSFW/BarPanel'),
-    mobileComponentFactory: () => import('../../components/features/BarNSFW/MobileBarPanel'),
+    desktopComponentFactory: () => import('../../src/components/features/BarNSFW/BarPanel'),
+    mobileComponentFactory: () => import('../../src/components/features/BarNSFW/MobileBarPanel'),
     visibility: 'config-dependent',
     configKey: '酒吧NSFW设置',
     configValue: true,
@@ -1085,8 +1085,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/BoardGame/BoardGameDashboard'),
-    mobileComponentFactory: () => import('../../components/features/BoardGame/MobileBoardGameDashboard'),
+    desktopComponentFactory: () => import('../../src/components/features/BoardGame/BoardGameDashboard'),
+    mobileComponentFactory: () => import('../../src/components/features/BoardGame/MobileBoardGameDashboard'),
     visibility: 'always',
     stateKey: 'showBoardGameDashboard',
     propsFactory: ({ state, setters, modalManager }) => {
@@ -1116,8 +1116,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/BoardGame/BoardGameModal'),
-    mobileComponentFactory: () => import('../../components/features/BoardGame/MobileBoardGameModal'),
+    desktopComponentFactory: () => import('../../src/components/features/BoardGame/BoardGameModal'),
+    mobileComponentFactory: () => import('../../src/components/features/BoardGame/MobileBoardGameModal'),
     visibility: 'always',
     stateKey: 'showBoardGame',
     propsFactory: ({ state, setters, modalManager }) => {
@@ -1145,7 +1145,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/BDSMRelationshipModal'),
+    desktopComponentFactory: () => import('../../src/components/features/BDSMRelationshipModal'),
     visibility: 'always',
     propsFactory: ({ state, actions, setters, modalManager }) => {
       const 欲望系统 = ((state as any).校园系统?.欲望系统) || {};
@@ -1187,7 +1187,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/BDSMContractModal'),
+    desktopComponentFactory: () => import('../../src/components/features/BDSMContractModal'),
     visibility: 'always',
     propsFactory: ({ state, actions, setters, modalManager }) => {
       const 欲望系统 = ((state as any).校园系统?.欲望系统) || {};
@@ -1223,7 +1223,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/BDSMSafetyModal'),
+    desktopComponentFactory: () => import('../../src/components/features/BDSMSafetyModal'),
     visibility: 'always',
     propsFactory: ({ state, setters, modalManager }) => {
       const 校园系统 = (state as any).校园系统 || {};
@@ -1271,7 +1271,7 @@ UIFeatureRegistry.register({
   eraId: 'contemporary',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/MobileDevice/MobileDeviceModal'),
+    desktopComponentFactory: () => import('../../src/components/features/MobileDevice/MobileDeviceModal'),
     visibility: 'always',
     stateKey: 'showMobileDevice',
     gameViewOnly: true,
@@ -1488,8 +1488,8 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/NewGame/NewGameWizard'),
-    mobileComponentFactory: () => import('../../components/features/NewGame/mobile/MobileNewGameWizard'),
+    desktopComponentFactory: () => import('../../src/components/features/NewGame/NewGameWizard'),
+    mobileComponentFactory: () => import('../../src/components/features/NewGame/mobile/MobileNewGameWizard'),
     visibility: 'hidden',
     propsFactory: () => ({}),
   },
@@ -1509,7 +1509,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Battle/RpgBattleIntegration').then(m => ({ default: m.RpgBattleIntegration })),
+    desktopComponentFactory: () => import('../../src/components/features/Battle/RpgBattleIntegration').then(m => ({ default: m.RpgBattleIntegration })),
     visibility: 'always',
     gameViewOnly: true,
     propsFactory: ({ state, modalManager }) => ({
@@ -1530,7 +1530,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Equipment/RpgEquipmentIntegration').then(m => ({ default: m.RpgEquipmentIntegration })),
+    desktopComponentFactory: () => import('../../src/components/features/Equipment/RpgEquipmentIntegration').then(m => ({ default: m.RpgEquipmentIntegration })),
     visibility: 'always',
     propsFactory: ({ state, modalManager }) => ({
       character: state.角色,
@@ -1549,7 +1549,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Kungfu/RpgKungfuIntegration').then(m => ({ default: m.RpgKungfuIntegration })),
+    desktopComponentFactory: () => import('../../src/components/features/Kungfu/RpgKungfuIntegration').then(m => ({ default: m.RpgKungfuIntegration })),
     visibility: 'always',
     gameViewOnly: true,
     propsFactory: ({ state, modalManager }) => ({
@@ -1569,7 +1569,7 @@ UIFeatureRegistry.register({
   version: '1.1.0',
   dependencies: [],
   modal: {
-    desktopComponentFactory: () => import('../../components/features/Task/RpgTaskIntegration').then(m => ({ default: m.RpgTaskIntegration })),
+    desktopComponentFactory: () => import('../../src/components/features/Task/RpgTaskIntegration').then(m => ({ default: m.RpgTaskIntegration })),
     visibility: 'always',
     propsFactory: ({ state, actions, modalManager }) => ({
       tasks: state.任务列表,

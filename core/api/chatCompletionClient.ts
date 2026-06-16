@@ -1,4 +1,4 @@
-import type { 当前可用接口结构 } from '../../utils/apiConfig';
+import type { 当前可用接口结构 } from '../../src/utils/apiConfig';
 
 export type 通用消息角色 = 'system' | 'user' | 'assistant';
 

@@ -1,5 +1,5 @@
 import type { ModuleManifest } from '../../core/types/module';
-import { 构建桌游NSFW完整叙事约束 } from '../../prompts/runtime/boardGameNSFW';
+import { 构建桌游NSFW完整叙事约束 } from '../../src/prompts/runtime/boardGameNSFW';
 
 export const manifest: ModuleManifest = {
   id: 'nsfw-board-game',
@@ -21,4 +21,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 桌游类型, 桌游社交NSFW设置 } from '../../models/boardGameNSFW';
+export type { 桌游类型, 桌游社交NSFW设置 } from '../../src/models/boardGameNSFW';

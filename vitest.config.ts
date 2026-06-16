@@ -7,7 +7,7 @@ export default defineViteConfig({
     plugins: [react()],
     resolve: {
         alias: {
-            '@': path.resolve(__dirname),
+            '@': path.resolve(__dirname, './src'),
         },
     },
     // @ts-expect-error - vitest extends Vite config, 'test' property is valid at runtime
@@ -31,7 +31,7 @@ export default defineViteConfig({
             reporter: ['text', 'html', 'json-summary', 'lcov'],
             // 2026-06-08 Phase 5 Day 49-52：把 services/ 也纳入 coverage 范围
             // 写完 services 测试后 services 目标 ≥ 60%
-            include: ['utils/**/*.ts', 'models/**/*.ts', 'services/**/*.ts'],
+            include: ['src/utils/**/*.ts', 'src/models/**/*.ts', 'src/services/**/*.ts'],
             exclude: [
                 'node_modules/',
                 'dist/',
@@ -39,15 +39,15 @@ export default defineViteConfig({
                 '**/__tests__/**',
                 'src/test-utils/**',
                 // NSFW 子系统（spec 禁区：18 个）
-                'models/bdsmNSFW/**',
-                'models/boardGameNSFW/**',
-                'models/campusNSFW/**',
-                'models/exposureNSFW/**',
-                'models/npcNSFWEnhancement/**',
-                'models/nsfwCore/**',
-                'models/outdoorNSFW/**',
-                'models/photographyNSFW/**',
-                'utils/nsfwResourceOps.ts',
+                'src/models/bdsmNSFW/**',
+                'src/models/boardGameNSFW/**',
+                'src/models/campusNSFW/**',
+                'src/models/exposureNSFW/**',
+                'src/models/npcNSFWEnhancement/**',
+                'src/models/nsfwCore/**',
+                'src/models/outdoorNSFW/**',
+                'src/models/photographyNSFW/**',
+                'src/utils/nsfwResourceOps.ts',
             ],
             thresholds: {
                 // 2026-06-09 v2.1 Day 2 起步门槛：

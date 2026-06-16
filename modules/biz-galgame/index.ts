@@ -18,4 +18,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { GalgameRoute, GalgameEnding } from '../../models/avg/galgame';
+export type { GalgameRoute, GalgameEnding } from '../../src/models/avg/galgame';

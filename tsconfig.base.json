@@ -13,6 +13,6 @@
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],
-    "paths": { "@/*": ["./*"] }
+    "paths": { "@/*": ["./src/*"] }
   }
 }

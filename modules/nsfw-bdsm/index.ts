@@ -1,6 +1,6 @@
 import type { ModuleManifest } from '../../core/types/module';
-import { 构建BDSM完整叙事约束 } from '../../prompts/runtime/bdsmNSFW';
-import { 构建BDSM论坛叙事约束 } from '../../prompts/runtime/bdsmForum';
+import { 构建BDSM完整叙事约束 } from '../../src/prompts/runtime/bdsmNSFW';
+import { 构建BDSM论坛叙事约束 } from '../../src/prompts/runtime/bdsmForum';
 
 export const manifest: ModuleManifest = {
   id: 'nsfw-bdsm',
@@ -30,4 +30,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { BDSM系统设置 } from '../../models/bdsmNSFW';
+export type { BDSM系统设置 } from '../../src/models/bdsmNSFW';

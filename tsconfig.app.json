@@ -4,6 +4,10 @@
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/tsc/tsconfig.app.tsbuildinfo"
   },
-  "include": ["App.tsx", "index.tsx", "components/**/*.ts", "components/**/*.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "index.tsx"
+  ],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx", "**/__tests__/**"]
 }

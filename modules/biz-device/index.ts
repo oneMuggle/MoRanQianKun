@@ -18,4 +18,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { DeviceForm, MobileApp, DeviceMode, NotificationType } from '../../models/mobileDevice';
+export type { DeviceForm, MobileApp, DeviceMode, NotificationType } from '../../src/models/mobileDevice';

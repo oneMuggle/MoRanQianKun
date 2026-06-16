@@ -1,0 +1,361 @@
+import type {
+    角色数据结构,
+    场景图片档案,
+    存档结构,
+    战斗状态结构,
+    环境信息结构,
+    游戏设置结构,
+    记忆系统结构,
+    视觉设置结构,
+    详细门派结构,
+    聊天记录结构,
+    OpeningConfig,
+    剧情规划结构,
+    女主剧情规划结构,
+    同人剧情规划结构,
+    同人女主剧情规划结构,
+    剧情系统结构,
+    世界数据结构,
+    提示词结构,
+    时代信息结构
+} from './types';
+import type { 校规条目, 校规影响日志, 催眠记录, 催眠App等级, 校园系统数据 } from '../../../models/campusPhone';
+import type { 关系网络数据 } from '../../../models/relationship';
+import type { NPC结构 } from './types';
+import type { AvgRelationEngine } from '../engine/avgRelationEngine';
+import { 从NPC创建欲望档案, 创建默认欲望档案 } from '../nsfw/campusNSFWEngine';
+import { 执行手动存档, 执行自动存档, 执行读取存档 } from '../session/saveCoordinator';
+import type { 自动存档快照结构 } from '../session/saveCoordinator';
+import { 校验并修复世界状态 } from '../world/worldStateIntegrity';
+
+type 存档编排工作流依赖 = {
+    存档格式版本: number;
+    自动存档最小间隔毫秒: number;
+    深拷贝: <T>(value: T) => T;
+    历史记录: 聊天记录结构[];
+    角色: 角色数据结构;
+    环境: 环境信息结构;
+    社交: any[];
+    世界: 世界数据结构;
+    战斗: 战斗状态结构;
+    玩家门派: 详细门派结构;
+    任务列表: any[];
+    约定列表: any[];
+    剧情: 剧情系统结构;
+    剧情规划: 剧情规划结构;
+    女主剧情规划?: 女主剧情规划结构;
+    同人剧情规划?: 同人剧情规划结构;
+    同人女主剧情规划?: 同人女主剧情规划结构;
+    记忆系统: 记忆系统结构;
+    openingConfig?: OpeningConfig;
+    提示词池: 提示词结构[];
+    游戏初始时间: string;
+    gameConfig: 游戏设置结构;
+    memoryConfig: any;
+    获取当前视觉设置快照: () => 视觉设置结构;
+    获取当前场景图片档案快照: () => 场景图片档案;
+    获取角色锚点列表: () => any[];
+    获取当前角色锚点ID: () => string;
+    获取当前时代信息: () => 时代信息结构 | undefined;
+    校规系统?: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] };
+    催眠系统?: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number };
+    校园系统?: 校园系统数据;
+    写真系统?: unknown;
+    都市网约车系统?: unknown;
+    关系谱?: 关系网络数据;
+    // 探索引擎状态（从 Zustand 读取）
+    explorationNodes?: Array<{ id: string; type: string; name: string; description: string; dangerLevel: string; fowState: string; eventTriggered: boolean }>;
+    explorationPaths?: Array<{ from: string; to: string; actionCost: number; description?: string }>;
+    explorationCurrentAp?: number;
+    explorationMaxAp?: number;
+    explorationCurrentNodeId?: string | null;
+    // Galgame 引擎
+    avgGalgameEngine?: AvgRelationEngine | null;
+    设置GalgameEngine?: (engine: AvgRelationEngine | null) => void;
+    // 探索引擎状态恢复
+    同步探索状态到Zustand?: (nodes: Array<{ id: string; type: string; name: string; description: string; dangerLevel: string; fowState: string; eventTriggered: boolean }>, paths: Array<{ from: string; to: string; actionCost: number }>, currentNodeId: string | null, currentAp: number, maxAp: number) => void;
+    设置校规系统: (value: { 校规列表: 校规条目[]; 影响日志: 校规影响日志[] }) => void;
+    设置催眠系统: (value: { 催眠记录列表: 催眠记录[]; app等级: 催眠App等级; 累计使用次数: number }) => void;
+    设置校园系统: (value: 校园系统数据) => void;
+    设置写真系统?: (value: unknown) => void;
+    设置都市网约车系统?: (value: unknown) => void;
+    设置关系谱?: (value: 关系网络数据 | undefined) => void;
+    规范化环境信息: (envLike?: any) => 环境信息结构;
+    构建完整地点文本: (envLike?: any) => string;
+    规范化世界状态: (raw?: any) => 世界数据结构;
+    规范化战斗状态: (raw?: any) => 战斗状态结构;
+    规范化剧情状态: (raw?: any) => 剧情系统结构;
+    规范化剧情规划状态: (raw?: any) => 剧情规划结构;
+    规范化女主剧情规划状态: (raw?: any) => 女主剧情规划结构 | undefined;
+    规范化同人剧情规划状态: (raw?: any) => 同人剧情规划结构 | undefined;
+    规范化同人女主剧情规划状态: (raw?: any) => 同人女主剧情规划结构 | undefined;
+    规范化记忆系统: (raw?: any) => 记忆系统结构;
+    规范化可选开局配置: (raw?: any) => OpeningConfig | undefined;
+    规范化记忆配置: (raw?: any) => any;
+    规范化游戏设置: (raw?: any) => 游戏设置结构;
+    规范化视觉设置: (raw?: any) => 视觉设置结构;
+    规范化场景图片档案: (raw?: any) => 场景图片档案;
+    规范化角色物品容器映射: (raw?: any) => 角色数据结构;
+    规范化社交列表: (raw?: any[], options?: { 合并同名?: boolean }) => any[];
+    获取当前提示词池: () => 提示词结构[];
+    创建开场空白环境: () => 环境信息结构;
+    创建开场空白世界: () => 世界数据结构;
+    创建开场空白战斗: () => 战斗状态结构;
+    创建空门派状态: () => 详细门派结构;
+    创建开场空白剧情: () => 剧情系统结构;
+    应用并同步记忆系统: (memory: 记忆系统结构, options?: { 静默总结提示?: boolean }) => void;
+    setHasSave: (value: boolean) => void;
+    setGameConfig: (value: 游戏设置结构) => void;
+    setMemoryConfig: (value: any) => void;
+    设置视觉设置: (value: 视觉设置结构) => void;
+    设置场景图片档案: (value: 场景图片档案) => void;
+    设置游戏初始时间: (value: string) => void;
+    设置角色锚点列表: (value: any[]) => void;
+    设置当前角色锚点ID: (value: string) => void;
+    设置时代信息: (value: 时代信息结构 | undefined) => void;
+    setView: (value: 'home' | 'game' | 'new_game') => void;
+    setShowSaveLoad: (value: { show: boolean; mode: 'save' | 'load' }) => void;
+    设置最近开局配置: (value: any) => void;
+    设置角色: (value: 角色数据结构) => void;
+    设置环境: (value: 环境信息结构) => void;
+    设置社交: (value: any[]) => void;
+    设置世界: (value: 世界数据结构) => void;
+    设置战斗: (value: 战斗状态结构) => void;
+    设置玩家门派: (value: 详细门派结构) => void;
+    设置任务列表: (value: any[]) => void;
+    设置约定列表: (value: any[]) => void;
+    设置剧情: (value: 剧情系统结构) => void;
+    设置剧情规划: (value: 剧情规划结构) => void;
+    设置女主剧情规划: (value: 女主剧情规划结构 | undefined) => void;
+    设置同人剧情规划: (value: 同人剧情规划结构 | undefined) => void;
+    设置同人女主剧情规划: (value: 同人女主剧情规划结构 | undefined) => void;
+    设置开局配置: (value: OpeningConfig | undefined) => void;
+    设置提示词池: (value: 提示词结构[]) => void;
+    设置历史记录: (value: 聊天记录结构[]) => void;
+    清空重Roll快照: () => void;
+    重置自动存档状态: () => void;
+    最近自动存档时间戳Ref: { current: number };
+    最近自动存档签名Ref: { current: string };
+    读档前重置瞬态状态: () => void;
+    读档后重置上下文: () => void;
+    读档后定位到最新回合: () => void;
+};
+
+export const 创建存读档工作流 = (deps: 存档编排工作流依赖) => {
+    const 构建当前状态 = () => ({
+        历史记录: deps.历史记录,
+        角色: deps.角色,
+        环境: deps.环境,
+        社交: deps.社交,
+        世界: deps.世界,
+        战斗: deps.战斗,
+        玩家门派: deps.玩家门派,
+        任务列表: deps.任务列表,
+        约定列表: deps.约定列表,
+        剧情: deps.剧情,
+        剧情规划: deps.剧情规划,
+        女主剧情规划: deps.女主剧情规划,
+        同人剧情规划: deps.同人剧情规划,
+        同人女主剧情规划: deps.同人女主剧情规划,
+        记忆系统: deps.记忆系统,
+        openingConfig: deps.openingConfig,
+        提示词池: deps.提示词池,
+        游戏初始时间: deps.游戏初始时间,
+        gameConfig: deps.gameConfig,
+        memoryConfig: deps.memoryConfig,
+        visualConfig: deps.获取当前视觉设置快照(),
+        sceneImageArchive: deps.获取当前场景图片档案快照(),
+        角色锚点列表: deps.获取角色锚点列表(),
+        当前角色锚点ID: deps.获取当前角色锚点ID(),
+        时代信息: deps.获取当前时代信息(),
+        校规系统: deps.校规系统,
+        催眠系统: deps.催眠系统,
+        校园系统: deps.校园系统,
+        写真系统: deps.写真系统,
+        都市网约车系统: deps.都市网约车系统,
+        关系谱: deps.关系谱,
+        // 探索引擎状态
+        explorationNodes: deps.explorationNodes,
+        explorationPaths: deps.explorationPaths,
+        explorationCurrentAp: deps.explorationCurrentAp,
+        explorationMaxAp: deps.explorationMaxAp,
+        explorationCurrentNodeId: deps.explorationCurrentNodeId,
+        // Galgame 引擎
+        avgGalgameEngine: deps.avgGalgameEngine,
+    });
+
+    const 构建协调依赖 = () => ({
+        存档格式版本: deps.存档格式版本,
+        自动存档最小间隔毫秒: deps.自动存档最小间隔毫秒,
+        深拷贝: deps.深拷贝,
+        构建完整地点文本: deps.构建完整地点文本,
+        规范化环境信息: deps.规范化环境信息,
+        规范化世界状态: deps.规范化世界状态,
+        规范化战斗状态: deps.规范化战斗状态,
+        规范化剧情状态: deps.规范化剧情状态,
+        规范化剧情规划状态: deps.规范化剧情规划状态,
+        规范化女主剧情规划状态: deps.规范化女主剧情规划状态,
+        规范化同人剧情规划状态: deps.规范化同人剧情规划状态,
+        规范化同人女主剧情规划状态: deps.规范化同人女主剧情规划状态,
+        规范化记忆系统: deps.规范化记忆系统,
+        规范化可选开局配置: deps.规范化可选开局配置,
+        规范化记忆配置: deps.规范化记忆配置,
+        规范化游戏设置: deps.规范化游戏设置,
+        规范化视觉设置: deps.规范化视觉设置,
+        获取当前视觉设置: deps.获取当前视觉设置快照,
+        规范化场景图片档案: deps.规范化场景图片档案,
+        规范化角色物品容器映射: deps.规范化角色物品容器映射,
+        规范化社交列表: deps.规范化社交列表,
+        获取当前提示词池: deps.获取当前提示词池,
+        创建开场空白环境: deps.创建开场空白环境,
+        创建开场空白世界: deps.创建开场空白世界,
+        创建开场空白战斗: deps.创建开场空白战斗,
+        创建空门派状态: deps.创建空门派状态,
+        创建开场空白剧情: deps.创建开场空白剧情,
+        应用并同步记忆系统: deps.应用并同步记忆系统,
+        setHasSave: deps.setHasSave,
+        setGameConfig: deps.setGameConfig,
+        setMemoryConfig: deps.setMemoryConfig,
+        设置视觉设置: deps.设置视觉设置,
+        设置场景图片档案: deps.设置场景图片档案,
+        设置游戏初始时间: deps.设置游戏初始时间,
+        设置角色锚点列表: deps.设置角色锚点列表,
+        设置当前角色锚点ID: deps.设置当前角色锚点ID,
+        设置时代信息: deps.设置时代信息,
+        设置校规系统: deps.设置校规系统,
+        设置催眠系统: deps.设置催眠系统,
+        设置校园系统: deps.设置校园系统,
+        设置写真系统: deps.设置写真系统,
+        设置都市网约车系统: deps.设置都市网约车系统,
+        设置关系谱: deps.设置关系谱,
+        setView: deps.setView,
+        setShowSaveLoad: deps.setShowSaveLoad,
+        设置最近开局配置: deps.设置最近开局配置,
+        设置角色: deps.设置角色,
+        设置环境: deps.设置环境,
+        设置社交: deps.设置社交,
+        设置世界: deps.设置世界,
+        设置战斗: deps.设置战斗,
+        设置玩家门派: deps.设置玩家门派,
+        设置任务列表: deps.设置任务列表,
+        设置约定列表: deps.设置约定列表,
+        设置剧情: deps.设置剧情,
+        设置剧情规划: deps.设置剧情规划,
+        设置女主剧情规划: deps.设置女主剧情规划,
+        设置同人剧情规划: deps.设置同人剧情规划,
+        设置同人女主剧情规划: deps.设置同人女主剧情规划,
+        设置开局配置: deps.设置开局配置,
+        设置提示词池: deps.设置提示词池,
+        设置历史记录: deps.设置历史记录,
+        清空重Roll快照: deps.清空重Roll快照,
+        重置自动存档状态: deps.重置自动存档状态,
+        最近自动存档时间戳Ref: deps.最近自动存档时间戳Ref,
+        最近自动存档签名Ref: deps.最近自动存档签名Ref
+    });
+
+    const handleSaveGame = async () => 执行手动存档(
+        构建当前状态(),
+        构建协调依赖()
+    );
+
+    const performAutoSave = async (snapshot?: 自动存档快照结构) => 执行自动存档(
+        构建当前状态(),
+        构建协调依赖(),
+        snapshot
+    );
+
+    const handleLoadGame = async (save: 存档结构) => {
+        deps.读档前重置瞬态状态();
+        await 执行读取存档(
+            save,
+            构建协调依赖()
+        );
+
+        // 统一使用 save 数据作为本地工作副本，避免 React 异步状态读取问题
+        const 当前校园系统 = save.校园系统 && typeof save.校园系统 === 'object'
+            ? deps.深拷贝(save.校园系统)
+            : { ...(deps.校园系统 || {} as any) };
+        const 欲望系统 = 当前校园系统?.欲望系统;
+        const 已保存档案 = 欲望系统?.NPC欲望档案 || {};
+
+        // 旧存档兼容：若欲望系统缺失，基于当前社交列表重新初始化
+        if (!欲望系统 || !欲望系统.NPC欲望档案 || Object.keys(欲望系统.NPC欲望档案 || {}).length === 0) {
+            const 社交列表 = Array.isArray(save.社交) ? save.社交 : [];
+            const 欲望档案: Record<string, any> = {};
+            for (const npc of 社交列表) {
+                if (npc?.id) {
+                    // 优先使用已保存的档案（包含 BDSM关系 等深化数据）
+                    const 已保存 = 已保存档案[npc.id];
+                    if (已保存) {
+                        欲望档案[npc.id] = 已保存;
+                    } else {
+                        欲望档案[npc.id] = npc && typeof npc === 'object' && npc.核心性格特征
+                            ? 从NPC创建欲望档案(npc as NPC结构)
+                            : 创建默认欲望档案();
+                    }
+                }
+            }
+            当前校园系统.欲望系统 = {
+                ...(欲望系统 || {}),
+                NPC欲望档案: 欲望档案,
+                里程碑列表: 欲望系统?.里程碑列表 || [],
+                后果列表: 欲望系统?.后果列表 || [],
+                已解锁地点: 欲望系统?.已解锁地点 || [],
+                露出场景解锁: 欲望系统?.露出场景解锁 || [],
+                旁观者记录: 欲望系统?.旁观者记录 || [],
+                活动专属回忆: 欲望系统?.活动专属回忆 || [],
+                SM场景池: 欲望系统?.SM场景池 || [],
+                契约列表: 欲望系统?.契约列表 || [],
+                指令队列: 欲望系统?.指令队列 || [],
+            };
+        }
+
+        // 旧存档兼容：确保所有欲望档案都有 BDSM关系 字段（v1.6 新增）
+        const 最终档案 = 当前校园系统.欲望系统?.NPC欲望档案;
+        if (最终档案 && typeof 最终档案 === 'object') {
+            for (const npcId of Object.keys(最终档案)) {
+                const 档案 = 最终档案[npcId];
+                if (档案 && typeof 档案 === 'object' && !档案.BDSM关系) {
+                    档案.BDSM关系 = {
+                        阶段: '初识',
+                        服从度: 0,
+                        权力天平: 0,
+                        契约记录: [],
+                        任务历史: [],
+                        日常指令: [],
+                        里程碑: [],
+                        安全词: '月光',
+                        底线列表: [],
+                    };
+                }
+            }
+        }
+
+        deps.设置校园系统(当前校园系统 as 校园系统数据);
+
+        // 探索引擎状态恢复（旧存档可能没有这些字段）
+        if (save.explorationNodes && Array.isArray(save.explorationNodes) && save.explorationNodes.length > 0) {
+            deps.同步探索状态到Zustand?.(
+                save.explorationNodes,
+                save.explorationPaths || [],
+                save.explorationCurrentNodeId ?? null,
+                save.explorationCurrentAp ?? 10,
+                save.explorationMaxAp ?? 10,
+            );
+        }
+
+        deps.读档后重置上下文();
+        deps.读档后定位到最新回合();
+
+        // Galgame 引擎状态恢复
+        if (deps.设置GalgameEngine && (save as any)._restoredGalgameEngine) {
+            deps.设置GalgameEngine((save as any)._restoredGalgameEngine as AvgRelationEngine | null);
+        }
+    };
+
+    return {
+        handleSaveGame,
+        performAutoSave,
+        handleLoadGame
+    };
+};

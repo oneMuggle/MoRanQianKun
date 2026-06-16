@@ -5,18 +5,18 @@
     "noImplicitOverride": true
   },
   "include": [
-    "utils/apiConfig.ts",
-    "utils/apiConfigConstants.ts",
-    "utils/apiConfigNormalization.ts",
-    "utils/apiDiagnostics.ts",
-    "utils/apiFailover.ts",
-    "utils/builtinPrompts.ts",
-    "utils/jsonRepair.ts",
-    "utils/promptFeatureToggles.ts",
-    "utils/modelCategorizer.ts",
-    "utils/stateHelpers.ts",
-    "utils/tokenEstimate.ts",
-    "utils/visualSettings.ts"
+    "src/utils/apiConfig.ts",
+    "src/utils/apiConfigConstants.ts",
+    "src/utils/apiConfigNormalization.ts",
+    "src/utils/apiDiagnostics.ts",
+    "src/utils/apiFailover.ts",
+    "src/utils/builtinPrompts.ts",
+    "src/utils/jsonRepair.ts",
+    "src/utils/promptFeatureToggles.ts",
+    "src/utils/modelCategorizer.ts",
+    "src/utils/stateHelpers.ts",
+    "src/utils/tokenEstimate.ts",
+    "src/utils/visualSettings.ts"
   ],
   "exclude": [
     "**/*.test.ts",

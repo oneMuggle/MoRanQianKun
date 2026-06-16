@@ -13,30 +13,30 @@
  *   1 = 存在未标记条目（CI 友好）
  */
 
-import type { 天赋结构, 背景结构 } from '../types';
+import type { 天赋结构, 背景结构 } from '@/types';
 
 // ── 天赋数据 ────────────────────────────────────────────────────────────────
-import { 通用天赋 }             from '../data/talents/common';
-import { 武侠天赋 }             from '../data/talents/wuxia';
-import { 志怪天赋 }             from '../data/talents/zhiguai';
-import { 神话天赋 }             from '../data/talents/myth';
-import { 古希腊天赋 }           from '../data/talents/greek';
-import { 古罗马天赋 }           from '../data/talents/roman';
-import { 中世纪天赋 }           from '../data/talents/medieval';
-import { NSFW天赋 }             from '../data/talents/nsfw';
-import { 现代天赋 }             from '../data/talents/modern';
-import { 未来天赋 }             from '../data/talents/future';
+import { 通用天赋 }             from '@/data/talents/common';
+import { 武侠天赋 }             from '@/data/talents/wuxia';
+import { 志怪天赋 }             from '@/data/talents/zhiguai';
+import { 神话天赋 }             from '@/data/talents/myth';
+import { 古希腊天赋 }           from '@/data/talents/greek';
+import { 古罗马天赋 }           from '@/data/talents/roman';
+import { 中世纪天赋 }           from '@/data/talents/medieval';
+import { NSFW天赋 }             from '@/data/talents/nsfw';
+import { 现代天赋 }             from '@/data/talents/modern';
+import { 未来天赋 }             from '@/data/talents/future';
 
 // ── 背景数据 ────────────────────────────────────────────────────────────────
-import { NSFW背景 }             from '../data/backgrounds/nsfw';
-import { 通用背景 }             from '../data/backgrounds/common';
-import { 武侠背景 }             from '../data/backgrounds/wuxia';
-import { 志怪背景 }             from '../data/backgrounds/zhiguai';
-import { 神话背景 }             from '../data/backgrounds/myth';
-import { 古希腊背景 }           from '../data/backgrounds/greek';
-import { 古罗马背景 }           from '../data/backgrounds/roman';
-import { 中世纪背景 }           from '../data/backgrounds/medieval';
-import { 现代背景 }             from '../data/backgrounds/modern';
+import { NSFW背景 }             from '@/data/backgrounds/nsfw';
+import { 通用背景 }             from '@/data/backgrounds/common';
+import { 武侠背景 }             from '@/data/backgrounds/wuxia';
+import { 志怪背景 }             from '@/data/backgrounds/zhiguai';
+import { 神话背景 }             from '@/data/backgrounds/myth';
+import { 古希腊背景 }           from '@/data/backgrounds/greek';
+import { 古罗马背景 }           from '@/data/backgrounds/roman';
+import { 中世纪背景 }           from '@/data/backgrounds/medieval';
+import { 现代背景 }             from '@/data/backgrounds/modern';
 
 // ── 类型 ───────────────────────────────────────────────────────────────────
 interface UnmarkedEntry {
