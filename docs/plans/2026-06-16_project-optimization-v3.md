@@ -3,7 +3,7 @@
 > **创建日期**：2026-06-16
 > **作者**：planner
 > **状态**：已确认，待执行
-> **前置**：[v2.0 路线图](2026-06-03-project-optimization.md)（Phase 0~5 已完成）
+> **前置**：[v2.0 路线图](../technical/14-optimization-roadmap-v2.md)（Phase 0~5 已完成）
 > **项目**：墨染乾坤：万象纪元
 
 ---
