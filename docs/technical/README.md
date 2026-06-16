@@ -44,7 +44,17 @@
 - `2026-05-22_nsfw-gameplay-enhancement.md` → 08 章 NSFW 子项
 - `2026-05-31-module-refactor.md` → 02 章
 - `2026-06-01-systemPromptBuilder-migration.md` → 03 章
+- `2026-06-03-project-optimization.md`（v2 路线图）→ 14 章
 - `2026-06-15_yishijie-borrow-plan.md` + `2026-06-15_yishijie-ui-gameplay-borrow-plan.md` → 17 章
+
+### 批量归档（2026-06-16 Phase A）
+
+48 份历史 plan 已按年月归入 `plans-archive/2026-04/`（4 份）、`plans-archive/2026-05/`（29 份）、`plans-archive/2026-06/`（15 份），涵盖 v2 路线图 Phase 0~5 子阶段（ci-upgrade、b1-t1-pure-functions、b2-t2-services、c-docs-normalize、d-circular-deps、root-dir-cleanup 等）。归档后 `docs/plans/` 仅保留 7 份活跃/待实施文档。
+
+进行中的 v3 路线图仍保留在 `docs/plans/`：
+- [project-optimization-v3](../plans/2026-06-16_project-optimization-v3.md)（2026-06-16 创建，Phase A 进行中）
+
+完成后将并入 14 章，与 v2 路线图合并章节。
 
 ## 旧主题文档（未重构）
 
