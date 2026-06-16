@@ -1,5 +1,5 @@
 import type { ModuleManifest } from '../../core/types/module';
-import { 构建露出叙事约束 } from '../../prompts/runtime/exposureNSFW';
+import { 构建露出叙事约束 } from '../../src/prompts/runtime/exposureNSFW';
 
 export const manifest: ModuleManifest = {
   id: 'nsfw-exposure',
@@ -16,4 +16,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 露出偏好等级, ExposureNSFW设置 } from '../../models/exposureNSFW';
+export type { 露出偏好等级, ExposureNSFW设置 } from '../../src/models/exposureNSFW';

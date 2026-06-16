@@ -6,7 +6,7 @@
  */
 
 import type { ModuleManifest } from '../../core/types/module';
-import { 构建校园NSFW完整叙事约束 } from '../../prompts/runtime/campusNSFW';
+import { 构建校园NSFW完整叙事约束 } from '../../src/prompts/runtime/campusNSFW';
 
 /** 模块清单 */
 export const manifest: ModuleManifest = {
@@ -37,6 +37,6 @@ export const manifest: ModuleManifest = {
 };
 
 // 导出供外部使用的类型和常量
-export { 默认校园NSFW设置 } from '../../models/campusNSFW';
-export { 规范化校园NSFW设置 } from '../../models/campusNSFW/normalization';
-export type { 校园NSFW设置, 露出偏好等级, 权力倾向, SM场景类型 } from '../../models/campusNSFW';
+export { 默认校园NSFW设置 } from '../../src/models/campusNSFW';
+export { 规范化校园NSFW设置 } from '../../src/models/campusNSFW/normalization';
+export type { 校园NSFW设置, 露出偏好等级, 权力倾向, SM场景类型 } from '../../src/models/campusNSFW';

@@ -1,5 +1,5 @@
 import type { ModuleManifest } from '../../core/types/module';
-import { 生成酒吧叙事约束 } from '../../models/contemporary/barNSFW';
+import { 生成酒吧叙事约束 } from '../../src/models/contemporary/barNSFW';
 
 export const manifest: ModuleManifest = {
   id: 'nsfw-bar',
@@ -20,4 +20,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 酒吧NSFW设置 } from '../../models/contemporary/barNSFW';
+export type { 酒吧NSFW设置 } from '../../src/models/contemporary/barNSFW';

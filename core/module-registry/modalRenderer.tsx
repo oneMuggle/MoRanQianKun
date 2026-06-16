@@ -7,7 +7,7 @@
  */
 
 import * as React from 'react';
-import { 懒加载边界 } from '../../components/features/lazyComponents';
+import { 懒加载边界 } from '../../src/components/features/lazyComponents';
 import { UIFeatureRegistry } from './registry';
 import type { ModalConfig, ModalPropsContext } from './types';
 

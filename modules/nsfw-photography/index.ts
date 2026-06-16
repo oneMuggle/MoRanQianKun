@@ -3,7 +3,7 @@
  */
 
 import type { ModuleManifest } from '../../core/types/module';
-import { 构建写真NSFW完整叙事约束 } from '../../prompts/runtime/photographyNSFW';
+import { 构建写真NSFW完整叙事约束 } from '../../src/prompts/runtime/photographyNSFW';
 
 export const manifest: ModuleManifest = {
   id: 'nsfw-photography',
@@ -24,4 +24,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 写真NSFW设置, 泄露事件状态 } from '../../models/photographyNSFW';
+export type { 写真NSFW设置, 泄露事件状态 } from '../../src/models/photographyNSFW';

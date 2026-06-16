@@ -10,11 +10,11 @@
     "exactOptionalPropertyTypes": true
   },
   "include": [
-    "utils/**/*.ts"
+    "src/utils/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "utils/**/*.test.ts"
+    "src/utils/**/*.test.ts"
   ]
 }

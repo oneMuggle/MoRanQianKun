@@ -1,5 +1,5 @@
 import type { ModuleManifest } from '../../core/types/module';
-import { 构建行程NSFW叙事约束 } from '../../prompts/runtime/urbanDriverNSFW';
+import { 构建行程NSFW叙事约束 } from '../../src/prompts/runtime/urbanDriverNSFW';
 
 export const manifest: ModuleManifest = {
   id: 'nsfw-urban-driver',
@@ -16,4 +16,4 @@ export const manifest: ModuleManifest = {
   },
 };
 
-export type { 都市网约车NSFW设置 } from '../../models/urbanDriverNSFW';
+export type { 都市网约车NSFW设置 } from '../../src/models/urbanDriverNSFW';
