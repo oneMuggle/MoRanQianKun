@@ -8,9 +8,9 @@ import type {
     世界书内置分类,
     世界书注入模式,
     世界书作用域,
-    世界书类型,
-    聊天记录结构
-} from './types';
+    世界书类型
+} from '@/models/worldbook';
+import type { 聊天记录结构 } from '@/types';
 
 // ============ 存储键 / 版本常量 ============
 

@@ -70,7 +70,7 @@ export const 创建默认内置提示词列表 = (): 内置提示词条目结构
     const builtinBook = 创建内置预设世界书();
     return (Array.isArray(builtinBook.条目) ? builtinBook.条目 : [])
         .map(转换世界书条目为内置提示词)
-        .filter((item): item is 内置提示词条目结构 => Boolean(item));
+        .filter((item: 内置提示词条目结构 | null): item is 内置提示词条目结构 => Boolean(item));
 };
 
 const 默认内置提示词映射 = (): Map<string, 内置提示词条目结构> => (

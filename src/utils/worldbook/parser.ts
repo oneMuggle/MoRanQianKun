@@ -7,7 +7,7 @@ import type {
     世界书注入模式,
     世界书作用域,
     世界书类型
-} from './types';
+} from '@/models/worldbook';
 import { normalizeCanonicalGameTime } from '../../hooks/useGame/time/timeUtils';
 import {
     默认作用域,

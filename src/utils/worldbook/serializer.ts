@@ -8,7 +8,7 @@ import type {
     世界书注入模式,
     世界书作用域,
     世界书类型
-} from './types';
+} from '@/models/worldbook';
 import { 内置世界书ID, 世界书本体槽位 } from './types';
 import {
     获取世界书条目注入说明,

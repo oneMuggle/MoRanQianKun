@@ -85,7 +85,7 @@ export function bindBrowserErrorMonitor(): void {
             message: isResource
                 ? `资源加载失败: ${target?.tagName || 'unknown'} (${(target as any)?.src || (target as any)?.href || ''})`
                 : String(event.message || event.error || '未知错误'),
-            stack: event.error instanceof Error ? event.error.stack : '',
+            stack: event.error instanceof Error ? (event.error.stack || '') : '',
             filename: isResource
                 ? String((target as any)?.src || (target as any)?.href || '')
                 : String(event.filename || ''),
@@ -105,7 +105,7 @@ export function bindBrowserErrorMonitor(): void {
                     : (() => {
                         try { return JSON.stringify(reason); } catch { return 'Promise rejected'; }
                     })(),
-            stack: reason instanceof Error ? reason.stack : '',
+            stack: reason instanceof Error ? (reason.stack || '') : '',
             filename: '',
             lineno: 0,
             colno: 0,
