@@ -1,4 +1,5 @@
-import type { 聊天记录结构, 世界书结构, 世界书条目结构, 世界书条目形态, 世界书作用域, 世界书类型 } from './types';
+import type { 世界书结构, 世界书条目结构, 世界书条目形态, 世界书作用域, 世界书类型 } from '@/models/worldbook';
+import type { 聊天记录结构 } from '@/types';
 import { 环境时间转标准串 } from '../../hooks/useGame/time/timeUtils';
 import { 默认作用域, 世界书预算映射, 世界书本体槽位值, 世界书命中参数 } from './types';
 import {
