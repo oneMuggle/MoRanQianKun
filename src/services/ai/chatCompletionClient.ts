@@ -23,8 +23,8 @@ export class 协议请求错误 extends Error {
     constructor(message: string, status?: number, detail?: string) {
         super(message);
         this.name = '协议请求错误';
-        this.status = status;
-        this.detail = detail;
+        if (status !== undefined) this.status = status;
+        if (detail !== undefined) this.detail = detail;
     }
 }
 
@@ -174,9 +174,10 @@ const 应用强制JSON消息修正 = (
 
     const cloned = messages.map(msg => ({ ...msg }));
     const systemIndex = cloned.findIndex(msg => msg.role === 'system');
-    if (systemIndex >= 0) {
+    if (systemIndex >= 0 && cloned[systemIndex]) {
         cloned[systemIndex] = {
             ...cloned[systemIndex],
+            role: cloned[systemIndex].role,
             content: `${cloned[systemIndex].content}\n\nRespond in JSON format.`.trim()
         };
     } else {
@@ -610,7 +611,7 @@ const 请求OpenAI家族文本 = async (
                 'Authorization': `Bearer ${apiConfig.apiKey}`
             },
             body: JSON.stringify(body),
-            signal
+            ...(signal !== undefined && { signal })
         });
 
         if (!response.ok) {
@@ -694,7 +695,7 @@ export const 请求模型文本 = async (
             options.errorDetailLimit
         );
     }, {
-        signal: options.signal,
+        ...(options.signal !== undefined && { signal: options.signal }),
         retries: 2,
         baseDelayMs: 800
     });
