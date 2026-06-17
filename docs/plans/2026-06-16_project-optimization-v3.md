@@ -261,8 +261,9 @@
 
 按 Phase 顺序执行，每个 Phase 一个 feature 分支：
 
-- [ ] Phase A：文档清理
-- [ ] Phase B：大组件拆分
+- [x] Phase A：文档清理（2026-06-16，PR #9 merged）
+- [x] Phase B：大组件拆分（2026-06-16~17，B1 完成，PR #10~#14 merged）
+  - [x] B1：`ImageGenerationSettings.tsx`（2205 → 248 行，拆 6 个 panel）
 - [ ] Phase C：类型安全升级
 - [ ] Phase D：测试覆盖率提升
 - [ ] Phase E：循环依赖根治
