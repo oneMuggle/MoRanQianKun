@@ -94,7 +94,7 @@ export const generateVariableCalibrationUpdate = async (
     if (!apiConfig.apiKey) throw new Error('Missing API Key');
 
     const systemPrompt = 获取内置提示词槽位内容({
-        entries: params.builtinPromptEntries,
+        ...(params.builtinPromptEntries !== undefined && { entries: params.builtinPromptEntries }),
         slotId: params.worldEvolutionUpdated === true
             ? 世界书本体槽位.变量模型系统_世界演变已更新
             : 世界书本体槽位.变量模型系统_常规,
@@ -116,7 +116,7 @@ export const generateVariableCalibrationUpdate = async (
         return source;
     })();
     const userPromptExtraRules = 获取内置提示词槽位内容({
-        entries: params.builtinPromptEntries,
+        ...(params.builtinPromptEntries !== undefined && { entries: params.builtinPromptEntries }),
         slotId: params.worldEvolutionUpdated === true
             ? 世界书本体槽位.变量模型用户_世界演变已更新
             : 世界书本体槽位.变量模型用户_常规,
@@ -125,14 +125,16 @@ export const generateVariableCalibrationUpdate = async (
     const taskPrompt = 构建变量模型任务提示词({
         stateJson: params.stateJson,
         response: params.response,
-        extraPrompt,
+        ...(extraPrompt !== undefined && { extraPrompt }),
         isOpeningRound: params.isOpeningRound === true,
-        openingTaskContext: params.openingTaskContext
+        ...(params.openingTaskContext !== undefined && { openingTaskContext: params.openingTaskContext })
     });
     const variableCotPrompt = 获取内置提示词槽位内容({
-        entries: params.builtinPromptEntries,
+        ...(params.builtinPromptEntries !== undefined && { entries: params.builtinPromptEntries }),
         slotId: 世界书本体槽位.变量模型COT,
-        fallback: 获取变量校准COT提示词({ 启用修炼体系: params.cultivationSystemEnabled })
+        fallback: 获取变量校准COT提示词({
+            ...(params.cultivationSystemEnabled !== undefined && { 启用修炼体系: params.cultivationSystemEnabled })
+        })
     });
     const rulesContext = (params.calibrationRulesContext || '').trim();
     const messages = 规范化文本补全消息链([
@@ -159,11 +161,9 @@ export const generateVariableCalibrationUpdate = async (
 
     const rawText = await 请求模型文本(apiConfig, messages, {
         temperature: 0.2,
-        signal,
+        ...(signal !== undefined && { signal }),
         errorDetailLimit: Number.POSITIVE_INFINITY,
-        streamOptions: onStreamDelta
-            ? { stream: true, onDelta: onStreamDelta }
-            : undefined
+        ...(onStreamDelta && { streamOptions: { stream: true, onDelta: onStreamDelta } })
     });
     const parsed = 解析变量校准响应(rawText);
 

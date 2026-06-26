@@ -239,8 +239,8 @@ const 去重可见信息条目 = (
         const existingIndex = indexMap.get(key);
         if (typeof existingIndex === 'number') {
             ordered[existingIndex] = {
-                ...ordered[existingIndex],
-                信息可见性: 合并信息可见性(ordered[existingIndex].信息可见性, item.信息可见性)
+                ...ordered[existingIndex]!,
+                信息可见性: 合并信息可见性(ordered[existingIndex]!.信息可见性, item.信息可见性)
             };
             continue;
         }
@@ -427,13 +427,13 @@ const 解析条目块 = (text: string): Array<Record<string, string>> => {
             const inline = (entryMatch[2] || '').trim();
             if (inline) {
                 const kvInline = inline.match(/^([^:：]+)\s*[:：]\s*(.*)$/);
-                if (kvInline) { current[kvInline[1].trim()] = kvInline[2].trim(); lastKey = kvInline[1].trim(); }
+                if (kvInline) { current[kvInline[1]!.trim()] = kvInline[2]!.trim(); lastKey = kvInline[1]!.trim(); }
             }
             continue;
         }
         if (!current) current = {};
         const kvMatch = line.match(/^(?:[-*•]\s*)?([^:：]+)\s*[:：]\s*(.*)$/);
-        if (kvMatch) { current[kvMatch[1].trim()] = kvMatch[2].trim(); lastKey = kvMatch[1].trim(); continue; }
+        if (kvMatch) { current[kvMatch[1]!.trim()] = kvMatch[2]!.trim(); lastKey = kvMatch[1]!.trim(); continue; }
         if (lastKey) { current[lastKey] = `${current[lastKey] || ''}\n${line}`.trim(); }
     }
 
@@ -613,9 +613,9 @@ export const generateNovelDecomposition = async (
         { role: 'assistant', content: 小说拆分COT伪装提示词 }
     ], { 保留System: true, 合并同角色: false }), {
         temperature: 0.3,
-        signal,
+        ...(signal !== undefined && { signal }),
         errorDetailLimit: Number.POSITIVE_INFINITY,
-        streamOptions
+        ...(streamOptions !== undefined && { streamOptions })
     });
 
     return 解析结果(rawText);
@@ -716,7 +716,7 @@ export const generatePlanningAnalysis = async (
         { role: 'assistant', content: cotPseudoPrompt }
     ], { 保留System: true, 合并同角色: false }), {
         temperature: 0.3,
-        signal,
+        ...(signal !== undefined && { signal }),
         errorDetailLimit: Number.POSITIVE_INFINITY
     });
 

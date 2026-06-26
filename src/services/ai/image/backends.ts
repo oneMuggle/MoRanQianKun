@@ -202,7 +202,7 @@ const 规范化SD采样器与调度器 = (pngParams?: PNG解析参数结构): { 
 
     return {
         samplerName,
-        scheduler: normalizedScheduler || undefined
+        ...(normalizedScheduler && { scheduler: normalizedScheduler })
     };
 };
 
@@ -399,8 +399,9 @@ const 执行ComfyUI生图 = async (
     const baseUrl = 获取ComfyUI基础地址(apiConfig.baseUrl);
     if (!baseUrl) throw new Error('ComfyUI 缺少 API 地址');
     const [width, height] = size.split('x').map((value) => Number(value));
-    const workflow = 构建ComfyUI工作流(apiConfig.ComfyUI工作流JSON || '', prompt, negativePrompt, width, height, pngParams);
+    const workflow = 构建ComfyUI工作流(apiConfig.ComfyUI工作流JSON || '', prompt, negativePrompt, width ?? 0, height ?? 0, pngParams);
     const promptEndpoint = 构建图片端点(apiConfig.baseUrl, apiConfig.图片接口路径, apiConfig.图片接口路径模式);
+    if (!promptEndpoint) throw new Error('ComfyUI 缺少接口端点');
     const enqueueResponse = await fetch(promptEndpoint, {
         method: 'POST',
         headers: 构建生图请求头(apiConfig),
@@ -408,7 +409,7 @@ const 执行ComfyUI生图 = async (
             prompt: workflow,
             client_id: 'wuxia-web'
         }),
-        signal
+        ...(signal !== undefined && { signal })
     });
     if (!enqueueResponse.ok) {
         const detail = await 读取失败详情文本(enqueueResponse, Number.POSITIVE_INFINITY);
@@ -425,7 +426,7 @@ const 执行ComfyUI生图 = async (
         const historyResponse = await fetch(historyEndpoint, {
             method: 'GET',
             headers: 构建生图请求头(apiConfig),
-            signal
+            ...(signal !== undefined && { signal })
         });
         if (historyResponse.ok) {
             const historyText = await historyResponse.text();
@@ -433,7 +434,7 @@ const 执行ComfyUI生图 = async (
             const imageUrl = 提取ComfyUI图片地址(historyPayload, baseUrl);
             if (imageUrl) {
                 if (responseFormat === 'b64_json') {
-                    const imageResponse = await fetch(imageUrl, { signal });
+                    const imageResponse = await fetch(imageUrl, { ...(signal !== undefined && { signal }) });
                     if (!imageResponse.ok) {
                         throw new Error(`ComfyUI 图片下载失败: ${imageResponse.status}`);
                     }
@@ -469,7 +470,7 @@ const 执行NovelAI生图 = async (
             method: 'POST',
             headers: 构建生图请求头(apiConfig),
             body: JSON.stringify(requestBody),
-            signal
+            ...(signal !== undefined && { signal })
         });
     } catch (error: any) {
         throw new Error(`NovelAI 请求失败：${error?.message || '网络异常'}。如果你在本地开发环境，请确认仍在通过 Vite dev server 访问，并使用 https://image.novelai.net 作为基础地址。`);
@@ -522,7 +523,7 @@ const 执行OpenAI协议生图 = async (
             method: 'POST',
             headers: 构建生图请求头(apiConfig),
             body: JSON.stringify(requestBody),
-            signal
+            ...(signal !== undefined && { signal })
         });
     } catch (error: any) {
         throw error;
@@ -587,7 +588,7 @@ const 执行SDWebUI生图 = async (
         method: 'POST',
         headers: 构建生图请求头(apiConfig),
         body: JSON.stringify(requestBody),
-        signal
+        ...(signal !== undefined && { signal })
     });
 
     if (!response.ok) {
@@ -624,7 +625,7 @@ const 执行Grok生图 = async (
         method: 'POST',
         headers: 构建生图请求头(apiConfig),
         body: JSON.stringify(requestBody),
-        signal
+        ...(signal !== undefined && { signal })
     });
 
     if (!response.ok) {
@@ -685,8 +686,8 @@ export const generateImageByPrompt = async (
 
     if (backendType === 'novelai') {
         return await 执行NovelAI生图(normalizedPrompt, apiConfig, size, negativePromptText, signal, {
-            跳过基础负面提示词: options?.跳过基础负面提示词,
-            PNG参数: options?.PNG参数
+            ...(options?.跳过基础负面提示词 !== undefined && { 跳过基础负面提示词: options.跳过基础负面提示词 }),
+            ...(options?.PNG参数 !== undefined && { PNG参数: options.PNG参数 })
         });
     }
 
@@ -701,6 +702,6 @@ export const generateImageByPrompt = async (
     // Default: OpenAI protocol
     return await 执行OpenAI协议生图(normalizedPrompt, apiConfig, signal, {
         附加负面提示词: negativePromptText,
-        跳过基础负面提示词: options?.跳过基础负面提示词
+        ...(options?.跳过基础负面提示词 !== undefined && { 跳过基础负面提示词: options.跳过基础负面提示词 })
     });
 };

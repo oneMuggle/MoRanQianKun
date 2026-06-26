@@ -49,8 +49,8 @@ const 去重可见信息条目 = (
         const existingIndex = indexMap.get(key);
         if (typeof existingIndex === 'number') {
             ordered[existingIndex] = {
-                ...ordered[existingIndex],
-                信息可见性: 合并信息可见性(ordered[existingIndex].信息可见性, item.信息可见性)
+                ...ordered[existingIndex]!,
+                信息可见性: 合并信息可见性(ordered[existingIndex]!.信息可见性, item.信息可见性)
             };
             continue;
         }
@@ -276,18 +276,21 @@ const 构建树节点 = (params: {
     parentId?: string;
     relatedSegmentIds?: string[];
     children?: 小说拆分树节点结构[];
-}): 小说拆分树节点结构 => ({
-    id: 生成ID('novel_node'),
-    数据集ID: params.datasetId,
-    父节点ID: params.parentId,
-    类型: params.type,
-    标题: params.title,
-    内容: params.content || '',
-    目标链路: params.targets,
-    关联分段ID列表: params.relatedSegmentIds || [],
-    排序: params.order,
-    子节点: params.children || []
-});
+}): 小说拆分树节点结构 => {
+    const node: 小说拆分树节点结构 = {
+        id: 生成ID('novel_node'),
+        数据集ID: params.datasetId,
+        类型: params.type,
+        标题: params.title,
+        内容: params.content || '',
+        目标链路: params.targets,
+        关联分段ID列表: params.relatedSegmentIds || [],
+        排序: params.order,
+        子节点: params.children || []
+    };
+    if (params.parentId !== undefined) node.父节点ID = params.parentId;
+    return node;
+};
 
 export const 从原始文本提取章节 = (dataset: 小说拆分数据集结构): 小说拆分章节结构[] => {
     const rawText = 去空白(dataset.原始文本 || '');
@@ -318,8 +321,8 @@ export const 从原始文本提取章节 = (dataset: 小说拆分数据集结构
 
     lines.forEach((line, index) => {
         const heading = 识别TXT章节标题行(line, {
-            上一行: index > 0 ? lines[index - 1] : '',
-            下一行: index < lines.length - 1 ? lines[index + 1] : ''
+            上一行: index > 0 ? (lines[index - 1] ?? '') : '',
+            下一行: index < lines.length - 1 ? (lines[index + 1] ?? '') : ''
         });
         if (heading) {
             if (buffer.length > 0) {
@@ -391,14 +394,16 @@ export const 根据章节生成分段列表 = (dataset: 小说拆分数据集结
     for (let index = 0; index < chapterList.length; index += groupSize) {
         const group = chapterList.slice(index, index + groupSize);
         if (group.length <= 0) continue;
-        const 起始章序号 = group[0].序号;
-        const 结束章序号 = group[group.length - 1].序号;
+        const firstChapter = group[0]!;
+        const lastChapter = group[group.length - 1]!;
+        const 起始章序号 = firstChapter.序号;
+        const 结束章序号 = lastChapter.序号;
         const 原文内容 = group
             .map((item) => 去空白(item.内容 || ''))
             .filter(Boolean)
             .join('\n\n');
-        const startTitle = 规范化标题(group[0].标题 || '').trim() || `章节 ${起始章序号}`;
-        const endTitle = 规范化标题(group[group.length - 1].标题 || '').trim() || `章节 ${结束章序号}`;
+        const startTitle = 规范化标题(firstChapter.标题 || '').trim() || `章节 ${起始章序号}`;
+        const endTitle = 规范化标题(lastChapter.标题 || '').trim() || `章节 ${结束章序号}`;
         const 标题 = group.length === 1
             ? startTitle
             : startTitle === endTitle
@@ -709,12 +714,12 @@ export const 解析小说拆分分段 = async (params: {
         groupIndex: params.segment.组号 || params.segmentIndex + 1,
         chapterRange: params.segment.章节范围,
         chapterTitles: params.segment.章节标题,
-        previousGroupReference: params.previousGroupReference,
-        previousTimelineEnd: params.previousTimelineEnd,
-        nextChapterTitles: params.nextChapterTitles,
-        leadingSystemPrompt: params.leadingSystemPrompt,
-        extraPrompt: params.extraPrompt,
-        gptMode: params.gptMode === true
+        ...(params.previousGroupReference !== undefined && { previousGroupReference: params.previousGroupReference }),
+        ...(params.previousTimelineEnd !== undefined && { previousTimelineEnd: params.previousTimelineEnd }),
+        ...(params.nextChapterTitles !== undefined && { nextChapterTitles: params.nextChapterTitles }),
+        ...(params.leadingSystemPrompt !== undefined && { leadingSystemPrompt: params.leadingSystemPrompt }),
+        ...(params.extraPrompt !== undefined && { extraPrompt: params.extraPrompt }),
+        ...(params.gptMode === true && { gptMode: true })
     }, params.apiConfig, params.signal, params.onStreamDelta
         ? {
             stream: true,
@@ -820,7 +825,7 @@ export const 基于分段构建注入树 = (dataset: 小说拆分数据集结构
     const stageNode = 构建树节点({
         datasetId: dataset.id,
         title: '当前阶段概括',
-        content: dataset.当前阶段概括,
+        ...(dataset.当前阶段概括 !== undefined && { content: dataset.当前阶段概括 }),
         type: 'stage_summary',
         order: 10,
         targets: ['planning']

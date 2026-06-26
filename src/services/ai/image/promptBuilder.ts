@@ -94,7 +94,7 @@ const 请求分词器文本 = async (
     const messages = 规范化文本补全消息链(messagesRaw, { 保留System: true, 合并同角色: false });
     return 请求模型文本(params.apiConfig, messages, {
         temperature: 0.5,
-        signal: params.signal
+        ...(params.signal !== undefined && { signal: params.signal })
     });
 };
 
@@ -256,8 +256,8 @@ const 构建提示词装配结果 = (
         最终负向提示词: 最终负向,
         带内联负面提示词的正向提示词: 带内联负面,
         尺寸,
-        宽度,
-        高度
+        宽度: 宽度 ?? 0,
+        高度: 高度 ?? 0
     };
 };
 
@@ -355,7 +355,15 @@ export const buildNpcSecretPartDirectImagePrompt = (
 
     const isNovelAI = options.后端类型 === 'novelai';
     const 额外要求 = (options?.额外要求 || '').trim();
-    const 角色锚点注入词 = 构建角色锚点注入提示词(options?.角色锚点, { 构图: '部位特写', 部位 });
+    const 角色锚点注入词 = 构建角色锚点注入提示词(
+        options?.角色锚点
+            ? {
+                正面提示词: options.角色锚点.正面提示词,
+                ...(options.角色锚点.结构化特征 !== undefined && { 结构化特征: options.角色锚点.结构化特征 })
+            }
+            : null,
+        { 构图: '部位特写', 部位 }
+    );
     const fragments = [
         isNovelAI ? 生成NovelAI人物数量标签(source) : 'single female subject',
         读取NPC字段文本(source, '性别') === '女' ? 'female' : '',
@@ -412,7 +420,15 @@ export const generateNpcSecretPartImagePrompt = async (
     const 风格提示词输入 = (options?.风格提示词输入 || '').trim();
     const 角色锚点 = options?.角色锚点;
     const 使用角色锚点 = Boolean((角色锚点?.正面提示词 || '').trim());
-    const 角色锚点注入词 = 构建角色锚点注入提示词(角色锚点, { 构图: '部位特写', 部位 });
+    const 角色锚点注入词 = 构建角色锚点注入提示词(
+        角色锚点
+            ? {
+                正面提示词: 角色锚点.正面提示词,
+                ...(角色锚点.结构化特征 !== undefined && { 结构化特征: 角色锚点.结构化特征 })
+            }
+            : null,
+        { 构图: '部位特写', 部位 }
+    );
     const 特写说明 = 构建香闺秘档部位特写说明(部位);
     const 默认系统提示词 = (isNovelAI ? [
         '你是 NovelAI V4/V4.5 专用的武侠/仙侠私密部位特写提示词专家。',
@@ -474,7 +490,10 @@ export const generateNpcSecretPartImagePrompt = async (
     const raw = await 请求分词器文本({
         apiConfig, aiRolePrompt: 词组转化器AI角色提示词,
         systemPrompts: [相关转换提示词, 默认系统提示词, extraPrompt],
-        taskPrompt, signal, cotPseudoHistoryPrompt, taskType: '部位特写'
+        taskPrompt,
+        ...(signal !== undefined && { signal }),
+        ...(cotPseudoHistoryPrompt !== undefined && { cotPseudoHistoryPrompt }),
+        taskType: '部位特写'
     });
     const 生图词组 = 强化香闺秘档特写词组(
         合并正向提示词片段(角色锚点注入词, 归一化单段词组转化器输出(raw, { isNovelAI })),
@@ -569,7 +588,10 @@ export const generateNpcImagePrompt = async (
     const raw = await 请求分词器文本({
         apiConfig, aiRolePrompt: 词组转化器AI角色提示词,
         systemPrompts: [相关转换提示词, 默认系统提示词, extraPrompt],
-        taskPrompt, signal, cotPseudoHistoryPrompt, taskType: '角色'
+        taskPrompt,
+        ...(signal !== undefined && { signal }),
+        ...(cotPseudoHistoryPrompt !== undefined && { cotPseudoHistoryPrompt }),
+        taskType: '角色'
     });
     const 序列化结果 = 序列化词组转化器输出(raw, {
         strategy: 输出策略,
@@ -694,9 +716,13 @@ export const generateSceneImagePrompt = async (
     ).map((item) => Array.isArray(item) ? item.join('\n') : item);
 
     const raw = await 请求分词器文本({
-        apiConfig, aiRolePrompt: 词组转化器AI角色提示词,
+        apiConfig,
+        aiRolePrompt: 词组转化器AI角色提示词,
         systemPrompts: 场景系统提示词列表,
-        taskPrompt, signal, cotPseudoHistoryPrompt, taskType: '场景'
+        taskPrompt,
+        ...(signal !== undefined && { signal }),
+        ...(cotPseudoHistoryPrompt !== undefined && { cotPseudoHistoryPrompt }),
+        taskType: '场景'
     });
 
     const parsed = 强制构图
