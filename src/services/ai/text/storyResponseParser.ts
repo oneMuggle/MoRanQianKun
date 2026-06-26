@@ -16,7 +16,7 @@ export class StoryResponseParseError extends Error {
         super(message);
         this.name = 'StoryResponseParseError';
         this.rawText = rawText;
-        this.parseDetail = parseDetail;
+        if (parseDetail !== undefined) this.parseDetail = parseDetail;
     }
 }
 
@@ -172,7 +172,7 @@ const 提取候选命令文本 = (text: string): string => {
     const commands: string[] = [];
 
     for (let i = 0; i < rawLines.length; i += 1) {
-        const line = rawLines[i].trim();
+        const line = rawLines[i]!.trim();
         const match = line.match(commandHeaderRegex);
         if (!match) continue;
 
@@ -181,7 +181,7 @@ const 提取候选命令文本 = (text: string): string => {
         let rawValueText = multiLineValue.valueText;
         if (multiLineValue.consumedUntil > i) {
             for (let cursor = i + 1; cursor <= multiLineValue.consumedUntil; cursor += 1) {
-                commandText = `${commandText}\n${rawLines[cursor].trimEnd()}`;
+                commandText = `${commandText}\n${rawLines[cursor]!.trimEnd()}`;
             }
             i = multiLineValue.consumedUntil;
         }
@@ -189,7 +189,7 @@ const 提取候选命令文本 = (text: string): string => {
             let balance = 计算括号平衡(rawValueText);
             while (balance > 0 && i + 1 < rawLines.length) {
                 i += 1;
-                const nextRawLine = rawLines[i];
+                const nextRawLine = rawLines[i]!;
                 commandText = `${commandText}\n${nextRawLine.trimEnd()}`;
                 rawValueText = `${rawValueText}\n${nextRawLine.trimEnd()}`;
                 balance = 计算括号平衡(rawValueText);
@@ -532,7 +532,7 @@ const 解析正文日志 = (body: string): Array<{ sender: string; text: string 
 
         const match = line.match(/^【\s*([^】]+?)\s*】\s*(.*)$/);
         if (match) {
-            const sender = 规范化日志发送者(match[1]);
+            const sender = 规范化日志发送者(match[1] ?? '');
             const text = (match[2] || '').trim();
             current = { sender, text };
             logs.push(current);
@@ -639,7 +639,7 @@ export const 收集多行命令值 = (
 
     if (!valueText && (nextLine.startsWith('{') || nextLine.startsWith('['))) {
         consumedUntil += 1;
-        valueText = sourceLines[consumedUntil];
+        valueText = sourceLines[consumedUntil] ?? '';
     }
 
     if (!(valueText.startsWith('{') || valueText.startsWith('['))) {
@@ -861,7 +861,7 @@ export const 解析命令块 = (commandBlock: string): Array<{ action: 'add' | '
         .filter(line => !line.startsWith('```'));
     const commands: Array<{ action: 'add' | 'set' | 'push' | 'delete'; key: string; value: any }> = [];
     for (let i = 0; i < lines.length; i += 1) {
-        const line = lines[i];
+        const line = lines[i]!;
         const normalized = line
             .replace(/^\[#\d+\]\s*/i, '')
             .replace(/^#\d+\s*/i, '')
@@ -870,7 +870,7 @@ export const 解析命令块 = (commandBlock: string): Array<{ action: 'add' | '
             .trim();
         const match = normalized.match(/^([^\s=＝:：]+)\s+([^\s=＝:：]+)(?:\s*(?:=|＝|:|：|=>)\s*|\s+)?([\s\S]+)?$/i);
         if (!match) continue;
-        const actionRaw = 归一化命令动作(match[1]);
+        const actionRaw = 归一化命令动作(match[1] ?? '');
         if (!actionRaw) continue;
         const action = (actionRaw === 'sub' ? 'add' : actionRaw) as 'add' | 'set' | 'push' | 'delete';
         const key = (match[2] || '').trim();
@@ -968,18 +968,19 @@ const 解析标签协议响应 = (content: string): GameResponse | null => {
         return null;
     }
 
-    return {
-        thinking_pre: thinking ? `<thinking>${thinking}</thinking>` : undefined,
-        thinking_native: nativeThinking || undefined,
-        t_plan: storyPlanBlock || undefined,
-        t_var_plan: variablePlanBlock || undefined,
+    const response: GameResponse = {
         logs,
-        tavern_commands: commands.length > 0 ? commands : undefined,
-        shortTerm: shortTerm || undefined,
-        action_options: actionOptions.length > 0 ? actionOptions : undefined,
-        dynamic_world: dynamicWorld.length > 0 ? dynamicWorld : undefined,
-        judge_blocks: judgeBlocks
+        ...(judgeBlocks && { judge_blocks: judgeBlocks })
     };
+    if (thinking) response.thinking_pre = `<thinking>${thinking}</thinking>`;
+    if (nativeThinking) response.thinking_native = nativeThinking;
+    if (storyPlanBlock) response.t_plan = storyPlanBlock;
+    if (variablePlanBlock) response.t_var_plan = variablePlanBlock;
+    if (commands.length > 0) response.tavern_commands = commands;
+    if (shortTerm) response.shortTerm = shortTerm;
+    if (actionOptions.length > 0) response.action_options = actionOptions;
+    if (dynamicWorld.length > 0) response.dynamic_world = dynamicWorld;
+    return response;
 };
 
 const 修复思考区后半段标签协议文本 = (sourceText: string): string => {
