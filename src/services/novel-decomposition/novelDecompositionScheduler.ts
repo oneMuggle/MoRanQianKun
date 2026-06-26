@@ -173,6 +173,11 @@ class 小说拆分后台调度器 {
             }
 
             const task = resumableTasks[0];
+            if (!task) {
+                this.state.lastResultText = '暂无可自动续跑的后台任务';
+                this.state.currentStageText = '暂无待处理任务';
+                return this.getState();
+            }
             const dataset = datasets.find((item) => item.id === task.数据集ID);
             this.state.currentTaskId = task.id;
             this.state.currentTaskName = task.名称;
@@ -189,7 +194,7 @@ class 小说拆分后台调度器 {
 
             const result = await this.executor({
                 task,
-                dataset
+                ...(dataset !== undefined && { dataset })
             });
 
             if (result.type === 'completed') {
@@ -254,8 +259,8 @@ class 小说拆分后台调度器 {
             this.pushLog({
                 level: payload.level || 'info',
                 text: payload.message,
-                taskId: payload.taskId,
-                taskName: payload.taskName
+                ...(payload.taskId !== undefined && { taskId: payload.taskId }),
+                ...(payload.taskName !== undefined && { taskName: payload.taskName })
             });
         }
         this.emit();
@@ -295,8 +300,8 @@ class 小说拆分后台调度器 {
                 timestamp: now,
                 level: payload.level,
                 text,
-                taskId: payload.taskId,
-                taskName: payload.taskName
+                ...(payload.taskId !== undefined && { taskId: payload.taskId }),
+                ...(payload.taskName !== undefined && { taskName: payload.taskName })
             }
         ];
         this.state.recentLogs = logs.slice(-80);
