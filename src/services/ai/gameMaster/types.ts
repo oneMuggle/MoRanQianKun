@@ -3,7 +3,7 @@
  * 多智能体游戏大师系统 - 类型定义
  */
 
-import type { TavernCommand, GameResponse } from './types';
+import type { TavernCommand, GameResponse } from '../../../types';
 import type { 当前可用接口结构 } from '../../../utils/apiConfig';
 
 /**
