@@ -94,8 +94,8 @@ export const generateMemoryRecall = async (
     const startedAt = Date.now();
     const result = await 请求模型文本(apiConfig, messages, {
         temperature: 0.2,
-        signal,
-        streamOptions
+        ...(signal !== undefined && { signal }),
+        ...(streamOptions !== undefined && { streamOptions })
     });
     if (onDebugCapture) {
         const durationMs = Date.now() - startedAt;
@@ -194,7 +194,7 @@ export const generatePolishedBody = async (
     const startedAt = Date.now();
     const raw = await 请求模型文本(apiConfig, messages, {
         temperature: 0.6,
-        signal,
+        ...(signal !== undefined && { signal }),
         errorDetailLimit: Number.POSITIVE_INFINITY
     });
     if (onDebugCapture) {
@@ -403,10 +403,10 @@ export const generateFandomRealmData = async (
 
 const 解析故事响应 = (rawText: string, requestOptions?: StoryRequestOptions): StoryResponseResult => ({
     response: parseStoryRawText(rawText, {
-        validateTagCompleteness: requestOptions?.validateTagCompleteness,
-        enableTagRepair: requestOptions?.enableTagRepair,
-        requireActionOptionsTag: requestOptions?.requireActionOptionsTag,
-        requireDynamicWorldTag: requestOptions?.requireDynamicWorldTag
+        ...(requestOptions?.validateTagCompleteness !== undefined && { validateTagCompleteness: requestOptions.validateTagCompleteness }),
+        ...(requestOptions?.enableTagRepair !== undefined && { enableTagRepair: requestOptions.enableTagRepair }),
+        ...(requestOptions?.requireActionOptionsTag !== undefined && { requireActionOptionsTag: requestOptions.requireActionOptionsTag }),
+        ...(requestOptions?.requireDynamicWorldTag !== undefined && { requireDynamicWorldTag: requestOptions.requireDynamicWorldTag })
     }),
     rawText
 });
@@ -434,7 +434,10 @@ export const generateStoryResponse = async (
 
     if (orderedMessages.length > 0) {
         const rawText = await 请求模型文本(apiConfig, orderedMessages, {
-            temperature: 0.7, signal, streamOptions, errorDetailLimit: requestOptions?.errorDetailLimit
+            temperature: 0.7,
+            ...(signal !== undefined && { signal }),
+            ...(streamOptions !== undefined && { streamOptions }),
+            ...(requestOptions?.errorDetailLimit !== undefined && { errorDetailLimit: requestOptions.errorDetailLimit })
         });
         return 解析故事响应(rawText, requestOptions);
     }
@@ -473,7 +476,10 @@ export const generateStoryResponse = async (
     const normalizedApiMessages = 规范化文本补全消息链(apiMessages, { 保留System: true, 合并同角色: false });
 
     const rawText = await 请求模型文本(apiConfig, normalizedApiMessages, {
-        temperature: 0.7, signal, streamOptions, errorDetailLimit: requestOptions?.errorDetailLimit
+        temperature: 0.7,
+        ...(signal !== undefined && { signal }),
+        ...(streamOptions !== undefined && { streamOptions }),
+        ...(requestOptions?.errorDetailLimit !== undefined && { errorDetailLimit: requestOptions.errorDetailLimit })
     });
 
     return 解析故事响应(rawText, requestOptions);
@@ -536,7 +542,8 @@ export const generateStoryResponseWithFailover = async (
             candidates.push({
                 id: cfg.id, 名称: cfg.名称, 供应商: cfg.供应商, baseUrl: cfg.baseUrl,
                 apiKey: cfg.apiKey, model: cfg.model || primaryConfig?.model || '',
-                maxTokens: cfg.maxTokens, temperature: cfg.temperature
+                ...(cfg.maxTokens !== undefined && { maxTokens: cfg.maxTokens }),
+                ...(cfg.temperature !== undefined && { temperature: cfg.temperature })
             });
         }
     }
@@ -574,13 +581,17 @@ export const generateStoryResponseWithFailover = async (
                 return 规范化文本补全消息链(msgs, { 保留System: true, 合并同角色: true });
             })();
 
-            const rawText = await 请求模型文本(candidate, messages, {
-                temperature: 0.7, signal, streamOptions, errorDetailLimit: requestOptions?.errorDetailLimit
+            const rawText = await 请求模型文本(candidate!, messages, {
+                temperature: 0.7,
+                ...(signal !== undefined && { signal }),
+                ...(streamOptions !== undefined && { streamOptions }),
+                ...(requestOptions?.errorDetailLimit !== undefined && { errorDetailLimit: requestOptions.errorDetailLimit })
             });
-            return { ...解析故事响应(rawText, requestOptions), usedConfig: candidate, attempts: i + 1 };
+            return { ...解析故事响应(rawText, requestOptions), usedConfig: candidate!, attempts: i + 1 };
         } catch (error) {
             const msg = error instanceof Error ? error.message : 'Unknown error';
-            attemptDetails.push({ configId: candidate.id, baseUrl: candidate.baseUrl, error: msg });
+            const c = candidate!;
+            attemptDetails.push({ configId: c.id, baseUrl: c.baseUrl, error: msg });
             if (signal?.aborted) throw error;
         }
     }
