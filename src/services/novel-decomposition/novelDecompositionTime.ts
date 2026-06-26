@@ -97,7 +97,7 @@ const 解析中文数字 = (raw: string): number => {
 
     for (const char of text) {
         if (char in 中文数字映射) {
-            current = 中文数字映射[char];
+            current = 中文数字映射[char] ?? 0;
             continue;
         }
         const unit = unitMap[char];
@@ -115,7 +115,7 @@ const 解析中文数字 = (raw: string): number => {
     if (!hasUnit) {
         return Array.from(text).reduce((sum, char) => {
             if (!(char in 中文数字映射)) return sum;
-            return sum * 10 + 中文数字映射[char];
+            return sum * 10 + (中文数字映射[char] ?? 0);
         }, 0);
     }
 
@@ -167,9 +167,9 @@ const 解析中文日期 = (value: string): Partial<时间部件> | null => {
                         : /晚上|夜里|深夜/.test(normalized) ? 21
                             : 0;
     return {
-        year: 解析数字片段(match[1]),
-        month: 解析数字片段(match[2]),
-        day: 解析数字片段(match[3]),
+        year: 解析数字片段(match[1] ?? ''),
+        month: 解析数字片段(match[2] ?? ''),
+        day: 解析数字片段(match[3] ?? ''),
         hour,
         minute: 0
     };
@@ -293,7 +293,7 @@ export const 尝试规范化小说时间锚点 = (
         || 规范化时间部件(null);
     const relativeDay = text.match(/第([0-9零〇○一二两三四五六七八九十百千万]+)(?:天|日|夜)/);
     if (relativeDay) {
-        return 序列化时间部件(增加天数(base, Math.max(0, 解析数字片段(relativeDay[1]) - 1)));
+        return 序列化时间部件(增加天数(base, Math.max(0, 解析数字片段(relativeDay[1] ?? '') - 1)));
     }
 
     if (/当天|当日|这一日|这一夜/.test(text)) {
