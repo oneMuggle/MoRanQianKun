@@ -525,7 +525,7 @@ export const 清洗最终主体提示词 = (rawText: string, options?: { isNovel
     if (!extracted) {
         const lines = withoutThinking.split('\n');
         for (let i = lines.length - 1; i >= 0; i -= 1) {
-            const line = lines[i].trim();
+            const line = lines[i]!.trim();
             if (line && /[,\(\)]/.test(line) && !line.startsWith('**') && !line.includes(':') && line.length > 10) {
                 finalFallback = line;
                 break;
@@ -725,10 +725,10 @@ export const 构建NAI基础人数标签 = (segments: string[]): string[] => {
         if (lead && counts[lead] !== undefined) counts[lead] += 1;
     });
     const labels: string[] = [];
-    if (counts['1girl'] > 0) labels.push(counts['1girl'] > 1 ? `${counts['1girl']}girls` : '1girl');
-    if (counts['1boy'] > 0) labels.push(counts['1boy'] > 1 ? `${counts['1boy']}boys` : '1boy');
-    if (counts['1woman'] > 0) labels.push(counts['1woman'] > 1 ? `${counts['1woman']}women` : '1woman');
-    if (counts['1man'] > 0) labels.push(counts['1man'] > 1 ? `${counts['1man']}men` : '1man');
+    if ((counts['1girl'] ?? 0) > 0) labels.push((counts['1girl'] ?? 0) > 1 ? `${counts['1girl']}girls` : '1girl');
+    if ((counts['1boy'] ?? 0) > 0) labels.push((counts['1boy'] ?? 0) > 1 ? `${counts['1boy']}boys` : '1boy');
+    if ((counts['1woman'] ?? 0) > 0) labels.push((counts['1woman'] ?? 0) > 1 ? `${counts['1woman']}women` : '1woman');
+    if ((counts['1man'] ?? 0) > 0) labels.push((counts['1man'] ?? 0) > 1 ? `${counts['1man']}men` : '1man');
     return labels;
 };
 
@@ -769,7 +769,7 @@ const 构建结构化角色段列表 = (
         return {
             名称: roleName || safeAnchors[matchedAnchorIndex]?.名称 || `角色${roleIndex + 1}`,
             内容: (role?.内容 || '').trim(),
-            锚点: matchedAnchorIndex >= 0 ? safeAnchors[matchedAnchorIndex] : undefined
+            ...(matchedAnchorIndex >= 0 && safeAnchors[matchedAnchorIndex] && { 锚点: safeAnchors[matchedAnchorIndex] })
         };
     });
     safeAnchors.forEach((anchor, index) => {
@@ -777,7 +777,7 @@ const 构建结构化角色段列表 = (
         resolved.push({
             名称: (anchor?.名称 || '').trim() || `角色${resolved.length + 1}`,
             内容: '',
-            锚点: anchor
+            ...(anchor && { 锚点: anchor })
         });
     });
     return resolved.filter((item) => (item?.名称 || item?.内容 || item?.锚点?.正面提示词 || '').trim());
@@ -792,7 +792,7 @@ const 序列化结构化词组结果 = (
     const 角色段列表 = 构建结构化角色段列表(structured?.角色列表 || [], anchors);
     if (strategy === 'nai_character_segments') {
         const 序列化角色段 = 角色段列表
-            .map((role) => 确保NAI角色段起始标签(合并正向提示词片段(构建角色锚点稳定外观提示词(role.锚点), role.内容)))
+            .map((role) => 确保NAI角色段起始标签(合并正向提示词片段(构建角色锚点稳定外观提示词(role.锚点 as Pick<角色锚点结构, "正面提示词" | "结构化特征"> | null), role.内容)))
             .map((text) => (text ? 保守补全NAI权重语法(text) : ''))
             .filter(Boolean);
         if (序列化角色段.length <= 0) return 保守补全NAI权重语法(基础);
@@ -802,7 +802,7 @@ const 序列化结构化词组结果 = (
 
     const 角色描述段 = 角色段列表
         .map((role, index) => {
-            const text = 合并正向提示词片段(构建角色锚点稳定外观提示词(role.锚点), role.内容);
+            const text = 合并正向提示词片段(构建角色锚点稳定外观提示词(role.锚点 as Pick<角色锚点结构, "正面提示词" | "结构化特征"> | null), role.内容);
             if (!text) return '';
             const label = (role.名称 || '').trim() || `Character ${index + 1}`;
             return `${label}: ${text}`;
@@ -859,7 +859,7 @@ export const 归一化单段词组转化器输出 = (
             structured.基础,
             ...((structured.角色列表 || []).map((role) => 清理NAI角色段占位词(role?.内容 || '')))
         )
-        : 清洗最终主体提示词(sanitizedRawText, { isNovelAI: options?.isNovelAI });
+        : 清洗最终主体提示词(sanitizedRawText, { ...(options?.isNovelAI !== undefined && { isNovelAI: options.isNovelAI }) });
     return options?.isNovelAI
         ? 保守补全NAI权重语法(merged)
         : 清理生图词组输出(merged);

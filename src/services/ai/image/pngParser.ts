@@ -196,7 +196,7 @@ const 从PNG隐写Alpha提取NovelAI文本 = async (blob: Blob): Promise<string>
         ctx.drawImage(image, 0, 0);
         const imageData = ctx.getImageData(0, 0, image.width, image.height);
         const alphaLsb = new Uint8Array(image.width * image.height);
-        for (let p = 0; p < alphaLsb.length; p += 1) alphaLsb[p] = imageData.data[p * 4 + 3] & 1;
+        for (let p = 0; p < alphaLsb.length; p += 1) alphaLsb[p] = imageData.data[p * 4 + 3]! & 1;
         let bitOffset = 0;
         const nextByte = (): number | null => { if (bitOffset + 8 > alphaLsb.length) return null; let byte = 0; for (let i = 0; i < 8; i += 1) { const c = (bitOffset % image.height) * image.width + Math.floor(bitOffset / image.height); if (c >= alphaLsb.length) return null; byte |= alphaLsb[c] << (7 - i); bitOffset += 1; } return byte; };
         const magicBytes = new Uint8Array(NovelAI隐写PNG魔术字符串.length);
@@ -219,7 +219,7 @@ const 从PNG原始字节搜索NovelAI元数据 = (pngBytes: Uint8Array): { 正�
     for (const marker of ['"request_type":"PromptGenerateRequest"', '"request_type": "PromptGenerateRequest"', '"signed_hash"', '"v4_negative_prompt"', '"extra_passthrough_testing"']) {
         const mi = rawText.indexOf(marker); if (mi < 0) continue;
         let bi = rawText.lastIndexOf('{', mi); let attempts = 0;
-        while (bi >= 0 && attempts < 12) { const c = 提取平衡JSON对象(rawText, bi); if (c) { const p = 解析NovelAI注释JSON(c); if (p?.正面提示词) return { 正面提示词: p.正面提示词, 负面提示词: p.负面提示词, 参数: p.参数, 原始元数据: c }; } bi = rawText.lastIndexOf('{', bi - 1); attempts += 1; }
+        while (bi >= 0 && attempts < 12) { const c = 提取平衡JSON对象(rawText, bi); if (c) { const p = 解析NovelAI注释JSON(c); if (p?.正面提示词) return { 正面提示词: p.正面提示词, 负面提示词: p.负面提示词, ...(p.参数 !== undefined && { 参数: p.参数 }), 原始元数据: c }; } bi = rawText.lastIndexOf('{', bi - 1); attempts += 1; }
     }
     return null;
 };
@@ -234,7 +234,7 @@ const 提取LoRA列表 = (text: string): PNG解析参数结构['LoRA列表'] => 
     const matches = Array.from((text || '').matchAll(/<lora:([^:>]+)(?::([\d.]+))?>/gi));
     if (!matches.length) return undefined;
     const items: Array<{ 名称: string; 权重?: number }> = [];
-    for (const m of matches) { const n = (m?.[1] || '').trim(); if (!n) continue; items.push({ 名称: n, 权重: m?.[2] ? Number(m[2]) : undefined }); }
+    for (const m of matches) { const n = (m?.[1] || '').trim(); if (!n) continue; const w = m?.[2] ? Number(m[2]) : undefined; items.push({ 名称: n, ...(w !== undefined && { 权重: w }) }); }
     return items.length ? items : undefined;
 };
 
@@ -245,7 +245,11 @@ const 读取V4提示结构 = (v: unknown): PNG解析参数结构['V4正向提示
     if (!v || typeof v !== 'object') return undefined; const s = v as Record<string, unknown>;
     const cap = s.caption && typeof s.caption === 'object' ? s.caption as Record<string, unknown> : null;
     const cc = Array.isArray(cap?.char_captions) ? cap.char_captions.filter((x): x is string | Record<string, unknown> => (typeof x === 'string' && x.trim().length > 0) || Boolean(x) && typeof x === 'object') : [];
-    const r = { useCoords: 读取布尔值(s.use_coords), useOrder: 读取布尔值(s.use_order), legacyUc: 读取布尔值(s.legacy_uc), characterCaptions: cc.length ? cc : undefined };
+    const r: { useCoords?: boolean; useOrder?: boolean; legacyUc?: boolean; characterCaptions?: (string | Record<string, unknown>)[] } = {};
+    const useCoords = 读取布尔值(s.use_coords); if (useCoords !== undefined) r.useCoords = useCoords;
+    const useOrder = 读取布尔值(s.use_order); if (useOrder !== undefined) r.useOrder = useOrder;
+    const legacyUc = 读取布尔值(s.legacy_uc); if (legacyUc !== undefined) r.legacyUc = legacyUc;
+    if (cc.length) r.characterCaptions = cc;
     return Object.values(r).some((x) => x !== undefined) ? r : undefined;
 };
 
@@ -255,28 +259,55 @@ const 解析NovelAI注释JSON = (rawText: string): { 正面提示词: string; �
     const 正面 = typeof p.prompt === 'string' ? p.prompt.trim() : '';
     const 负面 = typeof p.uc === 'string' ? p.uc.trim() : (typeof p.negative_prompt === 'string' ? p.negative_prompt.trim() : '');
     if (!正面 && !负面) return null;
-    const params: PNG解析参数结构 = {
-        采样器: typeof p.sampler === 'string' ? p.sampler.trim() : undefined,
-        噪声计划: (typeof p.noise_schedule === 'string' ? p.noise_schedule.trim() : '') || undefined,
-        步数: Number.isFinite(p.steps) ? Math.floor(p.steps) : undefined,
-        CFG强度: Number.isFinite(p.scale ?? p.cfg_scale ?? p.cfg) ? (p.scale ?? p.cfg_scale ?? p.cfg) : undefined,
-        CFG重缩放: 读取有限数字(p.cfg_rescale ?? p.prompt_guidance_rescale),
-        反向提示引导强度: 读取有限数字(p.uncond_scale),
-        ClipSkip: Number.isFinite(p.clip_skip ?? p.clipSkip) ? Math.floor(p.clip_skip ?? p.clipSkip) : undefined,
-        宽度: (() => { const w = 读取有限数字(p.width); return w ? Math.floor(w) : undefined; })(),
-        高度: (() => { const h = 读取有限数字(p.height); return h ? Math.floor(h) : undefined; })(),
-        随机种子: (() => { const s = 读取有限数字(p.seed); return s ? Math.floor(s) : undefined; })(),
-        SMEA: 读取布尔值(p.sm), SMEA动态: 读取布尔值(p.sm_dyn), 动态阈值: 读取布尔值(p.dynamic_thresholding),
-        动态阈值百分位: 读取有限数字(p.dynamic_thresholding_percentile), 动态阈值模拟CFG: 读取有限数字(p.dynamic_thresholding_mimic_scale),
-        高Sigma跳过CFG: 读取有限数字(p.skip_cfg_above_sigma), 低Sigma跳过CFG: 读取有限数字(p.skip_cfg_below_sigma),
-        偏好布朗噪声: 读取布尔值(p.prefer_brownian), Euler祖先采样Bug兼容: 读取布尔值(p.deliberate_euler_ancestral_bug),
-        精细细节增强: 读取布尔值(p.explike_fine_detail), 最小化Sigma无穷: 读取布尔值(p.minimize_sigma_inf),
-        模型: typeof p.model === 'string' ? p.model.trim() : undefined,
-        V4正向提示: 读取V4提示结构(p.v4_prompt), V4负向提示: 读取V4提示结构(p.v4_negative_prompt),
-        原始参数: JSON.parse(JSON.stringify(p)) as Record<string, unknown>,
-        LoRA列表: 提取LoRA列表(正面)
-    };
-    return { 正面提示词: 正面, 负面提示词: 负面, 参数: params };
+    const buildParam: PNG解析参数结构 = {} as PNG解析参数结构;
+    const sampler = typeof p.sampler === 'string' ? p.sampler.trim() : undefined;
+    if (sampler) buildParam.采样器 = sampler;
+    const noiseSchedule = (typeof p.noise_schedule === 'string' ? p.noise_schedule.trim() : '') || undefined;
+    if (noiseSchedule) buildParam.噪声计划 = noiseSchedule;
+    const steps = Number.isFinite(p.steps) ? Math.floor(p.steps) : undefined;
+    if (steps !== undefined) buildParam.步数 = steps;
+    const cfg = Number.isFinite(p.scale ?? p.cfg_scale ?? p.cfg) ? (p.scale ?? p.cfg_scale ?? p.cfg) : undefined;
+    if (cfg !== undefined) buildParam.CFG强度 = cfg;
+    const cfgRescale = 读取有限数字(p.cfg_rescale ?? p.prompt_guidance_rescale);
+    if (cfgRescale !== undefined) buildParam.CFG重缩放 = cfgRescale;
+    const uncondScale = 读取有限数字(p.uncond_scale);
+    if (uncondScale !== undefined) buildParam.反向提示引导强度 = uncondScale;
+    const clipSkip = Number.isFinite(p.clip_skip ?? p.clipSkip) ? Math.floor(p.clip_skip ?? p.clipSkip) : undefined;
+    if (clipSkip !== undefined) buildParam.ClipSkip = clipSkip;
+    const width = (() => { const w = 读取有限数字(p.width); return w ? Math.floor(w) : undefined; })();
+    if (width !== undefined) buildParam.宽度 = width;
+    const height = (() => { const h = 读取有限数字(p.height); return h ? Math.floor(h) : undefined; })();
+    if (height !== undefined) buildParam.高度 = height;
+    const seed = (() => { const s = 读取有限数字(p.seed); return s ? Math.floor(s) : undefined; })();
+    if (seed !== undefined) buildParam.随机种子 = seed;
+    const sm = 读取布尔值(p.sm); if (sm !== undefined) buildParam.SMEA = sm;
+    const smDyn = 读取布尔值(p.sm_dyn); if (smDyn !== undefined) buildParam.SMEA动态 = smDyn;
+    const dt = 读取布尔值(p.dynamic_thresholding); if (dt !== undefined) buildParam.动态阈值 = dt;
+    const dtp = 读取有限数字(p.dynamic_thresholding_percentile);
+    if (dtp !== undefined) buildParam.动态阈值百分位 = dtp;
+    const dtm = 读取有限数字(p.dynamic_thresholding_mimic_scale);
+    if (dtm !== undefined) buildParam.动态阈值模拟CFG = dtm;
+    const sca = 读取有限数字(p.skip_cfg_above_sigma);
+    if (sca !== undefined) buildParam.高Sigma跳过CFG = sca;
+    const scb = 读取有限数字(p.skip_cfg_below_sigma);
+    if (scb !== undefined) buildParam.低Sigma跳过CFG = scb;
+    const pb = 读取布尔值(p.prefer_brownian); if (pb !== undefined) buildParam.偏好布朗噪声 = pb;
+    const dea = 读取布尔值(p.deliberate_euler_ancestral_bug);
+    if (dea !== undefined) buildParam.Euler祖先采样Bug兼容 = dea;
+    const efd = 读取布尔值(p.explike_fine_detail);
+    if (efd !== undefined) buildParam.精细细节增强 = efd;
+    const msi = 读取布尔值(p.minimize_sigma_inf);
+    if (msi !== undefined) buildParam.最小化Sigma无穷 = msi;
+    const model = typeof p.model === 'string' ? p.model.trim() : undefined;
+    if (model) buildParam.模型 = model;
+    const v4p = 读取V4提示结构(p.v4_prompt);
+    if (v4p) buildParam.V4正向提示 = v4p;
+    const v4n = 读取V4提示结构(p.v4_negative_prompt);
+    if (v4n) buildParam.V4负向提示 = v4n;
+    buildParam.原始参数 = JSON.parse(JSON.stringify(p)) as Record<string, unknown>;
+    const loraList = 提取LoRA列表(正面);
+    if (loraList) buildParam.LoRA列表 = loraList;
+    return { 正面提示词: 正面, 负面提示词: 负面, 参数: buildParam };
 };
 
 // ==================== SD Parameter Parsing ====================
@@ -292,18 +323,34 @@ const 解析SD参数文本 = (rawText: string): { 正面提示词: string; 负�
     const mp: Record<string, string> = {};
     if (metaLine) metaLine.replace(/([^:]+):\s*([^,]+)(?:,|$)/g, (_, k, v) => { const kk = String(k || '').trim(); if (kk) mp[kk] = String(v || '').trim(); return ''; });
     const rm = (pats: RegExp[]): string => { const e = Object.entries(mp).find(([k]) => pats.some((r) => r.test(k))); return e?.[1]?.trim() || ''; };
-    const 解析参数: PNG解析参数结构 = {
-        采样器: rm([/^Sampler$/i]) || undefined,
-        步数: (() => { const s = Number(rm([/^Steps$/i])); return Number.isFinite(s) ? Math.floor(s) : undefined; })(),
-        CFG强度: (() => { const c = Number(rm([/^CFG scale$/i, /^CFG$/i])); return Number.isFinite(c) ? c : undefined; })(),
-        ClipSkip: (() => { const c = Number(rm([/^Clip skip$/i])); return Number.isFinite(c) ? Math.floor(c) : undefined; })(),
-        模型: rm([/^Model$/i]) || undefined, LoRA列表: 提取LoRA列表(正面)
-    };
+    const 解析参数: PNG解析参数结构 = {};
+    const samplerVal = rm([/^Sampler$/i]); if (samplerVal) 解析参数.采样器 = samplerVal;
+    const stepsVal = (() => { const s = Number(rm([/^Steps$/i])); return Number.isFinite(s) ? Math.floor(s) : undefined; })();
+    if (stepsVal !== undefined) 解析参数.步数 = stepsVal;
+    const cfgVal = (() => { const c = Number(rm([/^CFG scale$/i, /^CFG$/i])); return Number.isFinite(c) ? c : undefined; })();
+    if (cfgVal !== undefined) 解析参数.CFG强度 = cfgVal;
+    const clipSkipVal = (() => { const c = Number(rm([/^Clip skip$/i])); return Number.isFinite(c) ? Math.floor(c) : undefined; })();
+    if (clipSkipVal !== undefined) 解析参数.ClipSkip = clipSkipVal;
+    const modelVal = rm([/^Model$/i]); if (modelVal) 解析参数.模型 = modelVal;
+    const loraList = 提取LoRA列表(正面); if (loraList) 解析参数.LoRA列表 = loraList;
     const hs = Number(rm([/^Hires upscale$/i])); const hst = Number(rm([/^Hires steps$/i]));
     const hd = Number(rm([/^Denoising strength$/i])); const hu = rm([/^Hires upscaler$/i]);
-    if (Number.isFinite(hs) || Number.isFinite(hst) || Number.isFinite(hd) || hu) { 解析参数.Hires修复 = { 放大倍数: Number.isFinite(hs) ? hs : undefined, 步数: Number.isFinite(hst) ? Math.floor(hst) : undefined, 放大器: hu || undefined, 去噪强度: Number.isFinite(hd) ? hd : undefined }; }
+    if (Number.isFinite(hs) || Number.isFinite(hst) || Number.isFinite(hd) || hu) {
+        const hiresFix: { 放大倍数?: number; 步数?: number; 放大器?: string; 去噪强度?: number } = {};
+        if (Number.isFinite(hs)) hiresFix.放大倍数 = hs;
+        if (Number.isFinite(hst)) hiresFix.步数 = Math.floor(hst);
+        if (hu) hiresFix.放大器 = hu;
+        if (Number.isFinite(hd)) hiresFix.去噪强度 = hd;
+        解析参数.Hires修复 = hiresFix;
+    }
     const adm = rm([/^ADetailer model/i]); const adp = rm([/^ADetailer prompt/i]); const adn = rm([/^ADetailer negative prompt/i]);
-    if (adm || adp || adn) { 解析参数.ADetailer = { 模型: adm || undefined, 正向提示词: adp || undefined, 负向提示词: adn || undefined }; }
+    if (adm || adp || adn) {
+        const ad: { 模型?: string; 正向提示词?: string; 负向提示词?: string } = {};
+        if (adm) ad.模型 = adm;
+        if (adp) ad.正向提示词 = adp;
+        if (adn) ad.负向提示词 = adn;
+        解析参数.ADetailer = ad;
+    }
     return { 正面提示词: 正面, 负面提示词: 负面, 参数: 解析参数 };
 };
 
@@ -316,13 +363,45 @@ export const 解析PNG字节元数据 = (pngBytes: Uint8Array, 额外NovelAI注�
     const descriptionText = 读取元数据字段(标签映射, ['description', 'Description', 'ImageDescription']);
     for (const candidate of [commentText, 额外NovelAI注释文本].filter((x): x is string => Boolean(x && x.trim()))) {
         const p = 尝试解析NovelAI注释文本(candidate); if (!p) continue;
-        return { 来源: 'novelai', 正面提示词: p.正面提示词 || descriptionText || '', 负面提示词: p.负面提示词 || '', 参数: p.参数, 原始元数据: candidate || descriptionText || JSON.stringify(标签映射, null, 2), 元数据标签: Object.keys(标签映射).length > 0 ? 标签映射 : undefined };
+        return {
+            来源: 'novelai',
+            正面提示词: p.正面提示词 || descriptionText || '',
+            负面提示词: p.负面提示词 || '',
+            ...(p.参数 !== undefined && { 参数: p.参数 }),
+            原始元数据: candidate || descriptionText || JSON.stringify(标签映射, null, 2),
+            ...(Object.keys(标签映射).length > 0 && { 元数据标签: 标签映射 })
+        };
     }
     const raw = 从PNG原始字节搜索NovelAI元数据(pngBytes);
-    if (raw) return { 来源: 'novelai', 正面提示词: raw.正面提示词 || descriptionText || '', 负面提示词: raw.负面提示词 || '', 参数: raw.参数, 原始元数据: raw.原始元数据 || commentText || descriptionText || JSON.stringify(标签映射, null, 2), 元数据标签: Object.keys(标签映射).length > 0 ? 标签映射 : undefined };
-    if (parametersText) { const p = 解析SD参数文本(parametersText); return { 来源: 'sd_webui', 正面提示词: p.正面提示词, 负面提示词: p.负面提示词, 参数: p.参数, 原始元数据: parametersText, 元数据标签: Object.keys(标签映射).length > 0 ? 标签映射 : undefined }; }
+    if (raw) return {
+        来源: 'novelai',
+        正面提示词: raw.正面提示词 || descriptionText || '',
+        负面提示词: raw.负面提示词 || '',
+        ...(raw.参数 !== undefined && { 参数: raw.参数 }),
+        原始元数据: raw.原始元数据 || commentText || descriptionText || JSON.stringify(标签映射, null, 2),
+        ...(Object.keys(标签映射).length > 0 && { 元数据标签: 标签映射 })
+    };
+    if (parametersText) {
+        const p = 解析SD参数文本(parametersText);
+        return {
+            来源: 'sd_webui',
+            正面提示词: p.正面提示词,
+            负面提示词: p.负面提示词,
+            ...(p.参数 !== undefined && { 参数: p.参数 }),
+            原始元数据: parametersText,
+            ...(Object.keys(标签映射).length > 0 && { 元数据标签: 标签映射 })
+        };
+    }
     const fb = descriptionText || commentText || '';
-    return { 来源: 'unknown', 正面提示词: fb, 负面提示词: '', 参数: fb ? { LoRA列表: 提取LoRA列表(fb) } : undefined, 原始元数据: fb || JSON.stringify(标签映射, null, 2), 元数据标签: Object.keys(标签映射).length > 0 ? 标签映射 : undefined };
+    const fbLora = fb ? 提取LoRA列表(fb) : undefined;
+    return {
+        来源: 'unknown',
+        正面提示词: fb,
+        负面提示词: '',
+        ...(fb ? { 参数: { ...(fbLora !== undefined && { LoRA列表: fbLora }) } } : {}),
+        原始元数据: fb || JSON.stringify(标签映射, null, 2),
+        ...(Object.keys(标签映射).length > 0 && { 元数据标签: 标签映射 })
+    };
 };
 
 export const 解析PNG文件元数据 = async (file: File): Promise<PNG元数据解析结果> => {
