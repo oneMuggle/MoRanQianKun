@@ -3,6 +3,8 @@ import { allEraNodes } from '../../../models/eraTheme';
 import { 游戏设置结构 } from '@/types';
 import GameButton from '../../ui/GameButton';
 import ToggleSwitch from '../../ui/ToggleSwitch';
+import InAppConfirmModal from '../../ui/InAppConfirmModal';
+import { NSFW最低年龄, 读取成年确认状态, 写入成年确认状态 } from '../../../utils/nsfwAgeSafeguard';
 
 interface Props {
     settings: 游戏设置结构;
@@ -13,6 +15,7 @@ interface Props {
 const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
     const [form, setForm] = useState<游戏设置结构>(settings);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [showNSFWAgeConfirm, setShowNSFWAgeConfirm] = useState(false);
     const [openMenu, setOpenMenu] = useState<'perspective' | 'style' | 'ntl' | null>(null);
     const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -362,10 +365,35 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                     </div>
                     <ToggleSwitch
                         checked={form.启用NSFW模式 === true}
-                        onChange={(next) => 实时应用更新({ 启用NSFW模式: next })}
+                        onChange={(next) => {
+                            if (next) {
+                                // 开启前必须确认年满 18 周岁（确认后本地记住）
+                                if (读取成年确认状态()) {
+                                    实时应用更新({ 启用NSFW模式: true });
+                                    return;
+                                }
+                                setShowNSFWAgeConfirm(true);
+                                return;
+                            }
+                            实时应用更新({ 启用NSFW模式: false });
+                        }}
                         ariaLabel="切换NSFW模式"
                     />
                 </div>
+                <InAppConfirmModal
+                    open={showNSFWAgeConfirm}
+                    title="成人内容确认"
+                    message={`NSFW 模式包含成人内容。\n\n开启即表示你确认：\n· 你已年满 ${NSFW最低年龄} 周岁，且所在地允许浏览此类内容；\n· 游戏中参与亲密内容的所有角色均为 ${NSFW最低年龄} 岁及以上的虚构成年人。`}
+                    confirmText={`我已年满 ${NSFW最低年龄} 岁，开启`}
+                    cancelText="取消"
+                    danger
+                    onConfirm={() => {
+                        setShowNSFWAgeConfirm(false);
+                        写入成年确认状态(true);
+                        实时应用更新({ 启用NSFW模式: true });
+                    }}
+                    onCancel={() => setShowNSFWAgeConfirm(false)}
+                />
                 {form.启用NSFW模式 === true && (
                     <div className="flex items-center justify-between gap-4 pt-2 border-t border-wuxia-gold/10">
                         <div>

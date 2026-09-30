@@ -1,3 +1,4 @@
+import { 角色可参与NSFW } from '../../../utils/nsfwAgeSafeguard';
 import type { OpeningConfig, 记忆配置结构 } from './types';
 import { 规范化记忆配置 } from '../memory/memoryUtils';
 import { 构建NPC记忆展示结果 } from '../memory/npcMemorySummary';
@@ -611,7 +612,8 @@ export const 构建NPC上下文 = (
         const 里模式注入 = 构建NPC表里切换注入(npc, eraId, liModeEnabled);
         const stage: LiModeStage = npc.里模式阶段 ?? options?.子纪元里模式阶段?.[eraId ?? ''] ?? '羞耻';
         const 里模式阶段注入 = 构建里模式阶段注入(eraId, stage, liModeEnabled);
-        const nsfwEnabled = options?.启用NSFW模式 ?? false;
+        // 年龄未满 18 岁的角色一律不注入任何 NSFW 内容
+        const nsfwEnabled = (options?.启用NSFW模式 ?? false) && 角色可参与NSFW(npc);
         const NSFW增强注入 = 构建NPCNSFW注入(npc, eraId, nsfwEnabled);
 
         // 动态叙事约束注入

@@ -22,6 +22,7 @@ import { 构建BDSM论坛叙事约束 } from './bdsmForum';
 import { 构建调教任务系统叙事约束 } from './bdsmNSFW';
 import type { 校园亲密互动类型 } from '../../models/intimacy';
 import type { BDSM调教任务 } from './bdsmTasks';
+import { 校园成年设定提示词 } from '../../utils/nsfwAgeSafeguard';
 
 // ==================== 核心配置注入 ====================
 
@@ -181,7 +182,8 @@ export const 构建校园NSFW完整叙事约束 = (参数: {
 - 阶段推进只在关系类型发生实质性变化时输出
 - 如果没有发生任何关系变化，不需要输出此标签`);
 
-  return 组件.join('\n\n');
+  // 成年设定约束始终置顶
+  return [校园成年设定提示词, ...组件].join('\n\n');
 };
 
 // ==================== 欲望状态约束 ====================

@@ -11,6 +11,7 @@ import type {
 import { 规范化记忆配置 } from './memory/memoryUtils';
 import { 格式化短期记忆展示文本 } from './memory/memoryUtils';
 import { 构建NPC上下文 } from './npc/npcContext';
+import { NSFW全局成年约束提示词, 过滤可参与NSFW角色 } from '../../utils/nsfwAgeSafeguard';
 import { normalizeCanonicalGameTime, 环境时间转标准串, 结构化时间转标准串 } from './time/timeUtils';
 import { 规范化游戏设置 } from '../../utils/gameSettings';
 import {
@@ -1691,6 +1692,7 @@ export const 构建系统提示词 = ({
         ? (() => {
             const 在场列表: NPC主动行为上下文[] = (socialData || [])
                 .filter((n: any) => n.是否在场)
+                .filter((n: any) => 过滤可参与NSFW角色([n]).length > 0)
                 .map((n: any) => ({
                     npcId: n.id ?? '',
                     姓名: n.姓名,
@@ -1704,7 +1706,7 @@ export const 构建系统提示词 = ({
 
             // 对所有NPC执行状态初始化 + 自主行为计算
             const 提示词组: string[] = [];
-            for (const npc of socialData || []) {
+            for (const npc of 过滤可参与NSFW角色(socialData || [])) {
                 const 结果 = 执行NSFW回合预处理(npc, 在场列表, undefined, npc.亲密度等级 ?? 0);
                 if (结果.提示词注入) {
                     提示词组.push(结果.提示词注入);
@@ -1756,7 +1758,7 @@ export const 构建系统提示词 = ({
     const contextNPCData = npcContext.在场数据块;
     const nsfwCardBlock = normalizedGameConfig.启用NSFW模式
         ? 构建在场NPC_NSWF卡片组(
-            socialData || [],
+            过滤可参与NSFW角色(socialData || []),
             openingConfig?.nsfw场景类型 ?? '无',
             { 时代配置ID: options?.eraId }
         )
@@ -1788,6 +1790,7 @@ export const 构建系统提示词 = ({
 
     return {
         systemPrompt: [
+            normalizedGameConfig.启用NSFW模式 ? NSFW全局成年约束提示词 : '',
             promptHeader,
             difficultyPrompts,
             activePerspectiveContent,
