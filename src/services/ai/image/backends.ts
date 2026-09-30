@@ -4,6 +4,7 @@ import type { PNG解析参数结构 } from '../../../models/system';
 import type { 图片生成结果 } from './imageTasksTypes';
 import { 清理末尾斜杠, 合并负面提示词片段, 自动去水印负面提示词, 默认NovelAI负面提示词, 构建图片端点, 构建生图请求头 } from './constants';
 import { 解析可能是JSON字符串, 提取图片生成结果 } from './imageTokenizer';
+import { 检测未成年性化内容, 提示词含露骨内容, 未成年绝对负面提示词, 未成年露骨场景负面提示词, 未成年内容拦截错误 } from '../../../utils/nsfwAgeSafeguard';
 import { 提取OpenAI完整文本, 读取失败详情文本, 协议请求错误 } from '../chatCompletionClient';
 import { blob转DataUrl, uint8数组转DataUrl, 推断图片Mime类型 } from './persistence';
 
@@ -672,7 +673,16 @@ export const generateImageByPrompt = async (
 
     const responseFormat = apiConfig.图片响应格式 === 'b64_json' ? 'b64_json' : 'url';
     const backendType = apiConfig.图片后端类型 || 'openai';
-    const negativePromptText = (options?.附加负面提示词 || '').trim();
+    // 年龄安全护栏：拦截涉及未成年人的性化内容，并强制附加未成年负面提示词
+    const 安全检测 = 检测未成年性化内容(normalizedPrompt);
+    if (安全检测.命中) {
+        throw new 未成年内容拦截错误(安全检测.原因 || '疑似涉及未成年人');
+    }
+    const negativePromptText = 合并负面提示词片段(
+        (options?.附加负面提示词 || '').trim(),
+        未成年绝对负面提示词,
+        提示词含露骨内容(normalizedPrompt) ? 未成年露骨场景负面提示词 : ''
+    );
     const size = options?.尺寸 || '1024x1024';
 
     if (backendType === 'novelai' && !(apiConfig.apiKey || '').trim()) {
