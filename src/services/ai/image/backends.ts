@@ -661,7 +661,7 @@ export const generateImageByPrompt = async (
     prompt: string,
     apiConfig: 当前可用接口结构,
     signal?: AbortSignal,
-    options?: { 构图?: '头像' | '半身' | '立绘' | '场景' | '部位特写'; 场景类型?: '场景快照' | '风景场景'; 附加正向提示词?: string; 附加负面提示词?: string; 尺寸?: string; 跳过基础负面提示词?: boolean; PNG参数?: PNG解析参数结构 }
+    options?: { 构图?: '头像' | '半身' | '立绘' | '场景' | '部位特写'; 场景类型?: '场景快照' | '风景场景'; 附加正向提示词?: string; 附加负面提示词?: string; 尺寸?: string; 跳过基础负面提示词?: boolean; PNG参数?: PNG解析参数结构; NSFW场景?: boolean }
 ): Promise<图片生成结果> => {
     const endpoint = 构建图片端点(apiConfig.baseUrl, apiConfig.图片接口路径, apiConfig.图片接口路径模式);
     if (!endpoint) throw new Error('Missing API Base URL');
@@ -674,14 +674,15 @@ export const generateImageByPrompt = async (
     const responseFormat = apiConfig.图片响应格式 === 'b64_json' ? 'b64_json' : 'url';
     const backendType = apiConfig.图片后端类型 || 'openai';
     // 年龄安全护栏：拦截涉及未成年人的性化内容，并强制附加未成年负面提示词
-    const 安全检测 = 检测未成年性化内容(normalizedPrompt);
+    const 是NSFW场景 = options?.NSFW场景 === true;
+    const 安全检测 = 检测未成年性化内容(normalizedPrompt, { 视为NSFW场景: 是NSFW场景 });
     if (安全检测.命中) {
         throw new 未成年内容拦截错误(安全检测.原因 || '疑似涉及未成年人');
     }
     const negativePromptText = 合并负面提示词片段(
         (options?.附加负面提示词 || '').trim(),
         未成年绝对负面提示词,
-        提示词含露骨内容(normalizedPrompt) ? 未成年露骨场景负面提示词 : ''
+        是NSFW场景 || 提示词含露骨内容(normalizedPrompt) ? 未成年露骨场景负面提示词 : ''
     );
     const size = options?.尺寸 || '1024x1024';
 

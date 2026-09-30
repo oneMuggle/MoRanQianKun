@@ -4,7 +4,7 @@ import { 游戏设置结构 } from '@/types';
 import GameButton from '../../ui/GameButton';
 import ToggleSwitch from '../../ui/ToggleSwitch';
 import InAppConfirmModal from '../../ui/InAppConfirmModal';
-import { NSFW最低年龄 } from '../../../utils/nsfwAgeSafeguard';
+import { NSFW最低年龄, 读取成年确认状态, 写入成年确认状态 } from '../../../utils/nsfwAgeSafeguard';
 
 interface Props {
     settings: 游戏设置结构;
@@ -367,7 +367,11 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                         checked={form.启用NSFW模式 === true}
                         onChange={(next) => {
                             if (next) {
-                                // 开启前必须确认年满 18 周岁
+                                // 开启前必须确认年满 18 周岁（确认后本地记住）
+                                if (读取成年确认状态()) {
+                                    实时应用更新({ 启用NSFW模式: true });
+                                    return;
+                                }
                                 setShowNSFWAgeConfirm(true);
                                 return;
                             }
@@ -385,6 +389,7 @@ const GameSettings: React.FC<Props> = ({ settings, onSave, currentEra }) => {
                     danger
                     onConfirm={() => {
                         setShowNSFWAgeConfirm(false);
+                        写入成年确认状态(true);
                         实时应用更新({ 启用NSFW模式: true });
                     }}
                     onCancel={() => setShowNSFWAgeConfirm(false)}

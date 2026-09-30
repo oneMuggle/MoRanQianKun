@@ -17,6 +17,14 @@ export const NSFW全局成年约束提示词 = [
     `- 若资料中某角色年龄未满 ${NSFW最低年龄} 岁或无法确认已成年，该角色不得参与任何亲密或 NSFW 内容，相关剧情须自然转向或淡出。`,
 ].join('\n');
 
+/** 校园题材专用的成年设定约束。 */
+export const 校园成年设定提示词 = [
+    '【校园题材·成年设定】',
+    `- 本题材中的“校园”一律指大学（本科 / 研究生）及以上院校，所有学生、社团成员与 NPC 均为年满 ${NSFW最低年龄} 周岁的成年人。`,
+    '- 禁止出现高中、初中、小学等中小学设定，禁止使用“高一”“初三”等中学年级描述。',
+    '- 校服、社团、宿舍等元素只作为大学生活背景，不得用来暗示未成年。',
+].join('\n');
+
 /** 任何生图请求都会附加的负面提示词（这些词在本项目中没有正当用途）。 */
 export const 未成年绝对负面提示词 = 'loli, lolicon, shota, shotacon, underage, preteen';
 
@@ -72,18 +80,40 @@ export const 解析角色年龄 = (value: unknown): number | null => {
 
 /**
  * 角色是否允许参与 NSFW 内容。
- * 年龄明确低于下限时返回 false；年龄缺失时放行，由全局成年约束提示词兜底要求模型按成年处理。
+ * 只有年龄明确且不低于下限时才返回 true；年龄缺失、无法解析或为 0（占位值）一律视为不可参与。
  */
 export const 角色可参与NSFW = (character: { 年龄?: unknown } | null | undefined): boolean => {
     if (!character) return false;
     const age = 解析角色年龄(character.年龄);
-    if (age === null) return true;
+    if (age === null || age <= 0) return false;
     return age >= NSFW最低年龄;
 };
 
 /** 过滤出允许参与 NSFW 内容的角色列表。 */
 export const 过滤可参与NSFW角色 = <T extends { 年龄?: unknown }>(list: T[] | null | undefined): T[] =>
     (list || []).filter((item) => 角色可参与NSFW(item));
+
+const 成年确认存储键 = 'moran.nsfwAgeConfirmed.v1';
+
+/** 读取玩家是否已完成 18 岁确认（本地持久化）。 */
+export const 读取成年确认状态 = (): boolean => {
+    try {
+        return typeof localStorage !== 'undefined' && localStorage.getItem(成年确认存储键) === '1';
+    } catch {
+        return false;
+    }
+};
+
+/** 写入 / 撤销玩家的 18 岁确认。 */
+export const 写入成年确认状态 = (confirmed: boolean): void => {
+    try {
+        if (typeof localStorage === 'undefined') return;
+        if (confirmed) localStorage.setItem(成年确认存储键, '1');
+        else localStorage.removeItem(成年确认存储键);
+    } catch {
+        // 存储不可用时忽略，下次开启会重新确认
+    }
+};
 
 /** 未成年生图请求被拦截时抛出的错误。 */
 export class 未成年内容拦截错误 extends Error {
